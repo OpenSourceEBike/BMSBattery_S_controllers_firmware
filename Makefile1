@@ -1,0 +1,16 @@
+SDCC=sdcc
+SDLD=sdld
+OBJECTS=main.ihx
+
+.PHONY: all clean flash
+
+all: $(OBJECTS)
+
+clean:
+	rm -f $(OBJECTS)
+
+flash: $(OBJECT).ihx
+	stm8flash -cstlinkv2 -stm8s003f3 -w $(OBJECT).ihx
+
+%.ihx: %.c
+	$(SDCC) -lstm8 -mstm8 --out-fmt-ihx $(CFLAGS) $(LDFLAGS) $<
