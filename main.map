@@ -7,7 +7,7 @@ Area                                    Addr        Size        Decimal Bytes (A
 
       Value  Global                              Global Defined In Module
       -----  --------------------------------   ------------------------
-     00000000  .__.ABS.                           main
+     00000000  .__.ABS.                           _strlen
      00000000  l_CABS                          
      00000000  l_DABS                          
      00000000  l_DATA                          
@@ -17,29 +17,31 @@ Area                                    Addr        Size        Decimal Bytes (A
      00000000  s_CABS                          
      00000000  s_DABS                          
      00000000  s__CODE                         
-     00000001  l_SSEG                          
      00000001  s_DATA                          
      00000001  s_INITIALIZED                   
      00000001  s_SSEG                          
      00000003  l_GSFINAL                       
+     00000003  l_SSEG                          
      0000001E  l_GSINIT                        
-     00000022  l_CODE                          
      00000083  l_HOME                          
+     00000855  l_CODE                          
      00008000  s_HOME                          
      00008083  s_GSINIT                        
      000080A1  s_GSFINAL                       
      000080A4  s_CODE                          
-     000080C6  s_INITIALIZER                   
+     000088F9  s_INITIALIZER                   
 
 ASxxxx Linker V03.00 + NoICE + sdld,  page 2.
 Hexadecimal  [32-Bits]
 
 Area                                    Addr        Size        Decimal Bytes (Attributes)
 --------------------------------        ----        ----        ------- ----- ------------
-SSEG                                00000001    00000001 =           1. bytes (REL,CON)
+SSEG                                00000001    00000003 =           3. bytes (REL,CON)
 
       Value  Global                              Global Defined In Module
       -----  --------------------------------   ------------------------
+     00000001  _fp_                               main
+
 ASxxxx Linker V03.00 + NoICE + sdld,  page 3.
 Hexadecimal  [32-Bits]
 
@@ -49,6 +51,39 @@ HOME                                00008000    00000083 =         131. bytes (R
 
       Value  Global                              Global Defined In Module
       -----  --------------------------------   ------------------------
+     00008000  A$main$42                          main
+     00008004  A$main$43                          main
+     00008008  A$main$44                          main
+     0000800C  A$main$45                          main
+     00008010  A$main$46                          main
+     00008014  A$main$47                          main
+     00008018  A$main$48                          main
+     0000801C  A$main$49                          main
+     00008020  A$main$50                          main
+     00008024  A$main$51                          main
+     00008028  A$main$52                          main
+     0000802C  A$main$53                          main
+     00008030  A$main$54                          main
+     00008034  A$main$55                          main
+     00008038  A$main$56                          main
+     0000803C  A$main$57                          main
+     00008040  A$main$58                          main
+     00008044  A$main$59                          main
+     00008048  A$main$60                          main
+     0000804C  A$main$61                          main
+     00008050  A$main$62                          main
+     00008054  A$main$63                          main
+     00008058  A$main$64                          main
+     0000805C  A$main$65                          main
+     00008060  A$main$66                          main
+     00008064  A$main$67                          main
+     00008068  A$main$68                          main
+     0000806C  A$main$69                          main
+     00008070  A$main$70                          main
+     00008074  A$main$71                          main
+     00008078  A$main$72                          main
+     0000807C  A$main$73                          main
+     00008080  A$main$112                         main
 ASxxxx Linker V03.00 + NoICE + sdld,  page 4.
 Hexadecimal  [32-Bits]
 
@@ -58,7 +93,20 @@ GSINIT                              00008083    0000001E =          30. bytes (R
 
       Value  Global                              Global Defined In Module
       -----  --------------------------------   ------------------------
+     00008083  A$main$84                          main
      00008083  start                              main
+     00008086  A$main$85                          main
+     00008087  A$main$88                          main
+     0000808A  A$main$89                          main
+     0000808C  A$main$91                          main
+     00008090  A$main$92                          main
+     00008091  A$main$93                          main
+     00008093  A$main$95                          main
+     00008096  A$main$96                          main
+     00008098  A$main$98                          main
+     0000809B  A$main$99                          main
+     0000809E  A$main$100                         main
+     0000809F  A$main$101                         main
 
 ASxxxx Linker V03.00 + NoICE + sdld,  page 5.
 Hexadecimal  [32-Bits]
@@ -69,24 +117,136 @@ GSFINAL                             000080A1    00000003 =           3. bytes (R
 
       Value  Global                              Global Defined In Module
       -----  --------------------------------   ------------------------
+     000080A1  A$main$105                         main
+
 ASxxxx Linker V03.00 + NoICE + sdld,  page 6.
 Hexadecimal  [32-Bits]
 
 Area                                    Addr        Size        Decimal Bytes (Attributes)
 --------------------------------        ----        ----        ------- ----- ------------
-CODE                                000080A4    00000022 =          34. bytes (REL,CON)
+CODE                                000080A4    00000855 =        2133. bytes (REL,CON)
 
       Value  Global                              Global Defined In Module
       -----  --------------------------------   ------------------------
-     000080A4  main                               main
-
+     000080A4  A$main$128                         main
+     000080A4  C$main.c$19$0$0                    main
+     000080A4  G$putchar$0$0                      main
+     000080A4  putchar                            main
+     000080A7  A$main$129                         main
+     000080AA  A$main$130                         main
+     000080AC  A$main$131                         main
+     000080B0  A$main$137                         main
+     000080B0  C$main.c$21$1$12                   main
+     000080B3  A$main$138                         main
+     000080B4  A$main$140                         main
+     000080B5  A$main$141                         main
+     000080B7  A$main$142                         main
+     000080BA  A$main$148                         main
+     000080BA  C$main.c$23$1$12                   main
+     000080BD  A$main$149                         main
+     000080BF  A$main$150                         main
+     000080C0  A$main$156                         main
+     000080C0  C$main.c$24$1$12                   main
+     000080C0  XG$putchar$0$0                     main
+     000080C3  A$main$157                         main
+     000080C6  A$main$158                         main
+     000080C7  A$main$169                         main
+     000080C7  C$main.c$26$1$12                   main
+     000080C7  G$main$0$0                         main
+     000080C7  main                               main
+     000080CA  A$main$170                         main
+     000080CD  A$main$171                         main
+     000080CF  A$main$172                         main
+     000080D3  A$main$173                         main
+     000080D5  A$main$177                         main
+     000080D5  C$main.c$30$1$14                   main
+     000080D9  A$main$181                         main
+     000080D9  C$main.c$31$1$14                   main
+     000080DD  A$main$185                         main
+     000080DD  C$main.c$33$1$14                   main
+     000080E1  A$main$189                         main
+     000080E1  C$main.c$34$1$14                   main
+     000080E4  A$main$190                         main
+     000080E5  A$main$192                         main
+     000080E7  A$main$194                         main
+     000080EA  A$main$195                         main
+     000080EB  A$main$199                         main
+     000080EB  C$main.c$35$1$14                   main
+     000080EF  A$main$201                         main
+     000080F3  A$main$207                         main
+     000080F3  C$main.c$39$2$15                   main
+     000080F6  A$main$211                         main
+     000080F7  A$main$213                         main
+     000080FA  A$main$214                         main
 ASxxxx Linker V03.00 + NoICE + sdld,  page 7.
+Hexadecimal  [32-Bits]
+
+Area                                    Addr        Size        Decimal Bytes (Attributes)
+--------------------------------        ----        ----        ------- ----- ------------
+CODE                                000080A4    00000855 =        2133. bytes (REL,CON)
+
+      Value  Global                              Global Defined In Module
+      -----  --------------------------------   ------------------------
+     000080FC  A$main$218                         main
+     000080FC  C$main.c$40$2$15                   main
+     000080FF  A$main$222                         main
+     00008100  A$main$224                         main
+     00008103  A$main$225                         main
+     00008105  A$main$229                         main
+     00008105  C$main.c$42$2$15                   main
+     00008108  A$main$230                         main
+     0000810A  A$main$231                         main
+     0000810C  A$main$232                         main
+     0000810E  A$main$236                         main
+     00008110  A$main$237                         main
+     00008113  A$main$238                         main
+     00008115  A$main$239                         main
+     00008117  A$main$240                         main
+     00008118  A$main$241                         main
+     0000811A  A$main$242                         main
+     0000811C  A$main$243                         main
+     0000811D  A$main$245                         main
+     0000811E  A$main$246                         main
+     00008120  A$main$247                         main
+     00008121  A$main$248                         main
+     00008123  A$main$249                         main
+     00008125  A$main$250                         main
+     00008126  A$main$252                         main
+     00008128  A$main$253                         main
+     0000812A  A$main$254                         main
+     0000812B  A$main$255                         main
+     0000812D  A$main$257                         main
+     00008130  A$main$260                         main
+     00008133  A$main$264                         main
+     00008135  A$main$267                         main
+     00008135  C$main.c$44$1$14                   main
+     00008135  XG$main$0$0                        main
+     00008138  A$main$268                         main
+     0000813B  A$main$269                         main
+     0000813C  Fmain$__str_0$0$0                  main
+     0000814B  Fmain$__str_1$0$0                  main
+     00008182  vprintf                            vprintf
+     00008194  printf                             vprintf
+     00008257  _print_format                      printf_large
+     000088EA  strlen                             _strlen
+
+ASxxxx Linker V03.00 + NoICE + sdld,  page 8.
 
 Files Linked                              [ module(s) ]
 
 main.rel                                  [ main ]
 
-ASxxxx Linker V03.00 + NoICE + sdld,  page 8.
+
+Libraries Linked                          [ object file ]
+
+/usr/local/bin/../share/sdcc/lib/stm8/stm8.lib
+                                          [ vprintf.rel ]
+/usr/local/bin/../share/sdcc/lib/stm8/stm8.lib
+                                          [ printf_large.rel ]
+/usr/local/bin/../share/sdcc/lib/stm8/stm8.lib
+                                          [ _strlen.rel ]
+
+ASxxxx Linker V03.00 + NoICE + sdld,  page 9.
 
 User Base Address Definitions
 

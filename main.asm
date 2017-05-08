@@ -9,6 +9,8 @@
 ; Public variables in this module
 ;--------------------------------------------------------
 	.globl main
+	.globl printf
+	.globl putchar
 ;--------------------------------------------------------
 ; ram data
 ;--------------------------------------------------------
@@ -21,6 +23,10 @@
 ; Stack segment in internal ram 
 ;--------------------------------------------------------
 	.area	SSEG
+	.globl	_fp_
+_fp_:
+	.ds	2
+
 __start__stack:
 	.ds	1
 
@@ -109,35 +115,169 @@ __sdcc_program_startup:
 ; code
 ;--------------------------------------------------------
 	.area CODE
-;	main.c: 3: int main() {
+	G$putchar$0$0 ==.
+	C$main.c$19$0$0 ==.
+;	main.c: 19: void putchar(char c)
+; genLabel
+;	-----------------------------------------
+;	 function putchar
+;	-----------------------------------------
+;	Register assignment is optimal.
+;	Stack space usage: 0 bytes.
+putchar:
+	push	_fp_+1
+	push	_fp_
+	ldw	y, sp
+	ldw	_fp_, y
+	C$main.c$21$1$12 ==.
+;	main.c: 21: while(!(UART1_SR & UART_SR_TXE));
+; genLabel
+00101$:
+; genPointerGet
+	ldw	x, #0x5230
+	ld	a, (x)
+; genAnd
+	tnz	a
+	jrmi	00114$
+	jp	00101$
+00114$:
+; skipping generated iCode
+	C$main.c$23$1$12 ==.
+;	main.c: 23: UART1_DR = c;
+; genPointerSet
+	ldw	x, #0x5231
+	ld	a, (0x05, sp)
+	ld	(x), a
+; genLabel
+00104$:
+; genEndFunction
+	C$main.c$24$1$12 ==.
+	XG$putchar$0$0 ==.
+	pop	_fp_
+	pop	_fp_+1
+	ret
+	G$main$0$0 ==.
+	C$main.c$26$1$12 ==.
+;	main.c: 26: void main(void)
+; genLabel
 ;	-----------------------------------------
 ;	 function main
 ;	-----------------------------------------
+;	Register assignment might be sub-optimal.
+;	Stack space usage: 8 bytes.
 main:
-	sub	sp, #2
-;	main.c: 6: PD_DDR = (1 << 3); // LED on PD3
-	mov	0x5011+0, #0x08
-;	main.c: 7: PD_CR1 = (1 << 3);
-	mov	0x5012+0, #0x08
-;	main.c: 9: do {
-00102$:
-;	main.c: 11: PD_ODR ^= (1 << 3);
-	ldw	x, #0x500f
+	push	_fp_+1
+	push	_fp_
+	ldw	y, sp
+	ldw	_fp_, y
+	sub	sp, #8
+	C$main.c$30$1$14 ==.
+;	main.c: 30: CLK_DIVR = 0x00; // Set the frequency to 16 MHz
+; genPointerSet
+	mov	0x50c6+0, #0x00
+	C$main.c$31$1$14 ==.
+;	main.c: 31: CLK_PCKENR1 = 0xFF; // Enable peripherals
+; genPointerSet
+	mov	0x50c7+0, #0xff
+	C$main.c$33$1$14 ==.
+;	main.c: 33: UART1_CR2 = UART_CR2_TEN; // Allow TX and RX
+; genPointerSet
+	mov	0x5235+0, #0x08
+	C$main.c$34$1$14 ==.
+;	main.c: 34: UART1_CR3 &= ~(UART_CR3_STOP1 | UART_CR3_STOP2); // 1 stop bit
+; genPointerGet
+	ldw	x, #0x5236
 	ld	a, (x)
-	xor	a, #0x08
+; genAnd
+	and	a, #0xcf
+; genPointerSet
+	ldw	x, #0x5236
 	ld	(x), a
-;	main.c: 13: for(d = 0; d < 29000; d++)
-	ldw	x, #0x7148
-00107$:
-	decw	x
-	ldw	(0x01, sp), x
-	ldw	x, (0x01, sp)
-	ldw	y, (0x01, sp)
-	jrne	00107$
-;	main.c: 16: } while(1);
-	jra	00102$
+	C$main.c$35$1$14 ==.
+;	main.c: 35: UART1_BRR2 = 0x03; UART1_BRR1 = 0x68; // 9600 baud
+; genPointerSet
+	mov	0x5233+0, #0x03
+; genPointerSet
+	mov	0x5232+0, #0x68
+; genLabel
+00106$:
+	C$main.c$39$2$15 ==.
+;	main.c: 39: printf("Hello World!!\n");
+; genAddrOf
+	ldw	x, #__str_0+0
+; genCast
+; genAssign
+; genIPush
+	pushw	x
+; genCall
+	call	printf
 	addw	sp, #2
+	C$main.c$40$2$15 ==.
+;	main.c: 40: printf("OpenSource BMSBattery S controllers firmware\n\n");
+; genAddrOf
+	ldw	x, #__str_1+0
+; genCast
+; genAssign
+; genIPush
+	pushw	x
+; genCall
+	call	printf
+	addw	sp, #2
+	C$main.c$42$2$15 ==.
+;	main.c: 42: for(i = 0; i < 147456; i++); // delay of 1s
+; genAssign
+	ldw	x, #0x4000
+	ldw	(0x03, sp), x
+	ld	a, #0x02
+	clr	(0x01, sp)
+; genLabel
+00105$:
+; genMinus
+	ldw	x, (0x03, sp)
+	subw	x, #0x0001
+	ldw	(0x07, sp), x
+	sbc	a, #0x00
+	ld	xl, a
+	ld	a, (0x01, sp)
+	sbc	a, #0x00
+	ld	xh, a
+; genAssign
+	rlwa	x
+	ld	(0x01, sp), a
+	rrwa	x
+	ldw	y, (0x07, sp)
+	ldw	(0x03, sp), y
+	ld	a, xl
+; genIfx
+	ldw	y, (0x07, sp)
+	jrne	00122$
+	tnzw	x
+	jreq	00123$
+00122$:
+	jp	00105$
+00123$:
+; genGoto
+	jp	00106$
+; genLabel
+00108$:
+; genEndFunction
+	addw	sp, #8
+	C$main.c$44$1$14 ==.
+	XG$main$0$0 ==.
+	pop	_fp_
+	pop	_fp_+1
 	ret
 	.area CODE
+Fmain$__str_0$0$0 == .
+__str_0:
+	.ascii "Hello World!!"
+	.db 0x0a
+	.db 0x00
+Fmain$__str_1$0$0 == .
+__str_1:
+	.ascii "OpenSource BMSBattery S controllers firmware"
+	.db 0x0a
+	.db 0x0a
+	.db 0x00
 	.area INITIALIZER
 	.area CABS (ABS)
