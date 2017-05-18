@@ -1,47 +1,72 @@
-NAME=main
-SDCC=sdcc
-HEX2BIN=hex2bin
+#Makefile for STM8 Examples with SDCC compiler
+#Author:	Saeid Yazdani
+#Website:	WWW.EMBEDONIX.COM
+#Copyright 2016
+#LICENSE:	GNU-LGPL
 
-CCFLAGS= -I../  -I/usr/local/share/sdcc/include/ -mstm8 --all-callee-saves --debug --verbose --stack-auto --fverbose-asm  --float-reent --no-peep
-LDFLAGS= -mstm8 --all-callee-saves --debug --verbose --stack-auto --fverbose-asm  --float-reent --no-peep
-FLASHFLAGS= -c stlinkv2 -p stm8s003f3
-IHXFLAGS = --out-fmt-ihx
-ELFFLAGS = --out-fmt-elf
 
-SRC=$(wildcard *.c)
-# ATTENTION: FIRST in list should be file with main()
-OBJ=$(SRC:%.c=%.rel)
-TRASH=$(OBJ) $(SRC:%.c=%.rst) $(SRC:%.c=%.asm) $(SRC:%.c=%.lst)
-TRASH+=$(SRC:%.c=%.sym) $(NAME).ihx $(NAME).adb $(NAME).bin $(NAME).cdb $(NAME).elf $(NAME).lk $(NAME).map
-INDEPENDENT_HEADERS= Makefile
+# We're assuming POSIX conformance
+.POSIX:
 
-all: $(NAME).bin elf 
+#Compiler
+CC = sdcc
 
-$(SRC) : %.c : %.h $(INDEPENDENT_HEADERS)
-	@touch $@
-	@echo $@
+#Platform
+PLATFORM = stm8
 
-%.h: ;
+#Product name
+PNAME = main
+
+#Folders **** MAKE SURE TO CHANGE ACCORDING TO YOUR STRUCTURE!!! ****
+#Output directory for intermediate and final compiled file(s)
+ODIR = bin
+#Directory for helpers
+IDIR = STM8S_StdPeriphLib/include
+SDIR = STM8S_StdPeriphLib/src
+
+# In case you ever want a different name for the main source file
+MAINSRC = $(PNAME).c
+
+# These are the sources that must be compiled to .rel files:
+EXTRASRCS = \
+#	$(SDIR)/main.c \
+#	$(SDIR)/clock.c
+
+# The list of .rel files can be derived from the list of their source files
+RELS = $(EXTRASRCS:.c=.rel)
+
+INCLUDES = -I$(IDIR)
+CFLAGS   = -m$(PLATFORM)
+LIBS     = -l$(PLATFORM)
+
+# This just provides the conventional target name "all"; it is optional
+# Note: I assume you set PNAME via some means not exhibited in your original file
+all: $(PNAME)
+
+# How to build the overall program
+$(PNAME): $(MAINSRC) $(RELS)
+	@mkdir -p $(ODIR)
+	$(CC) $(INCLUDES) $(CFLAGS) $(LIBS) $(MAINSRC) $(wildcard $(ODIR)/*.rel) -o$(ODIR)/
+
+# How to build any .rel file from its corresponding .c file
+# GNU would have you use a pattern rule for this, but that's GNU-specific
+.c.rel:
+	@mkdir -p $(ODIR)
+	$(CC) -c $(INCLUDES) $(CFLAGS) $(LIBS) $< -o$(ODIR)/
+
+# Suffixes appearing in suffix rules we care about.
+# Necessary because .rel is not one of the standard suffixes.
+.SUFFIXES: .c .rel
+
+
+#phonies
+
+.PHONY:	clean flash
 
 clean:
-	rm -f $(TRASH)
-
-load: $(NAME).bin
-	stm8flash $(FLASHFLAGS) -w $(NAME).bin
-
-%.rel: %.c
-	$(SDCC) $(CCFLAGS) $(IHXFLAGS) -c $<
-
-$(NAME).ihx: $(OBJ)
-	$(SDCC) $(LDFLAGS) $(IHXFLAGS) $(OBJ) -o $(NAME).ihx
-
-$(NAME).bin: $(NAME).ihx
-	$(HEX2BIN) -p 00 $<
-
-elf:
-	$(SDCC) $(CCFLAGS) $(ELFFLAGS) $(SRC)
-	size $(NAME).elf
-
-.PHONY: all
-
+	@echo "Removing $(ODIR)..."
+	@rm -rf $(ODIR)
+	@echo "Done."
+flash:
+	stm8flash -cstlinkv2 -pstm8s003 -w$(ODIR)/$(PNAME).ihx
 

@@ -1,16 +1,18 @@
-#include "stm8l.h"
+#include "stm8s.h"
+#include "stm8s_gpio.h"
 
 int main() {
-	int d;
-	// Configure pins
-	PD_DDR = (1 << 3); // LED on PD3
-	PD_CR1 = (1 << 3);
+	volatile int d;
+
+#define LED_GPIO_PORT  GPIOD
+#define LED_GPIO_PINS  GPIO_PIN_3
+
+	GPIO_Init(LED_GPIO_PORT, (GPIO_Pin_TypeDef)LED_GPIO_PINS, GPIO_MODE_OUT_PP_LOW_FAST);
 
 	do {
+	    GPIO_WriteReverse(LED_GPIO_PORT, (GPIO_Pin_TypeDef)LED_GPIO_PINS);
 
-		PD_ODR ^= (1 << 3);
-
-		for(d = 0; d < 2900; d++)
+		for(d = 0; d < 29000; d++)
 		{ }
 
 	} while(1);
