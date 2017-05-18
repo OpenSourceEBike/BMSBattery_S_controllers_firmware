@@ -4,7 +4,7 @@ HEX2BIN=hex2bin
 
 CCFLAGS= -I../  -I/usr/local/share/sdcc/include/ -mstm8 --all-callee-saves --debug --verbose --stack-auto --fverbose-asm  --float-reent --no-peep
 LDFLAGS= -mstm8 --all-callee-saves --debug --verbose --stack-auto --fverbose-asm  --float-reent --no-peep
-FLASHFLAGS= -c stlinkv2 -p stm8s003f3
+FLASHFLAGS= -c stlinkv2 -p stm8s105?6
 IHXFLAGS = --out-fmt-ihx
 ELFFLAGS = --out-fmt-elf
 
