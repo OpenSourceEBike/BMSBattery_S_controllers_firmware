@@ -40,8 +40,8 @@ RELS = $(EXTRASRCS:.c=.rel)
 
 INCLUDES = -I$(IDIR)
 CFLAGS   = -m$(PLATFORM)
-IHX_FLAGS = --out-fmt-ihx
-ELF_FLAGS = --out-fmt-elf
+IHX_FLAGS = --out-fmt-ihx --debug
+ELF_FLAGS = --out-fmt-elf --debug
 LIBS     = -l$(PLATFORM)
 
 # This just provides the conventional target name "all"; it is optional
@@ -60,7 +60,7 @@ $(PNAME): $(MAINSRC) $(RELS)
 # GNU would have you use a pattern rule for this, but that's GNU-specific
 .c.rel:
 	@mkdir -p $(ODIR)
-	$(CC) -c $(INCLUDES) $(CFLAGS) $(ELF_FLAGS) $(LIBS) $< -o$(ODIR)/
+	$(CC) -c $(INCLUDES) $(CFLAGS) $(IHX_FLAGS) $(LIBS) $< -o$(ODIR)/
 
 # Suffixes appearing in suffix rules we care about.
 # Necessary because .rel is not one of the standard suffixes.

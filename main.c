@@ -12,7 +12,7 @@ int main() {
 	do {
 	    GPIO_WriteReverse(LED_GPIO_PORT, (GPIO_Pin_TypeDef)LED_GPIO_PINS);
 
-		for(d = 0; d < 29000; d++)
+		for(d = 0; d < 2900; d++)
 		{ }
 
 	} while(1);
