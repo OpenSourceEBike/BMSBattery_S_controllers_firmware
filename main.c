@@ -5,7 +5,7 @@ int main() {
 	volatile int d;
 
 #define LED_GPIO_PORT  GPIOD
-#define LED_GPIO_PINS  GPIO_PIN_3
+#define LED_GPIO_PINS  GPIO_PIN_5
 
 	GPIO_Init(LED_GPIO_PORT, (GPIO_Pin_TypeDef)LED_GPIO_PINS, GPIO_MODE_OUT_PP_LOW_FAST);
 
