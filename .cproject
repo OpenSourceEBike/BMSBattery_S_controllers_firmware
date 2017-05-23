@@ -62,4 +62,5 @@
 			<resource resourceType="PROJECT" workspacePath="/BMSBattery_S_controllers_firmware"/>
 		</configuration>
 	</storageModule>
+	<storageModule moduleId="org.eclipse.cdt.internal.ui.text.commentOwnerProjectMappings"/>
 </cproject>

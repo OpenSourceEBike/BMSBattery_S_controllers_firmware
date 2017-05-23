@@ -9,7 +9,7 @@
 .POSIX:
 
 #Compiler
-CC = sdcc
+CC = /home/cas/software/stm8-binutils/bin/sdcc
 
 #Platform
 PLATFORM = stm8
@@ -32,14 +32,21 @@ MAINSRC = $(PNAME).c
 
 # These are the sources that must be compiled to .rel files:
 EXTRASRCS = \
+	$(SDIR)/stm8s_itc.c \
+	$(SDIR)/stm8s_clk.c \
 	$(SDIR)/stm8s_gpio.c \
-#	$(SDIR)/clock.c
+	$(SDIR)/stm8s_exti.c \
+	$(SDIR)/stm8s_uart2.c \
+	gpio.c \
+	uart.c \
+	hall_sensors.c \
+	motor.c \
 
 # The list of .rel files can be derived from the list of their source files
 RELS = $(EXTRASRCS:.c=.rel)
 
-INCLUDES = -I$(IDIR)
-CFLAGS   = -m$(PLATFORM)
+INCLUDES = -I$(IDIR) -I. 
+CFLAGS   = -m$(PLATFORM) -I/usr/local/share/sdcc/include -I/usr/local/share/sdcc/lib/ --all-callee-saves --stack-auto --fverbose-asm  --float-reent --no-peep
 IHX_FLAGS = --out-fmt-ihx --debug
 ELF_FLAGS = --out-fmt-elf --debug
 LIBS     = -l$(PLATFORM)
@@ -51,7 +58,7 @@ all: $(PNAME)
 # How to build the overall program
 $(PNAME): $(MAINSRC) $(RELS)
 	@mkdir -p $(ODIR)
-	$(CC) $(INCLUDES) $(CFLAGS) $(IHX_FLAGS) $(LIBS) $(MAINSRC) $(wildcard $(ODIR)/*.rel) -o$(ODIR)/
+	$(CC) $(INCLUDES) $(CFLAGS) $(IHX_FLAGS) $(LIBS) -L/usr/local/share/sdcc/lib/stm8/stm8.lib -I/usr/local/share/sdcc/include $(MAINSRC) $(wildcard $(ODIR)/*.rel) -o$(ODIR)/
 	$(HEX2BIN) -p 00 $(ODIR)/$(PNAME).ihx
 	$(CC) $(INCLUDES) $(CFLAGS) $(ELF_FLAGS) $(LIBS) $(MAINSRC) $(wildcard $(ODIR)/*.rel) -o$(ODIR)/
 	$(SIZE) $(ODIR)/$(PNAME).elf

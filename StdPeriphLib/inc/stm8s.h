@@ -41,12 +41,12 @@
  /* #define STM8S007 */      /*!< STM8S Value Line High density devices */
  /* #define STM8AF52Ax */    /*!< STM8A High density devices with CAN */
  /* #define STM8AF62Ax */    /*!< STM8A High density devices without CAN */
- /* #define STM8S105 */         /*!< STM8S Medium density devices */
+#define STM8S105         /*!< STM8S Medium density devices */
  /* #define STM8S005 */      /*!< STM8S Value Line Medium density devices */
  /* #define STM8AF626x */    /*!< STM8A Medium density devices */
  /* #define STM8AF622x */    /*!< STM8A Low density devices */
  /* #define STM8S103 */      /*!< STM8S Low density devices */
-#define STM8S003      /*!< STM8S Value Line Low density devices */
+ /* #define STM8S003 */     /*!< STM8S Value Line Low density devices */
  /* #define STM8S903 */      /*!< STM8S Low density devices */
 
 /*   Tip: To avoid modifying this file each time you need to switch between these
