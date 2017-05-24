@@ -14,6 +14,7 @@
 #include "hall_sensors.h"
 #include "motor.h"
 #include "uart.h"
+#include "interrupts.h"
 
 //With SDCC, interrupt service routine function prototypes must be placed in the file that contains main ()
 //in order for an vector for the interrupt to be placed in the the interrupt vector space.  It's acceptable
@@ -23,7 +24,14 @@
 
 //Calling a function from interrupt not always works, SDCC manual says to avoid it. Maybe the best is to put
 //all the code inside the interrupt
-#define EXTI_PORTE_IRQHANDLER 7
+
+// BRAKE signal
+void EXTI_PORTA_IRQHandler(void) __interrupt(EXTI_PORTA_IRQHANDLER)
+{
+
+}
+
+// HALL SENSORS signal
 void EXTI_PORTE_IRQHandler(void) __interrupt(EXTI_PORTE_IRQHANDLER)
 {
   unsigned char hall_sensors = 0;
@@ -132,6 +140,15 @@ void EXTI_PORTE_IRQHandler(void) __interrupt(EXTI_PORTE_IRQHANDLER)
 
 int main()
 {
+  //set clock at the max 16MHz
+  CLK_HSIPrescalerConfig(CLK_PRESCALER_HSIDIV1);
+
+//  gpio_init ();
+  brake_init ();
+
+  // hold here until brake is pressed -- this is a protection for development
+  while (brake_is_set()) ;
+
   uart_init ();
   hall_sensor_init ();
   enableInterrupts ();

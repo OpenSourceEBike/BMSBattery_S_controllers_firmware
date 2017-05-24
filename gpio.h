@@ -34,9 +34,9 @@
  * PD5  (UART2_TX)    | out | ??  | usart_tx
  * PD6  (UART2_RX)    | out | ??  | usart_rx
  *
- * PA4                | in | ??  | brake
- * PB4  (ADC_AIN4)    | in | ??  | throttle
- * PD0                | in | ??  | PAS
+ * PA4                | in  | ??  | brake
+ * PB4  (ADC_AIN4)    | in  | ??  | throttle
+ * PD0                | in  | ??  | PAS
  *
  */
 
@@ -94,5 +94,7 @@
 #define PAS__PORT                 GPIOD
 
 void gpio_init (void);
+void brake_init (void);
+BitStatus brake_is_set (void);
 
 #endif /* GPIO_H_ */

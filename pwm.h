@@ -6,9 +6,9 @@
  * Released under the GPL License, Version 3
  */
 
-#ifndef _HALL_SENSOR_H_
-#define _HALL_SENSOR_H_
+#ifndef _PWM_H_
+#define _PWM_H_
 
-void hall_sensor_init (void);
+void pwm_init (void);
 
 #endif
