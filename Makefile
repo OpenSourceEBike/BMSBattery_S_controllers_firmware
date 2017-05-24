@@ -38,6 +38,7 @@ EXTRASRCS = \
 	$(SDIR)/stm8s_exti.c \
 	$(SDIR)/stm8s_uart2.c \
 	$(SDIR)/stm8s_tim1.c \
+	$(SDIR)/stm8s_adc1.c \
 	gpio.c \
 	uart.c \
 	hall_sensors.c \
@@ -48,7 +49,8 @@ EXTRASRCS = \
 RELS = $(EXTRASRCS:.c=.rel)
 
 INCLUDES = -I$(IDIR) -I. 
-CFLAGS   = -m$(PLATFORM) -I/usr/local/share/sdcc/include -I/usr/local/share/sdcc/lib/ --all-callee-saves --stack-auto --fverbose-asm  --float-reent --no-peep
+#CFLAGS   = -m$(PLATFORM) -I/usr/local/share/sdcc/include -I/usr/local/share/sdcc/lib/ --nogcse --noinvariant --noinduction --noloopreverse --nolabelopt --nooverlay --no-peep --nolospre
+CFLAGS   = -m$(PLATFORM) -I/usr/local/share/sdcc/include -I/usr/local/share/sdcc/lib/ --std-c99 --nolospre
 IHX_FLAGS = --out-fmt-ihx --debug
 ELF_FLAGS = --out-fmt-elf --debug
 LIBS     = -l$(PLATFORM)

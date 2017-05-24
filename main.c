@@ -16,6 +16,46 @@
 #include "uart.h"
 #include "pwm.h"
 #include "interrupts.h"
+#include "stm8s_adc1.h"
+
+//can't put ADC code file on external file like adc.c or the code will not work :-(
+void adc_init (void)
+{
+  //init GPIO for the used ADC pins
+  GPIO_Init(THROTTLE__PORT,
+	    THROTTLE__PIN,
+	    GPIO_MODE_IN_FL_NO_IT);
+
+  //de-Init ADC peripheral
+  ADC1_DeInit();
+
+  //init ADC2 peripheral
+  ADC1_Init(ADC1_CONVERSIONMODE_CONTINUOUS,
+	    ADC1_CHANNEL_4,
+	    ADC1_PRESSEL_FCPU_D2,
+            ADC1_EXTTRIG_TIM,
+	    DISABLE, //disable external trigger
+	    ADC1_ALIGN_RIGHT,
+	    ADC1_SCHMITTTRIG_CHANNEL9,
+            DISABLE);
+}
+
+uint16_t adc_read_throttle (void)
+{
+  ADC1_ConversionConfig(ADC1_CONVERSIONMODE_SINGLE,
+			ADC1_CHANNEL_4,
+			ADC1_ALIGN_RIGHT);
+
+  //start Conversion
+  ADC1_StartConversion();
+
+  //block waiting for the end of conversion
+  while (!ADC1_GetFlagStatus(ADC1_FLAG_EOC)) ;
+
+  return ADC1_GetConversionValue();
+}
+
+
 
 //With SDCC, interrupt service routine function prototypes must be placed in the file that contains main ()
 //in order for an vector for the interrupt to be placed in the the interrupt vector space.  It's acceptable
@@ -144,7 +184,7 @@ int main()
   //set clock at the max 16MHz
   CLK_HSIPrescalerConfig(CLK_PRESCALER_HSIDIV1);
 
-//  gpio_init ();
+  gpio_init ();
   brake_init ();
 
   // hold here while brake is pressed -- this is a protection for development
@@ -153,14 +193,15 @@ int main()
   uart_init ();
   hall_sensor_init ();
   pwm_init ();
-  enableInterrupts ();
-
-  pwm_set_duty_cycle_channel1(1024/10);
-  pwm_set_duty_cycle_channel2(1024/3);
-  pwm_set_duty_cycle_channel3(1024/2);
+  adc_init ();
+  enableInterrupts();
 
   while (1)
   {
-    ;
+    static uint16_t adc_value;
+    adc_value = adc_read_throttle ();
+    pwm_set_duty_cycle_channel1 (adc_value);
+    pwm_set_duty_cycle_channel2 (adc_value);
+    pwm_set_duty_cycle_channel3 (adc_value);
   }
 }

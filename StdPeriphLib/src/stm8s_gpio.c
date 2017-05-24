@@ -70,13 +70,6 @@ void GPIO_DeInit(GPIO_TypeDef* GPIOx)
 
 void GPIO_Init(GPIO_TypeDef* GPIOx, GPIO_Pin_TypeDef GPIO_Pin, GPIO_Mode_TypeDef GPIO_Mode)
 {
-  /*----------------------*/
-  /* Check the parameters */
-  /*----------------------*/
-  
-  assert_param(IS_GPIO_MODE_OK(GPIO_Mode));
-  assert_param(IS_GPIO_PIN_OK(GPIO_Pin));
-  
   /* Reset corresponding bit to GPIO_Pin in CR2 register */
   GPIOx->CR2 &= (uint8_t)(~(GPIO_Pin));
   
