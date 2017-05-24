@@ -14,6 +14,7 @@
 #include "hall_sensors.h"
 #include "motor.h"
 #include "uart.h"
+#include "pwm.h"
 #include "interrupts.h"
 
 //With SDCC, interrupt service routine function prototypes must be placed in the file that contains main ()
@@ -146,12 +147,17 @@ int main()
 //  gpio_init ();
   brake_init ();
 
-  // hold here until brake is pressed -- this is a protection for development
-  while (brake_is_set()) ;
+  // hold here while brake is pressed -- this is a protection for development
+  while (!brake_is_set()) ;
 
   uart_init ();
   hall_sensor_init ();
+  pwm_init ();
   enableInterrupts ();
+
+  pwm_set_duty_cycle_channel1(1024/10);
+  pwm_set_duty_cycle_channel2(1024/3);
+  pwm_set_duty_cycle_channel3(1024/2);
 
   while (1)
   {

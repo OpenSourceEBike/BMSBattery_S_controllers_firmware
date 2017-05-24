@@ -25,50 +25,57 @@ void pwm_init (void)
 		     (1024 - 1), //clock = 16MHz; counter period = 1024; PWM freq = 16MHz / 1024 = 15.625kHz
 		     0); //TIM1_RepetitionCounter = 0
 
-   TIM1_OC1Init(TIM1_OCMODE_PWM2,
+   TIM1_OC1Init(TIM1_OCMODE_PWM1,
 		TIM1_OUTPUTSTATE_ENABLE,
 		TIM1_OUTPUTNSTATE_DISABLE,
-                0, // duty_cycle value
+                0, // initial duty_cycle value
 		TIM1_OCPOLARITY_HIGH,
 		TIM1_OCNPOLARITY_LOW,
 		TIM1_OCIDLESTATE_SET,
                 TIM1_OCNIDLESTATE_RESET);
 
-   TIM1_OC2Init(TIM1_OCMODE_INACTIVE,
-		TIM1_OUTPUTSTATE_ENABLE,
-		TIM1_OUTPUTNSTATE_DISABLE,,
-		0, // duty_cycle value
-		TIM1_OCPOLARITY_LOW,
-		TIM1_OCNPOLARITY_LOW,
-		TIM1_OCIDLESTATE_SET,
-                TIM1_OCNIDLESTATE_RESET);
-
-   TIM1_OC3Init(TIM1_OCMODE_INACTIVE,
+   TIM1_OC2Init(TIM1_OCMODE_PWM1,
 		TIM1_OUTPUTSTATE_ENABLE,
 		TIM1_OUTPUTNSTATE_DISABLE,
-		0, // duty_cycle value
-		TIM1_OCPOLARITY_LOW,
+                0, // initial duty_cycle value
+		TIM1_OCPOLARITY_HIGH,
 		TIM1_OCNPOLARITY_LOW,
 		TIM1_OCIDLESTATE_SET,
                 TIM1_OCNIDLESTATE_RESET);
 
-   /* Automatic Output enable, Break, dead time and lock configuration */
-   /*
- 	TIM1_OSSIState = TIM1_OSSISTATE_ENABLE
-   TIM1_LockLevel = TIM1_LOCKLEVEL_1
-   TIM1_DeadTime = 117
-   TIM1_Break = TIM1_BREAK_ENABLE
-   TIM1_BreakPolarity = TIM1_BREAKPOLARITY_HIGH
-   TIM1_AutomaticOutput = TIM1_AUTOMATICOUTPUT_ENABLE
- 	*/
-   TIM1_BDTRConfig(TIM1_OSSISTATE_ENABLE,
-		   TIM1_LOCKLEVEL_1,
-		   117,
-		   TIM1_BREAK_ENABLE,
-		   TIM1_BREAKPOLARITY_HIGH,
-		   TIM1_AUTOMATICOUTPUT_ENABLE);
+   TIM1_OC3Init(TIM1_OCMODE_PWM1,
+		TIM1_OUTPUTSTATE_ENABLE,
+		TIM1_OUTPUTNSTATE_DISABLE,
+                0, // initial duty_cycle value
+		TIM1_OCPOLARITY_HIGH,
+		TIM1_OCNPOLARITY_LOW,
+		TIM1_OCIDLESTATE_SET,
+                TIM1_OCNIDLESTATE_RESET);
+
+   //break, dead time and lock configuration
+   TIM1_BDTRConfig(TIM1_OSSISTATE_DISABLE,
+		   TIM1_LOCKLEVEL_OFF,
+		   117, //dead time: ???
+		   TIM1_BREAK_DISABLE,
+		   TIM1_BREAKPOLARITY_LOW,
+		   TIM1_AUTOMATICOUTPUT_DISABLE);
 
 
    TIM1_Cmd(ENABLE); //TIM1 counter enable
    TIM1_CtrlPWMOutputs(ENABLE); //Main Output Enable
+}
+
+void pwm_set_duty_cycle_channel1(uint16_t value)
+{
+  TIM1_SetCompare1(value);
+}
+
+void pwm_set_duty_cycle_channel2(uint16_t value)
+{
+  TIM1_SetCompare2(value);
+}
+
+void pwm_set_duty_cycle_channel3(uint16_t value)
+{
+  TIM1_SetCompare3(value);
 }
