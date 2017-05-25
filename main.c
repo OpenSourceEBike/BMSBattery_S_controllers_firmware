@@ -17,6 +17,24 @@
 #include "pwm.h"
 #include "interrupts.h"
 #include "stm8s_adc1.h"
+#include "stm8s_tim1.h"
+
+int32_t map (int32_t x, int32_t in_min, int32_t in_max, int32_t out_min, int32_t out_max)
+{
+  // if input is smaller/bigger than expected return the min/max out ranges value
+  if (x < in_min)
+    return out_min;
+  else if (x > in_max)
+    return out_max;
+
+  // map the input to the output range.
+  // round up if mapping bigger ranges to smaller ranges
+  else  if ((in_max - in_min) > (out_max - out_min))
+    return (x - in_min) * (out_max - out_min + 1) / (in_max - in_min + 1) + out_min;
+  // round down if mapping smaller ranges to bigger ranges
+  else
+    return (x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
+}
 
 //can't put ADC code file on external file like adc.c or the code will not work :-(
 void adc_init (void)
@@ -200,8 +218,10 @@ int main()
   {
     static uint16_t adc_value;
     adc_value = adc_read_throttle ();
+    adc_value = map (adc_value, ADC_THROTTLE_MIN_VALUE, ADC_THROTTLE_MAX_VALUE, 0, 1023);
+
     pwm_set_duty_cycle_channel1 (adc_value);
     pwm_set_duty_cycle_channel2 (adc_value);
-    pwm_set_duty_cycle_channel3 (adc_value);
+    pwm_set_duty_cycle_channel3 (0);
   }
 }
