@@ -28,7 +28,7 @@ void pwm_init (void)
 
   TIM1_OC1Init(TIM1_OCMODE_PWM1,
 	       TIM1_OUTPUTSTATE_ENABLE,
-	       TIM1_OUTPUTNSTATE_ENABLE,
+	       TIM1_OUTPUTNSTATE_DISABLE,
 	       0, // initial duty_cycle value
 	       TIM1_OCPOLARITY_HIGH,
 	       TIM1_OCNPOLARITY_LOW,
@@ -37,7 +37,7 @@ void pwm_init (void)
 
   TIM1_OC2Init(TIM1_OCMODE_PWM1,
 	       TIM1_OUTPUTSTATE_ENABLE,
-	       TIM1_OUTPUTNSTATE_ENABLE,
+	       TIM1_OUTPUTNSTATE_DISABLE,
 	       0, // initial duty_cycle value
 	       TIM1_OCPOLARITY_HIGH,
 	       TIM1_OCNPOLARITY_LOW,
@@ -46,7 +46,7 @@ void pwm_init (void)
 
   TIM1_OC3Init(TIM1_OCMODE_PWM1,
 	       TIM1_OUTPUTSTATE_ENABLE,
-	       TIM1_OUTPUTNSTATE_ENABLE,
+	       TIM1_OUTPUTNSTATE_DISABLE,
 	       0, // initial duty_cycle value
 	       TIM1_OCPOLARITY_HIGH,
 	       TIM1_OCNPOLARITY_LOW,

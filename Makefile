@@ -57,7 +57,7 @@ LIBS     = -l$(PLATFORM)
 
 # This just provides the conventional target name "all"; it is optional
 # Note: I assume you set PNAME via some means not exhibited in your original file
-all: $(PNAME)
+all: clean $(PNAME)
 
 # How to build the overall program
 $(PNAME): $(MAINSRC) $(RELS)

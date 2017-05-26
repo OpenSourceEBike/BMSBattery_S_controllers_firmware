@@ -10,4 +10,4 @@
 *.rel
 *.rst
 *.sym
-debug
+Debug

@@ -96,5 +96,7 @@
 void gpio_init (void);
 void brake_init (void);
 BitStatus brake_is_set (void);
+void brake_coast_enable (void);
+void brake_coast_disable (void);
 
 #endif /* GPIO_H_ */

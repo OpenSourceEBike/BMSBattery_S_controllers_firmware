@@ -19,6 +19,192 @@
 #include "stm8s_adc1.h"
 #include "stm8s_tim1.h"
 
+volatile uint16_t pwm_value;
+
+void pwm_phase_a_disable (void)
+{
+  TIM1_OC3Init(TIM1_OCMODE_PWM1,
+	       TIM1_OUTPUTNSTATE_DISABLE,
+  	       TIM1_OUTPUTNSTATE_DISABLE,
+	       pwm_value,
+  	       TIM1_OCPOLARITY_HIGH,
+  	       TIM1_OCNPOLARITY_LOW,
+  	       TIM1_OCIDLESTATE_RESET,
+  	       TIM1_OCNIDLESTATE_SET);
+
+  // disable pin
+  GPIO_Init(PMW_PHASE_A_HIGH__PORT,
+	    PMW_PHASE_A_HIGH__PIN,
+	    GPIO_MODE_OUT_PP_LOW_FAST);
+
+  // disable pin
+  GPIO_Init(PMW_PHASE_A_LOW__PORT,
+	    PMW_PHASE_A_LOW__PIN,
+	    GPIO_MODE_OUT_PP_HIGH_FAST);
+}
+
+void pwm_phase_a_enable_pwm (void)
+{
+  TIM1_OC3Init(TIM1_OCMODE_PWM1,
+	       TIM1_OUTPUTSTATE_ENABLE,
+	       TIM1_OUTPUTNSTATE_DISABLE,
+	       pwm_value,
+	       TIM1_OCPOLARITY_HIGH,
+	       TIM1_OCNPOLARITY_LOW,
+	       TIM1_OCIDLESTATE_RESET,
+	       TIM1_OCNIDLESTATE_SET);
+
+  // disable pin
+  GPIO_Init(PMW_PHASE_A_LOW__PORT,
+	    PMW_PHASE_A_LOW__PIN,
+	    GPIO_MODE_OUT_PP_HIGH_FAST);
+}
+
+void pwm_phase_a_enable_low (void)
+{
+  TIM1_OC3Init(TIM1_OCMODE_PWM1,
+	       TIM1_OUTPUTNSTATE_DISABLE,
+  	       TIM1_OUTPUTNSTATE_DISABLE,
+	       pwm_value,
+	       TIM1_OCPOLARITY_HIGH,
+	       TIM1_OCNPOLARITY_LOW,
+	       TIM1_OCIDLESTATE_RESET,
+	       TIM1_OCNIDLESTATE_SET);
+
+  // disable pin
+  GPIO_Init(PMW_PHASE_A_HIGH__PORT,
+	    PMW_PHASE_A_HIGH__PIN,
+	    GPIO_MODE_OUT_PP_LOW_FAST);
+
+  // enable pin
+  GPIO_Init(PMW_PHASE_A_LOW__PORT,
+	    PMW_PHASE_A_LOW__PIN,
+	    GPIO_MODE_OUT_PP_LOW_FAST);
+}
+
+void pwm_phase_b_disable (void)
+{
+  TIM1_OC2Init(TIM1_OCMODE_PWM1,
+	       TIM1_OUTPUTNSTATE_DISABLE,
+  	       TIM1_OUTPUTNSTATE_DISABLE,
+	       pwm_value,
+  	       TIM1_OCPOLARITY_HIGH,
+  	       TIM1_OCNPOLARITY_LOW,
+  	       TIM1_OCIDLESTATE_RESET,
+  	       TIM1_OCNIDLESTATE_SET);
+
+  // disable pin
+  GPIO_Init(PMW_PHASE_B_HIGH__PORT,
+	    PMW_PHASE_B_HIGH__PIN,
+	    GPIO_MODE_OUT_PP_LOW_FAST);
+
+  // disable pin
+  GPIO_Init(PMW_PHASE_B_LOW__PORT,
+	    PMW_PHASE_B_LOW__PIN,
+	    GPIO_MODE_OUT_PP_HIGH_FAST);
+}
+
+void pwm_phase_b_enable_pwm (void)
+{
+  TIM1_OC2Init(TIM1_OCMODE_PWM1,
+	       TIM1_OUTPUTSTATE_ENABLE,
+	       TIM1_OUTPUTNSTATE_DISABLE,
+	       pwm_value,
+	       TIM1_OCPOLARITY_HIGH,
+	       TIM1_OCNPOLARITY_LOW,
+	       TIM1_OCIDLESTATE_RESET,
+	       TIM1_OCNIDLESTATE_SET);
+
+  // disable pin
+  GPIO_Init(PMW_PHASE_B_LOW__PORT,
+	    PMW_PHASE_B_LOW__PIN,
+	    GPIO_MODE_OUT_PP_HIGH_FAST);
+}
+
+void pwm_phase_b_enable_low (void)
+{
+  TIM1_OC2Init(TIM1_OCMODE_PWM1,
+	       TIM1_OUTPUTNSTATE_DISABLE,
+  	       TIM1_OUTPUTNSTATE_DISABLE,
+	       pwm_value,
+	       TIM1_OCPOLARITY_HIGH,
+	       TIM1_OCNPOLARITY_LOW,
+	       TIM1_OCIDLESTATE_RESET,
+	       TIM1_OCNIDLESTATE_SET);
+
+  // disable pin
+  GPIO_Init(PMW_PHASE_B_HIGH__PORT,
+	    PMW_PHASE_B_HIGH__PIN,
+	    GPIO_MODE_OUT_PP_LOW_FAST);
+
+  // enable pin
+  GPIO_Init(PMW_PHASE_B_LOW__PORT,
+	    PMW_PHASE_B_LOW__PIN,
+	    GPIO_MODE_OUT_PP_LOW_FAST);
+}
+
+void pwm_phase_c_disable (void)
+{
+  TIM1_OC1Init(TIM1_OCMODE_PWM1,
+	       TIM1_OUTPUTNSTATE_DISABLE,
+  	       TIM1_OUTPUTNSTATE_DISABLE,
+	       pwm_value,
+  	       TIM1_OCPOLARITY_HIGH,
+  	       TIM1_OCNPOLARITY_LOW,
+  	       TIM1_OCIDLESTATE_RESET,
+  	       TIM1_OCNIDLESTATE_SET);
+
+  // disable pin
+  GPIO_Init(PMW_PHASE_C_HIGH__PORT,
+	    PMW_PHASE_C_HIGH__PIN,
+	    GPIO_MODE_OUT_PP_LOW_FAST);
+
+  // disable pin
+  GPIO_Init(PMW_PHASE_C_LOW__PORT,
+	    PMW_PHASE_C_LOW__PIN,
+	    GPIO_MODE_OUT_PP_HIGH_FAST);
+}
+
+void pwm_phase_c_enable_pwm (void)
+{
+  TIM1_OC1Init(TIM1_OCMODE_PWM1,
+	       TIM1_OUTPUTSTATE_ENABLE,
+	       TIM1_OUTPUTNSTATE_DISABLE,
+	       pwm_value,
+	       TIM1_OCPOLARITY_HIGH,
+	       TIM1_OCNPOLARITY_LOW,
+	       TIM1_OCIDLESTATE_RESET,
+	       TIM1_OCNIDLESTATE_SET);
+
+  // disable pin
+  GPIO_Init(PMW_PHASE_C_LOW__PORT,
+	    PMW_PHASE_C_LOW__PIN,
+	    GPIO_MODE_OUT_PP_HIGH_FAST);
+}
+
+void pwm_phase_c_enable_low (void)
+{
+  TIM1_OC1Init(TIM1_OCMODE_PWM1,
+	       TIM1_OUTPUTNSTATE_DISABLE,
+  	       TIM1_OUTPUTNSTATE_DISABLE,
+	       pwm_value,
+	       TIM1_OCPOLARITY_HIGH,
+	       TIM1_OCNPOLARITY_LOW,
+	       TIM1_OCIDLESTATE_RESET,
+	       TIM1_OCNIDLESTATE_SET);
+
+  // disable pin
+  GPIO_Init(PMW_PHASE_C_HIGH__PORT,
+	    PMW_PHASE_C_HIGH__PIN,
+	    GPIO_MODE_OUT_PP_LOW_FAST);
+
+  // enable pin
+  GPIO_Init(PMW_PHASE_C_LOW__PORT,
+	    PMW_PHASE_C_LOW__PIN,
+	    GPIO_MODE_OUT_PP_LOW_FAST);
+}
+
+
 int32_t map (int32_t x, int32_t in_min, int32_t in_max, int32_t out_min, int32_t out_max)
 {
   // if input is smaller/bigger than expected return the min/max out ranges value
@@ -87,114 +273,72 @@ uint16_t adc_read_throttle (void)
 // BRAKE signal
 void EXTI_PORTA_IRQHandler(void) __interrupt(EXTI_PORTA_IRQHANDLER)
 {
+  if (brake_is_set())
+  {
+    brake_coast_disable (); // pwm main output disable
+  }
+  else
+  {
+    brake_coast_enable (); // pwm main output enable
+  }
+}
 
+void hall_sensors_read_and_action (void)
+{
+  unsigned char hall_sensors = 0;
+
+  // read hall sensors signal pins and mask other pins
+  hall_sensors = (GPIO_ReadInputData (HALL_SENSORS__PORT) & (HALL_SENSORS_MASK));
+
+  switch (hall_sensors)
+  {
+    case 3:
+      pwm_phase_a_enable_pwm ();
+      pwm_phase_b_disable ();
+      pwm_phase_c_enable_low ();
+
+    break;
+
+    case 1:
+      pwm_phase_a_enable_pwm ();
+      pwm_phase_b_enable_low ();
+      pwm_phase_c_disable ();
+    break;
+
+    case 5:
+      pwm_phase_a_disable ();
+      pwm_phase_b_enable_low ();
+      pwm_phase_c_enable_pwm ();
+    break;
+
+    case 4:
+      pwm_phase_a_enable_low ();
+      pwm_phase_b_disable ();
+      pwm_phase_c_enable_pwm ();
+    break;
+
+    case 6:
+      pwm_phase_a_enable_low ();
+      pwm_phase_b_enable_pwm ();
+      pwm_phase_c_disable ();
+    break;
+
+    case 2:
+      pwm_phase_a_disable ();
+      pwm_phase_b_enable_pwm ();
+      pwm_phase_c_enable_low ();
+    break;
+
+    default:
+    return;
+    break;
+  }
 }
 
 // HALL SENSORS signal
 void EXTI_PORTE_IRQHandler(void) __interrupt(EXTI_PORTE_IRQHANDLER)
 {
-  unsigned char hall_sensors = 0;
-//  static unsigned int flag_count_speed = 0;
-//
-  // read hall sensors signal pins and mask other pins
-  hall_sensors = (GPIO_ReadInputData (HALL_SENSORS__PORT) & (HALL_SENSORS_MASK));
-
-  // sequence: 1; 3; 2; 6; 4; 5
-
-  printf("%d\n", hall_sensors);
-
-//  if (get_motor_rotation_direction() == LEFT)
-//  {
-//    switch (hall_sensors) // angle increments with rotation
-//    {
-//      case 8192:
-//      motor_rotor_absolute_position = (60 * 5); // 6
-//      break;
-//
-//      case 24576: // transition to positive value of hall sensor A
-//      motor_rotor_absolute_position = (60 * 4); // 5
-//      break;
-//
-//      case 16384:
-//      motor_rotor_absolute_position = (60 * 3); // 4
-//      flag_count_speed = 1;
-//      break;
-//
-//      case 20480:
-//      motor_rotor_absolute_position = (60 * 2); // 3
-//      break;
-//
-//      case 4096:
-//      motor_rotor_absolute_position = (60 * 1); // 2
-//      break;
-//
-//      case 12288:
-//      motor_rotor_absolute_position = (60 * 0); // 1
-//
-//      // count speed only when motor did rotate half of 1 electronic rotation
-//      if (flag_count_speed)
-//      {
-//	  flag_count_speed = 0;
-////	  motor_speed_erps = PWM_CYCLES_COUNTER_MAX / PWM_cycles_counter;
-////	  interpolation_angle_step = (SVM_TABLE_LEN * 1000) / PWM_cycles_counter;
-////	  PWM_cycles_counter = 0;
-//      }
-//      break;
-//
-//      default:
-//      return;
-//      break;
-//    }
-//
-//    motor_rotor_absolute_position += MOTOR_ROTOR_DELTA_PHASE_ANGLE_LEFT;
-//  }
-//  else if (get_motor_rotation_direction() == RIGHT)
-//  {
-//    switch (hall_sensors) // angle DEcrements with rotation
-//    {
-//      case 8192:
-//      motor_rotor_absolute_position = (60 * 2); // 3
-//      break;
-//
-//      case 24576: // transition to positive value of hall sensor A
-//      motor_rotor_absolute_position = (60 * 1); // 2
-//      break;
-//
-//      case 16384:
-//      motor_rotor_absolute_position = (60 * 0); // 1
-//
-//      // count speed only when motor did rotate half of 1 electronic rotation
-//      if (flag_count_speed)
-//      {
-//	  flag_count_speed = 0;
-////	  motor_speed_erps = PWM_CYCLES_COUNTER_MAX / PWM_cycles_counter;
-////	  interpolation_angle_step = (SVM_TABLE_LEN * 1000) / PWM_cycles_counter;
-////	  PWM_cycles_counter = 0;
-//      }
-//      break;
-//
-//      case 20480:
-//      motor_rotor_absolute_position = (60 * 5); // 6
-//      break;
-//
-//      case 4096:
-//      motor_rotor_absolute_position = (60 * 4); // 5
-//      break;
-//
-//      case 12288:
-//      motor_rotor_absolute_position = (60 * 3); // 4
-//      flag_count_speed = 1;
-//      break;
-//
-//      default:
-//      return;
-//      break;
-//    }
-//
-//    motor_rotor_absolute_position += MOTOR_ROTOR_DELTA_PHASE_ANGLE_RIGHT;
-//  }
-//
-//  motor_rotor_position = mod_angle_degrees(motor_rotor_absolute_position + position_correction_value);
+  hall_sensors_read_and_action ();
 }
 
 int main()
@@ -204,24 +348,24 @@ int main()
 
   gpio_init ();
   brake_init ();
-
-  // hold here while brake is pressed -- this is a protection for development
-  while (!brake_is_set()) ;
-
+  while (brake_is_set()) ; // hold here while brake is pressed -- this is a protection for development
   uart_init ();
   hall_sensor_init ();
   pwm_init ();
   adc_init ();
   enableInterrupts();
 
+  hall_sensors_read_and_action (); // needed to start the motor
+
   while (1)
   {
     static uint16_t adc_value;
     adc_value = adc_read_throttle ();
     adc_value = map (adc_value, ADC_THROTTLE_MIN_VALUE, ADC_THROTTLE_MAX_VALUE, 0, 1023);
+    pwm_value = adc_value;
 
-    pwm_set_duty_cycle_channel1 (adc_value);
-    pwm_set_duty_cycle_channel2 (adc_value);
-    pwm_set_duty_cycle_channel3 (0);
+    pwm_set_duty_cycle_channel1 (pwm_value);
+    pwm_set_duty_cycle_channel2 (pwm_value);
+    pwm_set_duty_cycle_channel3 (pwm_value);
   }
 }
