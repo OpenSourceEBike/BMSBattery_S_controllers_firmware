@@ -13,4 +13,6 @@
 #define RIGHT 		1
 #define LEFT 		2
 
+#define SVM_TABLE_LEN 360
+
 #endif /* _MOTOR_H_ */

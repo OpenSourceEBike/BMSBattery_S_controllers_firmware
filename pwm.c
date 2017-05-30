@@ -22,13 +22,14 @@ void pwm_init (void)
   TIM1_DeInit();
 
   TIM1_TimeBaseInit(0, // TIM1_Prescaler = 0
-		     TIM1_COUNTERMODE_UP,
-		     (1024 - 1), // clock = 16MHz; counter period = 1024; PWM freq = 16MHz / 1024 = 15.625kHz
-		     0); // TIM1_RepetitionCounter = 0
+		    TIM1_COUNTERMODE_CENTERALIGNED1,
+		    (512 - 1), // clock = 16MHz; counter period = 1024; PWM freq = 16MHz / 1024 = 15.625kHz;
+		    //(BUT PWM center aligned mode needs twice the frequency)
+		    1); // will fire the TIM1_IT_UPDATE at every PWM period
 
   TIM1_OC1Init(TIM1_OCMODE_PWM1,
 	       TIM1_OUTPUTSTATE_ENABLE,
-	       TIM1_OUTPUTNSTATE_DISABLE,
+	       TIM1_OUTPUTNSTATE_ENABLE,
 	       0, // initial duty_cycle value
 	       TIM1_OCPOLARITY_HIGH,
 	       TIM1_OCNPOLARITY_LOW,
@@ -37,7 +38,7 @@ void pwm_init (void)
 
   TIM1_OC2Init(TIM1_OCMODE_PWM1,
 	       TIM1_OUTPUTSTATE_ENABLE,
-	       TIM1_OUTPUTNSTATE_DISABLE,
+	       TIM1_OUTPUTNSTATE_ENABLE,
 	       0, // initial duty_cycle value
 	       TIM1_OCPOLARITY_HIGH,
 	       TIM1_OCNPOLARITY_LOW,
@@ -46,7 +47,7 @@ void pwm_init (void)
 
   TIM1_OC3Init(TIM1_OCMODE_PWM1,
 	       TIM1_OUTPUTSTATE_ENABLE,
-	       TIM1_OUTPUTNSTATE_DISABLE,
+	       TIM1_OUTPUTNSTATE_ENABLE,
 	       0, // initial duty_cycle value
 	       TIM1_OCPOLARITY_HIGH,
 	       TIM1_OCNPOLARITY_LOW,
@@ -61,6 +62,8 @@ void pwm_init (void)
 		  TIM1_BREAK_DISABLE,
 		  TIM1_BREAKPOLARITY_HIGH,
 		  TIM1_AUTOMATICOUTPUT_ENABLE);
+
+//  TIM1_ITConfig(TIM1_IT_UPDATE, ENABLE);
 
   TIM1_Cmd(ENABLE); // TIM1 counter enable
   TIM1_CtrlPWMOutputs(ENABLE); // main Output Enable
