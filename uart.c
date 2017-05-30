@@ -8,6 +8,7 @@
 
 #include "stm8s.h"
 #include "stm8s_gpio.h"
+#include "gpio.h"
 
 void uart_init (void)
 {
@@ -28,3 +29,4 @@ void putchar(char c)
   //Loop until the end of transmission
   while (UART2_GetFlagStatus(UART2_FLAG_TXE) == RESET);
 }
+

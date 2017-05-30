@@ -45,3 +45,20 @@ void brake_coast_disable (void)
 {
   TIM1->BKR |= (uint8_t) (TIM1_BREAK_ENABLE);
 }
+
+void debug_pin_init (void)
+{
+  GPIO_Init(DEBUG__PORT,
+	    DEBUG__PIN,
+	    GPIO_MODE_OUT_PP_HIGH_FAST);
+}
+
+void debug_pin_set (void)
+{
+  GPIO_WriteHigh(DEBUG__PORT, DEBUG__PIN);
+}
+
+void debug_pin_reset (void)
+{
+  GPIO_WriteLow(DEBUG__PORT, DEBUG__PIN);
+}

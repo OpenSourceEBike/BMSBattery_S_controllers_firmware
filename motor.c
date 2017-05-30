@@ -376,3 +376,9 @@ int16_t svm_table [SVM_TABLE_LEN] =
     249	,
     256
 };
+
+
+int8_t get_motor_rotation_direction (void)
+{
+  return LEFT;
+}

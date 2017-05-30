@@ -93,10 +93,16 @@
 #define PAS__PIN                  GPIO_PIN_0
 #define PAS__PORT                 GPIOD
 
+#define DEBUG__PIN                  GPIO_PIN_2
+#define DEBUG__PORT                 GPIOD
+
 void gpio_init (void);
 void brake_init (void);
 BitStatus brake_is_set (void);
 void brake_coast_enable (void);
 void brake_coast_disable (void);
+void debug_pin_init (void);
+void debug_pin_set (void);
+void debug_pin_reset (void);
 
 #endif /* GPIO_H_ */

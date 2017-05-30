@@ -63,7 +63,7 @@ void pwm_init (void)
 		  TIM1_BREAKPOLARITY_HIGH,
 		  TIM1_AUTOMATICOUTPUT_ENABLE);
 
-//  TIM1_ITConfig(TIM1_IT_UPDATE, ENABLE);
+  TIM1_ITConfig(TIM1_IT_UPDATE, ENABLE);
 
   TIM1_Cmd(ENABLE); // TIM1 counter enable
   TIM1_CtrlPWMOutputs(ENABLE); // main Output Enable

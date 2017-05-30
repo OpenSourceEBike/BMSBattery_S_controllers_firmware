@@ -12,4 +12,8 @@
 void uart_init (void);
 void putchar(char c);
 
+void uart_tx_init_DEBUG (void);
+void uart_tx_set_DEBUG (void);
+void uart_tx_reset_DEBUG (void);
+
 #endif
