@@ -40,8 +40,6 @@ EXTRASRCS = \
 	$(SDIR)/stm8s_tim1.c \
 	$(SDIR)/stm8s_adc1.c \
 	gpio.c \
-	uart.c \
-	hall_sensors.c \
 	motor.c \
 	pwm.c \
 

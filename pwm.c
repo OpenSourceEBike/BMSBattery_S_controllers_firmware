@@ -9,7 +9,6 @@
 #include "stm8s.h"
 #include "stm8s_gpio.h"
 #include "stm8s_tim1.h"
-#include "hall_sensors.h"
 #include "main.h"
 #include "gpio.h"
 #include "motor.h"
@@ -28,8 +27,8 @@ void pwm_init (void)
 		    1); // will fire the TIM1_IT_UPDATE at every PWM period
 
   TIM1_OC1Init(TIM1_OCMODE_PWM1,
-	       TIM1_OUTPUTSTATE_ENABLE,
-	       TIM1_OUTPUTNSTATE_ENABLE,
+	       TIM1_OUTPUTSTATE_DISABLE,
+	       TIM1_OUTPUTNSTATE_DISABLE,
 	       0, // initial duty_cycle value
 	       TIM1_OCPOLARITY_HIGH,
 	       TIM1_OCNPOLARITY_LOW,
@@ -46,8 +45,8 @@ void pwm_init (void)
 	       TIM1_OCNIDLESTATE_SET);
 
   TIM1_OC3Init(TIM1_OCMODE_PWM1,
-	       TIM1_OUTPUTSTATE_ENABLE,
-	       TIM1_OUTPUTNSTATE_ENABLE,
+	       TIM1_OUTPUTSTATE_DISABLE,
+	       TIM1_OUTPUTNSTATE_DISABLE,
 	       0, // initial duty_cycle value
 	       TIM1_OCPOLARITY_HIGH,
 	       TIM1_OCNPOLARITY_LOW,
@@ -63,7 +62,7 @@ void pwm_init (void)
 		  TIM1_BREAKPOLARITY_HIGH,
 		  TIM1_AUTOMATICOUTPUT_ENABLE);
 
-  TIM1_ITConfig(TIM1_IT_UPDATE, ENABLE);
+//  TIM1_ITConfig(TIM1_IT_UPDATE, ENABLE);
 
   TIM1_Cmd(ENABLE); // TIM1 counter enable
   TIM1_CtrlPWMOutputs(ENABLE); // main Output Enable

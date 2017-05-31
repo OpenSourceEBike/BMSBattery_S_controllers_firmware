@@ -11,26 +11,291 @@
 #include "stm8s.h"
 #include "gpio.h"
 #include "stm8s_gpio.h"
-#include "hall_sensors.h"
 #include "motor.h"
-#include "uart.h"
 #include "pwm.h"
 #include "interrupts.h"
 #include "stm8s_adc1.h"
 #include "stm8s_tim1.h"
 
+uint8_t ui8_svm_table [SVM_TABLE_LEN] =
+{
+    131	,
+    136	,
+    140	,
+    145	,
+    150	,
+    154	,
+    159	,
+    163	,
+    168	,
+    173	,
+    177	,
+    182	,
+    186	,
+    191	,
+    195	,
+    199	,
+    204	,
+    208	,
+    212	,
+    216	,
+    221	,
+    224	,
+    225	,
+    226	,
+    227	,
+    228	,
+    230	,
+    231	,
+    232	,
+    232	,
+    233	,
+    234	,
+    235	,
+    235	,
+    236	,
+    236	,
+    237	,
+    237	,
+    237	,
+    238	,
+    238	,
+    238	,
+    238	,
+    238	,
+    238	,
+    238	,
+    237	,
+    237	,
+    237	,
+    236	,
+    236	,
+    235	,
+    235	,
+    234	,
+    233	,
+    232	,
+    231	,
+    230	,
+    229	,
+    228	,
+    227	,
+    226	,
+    225	,
+    224	,
+    224	,
+    225	,
+    227	,
+    228	,
+    229	,
+    230	,
+    231	,
+    232	,
+    233	,
+    233	,
+    234	,
+    235	,
+    235	,
+    236	,
+    236	,
+    237	,
+    237	,
+    237	,
+    238	,
+    238	,
+    238	,
+    238	,
+    238	,
+    238	,
+    238	,
+    237	,
+    237	,
+    237	,
+    236	,
+    236	,
+    235	,
+    234	,
+    234	,
+    233	,
+    232	,
+    231	,
+    230	,
+    229	,
+    228	,
+    227	,
+    226	,
+    224	,
+    223	,
+    219	,
+    215	,
+    210	,
+    206	,
+    202	,
+    198	,
+    193	,
+    189	,
+    184	,
+    180	,
+    175	,
+    171	,
+    166	,
+    162	,
+    157	,
+    152	,
+    148	,
+    143	,
+    138	,
+    134	,
+    129	,
+    124	,
+    119	,
+    115	,
+    110	,
+    105	,
+    101	,
+    96	,
+    92	,
+    87	,
+    82	,
+    78	,
+    73	,
+    69	,
+    64	,
+    60	,
+    56	,
+    51	,
+    47	,
+    43	,
+    39	,
+    34	,
+    31	,
+    30	,
+    29	,
+    28	,
+    27	,
+    25	,
+    24	,
+    23	,
+    23	,
+    22	,
+    21	,
+    20	,
+    20	,
+    19	,
+    19	,
+    18	,
+    18	,
+    18	,
+    17	,
+    17	,
+    17	,
+    17	,
+    17	,
+    17	,
+    17	,
+    18	,
+    18	,
+    18	,
+    19	,
+    19	,
+    20	,
+    20	,
+    21	,
+    22	,
+    23	,
+    24	,
+    25	,
+    26	,
+    27	,
+    28	,
+    29	,
+    30	,
+    31	,
+    31	,
+    30	,
+    28	,
+    27	,
+    26	,
+    25	,
+    24	,
+    23	,
+    22	,
+    22	,
+    21	,
+    20	,
+    20	,
+    19	,
+    19	,
+    18	,
+    18	,
+    18	,
+    17	,
+    17	,
+    17	,
+    17	,
+    17	,
+    17	,
+    17	,
+    18	,
+    18	,
+    18	,
+    19	,
+    19	,
+    20	,
+    21	,
+    21	,
+    22	,
+    23	,
+    24	,
+    25	,
+    26	,
+    27	,
+    28	,
+    29	,
+    31	,
+    32	,
+    36	,
+    40	,
+    45	,
+    49	,
+    53	,
+    57	,
+    62	,
+    66	,
+    71	,
+    75	,
+    80	,
+    84	,
+    89	,
+    93	,
+    98	,
+    103	,
+    107	,
+    112	,
+    117	,
+    121	,
+    126
+};
+
 int32_t motor_speed_erps = 0; // motor speed in electronic rotations per second
 int8_t flag_count_speed = 0;
 int16_t PWM_cycles_per_SVM_TABLE_step = 0;
 int32_t PWM_cycles_counter = 0;
-int16_t motor_rotor_position = 0; // in degrees
-int16_t motor_rotor_absolute_position = 0; // in degrees
-int16_t position_correction_value = 0; // in degrees
+uint8_t ui8_motor_rotor_position = 0; // in 360/256 degrees
+uint8_t ui8_motor_rotor_absolute_position = 0; // in 360/256 degrees
+uint8_t ui8_position_correction_value = 0; // in 360/256 degrees
 int32_t interpolation_angle_step = 0; // x1000
 int32_t interpolation_sum = 0; // x1000
 int16_t interpolation_angle = 0;
 
-volatile uint16_t duty_cycle;
+static uint8_t ui8_value_a;
+static uint8_t ui8_value_b;
+static uint8_t ui8_value_c;
+static uint16_t ui16_value_a;
+static uint16_t ui16_value_b;
+static uint16_t ui16_value_c;
+
+volatile uint8_t ui8_duty_cycle;
 
 /////////////////////////////////////////////////////////////////////////////////////////////
 //// Functions prototypes
@@ -49,12 +314,15 @@ void EXTI_PORTE_IRQHandler(void) __interrupt(EXTI_PORTE_IRQHANDLER);
 void hall_sensors_read_and_action (void);
 
 void motor_fast_loop (void);
-void apply_duty_cycle (int16_t duty_cycle_value);
+void apply_duty_cycle (uint8_t ui8_duty_cycle_value);
 
 // map / limit values
 int32_t map (int32_t x, int32_t in_min, int32_t in_max, int32_t out_min, int32_t out_max);
 
 int16_t mod_angle_degrees (int16_t value);
+
+void uart_init (void);
+void putchar(char c);
 
 /////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -123,7 +391,6 @@ uint16_t adc_read_throttle (void)
 //Calling a function from interrupt not always works, SDCC manual says to avoid it. Maybe the best is to put
 //all the code inside the interrupt
 
-// BRAKE signal
 void TIM1_UPD_OVF_TRG_BRK_IRQHandler(void) __interrupt(TIM1_UPD_OVF_TRG_BRK_IRQHANDLER)
 {
   debug_pin_set ();
@@ -144,15 +411,15 @@ void hall_sensors_read_and_action (void)
   switch (hall_sensors)
   {
     case 3:
-      motor_rotor_absolute_position = (60 * 0);
+      ui8_motor_rotor_absolute_position = (ANGLE_STEP_256_x1000 * 60 * 0) / 1000;
     break;
 
     case 1:
-      motor_rotor_absolute_position = (60 * 1);
+      ui8_motor_rotor_absolute_position = (ANGLE_STEP_256_x1000 * 60 * 1) / 1000;
     break;
 
     case 5:
-      motor_rotor_absolute_position = (60 * 2);
+      ui8_motor_rotor_absolute_position = (ANGLE_STEP_256_x1000 * 60 * 2) / 1000;
 
       // count speed only when motor did rotate half of 1 electronic rotation
       if (flag_count_speed)
@@ -165,15 +432,15 @@ void hall_sensors_read_and_action (void)
     break;
 
     case 4:
-      motor_rotor_absolute_position = (60 * 3);
+      ui8_motor_rotor_absolute_position = (ANGLE_STEP_256_x1000 * 60 * 3) / 1000;
     break;
 
     case 6:
-      motor_rotor_absolute_position = (60 * 4);
+      ui8_motor_rotor_absolute_position = (ANGLE_STEP_256_x1000 * 60 * 4) / 1000;
     break;
 
     case 2:
-      motor_rotor_absolute_position = (60 * 5);
+      ui8_motor_rotor_absolute_position = (ANGLE_STEP_256_x1000 * 60 * 5) / 1000;
 
       flag_count_speed = 1;
     break;
@@ -183,9 +450,9 @@ void hall_sensors_read_and_action (void)
     break;
   }
 
-  motor_rotor_absolute_position += MOTOR_ROTOR_DELTA_PHASE_ANGLE_RIGHT;
+  ui8_motor_rotor_absolute_position += MOTOR_ROTOR_DELTA_PHASE_ANGLE_RIGHT;
 
-  motor_rotor_position = mod_angle_degrees(motor_rotor_absolute_position + position_correction_value);
+  ui8_motor_rotor_position = mod_angle_degrees(ui8_motor_rotor_absolute_position + ui8_position_correction_value);
   interpolation_sum = 0;
 }
 
@@ -209,7 +476,7 @@ void motor_fast_loop (void)
 #if DO_INTERPOLATION == 1
   // calculate the interpolation angle
   // interpolation seems a problem when motor starts, so avoid to do it at very low speed
-  if ( !(duty_cycle < 5 && duty_cycle > -5) || motor_speed_erps >= 80)
+  if ( !(ui8_duty_cycle < 5 && ui8_duty_cycle > -5) || motor_speed_erps >= 80)
   {
     if (interpolation_sum <= (60 * 1000)) // interpolate only for angle <= 60º
     {
@@ -217,76 +484,70 @@ void motor_fast_loop (void)
       interpolation_sum += interpolation_angle_step;
       interpolation_angle = (int16_t) (interpolation_sum / 1000);
 
-      motor_rotor_position = mod_angle_degrees(motor_rotor_absolute_position + position_correction_value + interpolation_angle);
+      ui8_motor_rotor_position = mod_angle_degrees(ui8_motor_rotor_absolute_position + ui8_position_correction_value + interpolation_angle);
     }
   }
 #endif
 
-  apply_duty_cycle (duty_cycle);
+  apply_duty_cycle (ui8_duty_cycle);
 }
 
-void apply_duty_cycle (int16_t duty_cycle_value)
+void apply_duty_cycle (uint8_t ui8_duty_cycle_value)
 {
-  int16_t _duty_cycle;
-  static int16_t value_a;
-  static int16_t value_b;
-  static int16_t value_c;
-  int16_t temp;
+  static uint8_t ui8__duty_cycle;
+  static uint8_t ui8_temp;
 
-  _duty_cycle = duty_cycle_value;
+  ui8__duty_cycle = ui8_duty_cycle_value;
 
   // scale and apply _duty_cycle
-  temp = motor_rotor_position;
-  value_a = svm_table[temp];
-  if (value_a > MIDDLE_PWM_VALUE_DUTY_CYCLE_MAX)
+  ui8_temp = ui8_svm_table[ui8_motor_rotor_position];
+  if (ui8_temp > MIDDLE_PWM_VALUE_DUTY_CYCLE_MAX)
   {
-    value_a = (value_a - MIDDLE_PWM_VALUE_DUTY_CYCLE_MAX) * _duty_cycle;
-    value_a = value_a / 1000;
-    value_a = MIDDLE_PWM_VALUE_DUTY_CYCLE_MAX + value_a;
+    ui16_value_a = ((uint16_t) (ui8_temp - MIDDLE_PWM_VALUE_DUTY_CYCLE_MAX)) * ui8__duty_cycle;
+    ui8_temp = (uint8_t) (ui16_value_a >> 8);
+    ui8_value_a = MIDDLE_PWM_VALUE_DUTY_CYCLE_MAX + ui8_temp;
   }
   else
   {
-    value_a = (MIDDLE_PWM_VALUE_DUTY_CYCLE_MAX - value_a) * _duty_cycle;
-    value_a = value_a / 1000;
-    value_a = MIDDLE_PWM_VALUE_DUTY_CYCLE_MAX - value_a;
+    ui16_value_a = ((uint16_t) (MIDDLE_PWM_VALUE_DUTY_CYCLE_MAX - ui8_temp)) * ui8__duty_cycle;
+    ui8_temp = (uint8_t) (ui16_value_a >> 8);
+    ui8_value_a = MIDDLE_PWM_VALUE_DUTY_CYCLE_MAX - ui8_temp;
   }
 
   // add 120 degrees and limit
-  temp = mod_angle_degrees(motor_rotor_position + 120);
-  value_b = svm_table[temp];
-  if (value_b > MIDDLE_PWM_VALUE_DUTY_CYCLE_MAX)
+  ui8_temp = ui8_svm_table[(uint8_t) (ui8_motor_rotor_position + 120)];
+  if (ui8_temp > MIDDLE_PWM_VALUE_DUTY_CYCLE_MAX)
   {
-    value_b = (value_b - MIDDLE_PWM_VALUE_DUTY_CYCLE_MAX) * _duty_cycle;
-    value_b = value_b / 1000;
-    value_b = MIDDLE_PWM_VALUE_DUTY_CYCLE_MAX + value_b;
+    ui16_value_b = ((uint16_t) (ui8_temp - MIDDLE_PWM_VALUE_DUTY_CYCLE_MAX)) * ui8__duty_cycle;
+    ui8_temp = (uint8_t) (ui16_value_b >> 8);
+    ui8_value_b = MIDDLE_PWM_VALUE_DUTY_CYCLE_MAX + ui8_temp;
   }
   else
   {
-    value_b = (MIDDLE_PWM_VALUE_DUTY_CYCLE_MAX - value_b) * _duty_cycle;
-    value_b = value_b / 1000;
-    value_b = MIDDLE_PWM_VALUE_DUTY_CYCLE_MAX - value_b;
+    ui16_value_b = ((uint16_t) (MIDDLE_PWM_VALUE_DUTY_CYCLE_MAX - ui8_temp)) * ui8__duty_cycle;
+    ui8_temp = (uint8_t) (ui16_value_b >> 8);
+    ui8_value_b = MIDDLE_PWM_VALUE_DUTY_CYCLE_MAX - ui8_temp;
   }
 
   // subtract 120 degrees and limit
-  temp = mod_angle_degrees(motor_rotor_position + 240);
-  value_c = svm_table[temp];
-  if (value_c > MIDDLE_PWM_VALUE_DUTY_CYCLE_MAX)
+  ui8_temp = ui8_svm_table[(uint8_t) (ui8_motor_rotor_position + 240)];
+  if (ui8_temp > MIDDLE_PWM_VALUE_DUTY_CYCLE_MAX)
   {
-    value_c = (value_c - MIDDLE_PWM_VALUE_DUTY_CYCLE_MAX) * _duty_cycle;
-    value_c = value_c / 1000;
-    value_c = MIDDLE_PWM_VALUE_DUTY_CYCLE_MAX + value_c;
+    ui16_value_c = ((uint16_t) (ui8_temp - MIDDLE_PWM_VALUE_DUTY_CYCLE_MAX)) * ui8__duty_cycle;
+    ui8_temp = (uint8_t) (ui16_value_c >> 8);
+    ui8_value_c = MIDDLE_PWM_VALUE_DUTY_CYCLE_MAX + ui8_temp;
   }
   else
   {
-    value_c = (MIDDLE_PWM_VALUE_DUTY_CYCLE_MAX - value_c) * _duty_cycle;
-    value_c = value_c / 1000;
-    value_c = MIDDLE_PWM_VALUE_DUTY_CYCLE_MAX - value_c;
+    ui16_value_c = ((uint16_t) (MIDDLE_PWM_VALUE_DUTY_CYCLE_MAX - ui8_temp)) * ui8__duty_cycle;
+    ui8_temp = (uint8_t) (ui16_value_c >> 8);
+    ui8_value_c = MIDDLE_PWM_VALUE_DUTY_CYCLE_MAX - ui8_temp;
   }
 
   // set final duty_cycle value
-  TIM1_SetCompare1(value_a);
-  TIM1_SetCompare2(value_b);
-  TIM1_SetCompare4(value_c);
+  TIM1->CCR1L = ui8_value_a << 1;
+  TIM1->CCR2L = ui8_value_b << 1;
+  TIM1->CCR3L = ui8_value_c << 1;
 }
 
 // Brake signal
@@ -316,6 +577,26 @@ int16_t mod_angle_degrees (int16_t value)
   return ret;
 }
 
+void uart_init (void)
+{
+  UART2_DeInit();
+  UART2_Init((uint32_t)115200,
+	     UART2_WORDLENGTH_8D,
+	     UART2_STOPBITS_1,
+	     UART2_PARITY_NO,
+	     UART2_SYNCMODE_CLOCK_DISABLE,
+	     UART2_MODE_TXRX_ENABLE);
+}
+
+void putchar(char c)
+{
+  //Write a character to the UART2
+  UART2_SendData8(c);
+
+  //Loop until the end of transmission
+  while (UART2_GetFlagStatus(UART2_FLAG_TXE) == RESET);
+}
+
 int main (void)
 {
   //set clock at the max 16MHz
@@ -326,19 +607,33 @@ int main (void)
   while (brake_is_set()) ; // hold here while brake is pressed -- this is a protection for development
   debug_pin_init ();
   uart_init ();
-  hall_sensor_init ();
+//  hall_sensor_init ();
   pwm_init ();
   adc_init ();
   enableInterrupts();
 
+  TIM1_SetCompare1(126 << 1);
+  TIM1_SetCompare2(126 << 1);
+  TIM1_SetCompare3(126 << 1);
   hall_sensors_read_and_action (); // needed to start the motor
 
   while (1)
   {
     static uint16_t adc_value;
     adc_value = adc_read_throttle ();
-//    duty_cycle = map (adc_value, ADC_THROTTLE_MIN_VALUE, ADC_THROTTLE_MAX_VALUE, 0, 1000);
+    ui8_duty_cycle = (uint8_t) map (adc_value, ADC_THROTTLE_MIN_VALUE, ADC_THROTTLE_MAX_VALUE, 0, 255);
 
-    duty_cycle = 50;
+    ui8_duty_cycle = 255;
+
+    if (ui8_motor_rotor_position < 255)
+      ui8_motor_rotor_position++;
+    else
+      ui8_motor_rotor_position = 0;
+
+    debug_pin_set ();
+    motor_fast_loop ();
+    debug_pin_reset ();
+
+    printf("%d, %d, %d\n", ui8_value_a, ui8_value_b, ui8_value_c);
   }
 }

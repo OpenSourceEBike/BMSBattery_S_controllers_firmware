@@ -13,10 +13,6 @@
 #define RIGHT 		1
 #define LEFT 		2
 
-#define SVM_TABLE_LEN 360
-
-extern int16_t svm_table [SVM_TABLE_LEN];
-
 int8_t get_motor_rotation_direction (void);
 
 #endif /* _MOTOR_H_ */
