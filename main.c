@@ -11,8 +11,6 @@
 #include "stm8s.h"
 #include "gpio.h"
 #include "stm8s_gpio.h"
-#include "motor.h"
-#include "pwm.h"
 #include "interrupts.h"
 #include "stm8s_adc1.h"
 #include "stm8s_tim1.h"
@@ -312,9 +310,12 @@ void EXTI_PORTA_IRQHandler(void) __interrupt(EXTI_PORTA_IRQHANDLER);
 void EXTI_PORTE_IRQHandler(void) __interrupt(EXTI_PORTE_IRQHANDLER);
 // reads hall sensors -- called from EXTI_PORTE_IRQHandler
 void hall_sensors_read_and_action (void);
+void hall_sensor_init (void);
 
 void motor_fast_loop (void);
 void apply_duty_cycle (uint8_t ui8_duty_cycle_value);
+
+void pwm_init (void);
 
 // map / limit values
 int32_t map (int32_t x, int32_t in_min, int32_t in_max, int32_t out_min, int32_t out_max);
@@ -403,7 +404,7 @@ void TIM1_UPD_OVF_TRG_BRK_IRQHandler(void) __interrupt(TIM1_UPD_OVF_TRG_BRK_IRQH
 
 void hall_sensors_read_and_action (void)
 {
-  int8_t hall_sensors = 0;
+  static int8_t hall_sensors;
 
   // read hall sensors signal pins and mask other pins
   hall_sensors = (GPIO_ReadInputData (HALL_SENSORS__PORT) & (HALL_SENSORS_MASK));
@@ -411,15 +412,15 @@ void hall_sensors_read_and_action (void)
   switch (hall_sensors)
   {
     case 3:
-      ui8_motor_rotor_absolute_position = (ANGLE_STEP_256_x1000 * 60 * 0) / 1000;
+      ui8_motor_rotor_absolute_position = ANGLE_0;
     break;
 
     case 1:
-      ui8_motor_rotor_absolute_position = (ANGLE_STEP_256_x1000 * 60 * 1) / 1000;
+      ui8_motor_rotor_absolute_position = ANGLE_60;
     break;
 
     case 5:
-      ui8_motor_rotor_absolute_position = (ANGLE_STEP_256_x1000 * 60 * 2) / 1000;
+      ui8_motor_rotor_absolute_position = ANGLE_120;
 
       // count speed only when motor did rotate half of 1 electronic rotation
       if (flag_count_speed)
@@ -432,15 +433,15 @@ void hall_sensors_read_and_action (void)
     break;
 
     case 4:
-      ui8_motor_rotor_absolute_position = (ANGLE_STEP_256_x1000 * 60 * 3) / 1000;
+      ui8_motor_rotor_absolute_position = ANGLE_180;
     break;
 
     case 6:
-      ui8_motor_rotor_absolute_position = (ANGLE_STEP_256_x1000 * 60 * 4) / 1000;
+      ui8_motor_rotor_absolute_position = ANGLE_240;
     break;
 
     case 2:
-      ui8_motor_rotor_absolute_position = (ANGLE_STEP_256_x1000 * 60 * 5) / 1000;
+      ui8_motor_rotor_absolute_position = ANGLE_300;
 
       flag_count_speed = 1;
     break;
@@ -450,9 +451,9 @@ void hall_sensors_read_and_action (void)
     break;
   }
 
-  ui8_motor_rotor_absolute_position += MOTOR_ROTOR_DELTA_PHASE_ANGLE_RIGHT;
+  ui8_motor_rotor_absolute_position = (uint8_t) (ui8_motor_rotor_absolute_position + MOTOR_ROTOR_DELTA_PHASE_ANGLE_RIGHT);
 
-  ui8_motor_rotor_position = mod_angle_degrees(ui8_motor_rotor_absolute_position + ui8_position_correction_value);
+  ui8_motor_rotor_position = (uint8_t) (ui8_motor_rotor_absolute_position + ui8_position_correction_value);
   interpolation_sum = 0;
 }
 
@@ -545,9 +546,62 @@ void apply_duty_cycle (uint8_t ui8_duty_cycle_value)
   }
 
   // set final duty_cycle value
-  TIM1->CCR1L = ui8_value_a << 1;
-  TIM1->CCR2L = ui8_value_b << 1;
-  TIM1->CCR3L = ui8_value_c << 1;
+  TIM1_SetCompare1((uint16_t) (ui8_value_a << 1));
+  TIM1_SetCompare2((uint16_t) (ui8_value_c << 1));
+  TIM1_SetCompare3((uint16_t) (ui8_value_b << 1));
+}
+
+void pwm_init (void)
+{
+// TIM1 Peripheral Configuration
+  TIM1_DeInit();
+
+  TIM1_TimeBaseInit(0, // TIM1_Prescaler = 0
+		    TIM1_COUNTERMODE_CENTERALIGNED1,
+		    (512 - 1), // clock = 16MHz; counter period = 1024; PWM freq = 16MHz / 1024 = 15.625kHz;
+		    //(BUT PWM center aligned mode needs twice the frequency)
+		    1); // will fire the TIM1_IT_UPDATE at every PWM period
+
+  TIM1_OC1Init(TIM1_OCMODE_PWM1,
+	       TIM1_OUTPUTSTATE_ENABLE,
+	       TIM1_OUTPUTNSTATE_ENABLE,
+	       0, // initial duty_cycle value
+	       TIM1_OCPOLARITY_HIGH,
+	       TIM1_OCNPOLARITY_LOW,
+	       TIM1_OCIDLESTATE_RESET,
+	       TIM1_OCNIDLESTATE_SET);
+
+  TIM1_OC2Init(TIM1_OCMODE_PWM1,
+	       TIM1_OUTPUTSTATE_ENABLE,
+	       TIM1_OUTPUTNSTATE_ENABLE,
+	       0, // initial duty_cycle value
+	       TIM1_OCPOLARITY_HIGH,
+	       TIM1_OCNPOLARITY_LOW,
+	       TIM1_OCIDLESTATE_RESET,
+	       TIM1_OCNIDLESTATE_SET);
+
+  TIM1_OC3Init(TIM1_OCMODE_PWM1,
+	       TIM1_OUTPUTSTATE_ENABLE,
+	       TIM1_OUTPUTNSTATE_ENABLE,
+	       0, // initial duty_cycle value
+	       TIM1_OCPOLARITY_HIGH,
+	       TIM1_OCNPOLARITY_LOW,
+	       TIM1_OCIDLESTATE_RESET,
+	       TIM1_OCNIDLESTATE_SET);
+
+  // break, dead time and lock configuration
+  TIM1_BDTRConfig(TIM1_OSSISTATE_DISABLE,
+		  TIM1_LOCKLEVEL_OFF,
+		  // hardware nees a dead time of 1us
+		  16, // DTG = 0; dead time in 62.5 ns steps; 1us/62.5ns = 16
+		  TIM1_BREAK_DISABLE,
+		  TIM1_BREAKPOLARITY_HIGH,
+		  TIM1_AUTOMATICOUTPUT_ENABLE);
+
+  TIM1_ITConfig(TIM1_IT_UPDATE, ENABLE);
+
+  TIM1_Cmd(ENABLE); // TIM1 counter enable
+  TIM1_CtrlPWMOutputs(ENABLE); // main Output Enable
 }
 
 // Brake signal
@@ -575,6 +629,18 @@ int16_t mod_angle_degrees (int16_t value)
   if(ret < 0)
     ret += 360;
   return ret;
+}
+
+void hall_sensor_init (void)
+{
+  //hall sensors pins as external input pin interrupt
+  GPIO_Init(HALL_SENSORS__PORT,
+	    (GPIO_Pin_TypeDef)(HALL_SENSOR_A__PIN | HALL_SENSOR_B__PIN | HALL_SENSOR_C__PIN),
+            GPIO_MODE_IN_FL_IT);
+
+  //initialize the Interrupt sensitivity
+  EXTI_SetExtIntSensitivity(EXTI_PORT_GPIOE,
+			    EXTI_SENSITIVITY_RISE_FALL);
 }
 
 void uart_init (void)
@@ -607,7 +673,7 @@ int main (void)
   while (brake_is_set()) ; // hold here while brake is pressed -- this is a protection for development
   debug_pin_init ();
   uart_init ();
-//  hall_sensor_init ();
+  hall_sensor_init ();
   pwm_init ();
   adc_init ();
   enableInterrupts();
@@ -623,17 +689,15 @@ int main (void)
     adc_value = adc_read_throttle ();
     ui8_duty_cycle = (uint8_t) map (adc_value, ADC_THROTTLE_MIN_VALUE, ADC_THROTTLE_MAX_VALUE, 0, 255);
 
-    ui8_duty_cycle = 255;
+//    hall_sensors_read_and_action ();
 
-    if (ui8_motor_rotor_position < 255)
-      ui8_motor_rotor_position++;
-    else
-      ui8_motor_rotor_position = 0;
+//    ui8_duty_cycle = 255;
+//
+//    if (ui8_motor_rotor_position < 255)
+//      ui8_motor_rotor_position++;
+//    else
+//      ui8_motor_rotor_position = 0;
 
-    debug_pin_set ();
-    motor_fast_loop ();
-    debug_pin_reset ();
-
-    printf("%d, %d, %d\n", ui8_value_a, ui8_value_b, ui8_value_c);
+//    printf("%d\n", ui8_motor_rotor_position);
   }
 }

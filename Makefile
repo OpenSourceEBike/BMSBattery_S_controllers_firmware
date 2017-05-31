@@ -40,8 +40,6 @@ EXTRASRCS = \
 	$(SDIR)/stm8s_tim1.c \
 	$(SDIR)/stm8s_adc1.c \
 	gpio.c \
-	motor.c \
-	pwm.c \
 
 # The list of .rel files can be derived from the list of their source files
 RELS = $(EXTRASRCS:.c=.rel)
