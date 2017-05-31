@@ -275,16 +275,15 @@ uint8_t ui8_svm_table [SVM_TABLE_LEN] =
     126
 };
 
-int32_t motor_speed_erps = 0; // motor speed in electronic rotations per second
-int8_t flag_count_speed = 0;
-int16_t PWM_cycles_per_SVM_TABLE_step = 0;
-int32_t PWM_cycles_counter = 0;
+uint32_t ui32_motor_speed_erps = 0; // motor speed in electronic rotations per second
+uint8_t ui8_flag_count_speed = 0;
+uint32_t ui32_PWM_cycles_counter = 0;
 uint8_t ui8_motor_rotor_position = 0; // in 360/256 degrees
 uint8_t ui8_motor_rotor_absolute_position = 0; // in 360/256 degrees
 uint8_t ui8_position_correction_value = 0; // in 360/256 degrees
-int32_t interpolation_angle_step = 0; // x1000
-int32_t interpolation_sum = 0; // x1000
-int16_t interpolation_angle = 0;
+uint32_t ui32_interpolation_angle_step = 0; // x1000
+uint32_t ui32_interpolation_sum = 0; // x1000
+uint8_t ui8_interpolation_angle = 0;
 
 static uint8_t ui8_value_a;
 static uint8_t ui8_value_b;
@@ -423,12 +422,12 @@ void hall_sensors_read_and_action (void)
       ui8_motor_rotor_absolute_position = ANGLE_120;
 
       // count speed only when motor did rotate half of 1 electronic rotation
-      if (flag_count_speed)
+      if (ui8_flag_count_speed)
       {
-	  flag_count_speed = 0;
-	  motor_speed_erps = PWM_CYCLES_COUNTER_MAX / PWM_cycles_counter;
-	  interpolation_angle_step = (SVM_TABLE_LEN * 1000) / PWM_cycles_counter;
-	  PWM_cycles_counter = 0;
+	ui8_flag_count_speed = 0;
+	ui32_motor_speed_erps = PWM_CYCLES_COUNTER_MAX / ui32_PWM_cycles_counter;
+	ui32_interpolation_angle_step = (SVM_TABLE_LEN << 10) / ui32_PWM_cycles_counter;
+	ui32_PWM_cycles_counter = 0;
       }
     break;
 
@@ -443,7 +442,7 @@ void hall_sensors_read_and_action (void)
     case 2:
       ui8_motor_rotor_absolute_position = ANGLE_300;
 
-      flag_count_speed = 1;
+      ui8_flag_count_speed = 1;
     break;
 
     default:
@@ -454,38 +453,38 @@ void hall_sensors_read_and_action (void)
   ui8_motor_rotor_absolute_position = (uint8_t) (ui8_motor_rotor_absolute_position + MOTOR_ROTOR_DELTA_PHASE_ANGLE_RIGHT);
 
   ui8_motor_rotor_position = (uint8_t) (ui8_motor_rotor_absolute_position + ui8_position_correction_value);
-  interpolation_sum = 0;
+  ui32_interpolation_sum = 0;
 }
 
 // runs every 64us (PWM frequency)
 void motor_fast_loop (void)
 {
   // count number of fast loops / PWM cycles
-  if (PWM_cycles_counter < PWM_CYCLES_COUNTER_MAX)
+  if (ui32_PWM_cycles_counter < PWM_CYCLES_COUNTER_MAX)
   {
-    PWM_cycles_counter++;
+    ui32_PWM_cycles_counter++;
   }
   else
   {
-    PWM_cycles_counter = 0;
-    motor_speed_erps = 0;
-    interpolation_angle_step = (SVM_TABLE_LEN * 1000) / PWM_CYCLES_COUNTER_MAX;
-    interpolation_sum = 0;
+    ui32_PWM_cycles_counter = 0;
+    ui32_motor_speed_erps = 0;
+    ui32_interpolation_angle_step = (SVM_TABLE_LEN << 10) / PWM_CYCLES_COUNTER_MAX;
+    ui32_interpolation_sum = 0;
   }
 
-#define DO_INTERPOLATION 0 // may be usefull when debugging
+#define DO_INTERPOLATION 1 // may be usefull when debugging
 #if DO_INTERPOLATION == 1
   // calculate the interpolation angle
   // interpolation seems a problem when motor starts, so avoid to do it at very low speed
-  if ( !(ui8_duty_cycle < 5 && ui8_duty_cycle > -5) || motor_speed_erps >= 80)
+  if ((ui8_duty_cycle < 5) || ui32_motor_speed_erps >= 80)
   {
-    if (interpolation_sum <= (60 * 1000)) // interpolate only for angle <= 60º
+    if (ui32_interpolation_sum <= ANGLE_60_x10) // interpolate only for angle <= 60º
     {
       // add step interpolation value to motor_rotor_position
-      interpolation_sum += interpolation_angle_step;
-      interpolation_angle = (int16_t) (interpolation_sum / 1000);
+      ui32_interpolation_sum += ui32_interpolation_angle_step;
+      ui8_interpolation_angle = (uint8_t) (ui32_interpolation_sum >> 10);
 
-      ui8_motor_rotor_position = mod_angle_degrees(ui8_motor_rotor_absolute_position + ui8_position_correction_value + interpolation_angle);
+      ui8_motor_rotor_position = (uint8_t) (ui8_motor_rotor_absolute_position + ui8_position_correction_value + ui8_interpolation_angle);
     }
   }
 #endif
@@ -698,6 +697,6 @@ int main (void)
 //    else
 //      ui8_motor_rotor_position = 0;
 
-//    printf("%d\n", ui8_motor_rotor_position);
+    printf("%d\n", ui8_motor_rotor_position);
   }
 }
