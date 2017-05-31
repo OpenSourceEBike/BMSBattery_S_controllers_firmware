@@ -426,7 +426,7 @@ void hall_sensors_read_and_action (void)
       {
 	ui8_flag_count_speed = 0;
 	ui32_motor_speed_erps = PWM_CYCLES_COUNTER_MAX / ui32_PWM_cycles_counter;
-	ui32_interpolation_angle_step = (SVM_TABLE_LEN << 10) / ui32_PWM_cycles_counter;
+	ui32_interpolation_angle_step = SVM_TABLE_LEN_x1024 / ui32_PWM_cycles_counter;
 	ui32_PWM_cycles_counter = 0;
       }
     break;
@@ -468,7 +468,7 @@ void motor_fast_loop (void)
   {
     ui32_PWM_cycles_counter = 0;
     ui32_motor_speed_erps = 0;
-    ui32_interpolation_angle_step = (SVM_TABLE_LEN << 10) / PWM_CYCLES_COUNTER_MAX;
+    ui32_interpolation_angle_step = (SVM_TABLE_LEN_x1024) / PWM_CYCLES_COUNTER_MAX;
     ui32_interpolation_sum = 0;
   }
 
@@ -476,9 +476,9 @@ void motor_fast_loop (void)
 #if DO_INTERPOLATION == 1
   // calculate the interpolation angle
   // interpolation seems a problem when motor starts, so avoid to do it at very low speed
-  if ((ui8_duty_cycle < 5) || ui32_motor_speed_erps >= 80)
+  if ((ui8_duty_cycle > 10) || ui32_motor_speed_erps >= 80)
   {
-    if (ui32_interpolation_sum <= ANGLE_60_x10) // interpolate only for angle <= 60º
+    if (ui32_interpolation_sum <= ANGLE_60_x1024) // interpolate only for angle <= 60º
     {
       // add step interpolation value to motor_rotor_position
       ui32_interpolation_sum += ui32_interpolation_angle_step;
@@ -686,7 +686,9 @@ int main (void)
   {
     static uint16_t adc_value;
     adc_value = adc_read_throttle ();
-    ui8_duty_cycle = (uint8_t) map (adc_value, ADC_THROTTLE_MIN_VALUE, ADC_THROTTLE_MAX_VALUE, 0, 255);
+//    ui8_duty_cycle = (uint8_t) map (adc_value, ADC_THROTTLE_MIN_VALUE, ADC_THROTTLE_MAX_VALUE, 0, 255);
+
+    ui8_duty_cycle = 40;
 
 //    hall_sensors_read_and_action ();
 
