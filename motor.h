@@ -9,9 +9,14 @@
 #ifndef _MOTOR_H
 #define _MOTOR_H
 
+#include "main.h"
+
 // direction of motor movement
 #define RIGHT 		1
 #define LEFT 		2
+
+
+extern uint8_t ui8_svm_table [SVM_TABLE_LEN];
 
 int8_t get_motor_rotation_direction (void);
 

@@ -14,6 +14,7 @@
 #include "interrupts.h"
 #include "stm8s_adc1.h"
 #include "stm8s_tim1.h"
+#include "motor.h"
 
 uint8_t ui8_svm_table [SVM_TABLE_LEN] =
 {
@@ -275,6 +276,7 @@ uint8_t ui8_svm_table [SVM_TABLE_LEN] =
     126
 };
 
+
 uint32_t ui32_motor_speed_erps = 0; // motor speed in electronic rotations per second
 uint8_t ui8_flag_count_speed = 0;
 uint32_t ui32_PWM_cycles_counter = 0;
@@ -476,7 +478,7 @@ void motor_fast_loop (void)
 #if DO_INTERPOLATION == 1
   // calculate the interpolation angle
   // interpolation seems a problem when motor starts, so avoid to do it at very low speed
-  if ((ui8_duty_cycle > 10) || ui32_motor_speed_erps >= 80)
+  if ((ui8_duty_cycle > 10) && ui32_motor_speed_erps >= 10)
   {
     if (ui8_interpolation_angle <= ANGLE_60) // interpolate only for angle <= 60º
     {
@@ -688,17 +690,6 @@ int main (void)
     adc_value = adc_read_throttle ();
     ui8_duty_cycle = (uint8_t) map (adc_value, ADC_THROTTLE_MIN_VALUE, ADC_THROTTLE_MAX_VALUE, 0, 255);
 
-//    ui8_duty_cycle = 44;
-
-//    hall_sensors_read_and_action ();
-
-//    ui8_duty_cycle = 255;
-//
-//    if (ui8_motor_rotor_position < 255)
-//      ui8_motor_rotor_position++;
-//    else
-//      ui8_motor_rotor_position = 0;
-
-    printf("%d\n", ui8_motor_rotor_position);
+//    printf("%d\n", ui16_log);
   }
 }
