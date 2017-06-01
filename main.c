@@ -276,6 +276,7 @@ uint8_t ui8_svm_table [SVM_TABLE_LEN] =
     126
 };
 
+uint8_t last_angle;
 
 uint32_t ui32_motor_speed_erps = 0; // motor speed in electronic rotations per second
 uint8_t ui8_flag_count_speed = 0;
@@ -325,6 +326,7 @@ int16_t mod_angle_degrees (int16_t value);
 
 void uart_init (void);
 void putchar(char c);
+char getchar(void);
 
 /////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -455,6 +457,7 @@ void hall_sensors_read_and_action (void)
   ui8_motor_rotor_absolute_position = (uint8_t) (ui8_motor_rotor_absolute_position + MOTOR_ROTOR_DELTA_PHASE_ANGLE_RIGHT);
 
   ui8_motor_rotor_position = (uint8_t) (ui8_motor_rotor_absolute_position + ui8_position_correction_value);
+  ui8_interpolation_angle = 0;
   ui32_interpolation_sum = 0;
 }
 
@@ -480,7 +483,7 @@ void motor_fast_loop (void)
   // interpolation seems a problem when motor starts, so avoid to do it at very low speed
   if ((ui8_duty_cycle > 10) && ui32_motor_speed_erps >= 10)
   {
-    if (ui8_interpolation_angle <= ANGLE_60) // interpolate only for angle <= 60º
+    if (ui8_interpolation_angle < ANGLE_60) // interpolate only for angle <= 60º
     {
       // add step interpolation value to motor_rotor_position
       ui32_interpolation_sum += ui32_interpolation_angle_step;
@@ -492,6 +495,12 @@ void motor_fast_loop (void)
 #endif
 
   apply_duty_cycle (ui8_duty_cycle);
+
+//  if (last_angle != ui8_motor_rotor_position)
+//  {
+//    last_angle = ui8_motor_rotor_position;
+//    printf("%d\n", ui8_motor_rotor_position);
+//  }
 }
 
 void apply_duty_cycle (uint8_t ui8_duty_cycle_value)
@@ -664,6 +673,19 @@ void putchar(char c)
   while (UART2_GetFlagStatus(UART2_FLAG_TXE) == RESET);
 }
 
+char getchar(void)
+{
+  uint8_t c = 0;
+
+  /* Loop until the Read data register flag is SET */
+  while (UART2_GetFlagStatus(UART2_FLAG_RXNE) == RESET) ;
+
+  c = UART2_ReceiveData8();
+
+  return (c);
+}
+
+
 int main (void)
 {
   //set clock at the max 16MHz
@@ -687,9 +709,30 @@ int main (void)
   while (1)
   {
     static uint16_t adc_value;
+    int8_t i8_buffer[64];
+    uint8_t ui8_value;
+    int objects_readed;
+
     adc_value = adc_read_throttle ();
     ui8_duty_cycle = (uint8_t) map (adc_value, ADC_THROTTLE_MIN_VALUE, ADC_THROTTLE_MAX_VALUE, 0, 255);
 
-//    printf("%d\n", ui16_log);
+
+  // get the parametters for PID, from the bluetooth
+//   fflush(stdin); // needed to unblock scanf() after a not expected formatted data
+   objects_readed = scanf("%s %d", &i8_buffer, &ui8_value);
+
+   if (objects_readed > 0)
+   {
+     switch (i8_buffer[0])
+     {
+      case 'a':
+	printf("a = %d\n", ui8_value);
+	ui8_position_correction_value = ui8_value;
+	break;
+
+      default:
+	break;
+     }
+   }
   }
 }
