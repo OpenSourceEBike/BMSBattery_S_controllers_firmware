@@ -16,8 +16,6 @@
 #include "stm8s_tim1.h"
 #include "motor.h"
 
-uint8_t last_angle;
-
 uint32_t ui32_motor_speed_erps = 0; // motor speed in electronic rotations per second
 uint8_t ui8_flag_count_speed = 0;
 uint32_t ui32_PWM_cycles_counter = 0;
@@ -62,13 +60,13 @@ void pwm_init (void);
 // map / limit values
 int32_t map (int32_t x, int32_t in_min, int32_t in_max, int32_t out_min, int32_t out_max);
 
-int16_t mod_angle_degrees (int16_t value);
-
 void uart_init (void);
 void putchar(char c);
 char getchar(void);
 
 /////////////////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////////////////
+
 
 int32_t map (int32_t x, int32_t in_min, int32_t in_max, int32_t out_min, int32_t out_max)
 {
@@ -151,6 +149,18 @@ void hall_sensors_read_and_action (void)
 
   // read hall sensors signal pins and mask other pins
   hall_sensors = (GPIO_ReadInputData (HALL_SENSORS__PORT) & (HALL_SENSORS_MASK));
+
+//  switch (hall_sensors)
+//  {
+//    case 3: hall_sensors = 1; break;
+//    case 1: hall_sensors = 5; break;
+//    case 5: hall_sensors = 4; break;
+//    case 4: hall_sensors = 6; break;
+//    case 6: hall_sensors = 2; break;
+//    case 2: hall_sensors = 3; break;
+//    default: hall_sensors = 2; return;
+//    break;
+//  }
 
   switch (hall_sensors)
   {
@@ -235,12 +245,6 @@ void motor_fast_loop (void)
 #endif
 
   apply_duty_cycle (ui8_duty_cycle);
-
-//  if (last_angle != ui8_motor_rotor_position)
-//  {
-//    last_angle = ui8_motor_rotor_position;
-//    printf("%d\n", ui8_motor_rotor_position);
-//  }
 }
 
 void apply_duty_cycle (uint8_t ui8_duty_cycle_value)
@@ -344,6 +348,9 @@ void pwm_init (void)
 		  TIM1_LOCKLEVEL_OFF,
 		  // hardware nees a dead time of 1us
 		  16, // DTG = 0; dead time in 62.5 ns steps; 1us/62.5ns = 16
+		  // 16 --> 1000ns
+		  // 12 --> 750ns
+		  // 8 --> 500ns
 		  TIM1_BREAK_DISABLE,
 		  TIM1_BREAKPOLARITY_HIGH,
 		  TIM1_AUTOMATICOUTPUT_ENABLE);
@@ -371,14 +378,6 @@ void EXTI_PORTA_IRQHandler(void) __interrupt(EXTI_PORTA_IRQHANDLER)
 void EXTI_PORTE_IRQHandler(void) __interrupt(EXTI_PORTE_IRQHANDLER)
 {
   hall_sensors_read_and_action ();
-}
-
-int16_t mod_angle_degrees (int16_t value)
-{
-  int16_t ret = value % 360;
-  if(ret < 0)
-    ret += 360;
-  return ret;
 }
 
 void hall_sensor_init (void)
@@ -448,6 +447,7 @@ int main (void)
 
   while (1)
   {
+//    static uint16_t c;
     static uint16_t adc_value;
     int8_t i8_buffer[64];
     uint8_t ui8_value;
@@ -456,8 +456,17 @@ int main (void)
     adc_value = adc_read_throttle ();
     ui8_duty_cycle = (uint8_t) map (adc_value, ADC_THROTTLE_MIN_VALUE, ADC_THROTTLE_MAX_VALUE, 0, 255);
 
+//    c++;
+//    if (c < 43)
+//    {
+//      motor_fast_loop ();
+//    }
+//    else
+//    {
+//      c = 0;
+//      hall_sensors_read_and_action ();
+//    }
 
-  // get the parametters for PID, from the bluetooth
 //   fflush(stdin); // needed to unblock scanf() after a not expected formatted data
 //   objects_readed = scanf("%s %d", &i8_buffer, &ui8_value);
 //
