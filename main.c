@@ -165,15 +165,15 @@ void hall_sensors_read_and_action (void)
   switch (hall_sensors)
   {
     case 3:
-      ui8_motor_rotor_absolute_position = ANGLE_180;
+      ui8_motor_rotor_absolute_position = ANGLE_210;
     break;
 
     case 1:
-      ui8_motor_rotor_absolute_position = ANGLE_240;
+      ui8_motor_rotor_absolute_position = ANGLE_270;
     break;
 
     case 5:
-      ui8_motor_rotor_absolute_position = ANGLE_300;
+      ui8_motor_rotor_absolute_position = ANGLE_330;
 
       // count speed only when motor did rotate half of 1 electronic rotation
       if (ui8_flag_count_speed)
@@ -186,15 +186,15 @@ void hall_sensors_read_and_action (void)
     break;
 
     case 4:
-      ui8_motor_rotor_absolute_position = ANGLE_0;
+      ui8_motor_rotor_absolute_position = ANGLE_30;
     break;
 
     case 6:
-      ui8_motor_rotor_absolute_position = ANGLE_60;
+      ui8_motor_rotor_absolute_position = ANGLE_90;
     break;
 
     case 2:
-      ui8_motor_rotor_absolute_position = ANGLE_120;
+      ui8_motor_rotor_absolute_position = ANGLE_150;
 
       ui8_flag_count_speed = 1;
     break;
