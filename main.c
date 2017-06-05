@@ -165,15 +165,15 @@ void hall_sensors_read_and_action (void)
   switch (hall_sensors)
   {
     case 3:
-      ui8_motor_rotor_absolute_position = ANGLE_210;
+      ui8_motor_rotor_absolute_position = ANGLE_30;
     break;
 
     case 1:
-      ui8_motor_rotor_absolute_position = ANGLE_270;
+      ui8_motor_rotor_absolute_position = ANGLE_90;
     break;
 
     case 5:
-      ui8_motor_rotor_absolute_position = ANGLE_330;
+      ui8_motor_rotor_absolute_position = ANGLE_150;
 
       // count speed only when motor did rotate half of 1 electronic rotation
       if (ui8_flag_count_speed)
@@ -186,15 +186,15 @@ void hall_sensors_read_and_action (void)
     break;
 
     case 4:
-      ui8_motor_rotor_absolute_position = ANGLE_30;
+      ui8_motor_rotor_absolute_position = ANGLE_210;
     break;
 
     case 6:
-      ui8_motor_rotor_absolute_position = ANGLE_90;
+      ui8_motor_rotor_absolute_position = ANGLE_270;
     break;
 
     case 2:
-      ui8_motor_rotor_absolute_position = ANGLE_150;
+      ui8_motor_rotor_absolute_position = ANGLE_330;
 
       ui8_flag_count_speed = 1;
     break;
@@ -231,7 +231,7 @@ void motor_fast_loop (void)
 #if DO_INTERPOLATION == 1
   // calculate the interpolation angle
   // interpolation seems a problem when motor starts, so avoid to do it at very low speed
-  if ((ui8_duty_cycle > 10) && ui32_motor_speed_erps >= 10)
+  if ((ui8_duty_cycle > 10) && (ui32_motor_speed_erps >= 10))
   {
     if (ui8_interpolation_angle < ANGLE_60) // interpolate only for angle <= 60º
     {

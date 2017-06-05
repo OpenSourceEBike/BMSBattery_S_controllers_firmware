@@ -17,7 +17,7 @@
 #define SINE 2
 #define SQUARE 3
 
-#define SVM_TABLE SINE
+#define SVM_TABLE SVM
 
 #if (SVM_TABLE == SVM)
 uint8_t ui8_svm_table [SVM_TABLE_LEN] =
