@@ -26,11 +26,11 @@ int32_t i32_interpolation_angle_step = 0; // x1000
 int32_t i32_interpolation_sum = 0; // x1000
 int16_t i16_interpolation_angle = 0;
 
-static int16_t i16_value_a;
-static int16_t i16_value_b;
-static int16_t i16_value_c;
+int32_t i32_value_a;
+int32_t i32_value_b;
+int32_t i32_value_c;
 
-volatile int16_t i16_duty_cycle;
+int16_t i16_duty_cycle;
 
 /////////////////////////////////////////////////////////////////////////////////////////////
 //// Functions prototypes
@@ -55,7 +55,7 @@ void apply_duty_cycle (int16_t i16_duty_cycle_value);
 void pwm_init (void);
 
 // map / limit values
-int16_t i16_map (int16_t x, int16_t in_min, int16_t in_max, int16_t out_min, int16_t out_max);
+uint32_t ui32_map (uint32_t x, uint32_t in_min, uint32_t in_max, uint32_t out_min, uint32_t out_max);
 
 void uart_init (void);
 void putchar(char c);
@@ -71,7 +71,7 @@ int16_t i16_mod_angle_degrees (int16_t value)
   return ret;
 }
 
-int16_t i16_map (int16_t x, int16_t in_min, int16_t in_max, int16_t out_min, int16_t out_max)
+uint32_t ui32_map (uint32_t x, uint32_t in_min, uint32_t in_max, uint32_t out_min, uint32_t out_max)
 {
   // if input is smaller/bigger than expected return the min/max out ranges value
   if (x < in_min)
@@ -138,9 +138,13 @@ uint16_t adc_read_throttle (void)
 
 void TIM1_UPD_OVF_TRG_BRK_IRQHandler(void) __interrupt(TIM1_UPD_OVF_TRG_BRK_IRQHANDLER)
 {
+  TIM1_ITConfig(TIM1_IT_UPDATE, DISABLE);
+
   debug_pin_set ();
   motor_fast_loop ();
   debug_pin_reset ();
+
+  TIM1_ITConfig(TIM1_IT_UPDATE, ENABLE);
 
   // clear the interrupt pending bit for TIM1
   TIM1_ClearITPendingBit(TIM1_IT_UPDATE);
@@ -244,7 +248,8 @@ void motor_fast_loop (void)
 
       i16_motor_rotor_position = i16_mod_angle_degrees (i16_motor_rotor_absolute_position +
 							i16_position_correction_value +
-							i16_interpolation_angle);
+							i16_interpolation_angle +
+							MOTOR_ROTOR_DELTA_PHASE_ANGLE_RIGHT);
     }
   }
 #endif
@@ -254,57 +259,57 @@ void motor_fast_loop (void)
 
 void apply_duty_cycle (int16_t i16_duty_cycle_value)
 {
-  static int16_t i16_temp;
+  static int32_t i32_temp;
 
   // scale and apply _duty_cycle
-  i16_temp = i16_svm_table[i16_motor_rotor_position];
-  if (i16_temp > MIDDLE_PWM_VALUE_DUTY_CYCLE_MAX)
+  i32_temp = (int32_t) i16_svm_table[i16_motor_rotor_position];
+  if (i32_temp > MIDDLE_PWM_VALUE_DUTY_CYCLE_MAX)
   {
-    i16_value_a = ((int16_t) (i16_temp - MIDDLE_PWM_VALUE_DUTY_CYCLE_MAX)) * i16_duty_cycle_value;
-    i16_temp = (int16_t) (i16_value_a >> 9);
-    i16_value_a = MIDDLE_PWM_VALUE_DUTY_CYCLE_MAX + i16_temp;
+    i32_value_a = (i32_temp - MIDDLE_PWM_VALUE_DUTY_CYCLE_MAX) * (int32_t) i16_duty_cycle_value;
+    i32_temp = i32_value_a >> 9;
+    i32_value_a = MIDDLE_PWM_VALUE_DUTY_CYCLE_MAX + i32_temp;
   }
   else
   {
-    i16_value_a = ((int16_t) (MIDDLE_PWM_VALUE_DUTY_CYCLE_MAX - i16_temp)) * i16_duty_cycle_value;
-    i16_temp = (int16_t) (i16_value_a >> 9);
-    i16_value_a = MIDDLE_PWM_VALUE_DUTY_CYCLE_MAX - i16_temp;
+    i32_value_a = (MIDDLE_PWM_VALUE_DUTY_CYCLE_MAX - i32_temp) * (int32_t) i16_duty_cycle_value;
+    i32_temp = i32_value_a >> 9;
+    i32_value_a = MIDDLE_PWM_VALUE_DUTY_CYCLE_MAX - i32_temp;
   }
 
   // add 120 degrees and limit
-  i16_temp = i16_svm_table[i16_mod_angle_degrees (i16_motor_rotor_position + 120)];
-  if (i16_temp > MIDDLE_PWM_VALUE_DUTY_CYCLE_MAX)
+  i32_temp = (int32_t) i16_svm_table[i16_mod_angle_degrees (i16_motor_rotor_position + 120)];
+  if (i32_temp > MIDDLE_PWM_VALUE_DUTY_CYCLE_MAX)
   {
-    i16_value_b = ((uint16_t) (i16_temp - MIDDLE_PWM_VALUE_DUTY_CYCLE_MAX)) * i16_duty_cycle_value;
-    i16_temp = (int16_t) (i16_value_b >> 9);
-    i16_value_b = MIDDLE_PWM_VALUE_DUTY_CYCLE_MAX + i16_temp;
+    i32_value_b = (i32_temp - MIDDLE_PWM_VALUE_DUTY_CYCLE_MAX) * (int32_t) i16_duty_cycle_value;
+    i32_temp = i32_value_b >> 9;
+    i32_value_b = MIDDLE_PWM_VALUE_DUTY_CYCLE_MAX + i32_temp;
   }
   else
   {
-    i16_value_b = ((uint16_t) (MIDDLE_PWM_VALUE_DUTY_CYCLE_MAX - i16_temp)) * i16_duty_cycle_value;
-    i16_temp = (int16_t) (i16_value_b >> 9);
-    i16_value_b = MIDDLE_PWM_VALUE_DUTY_CYCLE_MAX - i16_temp;
+    i32_value_b = (MIDDLE_PWM_VALUE_DUTY_CYCLE_MAX - i32_temp) * (int32_t) i16_duty_cycle_value;
+    i32_temp = i32_value_b >> 9;
+    i32_value_b = MIDDLE_PWM_VALUE_DUTY_CYCLE_MAX - i32_temp;
   }
 
   // subtract 120 degrees and limit
-  i16_temp = i16_svm_table[i16_mod_angle_degrees (i16_motor_rotor_position + 240)];
-  if (i16_temp > MIDDLE_PWM_VALUE_DUTY_CYCLE_MAX)
+  i32_temp = (int32_t) i16_svm_table[i16_mod_angle_degrees (i16_motor_rotor_position + 240)];
+  if (i32_temp > MIDDLE_PWM_VALUE_DUTY_CYCLE_MAX)
   {
-    i16_value_c = ((uint16_t) (i16_temp - MIDDLE_PWM_VALUE_DUTY_CYCLE_MAX)) * i16_duty_cycle_value;
-    i16_temp = (int16_t) (i16_value_c >> 9);
-    i16_value_c = MIDDLE_PWM_VALUE_DUTY_CYCLE_MAX + i16_temp;
+    i32_value_c = (i32_temp - MIDDLE_PWM_VALUE_DUTY_CYCLE_MAX) * (int32_t) i16_duty_cycle_value;
+    i32_temp = i32_value_c >> 9;
+    i32_value_c = MIDDLE_PWM_VALUE_DUTY_CYCLE_MAX + i32_temp;
   }
   else
   {
-    i16_value_c = ((uint16_t) (MIDDLE_PWM_VALUE_DUTY_CYCLE_MAX - i16_temp)) * i16_duty_cycle_value;
-    i16_temp = (int16_t) (i16_value_c >> 9);
-    i16_value_c = MIDDLE_PWM_VALUE_DUTY_CYCLE_MAX - i16_temp;
+    i32_value_c = (MIDDLE_PWM_VALUE_DUTY_CYCLE_MAX - i32_temp) * (int32_t) i16_duty_cycle_value;
+    i32_temp = i32_value_c >> 9;
+    i32_value_c = MIDDLE_PWM_VALUE_DUTY_CYCLE_MAX - i32_temp;
   }
 
   // set final duty_cycle value
-  TIM1_SetCompare1((uint16_t) i16_value_a);
-  TIM1_SetCompare2((uint16_t) i16_value_c);
-  TIM1_SetCompare3((uint16_t) i16_value_b);
+  TIM1_SetCompare1((uint16_t) i32_value_a);
+  TIM1_SetCompare2((uint16_t) i32_value_c);
+  TIM1_SetCompare3((uint16_t) i32_value_b);
 }
 
 void pwm_init (void)
@@ -321,6 +326,8 @@ void pwm_init (void)
   TIM1_OC1Init(TIM1_OCMODE_PWM1,
 	       TIM1_OUTPUTSTATE_ENABLE,
 	       TIM1_OUTPUTNSTATE_ENABLE,
+//	       TIM1_OUTPUTSTATE_DISABLE,
+//	       TIM1_OUTPUTNSTATE_DISABLE,
 	       0, // initial duty_cycle value
 	       TIM1_OCPOLARITY_HIGH,
 	       TIM1_OCNPOLARITY_LOW,
@@ -330,6 +337,8 @@ void pwm_init (void)
   TIM1_OC2Init(TIM1_OCMODE_PWM1,
 	       TIM1_OUTPUTSTATE_ENABLE,
 	       TIM1_OUTPUTNSTATE_ENABLE,
+//	       TIM1_OUTPUTSTATE_DISABLE,
+//	       TIM1_OUTPUTNSTATE_DISABLE,
 	       0, // initial duty_cycle value
 	       TIM1_OCPOLARITY_HIGH,
 	       TIM1_OCNPOLARITY_LOW,
@@ -339,6 +348,8 @@ void pwm_init (void)
   TIM1_OC3Init(TIM1_OCMODE_PWM1,
 	       TIM1_OUTPUTSTATE_ENABLE,
 	       TIM1_OUTPUTNSTATE_ENABLE,
+//	       TIM1_OUTPUTSTATE_DISABLE,
+//	       TIM1_OUTPUTNSTATE_DISABLE,
 	       0, // initial duty_cycle value
 	       TIM1_OCPOLARITY_HIGH,
 	       TIM1_OCNPOLARITY_LOW,
@@ -358,6 +369,7 @@ void pwm_init (void)
 		  TIM1_AUTOMATICOUTPUT_ENABLE);
 
   TIM1_ITConfig(TIM1_IT_UPDATE, ENABLE);
+  ITC_SetSoftwarePriority(ITC_IRQ_TIM1_OVF, ITC_PRIORITYLEVEL_1);
 
   TIM1_Cmd(ENABLE); // TIM1 counter enable
   TIM1_CtrlPWMOutputs(ENABLE); // main Output Enable
@@ -388,6 +400,8 @@ void hall_sensor_init (void)
   GPIO_Init(HALL_SENSORS__PORT,
 	    (GPIO_Pin_TypeDef)(HALL_SENSOR_A__PIN | HALL_SENSOR_B__PIN | HALL_SENSOR_C__PIN),
             GPIO_MODE_IN_FL_IT);
+
+  ITC_SetSoftwarePriority(ITC_IRQ_PORTE, ITC_PRIORITYLEVEL_2);
 
   //initialize the Interrupt sensitivity
   EXTI_SetExtIntSensitivity(EXTI_PORT_GPIOE,
@@ -449,17 +463,23 @@ int main (void)
 
   while (1)
   {
-//    static uint16_t c;
+    static uint32_t ui32_value;
+    static uint16_t c;
     static uint16_t ui16_adc_value;
     int8_t i8_buffer[64];
     uint8_t ui8_value;
     int objects_readed;
 
     ui16_adc_value = adc_read_throttle ();
-    i16_duty_cycle = i16_map ((int16_t) ui16_adc_value, ADC_THROTTLE_MIN_VALUE, ADC_THROTTLE_MAX_VALUE, 0, 511);
+    ui32_value = ui32_map ((uint32_t) ui16_adc_value, ADC_THROTTLE_MIN_VALUE, ADC_THROTTLE_MAX_VALUE, 0, 511);
+    i16_duty_cycle = (int16_t) ui32_value;
+
+//    i16_duty_cycle = 255;
+
+//    printf("%d\n", i16_duty_cycle);
 
 //    c++;
-//    if (c < 43)
+//    if (c < 250)
 //    {
 //      motor_fast_loop ();
 //    }
@@ -468,6 +488,7 @@ int main (void)
 //      c = 0;
 //      hall_sensors_read_and_action ();
 //    }
+//    printf("%d, %d, %d, %d\n", i16_motor_rotor_position, (uint16_t) i32_value_a, (uint16_t) i32_value_b, (uint16_t) i32_value_c);
 
 //   fflush(stdin); // needed to unblock scanf() after a not expected formatted data
 //   objects_readed = scanf("%s %d", &i8_buffer, &ui8_value);
