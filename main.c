@@ -90,7 +90,8 @@ uint16_t adc_read_throttle (void);
 void TIM2_init(void)
 {
   TIM2_DeInit();
-  TIM2_TimeBaseInit(TIM2_PRESCALER_1, 720); // TIM2 clock = 16MHz; 208 --> 13us
+//  TIM2_TimeBaseInit(TIM2_PRESCALER_1, 480); // TIM2 clock = 16MHz; 208 --> 13us
+  TIM2_TimeBaseInit(TIM2_PRESCALER_1, 288); // TIM2 clock = 16MHz; 208 --> 13us
   TIM2_ITConfig(TIM2_IT_UPDATE, ENABLE); // update event interrupt enable
   TIM2_Cmd(DISABLE);
 }
@@ -126,12 +127,9 @@ void ADC1_IRQHandler(void) __interrupt(ADC1_IRQHANDLER)
 
     adc_total_current = ADC1->DRH;
 
-    if (adc_total_current > 1)
+    if (adc_total_current > 90)
     {
-//      TIM1_GenerateEvent (TIM1_EVENTSOURCE_BREAK);
-//      TIM1->BKR &= (uint8_t) ~(TIM1_BKR_MOE);
-//      GPIOD->ODR &= (uint8_t)(~(GPIO_PIN_0));
-//      TIM1->BKR &= (uint8_t)(~TIM1_BKR_MOE);
+      TIM1->BKR &= (uint8_t) ~(TIM1_BKR_MOE);
     }
 
     ui8_adc_total_current_busy_flag = 0;
@@ -243,7 +241,7 @@ uint16_t adc_read_throttle (void)
 
 void TIM2_UPD_OVF_TRG_BRK_IRQHandler(void) __interrupt(TIM2_UPD_OVF_TRG_BRK_IRQHANDLER)
 {
-  debug_pin_set ();
+//  debug_pin_set ();
 
   // stop TIM2 counter
   TIM2->CR1 &= (uint8_t)(~TIM2_CR1_CEN);
@@ -262,7 +260,7 @@ void TIM2_UPD_OVF_TRG_BRK_IRQHandler(void) __interrupt(TIM2_UPD_OVF_TRG_BRK_IRQH
 
 void TIM1_UPD_OVF_TRG_BRK_IRQHandler(void) __interrupt(TIM1_UPD_OVF_TRG_BRK_IRQHANDLER)
 {
-  debug_pin_set ();
+//  debug_pin_set ();
 
   // reset and start TIM2 counter
   TIM2->CNTRH = 0;
@@ -603,7 +601,7 @@ int main (void)
     uint8_t ui8_value;
     int objects_readed;
 
-    debug_pin_reset ();
+//    debug_pin_reset ();
 
     ui32_counter++;
     if (ui32_counter > 10000) // 25ms
