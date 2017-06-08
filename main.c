@@ -37,7 +37,13 @@ static uint16_t ui16_value_c;
 
 volatile uint8_t ui8_duty_cycle;
 
-uint16_t adc_value;
+uint8_t adc_current_phase_B = 0;
+uint8_t adc_total_current = 0;
+uint8_t ui8_adc_total_current_busy_flag = 0;
+uint8_t adc_throttle = 0;
+uint8_t adc_throttle_busy_flag = 0;
+
+uint16_t ui16_adc_value;
 
 /////////////////////////////////////////////////////////////////////////////////////////////
 //// Functions prototypes
@@ -74,6 +80,7 @@ void TIM2_UPD_OVF_TRG_BRK_IRQHandler(void) __interrupt(TIM2_UPD_OVF_TRG_BRK_IRQH
 
 void adc_init (void);
 void ADC1_IRQHandler(void) __interrupt(ADC1_IRQHANDLER);
+void adc_start_read_throttle (void);
 uint16_t adc_read_throttle (void);
 
 /////////////////////////////////////////////////////////////////////////////////////////////
@@ -107,22 +114,42 @@ int32_t map (int32_t x, int32_t in_min, int32_t in_max, int32_t out_min, int32_t
 
 void ADC1_IRQHandler(void) __interrupt(ADC1_IRQHANDLER)
 {
+  uint8_t ui8_temp;
+
   debug_pin_set ();
 
-  if (ADC1->CSR && ADC1_CHANNEL_6)
-    {
+  ui8_temp = (ADC1->CSR & 0x0f);
 
-  if (ADC1->DRH > 100) // 400 >> 2 = 100
+  if (ui8_temp == ADC1_CHANNEL_6)
   {
-//    TIM1_GenerateEvent (TIM1_EVENTSOURCE_BREAK);
-//    TIM1->BKR = (uint8_t) (1 << 7);
-  }
+    debug_pin_set ();
+
+    adc_total_current = ADC1->DRH;
+
+    if (adc_total_current > 1)
+    {
+//      TIM1_GenerateEvent (TIM1_EVENTSOURCE_BREAK);
+//      TIM1->BKR &= (uint8_t) ~(TIM1_BKR_MOE);
+//      GPIOD->ODR &= (uint8_t)(~(GPIO_PIN_0));
+//      TIM1->BKR &= (uint8_t)(~TIM1_BKR_MOE);
     }
 
-  debug_pin_reset ();
+    ui8_adc_total_current_busy_flag = 0;
+  }
+  else if (ui8_temp == ADC1_CHANNEL_5)
+  {
+    adc_current_phase_B = ADC1->DRH;
+  }
+  else if (ui8_temp == ADC1_CHANNEL_4)
+  {
+    adc_throttle = ADC1->DRH;
+    adc_throttle_busy_flag = 0;
+  }
 
-  // clear the interrupt pending bit
-  ADC1_ClearITPendingBit(ADC1_IT_EOC);
+  ADC1_ClearITPendingBit(ADC1_IT_EOC);   // clear the interrupt pending bit
+  ADC1->CSR &= (uint8_t) (~ADC1_FLAG_EOC); // clear the End of Conversion flag
+
+  debug_pin_reset ();
 }
 
 //can't put ADC code file on external file like adc.c or the code will not work :-(
@@ -138,7 +165,7 @@ void adc_init (void)
 
   //init ADC2 peripheral
   ADC1_Init(ADC1_CONVERSIONMODE_SINGLE,
-	    (ADC1_CHANNEL_4 || ADC1_CHANNEL_5 || ADC1_CHANNEL_6),
+	    ADC1_CHANNEL_6,
 	    ADC1_PRESSEL_FCPU_D2,
             ADC1_EXTTRIG_TIM,
 	    DISABLE, //disable external trigger
@@ -149,26 +176,61 @@ void adc_init (void)
   ADC1_ITConfig (ADC1_IT_EOCIE, ENABLE);
 }
 
+void adc_start_read_throttle (void)
+{
+  adc_throttle_busy_flag = 1;
+  ADC1->CSR |= (uint8_t)(ADC1_CHANNEL_4);
+  ADC1_StartConversion();
+}
+
 uint16_t adc_read_throttle (void)
 {
   uint16_t value;
 
-//  ADC1_ITConfig (ADC1_IT_EOCIE, DISABLE); // disable just for this read
+  adc_throttle_busy_flag = 1;
 
-  ADC1_ConversionConfig(ADC1_CONVERSIONMODE_SINGLE, ADC1_CHANNEL_4, ADC1_ALIGN_RIGHT);
+  ADC1_ITConfig (ADC1_IT_EOCIE, DISABLE); // disable just for this read
 
-  ADC1_StartConversion();
+  ADC1->CSR &= (uint8_t)(~ADC1_CSR_CH);
+  ADC1->CSR |= (uint8_t)(ADC1_CHANNEL_4);
+  ADC1->CR1 |= ADC1_CR1_ADON;
 
   while (!ADC1_GetFlagStatus(ADC1_FLAG_EOC)) ; //block waiting for the end of conversion
 
-  value = ADC1_GetConversionValue();
+  value = ADC1->DRH;
 
-//  ADC1_ClearITPendingBit(ADC1_IT_EOC); // clear the interrupt (possible)pending bit
-//  ADC1_ITConfig (ADC1_IT_EOCIE, ENABLE); // enable again
+  ADC1_ClearFlag(ADC1_FLAG_EOC);
+
+  // enable again
+  ADC1->CSR &= (uint8_t)(~ADC1_CSR_CH);
+  ADC1->CSR |= (uint8_t)(ADC1_CHANNEL_6);
+
+  ADC1_ITConfig (ADC1_IT_EOCIE, ENABLE); // enable again
+
+  adc_throttle_busy_flag = 0;
 
   return value;
-}
 
+
+
+//  uint16_t value;
+//
+//  ADC1_ITConfig (ADC1_IT_EOCIE, DISABLE); // disable just for this read
+//  adc_throttle_busy_flag = 1;
+//
+//  ADC1_ConversionConfig(ADC1_CONVERSIONMODE_SINGLE, ADC1_CHANNEL_4, ADC1_ALIGN_RIGHT);
+//
+//  ADC1_StartConversion();
+//
+//  while (!ADC1_GetFlagStatus(ADC1_FLAG_EOC)) ; //block waiting for the end of conversion
+//
+//  value = ADC1_GetConversionValue();
+//
+////  ADC1_ClearITPendingBit(ADC1_IT_EOC); // clear the interrupt (possible)pending bit
+////  ADC1_ITConfig (ADC1_IT_EOCIE, ENABLE); // enable again
+//
+//  return value;
+}
 
 //With SDCC, interrupt service routine function prototypes must be placed in the file that contains main ()
 //in order for an vector for the interrupt to be placed in the the interrupt vector space.  It's acceptable
@@ -181,22 +243,26 @@ uint16_t adc_read_throttle (void)
 
 void TIM2_UPD_OVF_TRG_BRK_IRQHandler(void) __interrupt(TIM2_UPD_OVF_TRG_BRK_IRQHANDLER)
 {
+  debug_pin_set ();
+
   // stop TIM2 counter
   TIM2->CR1 &= (uint8_t)(~TIM2_CR1_CEN);
 
-//  debug_pin_set ();
-
-  ADC1->CR1 |= ADC1_CR1_ADON; // ADC1 start conversion
-
-//  debug_pin_reset ();
+  if (adc_throttle_busy_flag == 0) // ADC1 start conversion only when it is free
+  {
+    ui8_adc_total_current_busy_flag = 1;
+    ADC1->CR1 |= ADC1_CR1_ADON;
+  }
 
   // clear the interrupt pending bit for TIM2
   TIM2_ClearITPendingBit(TIM2_IT_UPDATE);
+
+//  debug_pin_reset ();
 }
 
 void TIM1_UPD_OVF_TRG_BRK_IRQHandler(void) __interrupt(TIM1_UPD_OVF_TRG_BRK_IRQHANDLER)
 {
-//  debug_pin_set ();
+  debug_pin_set ();
 
   // reset and start TIM2 counter
   TIM2->CNTRH = 0;
@@ -205,10 +271,10 @@ void TIM1_UPD_OVF_TRG_BRK_IRQHandler(void) __interrupt(TIM1_UPD_OVF_TRG_BRK_IRQH
 
   motor_fast_loop ();
 
-//  debug_pin_reset ();
-
   // clear the interrupt pending bit for TIM1
   TIM1_ClearITPendingBit(TIM1_IT_UPDATE);
+
+//  debug_pin_reset ();
 }
 
 void hall_sensors_read_and_action (void)
@@ -368,9 +434,9 @@ void apply_duty_cycle (uint8_t ui8_duty_cycle_value)
   }
 
   // set final duty_cycle value
-  TIM1_SetCompare1((uint16_t) (ui8_value_a << 1));
-  TIM1_SetCompare2((uint16_t) (ui8_value_c << 1));
-  TIM1_SetCompare3((uint16_t) (ui8_value_b << 1));
+  TIM1_SetCompare1((uint16_t) (ui8_value_a << 2));
+  TIM1_SetCompare2((uint16_t) (ui8_value_c << 2));
+  TIM1_SetCompare3((uint16_t) (ui8_value_b << 2));
 }
 
 void pwm_init (void)
@@ -380,15 +446,16 @@ void pwm_init (void)
 
   TIM1_TimeBaseInit(0, // TIM1_Prescaler = 0
 		    TIM1_COUNTERMODE_CENTERALIGNED1,
-		    (512 - 1), // clock = 16MHz; counter period = 1024; PWM freq = 16MHz / 1024 = 15.625kHz;
+		    (1024 - 1), // clock = 16MHz; counter period = 1024; PWM freq = 16MHz / 1024 = 15.625kHz;
+//		    (512 - 1), // clock = 16MHz; counter period = 1024; PWM freq = 16MHz / 1024 = 15.625kHz;
 		    //(BUT PWM center aligned mode needs twice the frequency)
 		    1); // will fire the TIM1_IT_UPDATE at every PWM period
 
   TIM1_OC1Init(TIM1_OCMODE_PWM1,
-	       TIM1_OUTPUTSTATE_DISABLE,
-	       TIM1_OUTPUTNSTATE_DISABLE,
-//	       TIM1_OUTPUTSTATE_ENABLE,
-//	       TIM1_OUTPUTNSTATE_ENABLE,
+//	       TIM1_OUTPUTSTATE_DISABLE,
+//	       TIM1_OUTPUTNSTATE_DISABLE,
+	       TIM1_OUTPUTSTATE_ENABLE,
+	       TIM1_OUTPUTNSTATE_ENABLE,
 	       0, // initial duty_cycle value
 	       TIM1_OCPOLARITY_HIGH,
 	       TIM1_OCNPOLARITY_LOW,
@@ -405,10 +472,10 @@ void pwm_init (void)
 	       TIM1_OCNIDLESTATE_SET);
 
   TIM1_OC3Init(TIM1_OCMODE_PWM1,
-	       TIM1_OUTPUTSTATE_DISABLE,
-	       TIM1_OUTPUTNSTATE_DISABLE,
-//	       TIM1_OUTPUTSTATE_ENABLE,
-//	       TIM1_OUTPUTNSTATE_ENABLE,
+//	       TIM1_OUTPUTSTATE_DISABLE,
+//	       TIM1_OUTPUTNSTATE_DISABLE,
+	       TIM1_OUTPUTSTATE_ENABLE,
+	       TIM1_OUTPUTNSTATE_ENABLE,
 	       0, // initial duty_cycle value
 	       TIM1_OCPOLARITY_HIGH,
 	       TIM1_OCNPOLARITY_LOW,
@@ -416,14 +483,16 @@ void pwm_init (void)
 	       TIM1_OCNIDLESTATE_SET);
 
   // break, dead time and lock configuration
-  TIM1_BDTRConfig(TIM1_OSSISTATE_DISABLE,
+  TIM1_BDTRConfig(TIM1_OSSISTATE_ENABLE,
 		  TIM1_LOCKLEVEL_OFF,
 		  // hardware nees a dead time of 1us
 		  16, // DTG = 0; dead time in 62.5 ns steps; 1us/62.5ns = 16
+//		  TIM1_BREAK_ENABLE,
 		  TIM1_BREAK_DISABLE,
-		  TIM1_BREAKPOLARITY_HIGH,
+		  TIM1_BREAKPOLARITY_LOW,
 		  TIM1_AUTOMATICOUTPUT_ENABLE);
 
+  TIM1_ITConfig(TIM1_IT_UPDATE, ENABLE);
   TIM1_ITConfig(TIM1_IT_UPDATE, ENABLE);
 
   TIM1_Cmd(ENABLE); // TIM1 counter enable
@@ -509,26 +578,46 @@ int main (void)
   adc_init ();
   TIM2_init ();
 
-  ITC_SetSoftwarePriority (ITC_IRQ_TIM2_OVF, ITC_PRIORITYLEVEL_1);
-  ITC_SetSoftwarePriority (ITC_IRQ_TIM1_OVF, ITC_PRIORITYLEVEL_2);
+//  GPIO_Init(GPIOD,
+//	    (GPIO_Pin_TypeDef) GPIO_PIN_0,
+//	    GPIO_MODE_OUT_PP_HIGH_FAST);
+
+  ITC_SetSoftwarePriority (ITC_IRQ_ADC1, ITC_PRIORITYLEVEL_1);
+  ITC_SetSoftwarePriority (ITC_IRQ_TIM2_OVF, ITC_PRIORITYLEVEL_2);
+  ITC_SetSoftwarePriority (ITC_IRQ_TIM1_OVF, ITC_PRIORITYLEVEL_3);
   ITC_SetSoftwarePriority (ITC_IRQ_PORTE, ITC_PRIORITYLEVEL_3);
 
   enableInterrupts();
 
-  TIM1_SetCompare1(126 << 1);
-  TIM1_SetCompare2(126 << 1);
-  TIM1_SetCompare3(126 << 1);
+  TIM1_SetCompare1(126 << 2);
+  TIM1_SetCompare2(126 << 2);
+  TIM1_SetCompare3(126 << 2);
   hall_sensors_read_and_action (); // needed to start the motor
 
   while (1)
   {
 //    static uint16_t c;
+    static uint32_t ui32_counter = 0;
+    uint8_t abc;
     int8_t i8_buffer[64];
     uint8_t ui8_value;
     int objects_readed;
 
-    adc_value = adc_read_throttle ();
-    ui8_duty_cycle = (uint8_t) map (adc_value, ADC_THROTTLE_MIN_VALUE, ADC_THROTTLE_MAX_VALUE, 0, 255);
+    debug_pin_reset ();
+
+    ui32_counter++;
+    if (ui32_counter > 10000) // 25ms
+    {
+      ui32_counter = 0;
+      while (ui8_adc_total_current_busy_flag) ;
+      ui16_adc_value = adc_read_throttle ();
+//      debug_pin_reset ();
+      ui8_duty_cycle = (uint8_t) map (ui16_adc_value, ADC_THROTTLE_MIN_VALUE, ADC_THROTTLE_MAX_VALUE, 0, 255);
+//      adc_start_read_throttle ();
+    }
+
+
+
 //    ui8_duty_cycle = 80;
 
 //    apply_duty_cycle (ui8_duty_cycle);
