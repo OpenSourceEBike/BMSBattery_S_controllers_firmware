@@ -38,7 +38,9 @@ EXTRASRCS = \
 	$(SDIR)/stm8s_exti.c \
 	$(SDIR)/stm8s_uart2.c \
 	$(SDIR)/stm8s_tim1.c \
+	$(SDIR)/stm8s_tim2.c \
 	$(SDIR)/stm8s_adc1.c \
+	$(SDIR)/stm8s_itc.c \
 	gpio.c \
 	motor.c \
 

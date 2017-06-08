@@ -10,10 +10,12 @@
 #include <stdio.h>
 #include "stm8s.h"
 #include "gpio.h"
+#include "stm8s_itc.h"
 #include "stm8s_gpio.h"
 #include "interrupts.h"
 #include "stm8s_adc1.h"
 #include "stm8s_tim1.h"
+#include "stm8s_tim2.h"
 #include "motor.h"
 
 uint32_t ui32_motor_speed_erps = 0; // motor speed in electronic rotations per second
@@ -34,6 +36,8 @@ static uint16_t ui16_value_b;
 static uint16_t ui16_value_c;
 
 volatile uint8_t ui8_duty_cycle;
+
+uint16_t adc_value;
 
 /////////////////////////////////////////////////////////////////////////////////////////////
 //// Functions prototypes
@@ -56,6 +60,7 @@ void motor_fast_loop (void);
 void apply_duty_cycle (uint8_t ui8_duty_cycle_value);
 
 void pwm_init (void);
+void TIM1_UPD_OVF_TRG_BRK_IRQHandler(void) __interrupt(TIM1_UPD_OVF_TRG_BRK_IRQHANDLER);
 
 // map / limit values
 int32_t map (int32_t x, int32_t in_min, int32_t in_max, int32_t out_min, int32_t out_max);
@@ -64,9 +69,24 @@ void uart_init (void);
 void putchar(char c);
 char getchar(void);
 
+void TIM2_init(void);
+void TIM2_UPD_OVF_TRG_BRK_IRQHandler(void) __interrupt(TIM2_UPD_OVF_TRG_BRK_IRQHANDLER);
+
+void adc_init (void);
+void ADC1_IRQHandler(void) __interrupt(ADC1_IRQHANDLER);
+uint16_t adc_read_throttle (void);
+
 /////////////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////////////
 
+
+void TIM2_init(void)
+{
+  TIM2_DeInit();
+  TIM2_TimeBaseInit(TIM2_PRESCALER_1, 720); // TIM2 clock = 16MHz; 208 --> 13us
+  TIM2_ITConfig(TIM2_IT_UPDATE, ENABLE); // update event interrupt enable
+  TIM2_Cmd(DISABLE);
+}
 
 int32_t map (int32_t x, int32_t in_min, int32_t in_max, int32_t out_min, int32_t out_max)
 {
@@ -85,43 +105,69 @@ int32_t map (int32_t x, int32_t in_min, int32_t in_max, int32_t out_min, int32_t
     return (x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
 }
 
+void ADC1_IRQHandler(void) __interrupt(ADC1_IRQHANDLER)
+{
+  debug_pin_set ();
+
+  if (ADC1->CSR && ADC1_CHANNEL_6)
+    {
+
+  if (ADC1->DRH > 100) // 400 >> 2 = 100
+  {
+//    TIM1_GenerateEvent (TIM1_EVENTSOURCE_BREAK);
+//    TIM1->BKR = (uint8_t) (1 << 7);
+  }
+    }
+
+  debug_pin_reset ();
+
+  // clear the interrupt pending bit
+  ADC1_ClearITPendingBit(ADC1_IT_EOC);
+}
+
 //can't put ADC code file on external file like adc.c or the code will not work :-(
 void adc_init (void)
 {
   //init GPIO for the used ADC pins
-  GPIO_Init(THROTTLE__PORT,
-	    THROTTLE__PIN,
+  GPIO_Init(GPIOB,
+	    (THROTTLE__PIN || CURRENT_PHASE_B__PIN || CURRENT_TOTAL__PIN),
 	    GPIO_MODE_IN_FL_NO_IT);
 
   //de-Init ADC peripheral
   ADC1_DeInit();
 
   //init ADC2 peripheral
-  ADC1_Init(ADC1_CONVERSIONMODE_CONTINUOUS,
-	    ADC1_CHANNEL_4,
+  ADC1_Init(ADC1_CONVERSIONMODE_SINGLE,
+	    (ADC1_CHANNEL_4 || ADC1_CHANNEL_5 || ADC1_CHANNEL_6),
 	    ADC1_PRESSEL_FCPU_D2,
             ADC1_EXTTRIG_TIM,
 	    DISABLE, //disable external trigger
-	    ADC1_ALIGN_RIGHT,
-	    ADC1_SCHMITTTRIG_CHANNEL9,
+	    ADC1_ALIGN_LEFT,
+	    (ADC1_SCHMITTTRIG_CHANNEL4 || ADC1_SCHMITTTRIG_CHANNEL5 || ADC1_SCHMITTTRIG_CHANNEL6),
             DISABLE);
+
+  ADC1_ITConfig (ADC1_IT_EOCIE, ENABLE);
 }
 
 uint16_t adc_read_throttle (void)
 {
-  ADC1_ConversionConfig(ADC1_CONVERSIONMODE_SINGLE,
-			ADC1_CHANNEL_4,
-			ADC1_ALIGN_RIGHT);
+  uint16_t value;
 
-  //start Conversion
+//  ADC1_ITConfig (ADC1_IT_EOCIE, DISABLE); // disable just for this read
+
+  ADC1_ConversionConfig(ADC1_CONVERSIONMODE_SINGLE, ADC1_CHANNEL_4, ADC1_ALIGN_RIGHT);
+
   ADC1_StartConversion();
 
-  //block waiting for the end of conversion
-  while (!ADC1_GetFlagStatus(ADC1_FLAG_EOC)) ;
+  while (!ADC1_GetFlagStatus(ADC1_FLAG_EOC)) ; //block waiting for the end of conversion
 
-  return ADC1_GetConversionValue();
+  value = ADC1_GetConversionValue();
+
+//  ADC1_ClearITPendingBit(ADC1_IT_EOC); // clear the interrupt (possible)pending bit
+//  ADC1_ITConfig (ADC1_IT_EOCIE, ENABLE); // enable again
+
+  return value;
 }
-
 
 
 //With SDCC, interrupt service routine function prototypes must be placed in the file that contains main ()
@@ -133,11 +179,33 @@ uint16_t adc_read_throttle (void)
 //Calling a function from interrupt not always works, SDCC manual says to avoid it. Maybe the best is to put
 //all the code inside the interrupt
 
+void TIM2_UPD_OVF_TRG_BRK_IRQHandler(void) __interrupt(TIM2_UPD_OVF_TRG_BRK_IRQHANDLER)
+{
+  // stop TIM2 counter
+  TIM2->CR1 &= (uint8_t)(~TIM2_CR1_CEN);
+
+//  debug_pin_set ();
+
+  ADC1->CR1 |= ADC1_CR1_ADON; // ADC1 start conversion
+
+//  debug_pin_reset ();
+
+  // clear the interrupt pending bit for TIM2
+  TIM2_ClearITPendingBit(TIM2_IT_UPDATE);
+}
+
 void TIM1_UPD_OVF_TRG_BRK_IRQHandler(void) __interrupt(TIM1_UPD_OVF_TRG_BRK_IRQHANDLER)
 {
-  debug_pin_set ();
+//  debug_pin_set ();
+
+  // reset and start TIM2 counter
+  TIM2->CNTRH = 0;
+  TIM2->CNTRL = 0;
+  TIM2->CR1 |= (uint8_t)TIM2_CR1_CEN;
+
   motor_fast_loop ();
-  debug_pin_reset ();
+
+//  debug_pin_reset ();
 
   // clear the interrupt pending bit for TIM1
   TIM1_ClearITPendingBit(TIM1_IT_UPDATE);
@@ -165,15 +233,15 @@ void hall_sensors_read_and_action (void)
   switch (hall_sensors)
   {
     case 3:
-      ui8_motor_rotor_absolute_position = ANGLE_30;
+      ui8_motor_rotor_absolute_position = ANGLE_210;
     break;
 
     case 1:
-      ui8_motor_rotor_absolute_position = ANGLE_90;
+      ui8_motor_rotor_absolute_position = ANGLE_270;
     break;
 
     case 5:
-      ui8_motor_rotor_absolute_position = ANGLE_150;
+      ui8_motor_rotor_absolute_position = ANGLE_330;
 
       // count speed only when motor did rotate half of 1 electronic rotation
       if (ui8_flag_count_speed)
@@ -186,15 +254,15 @@ void hall_sensors_read_and_action (void)
     break;
 
     case 4:
-      ui8_motor_rotor_absolute_position = ANGLE_210;
+      ui8_motor_rotor_absolute_position = ANGLE_30;
     break;
 
     case 6:
-      ui8_motor_rotor_absolute_position = ANGLE_270;
+      ui8_motor_rotor_absolute_position = ANGLE_90;
     break;
 
     case 2:
-      ui8_motor_rotor_absolute_position = ANGLE_330;
+      ui8_motor_rotor_absolute_position = ANGLE_150;
 
       ui8_flag_count_speed = 1;
     break;
@@ -317,8 +385,10 @@ void pwm_init (void)
 		    1); // will fire the TIM1_IT_UPDATE at every PWM period
 
   TIM1_OC1Init(TIM1_OCMODE_PWM1,
-	       TIM1_OUTPUTSTATE_ENABLE,
-	       TIM1_OUTPUTNSTATE_ENABLE,
+	       TIM1_OUTPUTSTATE_DISABLE,
+	       TIM1_OUTPUTNSTATE_DISABLE,
+//	       TIM1_OUTPUTSTATE_ENABLE,
+//	       TIM1_OUTPUTNSTATE_ENABLE,
 	       0, // initial duty_cycle value
 	       TIM1_OCPOLARITY_HIGH,
 	       TIM1_OCNPOLARITY_LOW,
@@ -335,8 +405,10 @@ void pwm_init (void)
 	       TIM1_OCNIDLESTATE_SET);
 
   TIM1_OC3Init(TIM1_OCMODE_PWM1,
-	       TIM1_OUTPUTSTATE_ENABLE,
-	       TIM1_OUTPUTNSTATE_ENABLE,
+	       TIM1_OUTPUTSTATE_DISABLE,
+	       TIM1_OUTPUTNSTATE_DISABLE,
+//	       TIM1_OUTPUTSTATE_ENABLE,
+//	       TIM1_OUTPUTNSTATE_ENABLE,
 	       0, // initial duty_cycle value
 	       TIM1_OCPOLARITY_HIGH,
 	       TIM1_OCNPOLARITY_LOW,
@@ -348,9 +420,6 @@ void pwm_init (void)
 		  TIM1_LOCKLEVEL_OFF,
 		  // hardware nees a dead time of 1us
 		  16, // DTG = 0; dead time in 62.5 ns steps; 1us/62.5ns = 16
-		  // 16 --> 1000ns
-		  // 12 --> 750ns
-		  // 8 --> 500ns
 		  TIM1_BREAK_DISABLE,
 		  TIM1_BREAKPOLARITY_HIGH,
 		  TIM1_AUTOMATICOUTPUT_ENABLE);
@@ -438,6 +507,12 @@ int main (void)
   hall_sensor_init ();
   pwm_init ();
   adc_init ();
+  TIM2_init ();
+
+  ITC_SetSoftwarePriority (ITC_IRQ_TIM2_OVF, ITC_PRIORITYLEVEL_1);
+  ITC_SetSoftwarePriority (ITC_IRQ_TIM1_OVF, ITC_PRIORITYLEVEL_2);
+  ITC_SetSoftwarePriority (ITC_IRQ_PORTE, ITC_PRIORITYLEVEL_3);
+
   enableInterrupts();
 
   TIM1_SetCompare1(126 << 1);
@@ -448,13 +523,15 @@ int main (void)
   while (1)
   {
 //    static uint16_t c;
-    static uint16_t adc_value;
     int8_t i8_buffer[64];
     uint8_t ui8_value;
     int objects_readed;
 
     adc_value = adc_read_throttle ();
     ui8_duty_cycle = (uint8_t) map (adc_value, ADC_THROTTLE_MIN_VALUE, ADC_THROTTLE_MAX_VALUE, 0, 255);
+//    ui8_duty_cycle = 80;
+
+//    apply_duty_cycle (ui8_duty_cycle);
 
 //    c++;
 //    if (c < 43)
