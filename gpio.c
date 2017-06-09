@@ -19,9 +19,13 @@ void gpio_init (void)
 void brake_init (void)
 {
   //hall sensors pins as external input pin interrupt
+//  GPIO_Init(BRAKE__PORT,
+//	    BRAKE__PIN,
+//	    GPIO_MODE_IN_FL_IT); // with external interrupt
+
   GPIO_Init(BRAKE__PORT,
 	    BRAKE__PIN,
-	    GPIO_MODE_IN_FL_IT);
+	    GPIO_MODE_IN_FL_NO_IT); // no interrupt
 
   //initialize the Interrupt sensitivity
   EXTI_SetExtIntSensitivity(EXTI_PORT_GPIOA,
@@ -38,12 +42,12 @@ BitStatus brake_is_set (void)
 
 void brake_coast_enable (void)
 {
-  TIM1->BKR &= ~((uint8_t) (TIM1_BREAK_ENABLE));
+  TIM1->BKR &= (uint8_t) ~(TIM1_BKR_MOE);
 }
 
 void brake_coast_disable (void)
 {
-  TIM1->BKR |= (uint8_t) (TIM1_BREAK_ENABLE);
+  TIM1->BKR |= (uint8_t) (TIM1_BKR_MOE);
 }
 
 void debug_pin_init (void)
