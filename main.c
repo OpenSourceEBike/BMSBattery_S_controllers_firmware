@@ -86,12 +86,112 @@ uint16_t adc_read_throttle (void);
 /////////////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////////////
 
+void ADC1_IRQHandler(void) __interrupt(ADC1_IRQHANDLER)
+{
+
+/****************************************************************
+ * ADC reading and action:
+ * - limitting motor max current
+ * - read other ADCs for global variables
+ */
+  uint8_t ui8_temp;
+
+//  debug_pin_set ();
+
+  ui8_temp = (ADC1->CSR & 0x0f); // first see which ADC channel are we reading
+  if (ui8_temp == ADC1_CHANNEL_6) // motor total current ADC
+  {
+    debug_pin_set ();
+
+    adc_total_current = ADC1->DRH;
+
+    if ((adc_total_current > ADC_MOTOR_TOTAL_CURRENT_MAX_POSITIVE) ||
+	(adc_total_current < ADC_MOTOR_TOTAL_CURRENT_MAX_NEGATIVE))
+    {
+      TIM1->BKR &= (uint8_t) ~(TIM1_BKR_MOE);
+    }
+
+    ui8_adc_total_current_busy_flag = 0;
+  }
+  else if (ui8_temp == ADC1_CHANNEL_5) // motor phase B current
+  {
+    adc_current_phase_B = ADC1->DRH;
+  }
+  else if (ui8_temp == ADC1_CHANNEL_4) // throttle ADC
+  {
+    adc_throttle = ADC1->DRH;
+    adc_throttle_busy_flag = 0;
+  }
+
+  ADC1->CSR &= (uint8_t) (~ADC1_FLAG_EOC); // clear the End of Conversion flag
+/****************************************************************/
+
+
+  ADC1_ClearITPendingBit(ADC1_IT_EOC);   // clear the interrupt pending bit
+
+  debug_pin_reset ();
+}
+
+void TIM2_UPD_OVF_TRG_BRK_IRQHandler(void) __interrupt(TIM2_UPD_OVF_TRG_BRK_IRQHANDLER)
+{
+//  debug_pin_set ();
+
+
+/****************************************************************
+ * START ADC reading (with ADC interrupt)
+ */
+  // stop TIM2 counter
+  TIM2->CR1 &= (uint8_t)(~TIM2_CR1_CEN);
+
+  if (adc_throttle_busy_flag == 0) // ADC1 start conversion only when it is free
+  {
+    ui8_adc_total_current_busy_flag = 1;
+    ADC1->CR1 |= ADC1_CR1_ADON;
+  }
+/****************************************************************/
+
+
+  // clear the interrupt pending bit for TIM2
+  TIM2->SR1 = (uint8_t)(~TIM2_IT_UPDATE);
+
+//  debug_pin_reset ();
+}
+
+void TIM1_UPD_OVF_TRG_BRK_IRQHandler(void) __interrupt(TIM1_UPD_OVF_TRG_BRK_IRQHANDLER)
+{
+//  debug_pin_set ();
+
+
+/****************************************************************
+ * START TIM2 for later ADC reading
+ */
+  // reset and start TIM2 counter
+  TIM2->CNTRH = 0;
+  TIM2->CNTRL = 0;
+  TIM2->CR1 |= (uint8_t)TIM2_CR1_CEN;
+/****************************************************************/
+
+//  debug_pin_reset ();
+
+/****************************************************************
+ * Motor control: angle interpolation and PWM control
+ */
+  motor_fast_loop ();
+/****************************************************************/
+
+
+  // clear the interrupt pending bit for TIM1
+  TIM1_ClearITPendingBit(TIM1_IT_UPDATE);
+
+//  debug_pin_reset ();
+}
+
 
 void TIM2_init(void)
 {
   TIM2_DeInit();
-//  TIM2_TimeBaseInit(TIM2_PRESCALER_1, 480); // TIM2 clock = 16MHz; 208 --> 13us
-  TIM2_TimeBaseInit(TIM2_PRESCALER_1, 288); // TIM2 clock = 16MHz; 208 --> 13us
+//  TIM2_TimeBaseInit(TIM2_PRESCALER_1, 1);
+  TIM2_TimeBaseInit(TIM2_PRESCALER_1, 352); // TIM2 clock = 16MHz; 208 --> 13us
   TIM2_ITConfig(TIM2_IT_UPDATE, ENABLE); // update event interrupt enable
   TIM2_Cmd(DISABLE);
 }
@@ -111,43 +211,6 @@ int32_t map (int32_t x, int32_t in_min, int32_t in_max, int32_t out_min, int32_t
   // round down if mapping smaller ranges to bigger ranges
   else
     return (x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
-}
-
-void ADC1_IRQHandler(void) __interrupt(ADC1_IRQHANDLER)
-{
-  uint8_t ui8_temp;
-
-  debug_pin_set ();
-
-  ui8_temp = (ADC1->CSR & 0x0f);
-
-  if (ui8_temp == ADC1_CHANNEL_6)
-  {
-    debug_pin_set ();
-
-    adc_total_current = ADC1->DRH;
-
-    if (adc_total_current > 90)
-    {
-      TIM1->BKR &= (uint8_t) ~(TIM1_BKR_MOE);
-    }
-
-    ui8_adc_total_current_busy_flag = 0;
-  }
-  else if (ui8_temp == ADC1_CHANNEL_5)
-  {
-    adc_current_phase_B = ADC1->DRH;
-  }
-  else if (ui8_temp == ADC1_CHANNEL_4)
-  {
-    adc_throttle = ADC1->DRH;
-    adc_throttle_busy_flag = 0;
-  }
-
-  ADC1_ClearITPendingBit(ADC1_IT_EOC);   // clear the interrupt pending bit
-  ADC1->CSR &= (uint8_t) (~ADC1_FLAG_EOC); // clear the End of Conversion flag
-
-  debug_pin_reset ();
 }
 
 //can't put ADC code file on external file like adc.c or the code will not work :-(
@@ -238,42 +301,6 @@ uint16_t adc_read_throttle (void)
 
 //Calling a function from interrupt not always works, SDCC manual says to avoid it. Maybe the best is to put
 //all the code inside the interrupt
-
-void TIM2_UPD_OVF_TRG_BRK_IRQHandler(void) __interrupt(TIM2_UPD_OVF_TRG_BRK_IRQHANDLER)
-{
-//  debug_pin_set ();
-
-  // stop TIM2 counter
-  TIM2->CR1 &= (uint8_t)(~TIM2_CR1_CEN);
-
-  if (adc_throttle_busy_flag == 0) // ADC1 start conversion only when it is free
-  {
-    ui8_adc_total_current_busy_flag = 1;
-    ADC1->CR1 |= ADC1_CR1_ADON;
-  }
-
-  // clear the interrupt pending bit for TIM2
-  TIM2_ClearITPendingBit(TIM2_IT_UPDATE);
-
-//  debug_pin_reset ();
-}
-
-void TIM1_UPD_OVF_TRG_BRK_IRQHandler(void) __interrupt(TIM1_UPD_OVF_TRG_BRK_IRQHANDLER)
-{
-//  debug_pin_set ();
-
-  // reset and start TIM2 counter
-  TIM2->CNTRH = 0;
-  TIM2->CNTRL = 0;
-  TIM2->CR1 |= (uint8_t)TIM2_CR1_CEN;
-
-  motor_fast_loop ();
-
-  // clear the interrupt pending bit for TIM1
-  TIM1_ClearITPendingBit(TIM1_IT_UPDATE);
-
-//  debug_pin_reset ();
-}
 
 void hall_sensors_read_and_action (void)
 {
@@ -447,7 +474,7 @@ void pwm_init (void)
 		    (1024 - 1), // clock = 16MHz; counter period = 1024; PWM freq = 16MHz / 1024 = 15.625kHz;
 //		    (512 - 1), // clock = 16MHz; counter period = 1024; PWM freq = 16MHz / 1024 = 15.625kHz;
 		    //(BUT PWM center aligned mode needs twice the frequency)
-		    1); // will fire the TIM1_IT_UPDATE at every PWM period
+		    0); // will fire the TIM1_IT_UPDATE at every PWM period
 
   TIM1_OC1Init(TIM1_OCMODE_PWM1,
 //	       TIM1_OUTPUTSTATE_DISABLE,
