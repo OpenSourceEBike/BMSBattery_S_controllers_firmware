@@ -16,7 +16,7 @@
 #define LEFT 		2
 
 
-extern uint8_t ui8_svm_table [SVM_TABLE_LEN];
+extern uint8_t ui8_pwm_table_values [PWM_TABLE_VALUES_LEN];
 
 int8_t get_motor_rotation_direction (void);
 
