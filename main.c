@@ -62,6 +62,7 @@ void motor_fast_loop (void);
 void apply_duty_cycle (uint8_t ui8_duty_cycle_value);
 
 void pwm_init (void);
+void TIM1_UPD_OVF_TRG_BRK_IRQHandler(void) __interrupt(TIM1_UPD_OVF_TRG_BRK_IRQHANDLER);
 
 // map / limit values
 int32_t map (int32_t x, int32_t in_min, int32_t in_max, int32_t out_min, int32_t out_max);
@@ -77,7 +78,7 @@ void ADC1_IRQHandler(void) __interrupt(ADC1_IRQHANDLER)
 {
   uint8_t ui8_temp;
 
-  debug_pin_set ();
+//  debug_pin_set ();
 
 /****************************************************************
  * ADC reading and action:
@@ -94,14 +95,25 @@ void ADC1_IRQHandler(void) __interrupt(ADC1_IRQHANDLER)
 	(ui8_temp < ADC_MOTOR_TOTAL_CURRENT_MAX_NEGATIVE))
 //    if (ui8_temp < 72)
     {
-//      TIM1->BKR &= (uint8_t) ~(TIM1_BKR_MOE);
+      TIM1->BKR &= (uint8_t) ~(TIM1_BKR_MOE);
 //      debug_pin_reset ();
-//      debug_pin_set ();
+      debug_pin_set ();
     }
   }
 
-  ADC1->CSR &= (uint8_t) (~ADC1_FLAG_EOC); // clear the End of Conversion flag
+//  ADC1->CSR &= (uint8_t) (~ADC1_FLAG_EOC); // clear the End of Conversion flag
 /****************************************************************/
+
+  ADC1_ClearITPendingBit(ADC1_IT_EOC);   // clear the interrupt pending bit
+  ADC1_ClearITPendingBit(ADC1_IT_AWD);   // clear the interrupt pending bit
+  ADC1_ClearITPendingBit(ADC1_IT_AWDIE);   // clear the interrupt pending bit
+
+  debug_pin_reset ();
+}
+
+void TIM1_UPD_OVF_TRG_BRK_IRQHandler(void) __interrupt(TIM1_UPD_OVF_TRG_BRK_IRQHANDLER)
+{
+//  debug_pin_set ();
 
 /****************************************************************
  * Motor control: angle interpolation and PWM control
@@ -109,9 +121,11 @@ void ADC1_IRQHandler(void) __interrupt(ADC1_IRQHANDLER)
   motor_fast_loop ();
 /****************************************************************/
 
-  ADC1_ClearITPendingBit(ADC1_IT_EOC);   // clear the interrupt pending bit
 
-  debug_pin_reset ();
+  // clear the interrupt pending bit for TIM1
+  TIM1_ClearITPendingBit(TIM1_IT_UPDATE);
+
+//  debug_pin_reset ();
 }
 
 int32_t map (int32_t x, int32_t in_min, int32_t in_max, int32_t out_min, int32_t out_max)
@@ -147,12 +161,16 @@ void adc_init (void)
 	    ADC1_CHANNEL_6,
 	    ADC1_PRESSEL_FCPU_D2,
             ADC1_EXTTRIG_TIM,
-	    ENABLE,
-	    ADC1_ALIGN_LEFT,
+	    DISABLE,
+	    ADC1_ALIGN_RIGHT,
 	    (ADC1_SCHMITTTRIG_CHANNEL4 || ADC1_SCHMITTTRIG_CHANNEL5 || ADC1_SCHMITTTRIG_CHANNEL6),
             DISABLE);
 
-  ADC1_ITConfig (ADC1_IT_EOCIE, ENABLE);
+  ADC1_AWDChannelConfig (ADC1_CHANNEL_6, ENABLE);
+  ADC1_SetHighThreshold (ADC_MOTOR_TOTAL_CURRENT_MAX_POSITIVE << 2);
+  ADC1_SetLowThreshold (ADC_MOTOR_TOTAL_CURRENT_MAX_NEGATIVE << 2);
+
+  ADC1_ITConfig (ADC1_IT_AWDIE, ENABLE);
 }
 
 uint16_t adc_read_throttle (void)
@@ -161,7 +179,10 @@ uint16_t adc_read_throttle (void)
 
   adc_throttle_busy_flag = 1;
 
-  ADC1_ITConfig (ADC1_IT_EOCIE, DISABLE); // disable just for this read
+  ADC1_SetHighThreshold (1023);
+  ADC1_SetLowThreshold (0);
+//  ADC1_AWDChannelConfig (ADC1_CHANNEL_6, DISABLE);
+  ADC1_ITConfig (ADC1_IT_AWDIE, DISABLE); // disable just for this read
   ADC1_ConversionConfig (ADC1_CONVERSIONMODE_SINGLE, ADC1_CHANNEL_4, ADC1_ALIGN_RIGHT);
   ADC1_StartConversion ();
 
@@ -172,10 +193,14 @@ uint16_t adc_read_throttle (void)
 
   ADC1_ClearFlag(ADC1_FLAG_EOC);
 
-  ADC1_ConversionConfig (ADC1_CONVERSIONMODE_SINGLE, ADC1_CHANNEL_6, ADC1_ALIGN_RIGHT);
-  ADC1_ITConfig (ADC1_IT_EOCIE, ENABLE); // enable again
-
   adc_throttle_busy_flag = 0;
+
+  ADC1_SetHighThreshold (ADC_MOTOR_TOTAL_CURRENT_MAX_POSITIVE << 2);
+  ADC1_SetLowThreshold (ADC_MOTOR_TOTAL_CURRENT_MAX_NEGATIVE << 2);
+  ADC1_ConversionConfig (ADC1_CONVERSIONMODE_SINGLE, ADC1_CHANNEL_6, ADC1_ALIGN_RIGHT);
+//  ADC1_ITConfig (ADC1_IT_EOCIE, ENABLE); // enable again
+//  ADC1_AWDChannelConfig (ADC1_CHANNEL_6, ENABLE);
+  ADC1_ITConfig (ADC1_IT_AWDIE, ENABLE); // enable again
 
   return value;
 }
@@ -364,7 +389,7 @@ void pwm_init (void)
 		  TIM1_BREAKPOLARITY_LOW,
 		  TIM1_AUTOMATICOUTPUT_ENABLE);
 
-  TIM1_SelectOutputTrigger(TIM1_TRGOSOURCE_UPDATE);
+  TIM1_ITConfig(TIM1_IT_UPDATE, ENABLE);
 
   TIM1_Cmd(ENABLE); // TIM1 counter enable
   TIM1_CtrlPWMOutputs(ENABLE); // main Output Enable
@@ -401,7 +426,8 @@ int main (void)
   adc_init ();
 
   ITC_SetSoftwarePriority (ITC_IRQ_ADC1, ITC_PRIORITYLEVEL_1);
-  ITC_SetSoftwarePriority (ITC_IRQ_PORTE, ITC_PRIORITYLEVEL_2);
+  ITC_SetSoftwarePriority (ITC_IRQ_TIM1_OVF, ITC_PRIORITYLEVEL_2);
+  ITC_SetSoftwarePriority (ITC_IRQ_PORTE, ITC_PRIORITYLEVEL_3);
 
   enableInterrupts();
 
