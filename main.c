@@ -75,7 +75,33 @@ uint16_t adc_read_throttle (void);
 
 void ADC1_IRQHandler(void) __interrupt(ADC1_IRQHANDLER)
 {
+  uint8_t ui8_temp;
+
   debug_pin_set ();
+
+/****************************************************************
+ * ADC reading and action:
+ * - limitting motor max current
+ * - read other ADCs for global variables
+ */
+  if (adc_throttle_busy_flag == 0)
+  {
+//    ui8_temp = ADC1->DRH;
+    ui8_temp = (uint8_t) (ADC1_GetConversionValue () >> 2);
+//     = adc_total_current;
+
+    if ((ui8_temp > ADC_MOTOR_TOTAL_CURRENT_MAX_POSITIVE) ||
+	(ui8_temp < ADC_MOTOR_TOTAL_CURRENT_MAX_NEGATIVE))
+//    if (ui8_temp < 72)
+    {
+//      TIM1->BKR &= (uint8_t) ~(TIM1_BKR_MOE);
+//      debug_pin_reset ();
+//      debug_pin_set ();
+    }
+  }
+
+  ADC1->CSR &= (uint8_t) (~ADC1_FLAG_EOC); // clear the End of Conversion flag
+/****************************************************************/
 
 /****************************************************************
  * Motor control: angle interpolation and PWM control
@@ -136,16 +162,17 @@ uint16_t adc_read_throttle (void)
   adc_throttle_busy_flag = 1;
 
   ADC1_ITConfig (ADC1_IT_EOCIE, DISABLE); // disable just for this read
-  ADC1_ConversionConfig (ADC1_CONVERSIONMODE_SINGLE, ADC1_CHANNEL_4, ADC1_ALIGN_LEFT);
+  ADC1_ConversionConfig (ADC1_CONVERSIONMODE_SINGLE, ADC1_CHANNEL_4, ADC1_ALIGN_RIGHT);
   ADC1_StartConversion ();
 
   while (!ADC1_GetFlagStatus(ADC1_FLAG_EOC)) ; //block waiting for the end of conversion
 
-  value = ADC1->DRH;
+  value = (ADC1_GetConversionValue () >> 2);
+//  value = ADC1->DRH;
 
   ADC1_ClearFlag(ADC1_FLAG_EOC);
 
-  ADC1_ConversionConfig (ADC1_CONVERSIONMODE_SINGLE, ADC1_CHANNEL_6, ADC1_ALIGN_LEFT);
+  ADC1_ConversionConfig (ADC1_CONVERSIONMODE_SINGLE, ADC1_CHANNEL_6, ADC1_ALIGN_RIGHT);
   ADC1_ITConfig (ADC1_IT_EOCIE, ENABLE); // enable again
 
   adc_throttle_busy_flag = 0;
