@@ -68,7 +68,7 @@ void TIM1_UPD_OVF_TRG_BRK_IRQHandler(void) __interrupt(TIM1_UPD_OVF_TRG_BRK_IRQH
 int32_t map (int32_t x, int32_t in_min, int32_t in_max, int32_t out_min, int32_t out_max);
 
 void adc_init (void);
-uint16_t adc_read_throttle (void);
+uint8_t adc_read_throttle (void);
 
 /////////////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////////////
@@ -81,13 +81,18 @@ void TIM1_UPD_OVF_TRG_BRK_IRQHandler(void) __interrupt(TIM1_UPD_OVF_TRG_BRK_IRQH
   debug_pin_reset ();
   debug_pin_reset ();
 
-  ui8_temp = (uint8_t) (ADC1_GetBufferValue (6) >> 2);
-
-  if ((ui8_temp > ADC_MOTOR_TOTAL_CURRENT_MAX_POSITIVE) ||
-    (ui8_temp < ADC_MOTOR_TOTAL_CURRENT_MAX_NEGATIVE))
+  if (adc_throttle_busy_flag == 0)
   {
-    TIM1->BKR &= (uint8_t) ~(TIM1_BKR_MOE);
-    debug_pin_set ();
+    ADC1->CR1 |= ADC1_CR1_ADON;
+    while (!(ADC1->CSR & ADC1_FLAG_EOC)) ;
+    ui8_temp = ADC1->DRH;
+
+    if ((ui8_temp > ADC_MOTOR_TOTAL_CURRENT_MAX_POSITIVE) ||
+      (ui8_temp < ADC_MOTOR_TOTAL_CURRENT_MAX_NEGATIVE))
+    {
+      TIM1->BKR &= (uint8_t) ~(TIM1_BKR_MOE);
+      debug_pin_set ();
+    }
   }
 
 /****************************************************************
@@ -132,22 +137,47 @@ void adc_init (void)
   ADC1_DeInit();
 
   //init ADC1 peripheral
-  ADC1_Init(ADC1_CONVERSIONMODE_CONTINUOUS,
+  ADC1_Init(ADC1_CONVERSIONMODE_SINGLE,
 	    ADC1_CHANNEL_6,
 	    ADC1_PRESSEL_FCPU_D2,
             ADC1_EXTTRIG_TIM,
 	    DISABLE,
-	    ADC1_ALIGN_RIGHT,
+	    ADC1_ALIGN_LEFT,
+	    (ADC1_SCHMITTTRIG_CHANNEL4 || ADC1_SCHMITTTRIG_CHANNEL5 || ADC1_SCHMITTTRIG_CHANNEL6),
+            DISABLE);
+}
+
+uint8_t adc_read_throttle (void)
+{
+  uint8_t ui8_temp;
+
+  adc_throttle_busy_flag = 1;
+
+  ADC1_Init(ADC1_CONVERSIONMODE_SINGLE,
+	    ADC1_CHANNEL_4,
+	    ADC1_PRESSEL_FCPU_D2,
+            ADC1_EXTTRIG_TIM,
+	    DISABLE,
+	    ADC1_ALIGN_LEFT,
 	    (ADC1_SCHMITTTRIG_CHANNEL4 || ADC1_SCHMITTTRIG_CHANNEL5 || ADC1_SCHMITTTRIG_CHANNEL6),
             DISABLE);
 
-  ADC1_ConversionConfig(ADC1_CONVERSIONMODE_CONTINUOUS, ADC1_CHANNEL_6, ADC1_ALIGN_RIGHT);
-  ADC1_ScanModeCmd(ENABLE);
-}
+  ADC1->CR1 |= ADC1_CR1_ADON;
+  while (!(ADC1->CSR & ADC1_FLAG_EOC)) ;
+  ui8_temp = ADC1->DRH;
 
-uint16_t adc_read_throttle (void)
-{
-  return (ADC1_GetBufferValue(4) >> 2);
+  ADC1_Init(ADC1_CONVERSIONMODE_SINGLE,
+	    ADC1_CHANNEL_6,
+	    ADC1_PRESSEL_FCPU_D2,
+            ADC1_EXTTRIG_TIM,
+	    DISABLE,
+	    ADC1_ALIGN_LEFT,
+	    (ADC1_SCHMITTTRIG_CHANNEL4 || ADC1_SCHMITTTRIG_CHANNEL5 || ADC1_SCHMITTTRIG_CHANNEL6),
+            DISABLE);
+
+  adc_throttle_busy_flag = 0;
+
+  return ui8_temp;
 }
 
 //With SDCC, interrupt service routine function prototypes must be placed in the file that contains main ()
@@ -165,6 +195,18 @@ void hall_sensors_read_and_action (void)
 
   // read hall sensors signal pins and mask other pins
   hall_sensors = (GPIO_ReadInputData (HALL_SENSORS__PORT) & (HALL_SENSORS_MASK));
+
+//  switch (hall_sensors)
+//  {
+//    case 3: hall_sensors = 1; break;
+//    case 1: hall_sensors = 5; break;
+//    case 5: hall_sensors = 4; break;
+//    case 4: hall_sensors = 6; break;
+//    case 6: hall_sensors = 2; break;
+//    case 2: hall_sensors = 3; break;
+//    default: hall_sensors = 2; return;
+//    break;
+//  }
 
   switch (hall_sensors)
   {
@@ -293,11 +335,16 @@ void pwm_init (void)
 		    (1024 - 1), // clock = 16MHz; counter period = 1024; PWM freq = 16MHz / 1024 = 15.625kHz;
 		    0); // will fire the TIM1_IT_UPDATE at every PWM period
 
+//#define DISABLE_PWM_CHANNELS_1_3
+
   TIM1_OC1Init(TIM1_OCMODE_PWM1,
-//	       TIM1_OUTPUTSTATE_DISABLE,
-//	       TIM1_OUTPUTNSTATE_DISABLE,
+#ifdef DISABLE_PWM_CHANNELS_1_3
+	       TIM1_OUTPUTSTATE_DISABLE,
+	       TIM1_OUTPUTNSTATE_DISABLE,
+#else
 	       TIM1_OUTPUTSTATE_ENABLE,
 	       TIM1_OUTPUTNSTATE_ENABLE,
+#endif
 	       0, // initial duty_cycle value
 	       TIM1_OCPOLARITY_HIGH,
 	       TIM1_OCNPOLARITY_LOW,
@@ -314,10 +361,13 @@ void pwm_init (void)
 	       TIM1_OCNIDLESTATE_SET);
 
   TIM1_OC3Init(TIM1_OCMODE_PWM1,
-//	       TIM1_OUTPUTSTATE_DISABLE,
-//	       TIM1_OUTPUTNSTATE_DISABLE,
+#ifdef DISABLE_PWM_CHANNELS_1_3
+	       TIM1_OUTPUTSTATE_DISABLE,
+	       TIM1_OUTPUTNSTATE_DISABLE,
+#else
 	       TIM1_OUTPUTSTATE_ENABLE,
 	       TIM1_OUTPUTNSTATE_ENABLE,
+#endif
 	       0, // initial duty_cycle value
 	       TIM1_OCPOLARITY_HIGH,
 	       TIM1_OCNPOLARITY_LOW,
@@ -384,15 +434,27 @@ int main (void)
   while (1)
   {
     static uint32_t ui32_counter = 0;
+    static uint16_t c;
 
 //    debug_pin_reset ();
+
+//    c++;
+//    if (c < 256)
+//    {
+//      motor_fast_loop ();
+//    }
+//    else
+//    {
+//      c = 0;
+//      hall_sensors_read_and_action ();
+//    }
 
     ui32_counter++;
     if (ui32_counter > 10000) // 25ms
     {
       ui32_counter = 0;
       while (ui8_adc_total_current_busy_flag) ;
-      ui16_adc_value = adc_read_throttle ();
+      ui16_adc_value = (uint16_t) adc_read_throttle ();
 //      debug_pin_reset ();
 //      ui16_adc_value = 85;
       ui8_duty_cycle = (uint8_t) map (ui16_adc_value, ADC_THROTTLE_MIN_VALUE, ADC_THROTTLE_MAX_VALUE, 0, 255);
