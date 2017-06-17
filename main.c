@@ -544,7 +544,7 @@ int main (void)
       ui32_counter = 0;
       while (ui8_adc_total_current_busy_flag) ;
       ui16_adc_value = (uint16_t) adc_read_throttle ();
-      ui8_duty_cycle = (uint8_t) map (ui16_adc_value, ADC_THROTTLE_MIN_VALUE, ADC_THROTTLE_MAX_VALUE, 0, 255);
+      ui8_duty_cycle = (uint8_t) map (ui16_adc_value, ADC_THROTTLE_MIN_VALUE, ADC_THROTTLE_MAX_VALUE, 0, 250);
     }
 
 
