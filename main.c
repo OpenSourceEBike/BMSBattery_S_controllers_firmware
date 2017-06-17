@@ -78,8 +78,6 @@ void TIM1_UPD_OVF_TRG_BRK_IRQHandler(void) __interrupt(TIM1_UPD_OVF_TRG_BRK_IRQH
   uint8_t ui8_temp;
 
   debug_pin_set ();
-  debug_pin_reset ();
-  debug_pin_reset ();
 
   if (adc_throttle_busy_flag == 0)
   {
@@ -91,6 +89,7 @@ void TIM1_UPD_OVF_TRG_BRK_IRQHandler(void) __interrupt(TIM1_UPD_OVF_TRG_BRK_IRQH
       (ui8_temp < ADC_MOTOR_TOTAL_CURRENT_MAX_NEGATIVE))
     {
       TIM1->BKR &= (uint8_t) ~(TIM1_BKR_MOE);
+      debug_pin_reset ();
       debug_pin_set ();
     }
   }
@@ -100,7 +99,6 @@ void TIM1_UPD_OVF_TRG_BRK_IRQHandler(void) __interrupt(TIM1_UPD_OVF_TRG_BRK_IRQH
  */
   motor_fast_loop ();
 /****************************************************************/
-
 
   // clear the interrupt pending bit for TIM1
   TIM1_ClearITPendingBit(TIM1_IT_UPDATE);
@@ -196,18 +194,6 @@ void hall_sensors_read_and_action (void)
   // read hall sensors signal pins and mask other pins
   hall_sensors = (GPIO_ReadInputData (HALL_SENSORS__PORT) & (HALL_SENSORS_MASK));
 
-//  switch (hall_sensors)
-//  {
-//    case 3: hall_sensors = 1; break;
-//    case 1: hall_sensors = 5; break;
-//    case 5: hall_sensors = 4; break;
-//    case 4: hall_sensors = 6; break;
-//    case 6: hall_sensors = 2; break;
-//    case 2: hall_sensors = 3; break;
-//    default: hall_sensors = 2; return;
-//    break;
-//  }
-
   switch (hall_sensors)
   {
     case 3:
@@ -256,8 +242,6 @@ void hall_sensors_read_and_action (void)
   ui32_interpolation_sum = 0;
   ui32_PWM_cycles_counter1 = 0;
   ui32_last_counter_value = 0;
-
-//  debug_pin_reset ();
 }
 
 // runs every 64us (PWM frequency)
@@ -436,29 +420,13 @@ int main (void)
     static uint32_t ui32_counter = 0;
     static uint16_t c;
 
-//    debug_pin_reset ();
-
-//    c++;
-//    if (c < 256)
-//    {
-//      motor_fast_loop ();
-//    }
-//    else
-//    {
-//      c = 0;
-//      hall_sensors_read_and_action ();
-//    }
-
     ui32_counter++;
     if (ui32_counter > 10000) // 25ms
     {
       ui32_counter = 0;
       while (ui8_adc_total_current_busy_flag) ;
       ui16_adc_value = (uint16_t) adc_read_throttle ();
-//      debug_pin_reset ();
-//      ui16_adc_value = 85;
       ui8_duty_cycle = (uint8_t) map (ui16_adc_value, ADC_THROTTLE_MIN_VALUE, ADC_THROTTLE_MAX_VALUE, 0, 255);
-//      TIM1_SetCompare2((uint16_t) (85 << 2));
     }
   }
 }
