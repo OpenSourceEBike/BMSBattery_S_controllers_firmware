@@ -22,6 +22,7 @@ uint32_t ui32_motor_speed_erps = 0; // motor speed in electronic rotations per s
 uint8_t ui8_flag_count_speed = 0;
 uint32_t ui32_PWM_cycles_counter = 0;
 uint32_t ui32_PWM_cycles_counter1 = 0;
+uint32_t ui32_speed_inverse = 0;
 uint8_t ui8_motor_rotor_position = 0; // in 360/256 degrees
 uint8_t ui8_motor_rotor_absolute_position = 0; // in 360/256 degrees
 uint8_t ui8_position_correction_value = 0; // in 360/256 degrees
@@ -212,6 +213,7 @@ void hall_sensors_read_and_action (void)
       {
 	ui8_flag_count_speed = 0;
 	ui32_interpolation_angle_step = ui32_PWM_cycles_counter << 2; // (ui32_PWM_cycles_counter / 256) * 1024
+	ui32_speed_inverse = ui32_PWM_cycles_counter;
 	ui32_PWM_cycles_counter = 0;
       }
     break;
@@ -261,14 +263,14 @@ void motor_fast_loop (void)
     ui32_motor_speed_erps = 0;
     ui32_interpolation_angle_step = (SVM_TABLE_LEN_x1024) / PWM_CYCLES_COUNTER_MAX;
     ui32_interpolation_sum = 0;
+    ui32_speed_inverse = 0xffffffff;
   }
 
 #define DO_INTERPOLATION 1 // may be usefull when debugging
 #if DO_INTERPOLATION == 1
   // calculate the interpolation angle
   // interpolation seems a problem when motor starts, so avoid to do it at very low speed
-//  if ((ui8_duty_cycle > 10) && (ui32_motor_speed_erps >= 10))
-  if (ui8_duty_cycle > 10)
+  if ((ui8_duty_cycle > 10) && (ui32_speed_inverse < 312))
   {
     if (ui8_interpolation_angle < ANGLE_60) // interpolate only for angle <= 60º
     {
