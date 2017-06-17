@@ -78,7 +78,7 @@ void TIM1_UPD_OVF_TRG_BRK_IRQHandler(void) __interrupt(TIM1_UPD_OVF_TRG_BRK_IRQH
 {
   uint8_t ui8_temp;
 
-  debug_pin_set ();
+//  debug_pin_set ();
 
   if (adc_throttle_busy_flag == 0)
   {
@@ -90,7 +90,7 @@ void TIM1_UPD_OVF_TRG_BRK_IRQHandler(void) __interrupt(TIM1_UPD_OVF_TRG_BRK_IRQH
       (ui8_temp < ADC_MOTOR_TOTAL_CURRENT_MAX_NEGATIVE))
     {
       TIM1->BKR &= (uint8_t) ~(TIM1_BKR_MOE);
-      debug_pin_reset ();
+//      debug_pin_reset ();
       debug_pin_set ();
     }
   }
