@@ -78,7 +78,6 @@ void putchar(char c);
 char getchar(void);
 
 void adc_init (void);
-void adc_start_read_throttle (void);
 uint16_t adc_read_throttle (void);
 
 /////////////////////////////////////////////////////////////////////////////////////////////
