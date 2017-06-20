@@ -40,6 +40,12 @@ static uint16_t ui16_value_c;
 
 volatile uint8_t ui8_duty_cycle;
 
+static uint16_t ui16_last_value;
+static uint16_t ui16_array_measures [4];
+static uint8_t ui8_array_measures_index = 0;
+uint8_t ui8_start_phase_current_reading_flag = 0;
+uint8_t ui8_start_phase_current_reading_flag1 = 0;
+
 uint8_t adc_current_phase_B = 0;
 uint8_t adc_total_current = 0;
 uint8_t ui8_adc_total_current_busy_flag = 0;
@@ -86,24 +92,90 @@ uint16_t adc_read_throttle (void);
 
 void TIM1_UPD_OVF_TRG_BRK_IRQHandler(void) __interrupt(TIM1_UPD_OVF_TRG_BRK_IRQHANDLER)
 {
-  uint8_t ui8_temp;
+  static uint8_t ui8_temp;
+  static uint16_t ui16_temp;
+  static uint16_t ui16_temp1;
 
-  debug_pin_set ();
+//  debug_pin_set ();
 //  debug_pin_reset ();
 
-  if (adc_throttle_busy_flag == 0)
-  {
-    ADC1->CR1 |= ADC1_CR1_ADON;
-    while (!(ADC1->CSR & ADC1_FLAG_EOC)) ;
-    ui8_temp = ADC1->DRH;
+  // read new ADC value
+  ADC1->CR1 |= ADC1_CR1_ADON;
+  while (!(ADC1->CSR & ADC1_FLAG_EOC)) ;
+  ui16_temp = ADC1_GetConversionValue ();
 
-    if ((ui8_temp > ADC_MOTOR_TOTAL_CURRENT_MAX_POSITIVE) ||
-     (ui8_temp < ADC_MOTOR_TOTAL_CURRENT_MAX_NEGATIVE))
+  // store on the array
+  ui16_array_measures [ui8_array_measures_index] = ui16_temp;
+
+  // manage array
+  if (ui8_array_measures_index > 2) { ui8_array_measures_index = 0; }
+  else { ui8_array_measures_index++; }
+
+  // low pass filter
+  ui16_temp = ui16_array_measures [0] + ui16_array_measures [1] + ui16_array_measures [2] + ui16_array_measures [3];
+  ui16_temp = ui16_temp >> 2;
+
+  if (ui8_start_phase_current_reading_flag == 1)
+  {
+    // see if is max
+    if (ui16_temp < ui16_last_value) // is not
     {
-//      TIM1->BKR &= (uint8_t) ~(TIM1_BKR_MOE);
-//      debug_pin_set ();
+//      ui16_last_value = ui16_temp;
     }
+    else // is max
+    {
+	      debug_pin_set ();
+	      debug_pin_reset ();
+//      ui8_start_phase_current_reading_flag = 0;
+//      ui8_start_phase_current_reading_flag1 = 1;
+//            ui16_array_measures [0] = 512;
+//            ui16_array_measures [1] = 512;
+//            ui16_array_measures [2] = 512;
+//            ui16_array_measures [3] = 512;
+//            ui16_last_value = ui16_temp;
+//      debug_pin_reset ();
+    }
+
+    ui16_last_value = ui16_temp;
   }
+
+//  if (ui8_start_phase_current_reading_flag1 == 1)
+//  {
+//    // see if is minimum
+//    if (ui16_temp < ui16_last_value) // is not
+//    {
+//      ui16_last_value = ui16_temp;
+//      debug_pin_set ();
+//    }
+//    else // is minimum
+//    {
+//      ui16_last_value = 512; // ADC zero value
+//      ui16_array_measures [0] = 512;
+//      ui16_array_measures [1] = 512;
+//      ui16_array_measures [2] = 512;
+//      ui16_array_measures [3] = 512;
+//      ui8_start_phase_current_reading_flag1 = 0;
+//      debug_pin_reset ();
+//    }
+//  }
+
+
+
+
+//
+//  if (adc_throttle_busy_flag == 0)
+//  {
+//    ADC1->CR1 |= ADC1_CR1_ADON;
+//    while (!(ADC1->CSR & ADC1_FLAG_EOC)) ;
+//    ui8_temp = ADC1->DRH;
+//
+//    if ((ui8_temp > ADC_MOTOR_TOTAL_CURRENT_MAX_POSITIVE) ||
+//     (ui8_temp < ADC_MOTOR_TOTAL_CURRENT_MAX_NEGATIVE))
+//    {
+////      TIM1->BKR &= (uint8_t) ~(TIM1_BKR_MOE);
+////      debug_pin_set ();
+//    }
+//  }
 
 /****************************************************************
 * Motor control: angle interpolation and PWM control
@@ -115,7 +187,7 @@ void TIM1_UPD_OVF_TRG_BRK_IRQHandler(void) __interrupt(TIM1_UPD_OVF_TRG_BRK_IRQH
   TIM1_ClearITPendingBit(TIM1_IT_UPDATE);
 
 //  debug_pin_set ();
-  debug_pin_reset ();
+//  debug_pin_reset ();
 }
 
 int32_t map (int32_t x, int32_t in_min, int32_t in_max, int32_t out_min, int32_t out_max)
@@ -152,7 +224,7 @@ void adc_init (void)
 	    ADC1_PRESSEL_FCPU_D2,
             ADC1_EXTTRIG_TIM,
 	    DISABLE,
-	    ADC1_ALIGN_LEFT,
+	    ADC1_ALIGN_RIGHT,
 	    (ADC1_SCHMITTTRIG_CHANNEL4 || ADC1_SCHMITTTRIG_CHANNEL5 || ADC1_SCHMITTTRIG_CHANNEL6),
             DISABLE);
 }
@@ -181,7 +253,7 @@ uint16_t adc_read_throttle (void)
 	    ADC1_PRESSEL_FCPU_D2,
             ADC1_EXTTRIG_TIM,
 	    DISABLE,
-	    ADC1_ALIGN_LEFT,
+	    ADC1_ALIGN_RIGHT,
 	    (ADC1_SCHMITTTRIG_CHANNEL4 || ADC1_SCHMITTTRIG_CHANNEL5 || ADC1_SCHMITTTRIG_CHANNEL6),
             DISABLE);
 
@@ -226,10 +298,13 @@ void hall_sensors_read_and_action (void)
 
     case 1:
       ui8_motor_rotor_absolute_position = ANGLE_270;
+      ui8_start_phase_current_reading_flag = 1;
+      ui8_start_phase_current_reading_flag1 = 0;
     break;
 
     case 5:
       ui8_motor_rotor_absolute_position = ANGLE_330;
+      ui8_start_phase_current_reading_flag = 0;
 
       // count speed only when motor did rotate half of 1 electronic rotation
       if (ui8_flag_count_speed)
@@ -368,9 +443,9 @@ void apply_duty_cycle (uint8_t ui8_duty_cycle_value)
   }
 
   // set final duty_cycle value
-  TIM1_SetCompare1((uint16_t) (ui8_value_a << 1));
-  TIM1_SetCompare2((uint16_t) (ui8_value_c << 1));
-  TIM1_SetCompare3((uint16_t) (ui8_value_b << 1));
+  TIM1_SetCompare1((uint16_t) (ui8_value_a << 2));
+  TIM1_SetCompare2((uint16_t) (ui8_value_c << 2));
+  TIM1_SetCompare3((uint16_t) (ui8_value_b << 2));
 }
 
 void pwm_init (void)
@@ -380,7 +455,7 @@ void pwm_init (void)
 
   TIM1_TimeBaseInit(0, // TIM1_Prescaler = 0
 		    TIM1_COUNTERMODE_CENTERALIGNED1,
-		    (512 - 1), // clock = 16MHz; counter period = 1024; PWM freq = 16MHz / 1024 = 15.625kHz;
+		    (1024 - 1), // clock = 16MHz; counter period = 1024; PWM freq = 16MHz / 1024 = 15.625kHz;
 		    //(BUT PWM center aligned mode needs twice the frequency)
 		    1); // will fire the TIM1_IT_UPDATE at every PWM period cycle
 
@@ -522,9 +597,9 @@ int main (void)
 
   enableInterrupts();
 
-  TIM1_SetCompare1(126 << 1);
-  TIM1_SetCompare2(126 << 1);
-  TIM1_SetCompare3(126 << 1);
+  TIM1_SetCompare1(126 << 2);
+  TIM1_SetCompare2(126 << 2);
+  TIM1_SetCompare3(126 << 2);
   hall_sensors_read_and_action (); // needed to start the motor
 
   while (1)
