@@ -89,7 +89,7 @@ void TIM1_UPD_OVF_TRG_BRK_IRQHandler(void) __interrupt(TIM1_UPD_OVF_TRG_BRK_IRQH
   uint8_t ui8_temp;
 
   debug_pin_set ();
-  debug_pin_reset ();
+//  debug_pin_reset ();
 
   if (adc_throttle_busy_flag == 0)
   {
@@ -100,8 +100,8 @@ void TIM1_UPD_OVF_TRG_BRK_IRQHandler(void) __interrupt(TIM1_UPD_OVF_TRG_BRK_IRQH
     if ((ui8_temp > ADC_MOTOR_TOTAL_CURRENT_MAX_POSITIVE) ||
      (ui8_temp < ADC_MOTOR_TOTAL_CURRENT_MAX_NEGATIVE))
     {
-      TIM1->BKR &= (uint8_t) ~(TIM1_BKR_MOE);
-      debug_pin_set ();
+//      TIM1->BKR &= (uint8_t) ~(TIM1_BKR_MOE);
+//      debug_pin_set ();
     }
   }
 
@@ -114,7 +114,7 @@ void TIM1_UPD_OVF_TRG_BRK_IRQHandler(void) __interrupt(TIM1_UPD_OVF_TRG_BRK_IRQH
   // clear the interrupt pending bit for TIM1
   TIM1_ClearITPendingBit(TIM1_IT_UPDATE);
 
-  debug_pin_set ();
+//  debug_pin_set ();
   debug_pin_reset ();
 }
 
@@ -368,9 +368,9 @@ void apply_duty_cycle (uint8_t ui8_duty_cycle_value)
   }
 
   // set final duty_cycle value
-  TIM1_SetCompare1((uint16_t) (ui8_value_a << 2));
-  TIM1_SetCompare2((uint16_t) (ui8_value_c << 2));
-  TIM1_SetCompare3((uint16_t) (ui8_value_b << 2));
+  TIM1_SetCompare1((uint16_t) (ui8_value_a << 1));
+  TIM1_SetCompare2((uint16_t) (ui8_value_c << 1));
+  TIM1_SetCompare3((uint16_t) (ui8_value_b << 1));
 }
 
 void pwm_init (void)
@@ -380,10 +380,9 @@ void pwm_init (void)
 
   TIM1_TimeBaseInit(0, // TIM1_Prescaler = 0
 		    TIM1_COUNTERMODE_CENTERALIGNED1,
-		    (1024 - 1), // clock = 16MHz; counter period = 1024; PWM freq = 16MHz / 1024 = 15.625kHz;
-//		    (512 - 1), // clock = 16MHz; counter period = 1024; PWM freq = 16MHz / 1024 = 15.625kHz;
+		    (512 - 1), // clock = 16MHz; counter period = 1024; PWM freq = 16MHz / 1024 = 15.625kHz;
 		    //(BUT PWM center aligned mode needs twice the frequency)
-		    0); // will fire the TIM1_IT_UPDATE at every PWM period
+		    1); // will fire the TIM1_IT_UPDATE at every PWM period cycle
 
 //#define DISABLE_PWM_CHANNELS_1_3
 
@@ -523,9 +522,9 @@ int main (void)
 
   enableInterrupts();
 
-  TIM1_SetCompare1(126 << 2);
-  TIM1_SetCompare2(126 << 2);
-  TIM1_SetCompare3(126 << 2);
+  TIM1_SetCompare1(126 << 1);
+  TIM1_SetCompare2(126 << 1);
+  TIM1_SetCompare3(126 << 1);
   hall_sensors_read_and_action (); // needed to start the motor
 
   while (1)
