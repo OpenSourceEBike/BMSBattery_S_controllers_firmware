@@ -45,6 +45,7 @@ uint8_t adc_total_current = 0;
 uint8_t ui8_adc_total_current_busy_flag = 0;
 uint8_t adc_throttle = 0;
 uint8_t adc_throttle_busy_flag = 0;
+uint8_t ui8_cruise_state = 0;
 
 /////////////////////////////////////////////////////////////////////////////////////////////
 //// Functions prototypes
@@ -411,7 +412,7 @@ void pwm_init (void)
 		  16, // DTG = 0; dead time in 62.5 ns steps; 1us/62.5ns = 16
 		  TIM1_BREAK_DISABLE,
 		  TIM1_BREAKPOLARITY_LOW,
-		  TIM1_AUTOMATICOUTPUT_ENABLE);
+		  TIM1_AUTOMATICOUTPUT_DISABLE);
 
   TIM1_ITConfig(TIM1_IT_UPDATE, ENABLE);
 
@@ -424,11 +425,14 @@ void EXTI_PORTA_IRQHandler(void) __interrupt(EXTI_PORTA_IRQHANDLER)
 {
   if (brake_is_set())
   {
-    brake_coast_disable (); // pwm main output disable
+    brake_coast_enable ();
+    ui8_cruise_state = 0; // stop cruise control
   }
   else
   {
-    brake_coast_enable (); // pwm main output enable
+    brake_coast_disable ();
+    ui8_duty_cycle = 0;
+    ui8_cruise_state = 0; // stop cruise control
   }
 }
 
@@ -486,7 +490,6 @@ int main (void)
 {
   static uint32_t ui32_cruise_counter = 0;
   static uint8_t ui8_cruise_duty_cycle = 0;
-  static uint8_t ui8_cruise_state = 0;
   static uint16_t ui16_adc_value;
   static uint8_t ui8_temp = 0;
 
@@ -547,9 +550,9 @@ int main (void)
 	  if (ui32_cruise_counter > 50)
 	  {
 	    ui8_cruise_state = 1;
+	    ui8_duty_cycle = ui8_temp;
 	    ui32_cruise_counter = 0;
-	    ui8_cruise_duty_cycle = ui8_temp;
-	    ui8_duty_cycle = ui8_cruise_duty_cycle;
+	    ui8_cruise_duty_cycle = 0;
 	  }
         }
         else
@@ -568,7 +571,6 @@ int main (void)
         if (ui8_temp > 25)
         {
           ui8_cruise_state = 0;
-          ui8_cruise_duty_cycle = 0;
           ui8_duty_cycle = ui8_temp;
         }
       }

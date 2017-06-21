@@ -19,13 +19,9 @@ void gpio_init (void)
 void brake_init (void)
 {
   //hall sensors pins as external input pin interrupt
-//  GPIO_Init(BRAKE__PORT,
-//	    BRAKE__PIN,
-//	    GPIO_MODE_IN_FL_IT); // with external interrupt
-
   GPIO_Init(BRAKE__PORT,
 	    BRAKE__PIN,
-	    GPIO_MODE_IN_FL_NO_IT); // no interrupt
+	    GPIO_MODE_IN_FL_IT); // with external interrupt
 
   //initialize the Interrupt sensitivity
   EXTI_SetExtIntSensitivity(EXTI_PORT_GPIOA,
