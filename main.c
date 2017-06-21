@@ -40,11 +40,12 @@ static uint16_t ui16_value_c;
 
 volatile uint8_t ui8_duty_cycle;
 
-static uint16_t ui16_last_value;
-static uint16_t ui16_array_measures [4];
-static uint8_t ui8_array_measures_index = 0;
-uint8_t ui8_start_phase_current_reading_flag = 0;
-uint8_t ui8_start_phase_current_reading_flag1 = 0;
+volatile uint16_t ui16_last_value;
+volatile uint16_t ui16_array_measures [4];
+volatile uint8_t ui8_array_measures_index = 0;
+volatile uint8_t ui8_start_phase_current_reading_flag = 0;
+volatile uint8_t ui8_start_phase_current_reading_flag1 = 0;
+volatile uint8_t ui8_counter;
 
 uint8_t adc_current_phase_B = 0;
 uint8_t adc_total_current = 0;
@@ -96,48 +97,74 @@ void TIM1_UPD_OVF_TRG_BRK_IRQHandler(void) __interrupt(TIM1_UPD_OVF_TRG_BRK_IRQH
   static uint16_t ui16_temp;
   static uint16_t ui16_temp1;
 
-//  debug_pin_set ();
-//  debug_pin_reset ();
+  /****************************************************************
+  * Motor control: angle interpolation and PWM control
+  */
+    motor_fast_loop ();
+  /****************************************************************/
 
   // read new ADC value
-  ADC1->CR1 |= ADC1_CR1_ADON;
-  while (!(ADC1->CSR & ADC1_FLAG_EOC)) ;
+//  ADC1->CR1 |= ADC1_CR1_ADON;
+//  while (!(ADC1->CSR & ADC1_FLAG_EOC)) ;
   ui16_temp = ADC1_GetConversionValue ();
 
-  // store on the array
-  ui16_array_measures [ui8_array_measures_index] = ui16_temp;
+//  // store on the array
+//  ui16_array_measures [ui8_array_measures_index] = ui16_temp;
+//
+//  // manage array
+//  if (ui8_array_measures_index > 2) { ui8_array_measures_index = 0; }
+//  else { ui8_array_measures_index++; }
+//
+//  // low pass filter
+//  ui16_temp = ui16_array_measures [0] + ui16_array_measures [1] + ui16_array_measures [2] + ui16_array_measures [3];
+//  ui16_temp = ui16_temp >> 2;
 
-  // manage array
-  if (ui8_array_measures_index > 2) { ui8_array_measures_index = 0; }
-  else { ui8_array_measures_index++; }
-
-  // low pass filter
-  ui16_temp = ui16_array_measures [0] + ui16_array_measures [1] + ui16_array_measures [2] + ui16_array_measures [3];
-  ui16_temp = ui16_temp >> 2;
-
-  if (ui8_start_phase_current_reading_flag == 1)
+  ui16_last_value = ui16_temp;
+  ui8_counter++;
+  if ((ui8_start_phase_current_reading_flag == 1) && (ui8_counter > 2))
   {
-    // see if is max
+//      debug_pin_set ();
+//      debug_pin_reset ();
+
+    // see if is min
     if (ui16_temp < ui16_last_value) // is not
     {
 //      ui16_last_value = ui16_temp;
     }
-    else // is max
+    else // is min
     {
-	      debug_pin_set ();
-	      debug_pin_reset ();
-//      ui8_start_phase_current_reading_flag = 0;
-//      ui8_start_phase_current_reading_flag1 = 1;
-//            ui16_array_measures [0] = 512;
-//            ui16_array_measures [1] = 512;
-//            ui16_array_measures [2] = 512;
-//            ui16_array_measures [3] = 512;
-//            ui16_last_value = ui16_temp;
-//      debug_pin_reset ();
+      debug_pin_set ();
+      debug_pin_reset ();
+      ui8_start_phase_current_reading_flag = 0;
+      ui8_start_phase_current_reading_flag1 = 1;
+      ui16_array_measures [0] = 512;
+      ui16_array_measures [1] = 512;
+      ui16_array_measures [2] = 512;
+      ui16_array_measures [3] = 512;
+//      ui16_last_value = ui16_temp;
     }
-
-    ui16_last_value = ui16_temp;
   }
+
+//  if (ui8_start_phase_current_reading_flag1 == 1)
+//  {
+//    // see if is min
+//    if (ui16_temp < (ui16_last_value)) // is not
+//    {
+//      ui16_last_value = ui16_temp;
+//    }
+//    else // is min
+//    {
+////      debug_pin_set ();
+////      debug_pin_reset ();
+//      ui8_start_phase_current_reading_flag = 0;
+//      ui8_start_phase_current_reading_flag1 = 0;
+//      ui16_array_measures [0] = 512;
+//      ui16_array_measures [1] = 512;
+//      ui16_array_measures [2] = 512;
+//      ui16_array_measures [3] = 512;
+//      ui16_last_value = ui16_temp;
+//    }
+//  }
 
 //  if (ui8_start_phase_current_reading_flag1 == 1)
 //  {
@@ -177,12 +204,6 @@ void TIM1_UPD_OVF_TRG_BRK_IRQHandler(void) __interrupt(TIM1_UPD_OVF_TRG_BRK_IRQH
 //    }
 //  }
 
-/****************************************************************
-* Motor control: angle interpolation and PWM control
-*/
-  motor_fast_loop ();
-/****************************************************************/
-
   // clear the interrupt pending bit for TIM1
   TIM1_ClearITPendingBit(TIM1_IT_UPDATE);
 
@@ -219,12 +240,12 @@ void adc_init (void)
   ADC1_DeInit();
 
   //init ADC1 peripheral
-  ADC1_Init(ADC1_CONVERSIONMODE_SINGLE,
-	    ADC1_CHANNEL_6,
+  ADC1_Init(ADC1_CONVERSIONMODE_CONTINUOUS,
+	    ADC1_CHANNEL_5,
 	    ADC1_PRESSEL_FCPU_D2,
             ADC1_EXTTRIG_TIM,
 	    DISABLE,
-	    ADC1_ALIGN_RIGHT,
+	    ADC1_ALIGN_LEFT,
 	    (ADC1_SCHMITTTRIG_CHANNEL4 || ADC1_SCHMITTTRIG_CHANNEL5 || ADC1_SCHMITTTRIG_CHANNEL6),
             DISABLE);
 }
@@ -248,14 +269,16 @@ uint16_t adc_read_throttle (void)
   while (!(ADC1->CSR & ADC1_FLAG_EOC)) ;
   ui8_temp = ADC1->DRH;
 
-  ADC1_Init(ADC1_CONVERSIONMODE_SINGLE,
-	    ADC1_CHANNEL_6,
+  ADC1_Init(ADC1_CONVERSIONMODE_CONTINUOUS,
+	    ADC1_CHANNEL_5,
 	    ADC1_PRESSEL_FCPU_D2,
             ADC1_EXTTRIG_TIM,
 	    DISABLE,
 	    ADC1_ALIGN_RIGHT,
 	    (ADC1_SCHMITTTRIG_CHANNEL4 || ADC1_SCHMITTTRIG_CHANNEL5 || ADC1_SCHMITTTRIG_CHANNEL6),
             DISABLE);
+
+  ADC1->CR1 |= ADC1_CR1_ADON;
 
   adc_throttle_busy_flag = 0;
 
@@ -300,6 +323,12 @@ void hall_sensors_read_and_action (void)
       ui8_motor_rotor_absolute_position = ANGLE_270;
       ui8_start_phase_current_reading_flag = 1;
       ui8_start_phase_current_reading_flag1 = 0;
+      ui16_array_measures [0] = 512;
+      ui16_array_measures [1] = 512;
+      ui16_array_measures [2] = 512;
+      ui16_array_measures [3] = 512;
+      ui8_counter = 0;
+      ui16_last_value = 512;
     break;
 
     case 5:
@@ -586,7 +615,7 @@ int main (void)
   brake_init ();
   while (brake_is_set()) ; // hold here while brake is pressed -- this is a protection for development
   debug_pin_init ();
-//  uart_init ();
+  uart_init ();
   hall_sensor_init ();
   pwm_init ();
   adc_init ();
@@ -606,7 +635,9 @@ int main (void)
   {
 //    static uint16_t c;
     static uint32_t ui32_counter = 0;
-    int8_t i8_buffer[64];
+	static uint16_t ui16_adc_value = 0;
+
+    int8_t i8_buffer[64], a, b;
     uint8_t ui8_value;
     int objects_readed;
 
@@ -620,8 +651,6 @@ int main (void)
       ui16_adc_value = (uint16_t) adc_read_throttle ();
       ui8_duty_cycle = (uint8_t) map (ui16_adc_value, ADC_THROTTLE_MIN_VALUE, ADC_THROTTLE_MAX_VALUE, 0, 250);
     }
-
-
 
 //    ui8_duty_cycle = 80;
 
