@@ -46,8 +46,6 @@ uint8_t ui8_adc_total_current_busy_flag = 0;
 uint8_t adc_throttle = 0;
 uint8_t adc_throttle_busy_flag = 0;
 
-uint16_t ui16_adc_value;
-
 /////////////////////////////////////////////////////////////////////////////////////////////
 //// Functions prototypes
 
@@ -86,24 +84,23 @@ uint16_t adc_read_throttle (void);
 
 void TIM1_UPD_OVF_TRG_BRK_IRQHandler(void) __interrupt(TIM1_UPD_OVF_TRG_BRK_IRQHANDLER)
 {
-  uint8_t ui8_temp;
+//  uint8_t ui8_temp;
 
   debug_pin_set ();
-//  debug_pin_reset ();
 
-  if (adc_throttle_busy_flag == 0)
-  {
-    ADC1->CR1 |= ADC1_CR1_ADON;
-    while (!(ADC1->CSR & ADC1_FLAG_EOC)) ;
-    ui8_temp = ADC1->DRH;
-
-    if ((ui8_temp > ADC_MOTOR_TOTAL_CURRENT_MAX_POSITIVE) ||
-     (ui8_temp < ADC_MOTOR_TOTAL_CURRENT_MAX_NEGATIVE))
-    {
-//      TIM1->BKR &= (uint8_t) ~(TIM1_BKR_MOE);
-//      debug_pin_set ();
-    }
-  }
+//  if (adc_throttle_busy_flag == 0)
+//  {
+//    ADC1->CR1 |= ADC1_CR1_ADON;
+//    while (!(ADC1->CSR & ADC1_FLAG_EOC)) ;
+//    ui8_temp = ADC1->DRH;
+//
+//    if ((ui8_temp > ADC_MOTOR_TOTAL_CURRENT_MAX_POSITIVE) ||
+//     (ui8_temp < ADC_MOTOR_TOTAL_CURRENT_MAX_NEGATIVE))
+//    {
+////      TIM1->BKR &= (uint8_t) ~(TIM1_BKR_MOE);
+////      debug_pin_set ();
+//    }
+//  }
 
 /****************************************************************
 * Motor control: angle interpolation and PWM control
@@ -206,18 +203,6 @@ void hall_sensors_read_and_action (void)
   // read hall sensors signal pins and mask other pins
   hall_sensors = (GPIO_ReadInputData (HALL_SENSORS__PORT) & (HALL_SENSORS_MASK));
 
-//  switch (hall_sensors)
-//  {
-//    case 3: hall_sensors = 1; break;
-//    case 1: hall_sensors = 5; break;
-//    case 5: hall_sensors = 4; break;
-//    case 4: hall_sensors = 6; break;
-//    case 6: hall_sensors = 2; break;
-//    case 2: hall_sensors = 3; break;
-//    default: hall_sensors = 2; return;
-//    break;
-//  }
-
   switch (hall_sensors)
   {
     case 3:
@@ -234,8 +219,6 @@ void hall_sensors_read_and_action (void)
       // count speed only when motor did rotate half of 1 electronic rotation
       if (ui8_flag_count_speed)
       {
-//	debug_pin_set ();
-
 	ui8_flag_count_speed = 0;
 	ui32_interpolation_angle_step = ui32_PWM_cycles_counter << 2; // (ui32_PWM_cycles_counter / 256) * 1024
 	ui32_speed_inverse = ui32_PWM_cycles_counter;
@@ -269,8 +252,6 @@ void hall_sensors_read_and_action (void)
   ui32_interpolation_sum = 0;
   ui32_PWM_cycles_counter1 = 0;
   ui32_last_counter_value = 0;
-
-//  debug_pin_reset ();
 }
 
 // runs every 64us (PWM frequency)
@@ -501,9 +482,14 @@ char getchar(void)
   return (c);
 }
 
-
 int main (void)
 {
+  static uint32_t ui32_cruise_counter = 0;
+  static uint8_t ui8_cruise_duty_cycle = 0;
+  static uint8_t ui8_cruise_state = 0;
+  static uint16_t ui16_adc_value;
+  static uint8_t ui8_temp = 0;
+
   //set clock at the max 16MHz
   CLK_HSIPrescalerConfig(CLK_PRESCALER_HSIDIV1);
 
@@ -511,7 +497,7 @@ int main (void)
   brake_init ();
   while (brake_is_set()) ; // hold here while brake is pressed -- this is a protection for development
   debug_pin_init ();
-//  uart_init ();
+  uart_init ();
   hall_sensor_init ();
   pwm_init ();
   adc_init ();
@@ -542,8 +528,53 @@ int main (void)
     {
       ui32_counter = 0;
       while (ui8_adc_total_current_busy_flag) ;
+
+      /****************************************************************************/
+      // read throttle and execute cruise control
+      //
       ui16_adc_value = (uint16_t) adc_read_throttle ();
-      ui8_duty_cycle = (uint8_t) map (ui16_adc_value, ADC_THROTTLE_MIN_VALUE, ADC_THROTTLE_MAX_VALUE, 0, 250);
+      ui8_temp = (uint8_t) map (ui16_adc_value, ADC_THROTTLE_MIN_VALUE, ADC_THROTTLE_MAX_VALUE, 0, 250);
+
+      // Cruise control
+      if (ui8_cruise_state == 0)
+      {
+        if ((ui8_temp > 25) &&
+            ((ui8_temp > (ui8_cruise_duty_cycle - 25)) || (ui8_temp < (ui8_cruise_duty_cycle + 25))))
+        {
+	  ui32_cruise_counter++;
+	  ui8_duty_cycle = ui8_temp;
+
+	  if (ui32_cruise_counter > 50)
+	  {
+	    ui8_cruise_state = 1;
+	    ui32_cruise_counter = 0;
+	    ui8_cruise_duty_cycle = ui8_temp;
+	    ui8_duty_cycle = ui8_cruise_duty_cycle;
+	  }
+        }
+        else
+        {
+	  ui32_cruise_counter = 0;
+	  ui8_cruise_duty_cycle = ui8_temp;
+	  ui8_duty_cycle = ui8_cruise_duty_cycle;
+        }
+      }
+      else if (ui8_cruise_state == 1)
+      {
+        if (ui8_temp < 25) { ui8_cruise_state = 2; }
+      }
+      else if (ui8_cruise_state == 2)
+      {
+        if (ui8_temp > 25)
+        {
+          ui8_cruise_state = 0;
+          ui8_cruise_duty_cycle = 0;
+          ui8_duty_cycle = ui8_temp;
+        }
+      }
+      /****************************************************************************/
+
+      printf("%d\n", ui8_duty_cycle);
     }
 
 
