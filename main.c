@@ -40,7 +40,8 @@ static uint16_t ui16_value_c;
 
 volatile uint8_t ui8_duty_cycle;
 
-uint8_t adc_current_phase_B = 0;
+uint16_t ui16_adc_current_phase_B = 0;
+uint16_t ui16_adc_current_phase_B_temp = 0;
 uint8_t adc_total_current = 0;
 uint8_t ui8_adc_total_current_busy_flag = 0;
 uint8_t adc_throttle = 0;
@@ -78,7 +79,7 @@ void putchar(char c);
 char getchar(void);
 
 void adc_init (void);
-uint16_t adc_read_throttle (void);
+uint8_t adc_read_throttle (void);
 
 /////////////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////////////
@@ -86,28 +87,25 @@ uint16_t adc_read_throttle (void);
 void TIM1_UPD_OVF_TRG_BRK_IRQHandler(void) __interrupt(TIM1_UPD_OVF_TRG_BRK_IRQHANDLER)
 {
 //  uint8_t ui8_temp;
+  uint16_t ui16_temp;
+  static uint16_t ui16_last_value;
 
-  debug_pin_set ();
-
-//  if (adc_throttle_busy_flag == 0)
-//  {
-//    ADC1->CR1 |= ADC1_CR1_ADON;
-//    while (!(ADC1->CSR & ADC1_FLAG_EOC)) ;
-//    ui8_temp = ADC1->DRH;
-//
-//    if ((ui8_temp > ADC_MOTOR_TOTAL_CURRENT_MAX_POSITIVE) ||
-//     (ui8_temp < ADC_MOTOR_TOTAL_CURRENT_MAX_NEGATIVE))
-//    {
-////      TIM1->BKR &= (uint8_t) ~(TIM1_BKR_MOE);
-////      debug_pin_set ();
-//    }
-//  }
+//  debug_pin_set ();
 
 /****************************************************************
 * Motor control: angle interpolation and PWM control
 */
   motor_fast_loop ();
 /****************************************************************/
+
+  // find the adc_current_phase_B minimum value
+  ui16_temp = ADC1_GetConversionValue ();
+  if (ui16_temp < ui16_adc_current_phase_B_temp)
+  {
+    ui16_adc_current_phase_B_temp = ui16_temp;
+    debug_pin_set ();
+    debug_pin_reset ();
+  }
 
   // clear the interrupt pending bit for TIM1
   TIM1_ClearITPendingBit(TIM1_IT_UPDATE);
@@ -145,8 +143,8 @@ void adc_init (void)
   ADC1_DeInit();
 
   //init ADC1 peripheral
-  ADC1_Init(ADC1_CONVERSIONMODE_SINGLE,
-	    ADC1_CHANNEL_6,
+  ADC1_Init(ADC1_CONVERSIONMODE_CONTINUOUS,
+	    ADC1_CHANNEL_5,
 	    ADC1_PRESSEL_FCPU_D2,
             ADC1_EXTTRIG_TIM,
 	    DISABLE,
@@ -155,7 +153,7 @@ void adc_init (void)
             DISABLE);
 }
 
-uint16_t adc_read_throttle (void)
+uint8_t adc_read_throttle (void)
 {
   uint8_t ui8_temp;
 
@@ -174,14 +172,16 @@ uint16_t adc_read_throttle (void)
   while (!(ADC1->CSR & ADC1_FLAG_EOC)) ;
   ui8_temp = ADC1->DRH;
 
-  ADC1_Init(ADC1_CONVERSIONMODE_SINGLE,
-	    ADC1_CHANNEL_6,
+  ADC1_Init(ADC1_CONVERSIONMODE_CONTINUOUS,
+	    ADC1_CHANNEL_5,
 	    ADC1_PRESSEL_FCPU_D2,
             ADC1_EXTTRIG_TIM,
 	    DISABLE,
-	    ADC1_ALIGN_LEFT,
+	    ADC1_ALIGN_RIGHT,
 	    (ADC1_SCHMITTTRIG_CHANNEL4 || ADC1_SCHMITTTRIG_CHANNEL5 || ADC1_SCHMITTTRIG_CHANNEL6),
             DISABLE);
+
+  ADC1->CR1 |= ADC1_CR1_ADON;
 
   adc_throttle_busy_flag = 0;
 
@@ -233,6 +233,8 @@ void hall_sensors_read_and_action (void)
 
     case 6:
       ui8_motor_rotor_absolute_position = ANGLE_90;
+      ui16_adc_current_phase_B = ui16_adc_current_phase_B_temp;
+      ui16_adc_current_phase_B_temp = 512; // 2.5V, 0 amps
     break;
 
     case 2:
@@ -520,6 +522,7 @@ int main (void)
   {
 //    static uint16_t c;
     static uint32_t ui32_counter = 0;
+    uint16_t ui16_temp = 0;
     int8_t i8_buffer[64];
     uint8_t ui8_value;
     int objects_readed;
@@ -576,7 +579,8 @@ int main (void)
       }
       /****************************************************************************/
 
-      printf("%d\n", ui8_duty_cycle);
+      ui16_temp = ui16_adc_current_phase_B >> 2;
+      printf("%d\n", ui16_temp);
     }
 
 
