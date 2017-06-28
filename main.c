@@ -41,6 +41,7 @@ static uint16_t ui16_value_c;
 volatile uint8_t ui8_duty_cycle;
 
 uint16_t ui16_adc_current_phase_B = 0;
+uint8_t ui8_adc_current_phase_B_flag = 0;
 uint16_t ui16_adc_current_phase_B_temp = 0;
 uint8_t adc_total_current = 0;
 uint8_t ui8_adc_total_current_busy_flag = 0;
@@ -98,20 +99,23 @@ void TIM1_UPD_OVF_TRG_BRK_IRQHandler(void) __interrupt(TIM1_UPD_OVF_TRG_BRK_IRQH
   motor_fast_loop ();
 /****************************************************************/
 
-  // find the adc_current_phase_B minimum value
-  ui16_temp = ADC1_GetConversionValue ();
-  if (ui16_temp < ui16_adc_current_phase_B_temp)
+  if (ui8_adc_current_phase_B_flag == 1)
   {
-    ui16_adc_current_phase_B_temp = ui16_temp;
-    debug_pin_set ();
-    debug_pin_reset ();
+    // find the adc_current_phase_B minimum value
+    ui16_temp = ADC1_GetConversionValue ();
+    if (ui16_temp < ui16_adc_current_phase_B_temp)
+    {
+      ui16_adc_current_phase_B_temp = ui16_temp;
+      debug_pin_set ();
+      debug_pin_reset ();
+    }
   }
 
   // clear the interrupt pending bit for TIM1
   TIM1_ClearITPendingBit(TIM1_IT_UPDATE);
 
 //  debug_pin_set ();
-  debug_pin_reset ();
+//  debug_pin_reset ();
 }
 
 int32_t map (int32_t x, int32_t in_min, int32_t in_max, int32_t out_min, int32_t out_max)
@@ -208,6 +212,8 @@ void hall_sensors_read_and_action (void)
   {
     case 3:
       ui8_motor_rotor_absolute_position = ANGLE_210;
+      ui8_adc_current_phase_B_flag = 1;
+      ui16_adc_current_phase_B_temp = 512; // 2.5V, 0 amps
     break;
 
     case 1:
@@ -229,17 +235,16 @@ void hall_sensors_read_and_action (void)
 
     case 4:
       ui8_motor_rotor_absolute_position = ANGLE_30;
+      ui8_adc_current_phase_B_flag = 0;
     break;
 
     case 6:
       ui8_motor_rotor_absolute_position = ANGLE_90;
       ui16_adc_current_phase_B = ui16_adc_current_phase_B_temp;
-      ui16_adc_current_phase_B_temp = 512; // 2.5V, 0 amps
     break;
 
     case 2:
       ui8_motor_rotor_absolute_position = ANGLE_150;
-
       ui8_flag_count_speed = 1;
     break;
 
@@ -523,9 +528,11 @@ int main (void)
 //    static uint16_t c;
     static uint32_t ui32_counter = 0;
     uint16_t ui16_temp = 0;
+    uint16_t ui32_temp = 0;
     int8_t i8_buffer[64];
     uint8_t ui8_value;
     int objects_readed;
+    static uint32_t ui32_LPF_running_average = 0;
 
 //    debug_pin_reset ();
 
@@ -579,8 +586,16 @@ int main (void)
       }
       /****************************************************************************/
 
-      ui16_temp = ui16_adc_current_phase_B >> 2;
-      printf("%d\n", ui16_temp);
+      // low pass filter using running average
+      ui32_temp = ui32_LPF_running_average >> 2; // ui32_LPF_running_average / 8
+      ui32_LPF_running_average -= ui32_temp; // ui32_LPF_running_average is now reduced to 7/8 of the original ui32_LPF_running_average
+      ui32_LPF_running_average += (uint32_t) (ui16_adc_current_phase_B >> 2); //add 1/8 a to get the new average
+
+//      disableInterrupts();
+//      ui32_LPF_running_average = (uint32_t) ui16_adc_current_phase_B;
+//      enableInterrupts();
+
+      printf("%d\n", (uint16_t) ui32_LPF_running_average);
     }
 
 
