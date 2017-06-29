@@ -25,6 +25,12 @@
 #define ADC_MOTOR_TOTAL_CURRENT_MAX_POSITIVE 90 // +2A
 #define ADC_MOTOR_TOTAL_CURRENT_MAX_NEGATIVE 70 // +2A
 
+// Phase current: max of +-15.5 amps
+// 512 --> 15.5 amps
+// 1 ADC increment --> 0.030A
+// 1 ADC RMS --> 0.03 * 0.707 -- > 0.021A
+#define ADC_PHASE_B_CURRENT_STEP 21 // 0.021 * 1000 = 21
+
 #if MOTOR_TYPE == MOTOR_TYPE_Q85
 #define MOTOR_ROTOR_DELTA_PHASE_ANGLE_RIGHT 46// best value found (at max speed, minimum current and power supply voltage keeps the same)
 #elif MOTOR_TYPE == MOTOR_TYPE_EUC2

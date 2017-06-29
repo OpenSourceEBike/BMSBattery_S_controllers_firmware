@@ -261,7 +261,6 @@ void hall_sensors_read_and_action (void)
   }
 
   ui16_interpolation_angle_step = ((uint16_t) (ui8_PWM_cycles_counter << 8) / ANGLE_60);
-//  ui16_interpolation_angle_step = (uint16_t) (ui8_PWM_cycles_counter * 10);
   ui8_speed_inverse = ui8_PWM_cycles_counter;
   ui8_PWM_cycles_counter = 0;
 
@@ -297,8 +296,7 @@ void motor_fast_loop (void)
 #if DO_INTERPOLATION == 1
   // calculate the interpolation angle
   // interpolation seems a problem when motor starts, so avoid to do it at very low speed
-//  if ((ui8_duty_cycle > 10) && (ui8_speed_inverse < 75))
-  if (ui8_duty_cycle > 10)
+  if ((ui8_duty_cycle > 10) && (ui8_speed_inverse < 36))
   {
     if (ui8_interpolation_angle < ANGLE_60) // interpolate only for angle <= 60º
     {
@@ -587,6 +585,8 @@ int main (void)
     uint8_t ui8_value;
     int objects_readed;
     static uint32_t ui32_LPF_running_average = 0;
+    static uint32_t ui32_LPF_temp = 0;
+    static float f_temp = 0;
 
 //    debug_pin_reset ();
 
@@ -650,7 +650,9 @@ int main (void)
 //      enableInterrupts();
 
 //      printf("%d\n", (uint16_t) ui16_debug);
-      printf("%d\n", ui16_debug);
+      ui32_LPF_temp = 512 - ui32_LPF_running_average;
+      ui32_LPF_temp = ui32_LPF_temp * ADC_PHASE_B_CURRENT_STEP;
+      printf("%d\n", (uint16_t) ui32_LPF_temp);
     }
 
 
