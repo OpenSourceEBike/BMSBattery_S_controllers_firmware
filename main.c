@@ -18,14 +18,24 @@
 #include "stm8s_tim2.h"
 #include "motor.h"
 
+uint16_t ui16_LPF_angle_adjust = 0;
+uint16_t ui16_LPF_angle_adjust_temp = 0;
+
 uint8_t ui8_PWM_cycles_counter = 0;
+uint8_t ui8_PWM_cycles_counter_1 = 0;
+uint8_t ui8_PWM_cycles_counter_value = 0;
+uint8_t ui8_PWM_cycles_counter_value_t = 0;
 uint8_t ui8_speed_inverse = 0;
 uint8_t ui8_motor_rotor_position = 0; // in 360/256 degrees
 uint8_t ui8_motor_rotor_absolute_position = 0; // in 360/256 degrees
 uint8_t ui8_position_correction_value = 0; // in 360/256 degrees
 uint16_t ui16_interpolation_angle_step = 0; // x1000
 uint8_t ui8_interpolation_angle = 0;
+uint8_t ui8_interpolation_angle_old = 0;
 uint8_t ui8_last_counter_value = 0;
+
+uint8_t ui8_debug = 0;
+uint16_t ui16_debug = 0;
 
 static uint8_t ui8_value_a;
 static uint8_t ui8_value_b;
@@ -87,6 +97,7 @@ void TIM1_UPD_OVF_TRG_BRK_IRQHandler(void) __interrupt(TIM1_UPD_OVF_TRG_BRK_IRQH
 
 //  debug_pin_set ();
 
+  ui8_PWM_cycles_counter_1++;
   if (ui8_adc_current_phase_B_flag == 1)
   {
     // find the adc_current_phase_B minimum value
@@ -94,6 +105,7 @@ void TIM1_UPD_OVF_TRG_BRK_IRQHandler(void) __interrupt(TIM1_UPD_OVF_TRG_BRK_IRQH
     if (ui16_temp < ui16_adc_current_phase_B_temp)
     {
       ui16_adc_current_phase_B_temp = ui16_temp;
+      ui8_PWM_cycles_counter_value = ui8_PWM_cycles_counter_1;
       debug_pin_set ();
       debug_pin_reset ();
     }
@@ -222,6 +234,17 @@ void hall_sensors_read_and_action (void)
       ui8_motor_rotor_absolute_position = ANGLE_30;
       ui8_adc_current_phase_B_flag = 0;
       ui16_adc_current_phase_B = ui16_adc_current_phase_B_temp;
+
+
+//      ui8_PWM_cycles_counter_value_t = ui8_PWM_cycles_counter_value / ((uint8_t) (ui16_interpolation_angle_step >> 8));
+//      ui8_PWM_cycles_counter_value_t = ((uint8_t) (ui16_interpolation_angle_step >> 8));
+      ui8_PWM_cycles_counter_1 = 0;
+
+      // low pass filter using running average
+//      ui16_LPF_angle_adjust_temp = ui16_LPF_angle_adjust >> 3; // ui32_LPF_running_average / 8
+//      ui16_LPF_angle_adjust -= ui16_LPF_angle_adjust_temp; // ui32_LPF_running_average is now reduced to 7/8 of the original ui32_LPF_running_average
+//      ui16_LPF_angle_adjust += (uint16_t) (ui8_PWM_cycles_counter_value >> 3); //add 1/8 a to get the new average
+//      ui8_PWM_cycles_counter_value_t = (uint8_t) ui16_LPF_angle_adjust;
     break;
 
     case 6:
@@ -237,10 +260,15 @@ void hall_sensors_read_and_action (void)
     break;
   }
 
-  ui16_interpolation_angle_step = (uint16_t) (ui8_PWM_cycles_counter << 8);
-  ui16_interpolation_angle_step /= ANGLE_60;
+  ui16_interpolation_angle_step = ((uint16_t) (ui8_PWM_cycles_counter << 8) / ANGLE_60);
+//  ui16_interpolation_angle_step = (uint16_t) (ui8_PWM_cycles_counter * 10);
   ui8_speed_inverse = ui8_PWM_cycles_counter;
   ui8_PWM_cycles_counter = 0;
+
+//  ui16_debug = ((uint8_t) (ui16_interpolation_angle_step >> 8));
+  ui16_debug = ui16_interpolation_angle_step;
+
+//  ui16_debug = ui8_PWM_cycles_counter_value / ((uint8_t) (ui16_interpolation_angle_step >> 8));
 
   ui8_motor_rotor_absolute_position = (uint8_t) (ui8_motor_rotor_absolute_position + MOTOR_ROTOR_DELTA_PHASE_ANGLE_RIGHT);
 
@@ -269,15 +297,22 @@ void motor_fast_loop (void)
 #if DO_INTERPOLATION == 1
   // calculate the interpolation angle
   // interpolation seems a problem when motor starts, so avoid to do it at very low speed
-  if ((ui8_duty_cycle > 10) && (ui8_speed_inverse < 75))
+//  if ((ui8_duty_cycle > 10) && (ui8_speed_inverse < 75))
+  if (ui8_duty_cycle > 10)
   {
     if (ui8_interpolation_angle < ANGLE_60) // interpolate only for angle <= 60º
     {
-      if (((uint16_t) ((ui8_PWM_cycles_counter - ui8_last_counter_value) << 8)) > ui16_interpolation_angle_step)
-      {
-	ui8_interpolation_angle++;
-	ui8_last_counter_value = ui8_PWM_cycles_counter;
-      }
+      uint16_t ui16_temp;
+
+      ui16_temp = (uint16_t) ui8_PWM_cycles_counter << 8;
+      ui8_interpolation_angle = (uint8_t) (ui16_temp / ui16_interpolation_angle_step);
+
+//      if (ui8_interpolation_angle != ui8_interpolation_angle_old)
+//      {
+//	debug_pin_set ();
+//	debug_pin_reset ();
+//	ui8_interpolation_angle_old = ui8_interpolation_angle;
+//      }
 
       ui8_motor_rotor_position = (uint8_t) (ui8_motor_rotor_absolute_position + ui8_position_correction_value + ui8_interpolation_angle);
     }
@@ -614,7 +649,8 @@ int main (void)
 //      ui32_LPF_running_average = (uint32_t) ui16_adc_current_phase_B;
 //      enableInterrupts();
 
-      printf("%d\n", (uint16_t) ui32_LPF_running_average);
+//      printf("%d\n", (uint16_t) ui16_debug);
+      printf("%d\n", ui16_debug);
     }
 
 
