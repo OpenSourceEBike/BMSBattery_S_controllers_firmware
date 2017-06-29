@@ -18,7 +18,7 @@
 #define SVM 1
 #define SINE 2
 
-#define SVM_TABLE SINE
+#define SVM_TABLE SVM
 
 extern uint8_t ui8_svm_table [SVM_TABLE_LEN];
 

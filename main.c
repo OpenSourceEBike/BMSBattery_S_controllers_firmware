@@ -18,18 +18,15 @@
 #include "stm8s_tim2.h"
 #include "motor.h"
 
-uint32_t ui32_motor_speed_erps = 0; // motor speed in electronic rotations per second
-uint8_t ui8_flag_count_speed = 0;
-uint32_t ui32_PWM_cycles_counter = 0;
-uint32_t ui32_PWM_cycles_counter1 = 0;
-uint32_t ui32_speed_inverse = 0;
+uint8_t ui8_PWM_cycles_counter = 0;
+uint8_t ui8_PWM_cycles_counter1 = 0;
+uint8_t ui8_speed_inverse = 0;
 uint8_t ui8_motor_rotor_position = 0; // in 360/256 degrees
 uint8_t ui8_motor_rotor_absolute_position = 0; // in 360/256 degrees
 uint8_t ui8_position_correction_value = 0; // in 360/256 degrees
-uint32_t ui32_interpolation_angle_step = 0; // x1000
-uint32_t ui32_interpolation_sum = 0; // x1000
+uint16_t ui16_interpolation_angle_step = 0; // x1000
 uint8_t ui8_interpolation_angle = 0;
-uint32_t ui32_last_counter_value = 0;
+uint8_t ui8_last_counter_value = 0;
 
 static uint8_t ui8_value_a;
 static uint8_t ui8_value_b;
@@ -213,73 +210,57 @@ void hall_sensors_read_and_action (void)
       ui8_adc_current_phase_B_flag = 1;
       ui16_adc_current_phase_B_temp = 512; // 2.5V, 0 amps
 
-	ui32_PWM_cycles_counter <<= 4;
-	ui32_PWM_cycles_counter += ui32_PWM_cycles_counter << 1;
-	ui32_interpolation_angle_step = ui32_PWM_cycles_counter; // (ui32_PWM_cycles_counter / 256) * 1024
-	ui32_speed_inverse = ui32_PWM_cycles_counter;
-	ui32_PWM_cycles_counter = 0;
+      ui16_interpolation_angle_step = (uint16_t) (ui8_PWM_cycles_counter << 8);
+      ui16_interpolation_angle_step /= ANGLE_60;
+      ui8_speed_inverse = ui8_PWM_cycles_counter;
+      ui8_PWM_cycles_counter = 0;
     break;
 
     case 1:
       ui8_motor_rotor_absolute_position = ANGLE_270;
 
-	ui32_PWM_cycles_counter <<= 4;
-	ui32_PWM_cycles_counter += ui32_PWM_cycles_counter << 1;
-	ui32_interpolation_angle_step = ui32_PWM_cycles_counter; // (ui32_PWM_cycles_counter / 256) * 1024
-	ui32_speed_inverse = ui32_PWM_cycles_counter;
-	ui32_PWM_cycles_counter = 0;
+      ui16_interpolation_angle_step = (uint16_t) (ui8_PWM_cycles_counter << 8);
+      ui16_interpolation_angle_step /= ANGLE_60;
+      ui8_speed_inverse = ui8_PWM_cycles_counter;
+      ui8_PWM_cycles_counter = 0;
     break;
 
     case 5:
       ui8_motor_rotor_absolute_position = ANGLE_330;
 
-//      // count speed only when motor did rotate half of 1 electronic rotation
-//      if (ui8_flag_count_speed)
-//      {
-//	ui8_flag_count_speed = 0;
-//	ui32_interpolation_angle_step = ui32_PWM_cycles_counter << 2; // (ui32_PWM_cycles_counter / 256) * 1024
-//	ui32_speed_inverse = ui32_PWM_cycles_counter;
-//	ui32_PWM_cycles_counter = 0;
-//      }
-
-	ui32_PWM_cycles_counter <<= 4;
-	ui32_PWM_cycles_counter += ui32_PWM_cycles_counter << 1;
-	ui32_interpolation_angle_step = ui32_PWM_cycles_counter; // (ui32_PWM_cycles_counter / 256) * 1024
-	ui32_speed_inverse = ui32_PWM_cycles_counter;
-	ui32_PWM_cycles_counter = 0;
+      ui16_interpolation_angle_step = (uint16_t) (ui8_PWM_cycles_counter << 8);
+      ui16_interpolation_angle_step /= ANGLE_60;
+      ui8_speed_inverse = ui8_PWM_cycles_counter;
+      ui8_PWM_cycles_counter = 0;
     break;
 
     case 4:
       ui8_motor_rotor_absolute_position = ANGLE_30;
       ui8_adc_current_phase_B_flag = 0;
+      ui16_adc_current_phase_B = ui16_adc_current_phase_B_temp;
 
-	ui32_PWM_cycles_counter <<= 4;
-	ui32_PWM_cycles_counter += ui32_PWM_cycles_counter << 1;
-	ui32_interpolation_angle_step = ui32_PWM_cycles_counter; // (ui32_PWM_cycles_counter / 256) * 1024
-	ui32_speed_inverse = ui32_PWM_cycles_counter;
-	ui32_PWM_cycles_counter = 0;
+      ui16_interpolation_angle_step = (uint16_t) (ui8_PWM_cycles_counter << 8);
+      ui16_interpolation_angle_step /= ANGLE_60;
+      ui8_speed_inverse = ui8_PWM_cycles_counter;
+      ui8_PWM_cycles_counter = 0;
     break;
 
     case 6:
       ui8_motor_rotor_absolute_position = ANGLE_90;
-      ui16_adc_current_phase_B = ui16_adc_current_phase_B_temp;
 
-	ui32_PWM_cycles_counter <<= 4;
-	ui32_PWM_cycles_counter += ui32_PWM_cycles_counter << 1;
-	ui32_interpolation_angle_step = ui32_PWM_cycles_counter; // (ui32_PWM_cycles_counter / 256) * 1024
-	ui32_speed_inverse = ui32_PWM_cycles_counter;
-	ui32_PWM_cycles_counter = 0;
+      ui16_interpolation_angle_step = (uint16_t) (ui8_PWM_cycles_counter << 8);
+      ui16_interpolation_angle_step /= ANGLE_60;
+      ui8_speed_inverse = ui8_PWM_cycles_counter;
+      ui8_PWM_cycles_counter = 0;
     break;
 
     case 2:
       ui8_motor_rotor_absolute_position = ANGLE_150;
-      ui8_flag_count_speed = 1;
 
-	ui32_PWM_cycles_counter <<= 4;
-	ui32_PWM_cycles_counter += ui32_PWM_cycles_counter << 1;
-	ui32_interpolation_angle_step = ui32_PWM_cycles_counter; // (ui32_PWM_cycles_counter / 256) * 1024
-	ui32_speed_inverse = ui32_PWM_cycles_counter;
-	ui32_PWM_cycles_counter = 0;
+      ui16_interpolation_angle_step = (uint16_t) (ui8_PWM_cycles_counter << 8);
+      ui16_interpolation_angle_step /= ANGLE_60;
+      ui8_speed_inverse = ui8_PWM_cycles_counter;
+      ui8_PWM_cycles_counter = 0;
     break;
 
     default:
@@ -291,43 +272,40 @@ void hall_sensors_read_and_action (void)
 
   ui8_motor_rotor_position = (uint8_t) (ui8_motor_rotor_absolute_position + ui8_position_correction_value);
   ui8_interpolation_angle = 0;
-  ui32_interpolation_sum = 0;
-  ui32_PWM_cycles_counter1 = 0;
-  ui32_last_counter_value = 0;
+  ui8_PWM_cycles_counter1 = 0;
+  ui8_last_counter_value = 0;
 }
 
 // runs every 64us (PWM frequency)
 void motor_fast_loop (void)
 {
   // count number of fast loops / PWM cycles
-  if (ui32_PWM_cycles_counter < PWM_CYCLES_COUNTER_MAX)
+  if (ui8_PWM_cycles_counter < PWM_CYCLES_COUNTER_MAX)
   {
-    ui32_PWM_cycles_counter++;
-    ui32_PWM_cycles_counter1++;
+    ui8_PWM_cycles_counter++;
+    ui8_PWM_cycles_counter1++;
   }
   else
   {
-    ui32_PWM_cycles_counter = 0;
-    ui32_last_counter_value = 0;
-    ui32_PWM_cycles_counter1 = 0;
-    ui32_motor_speed_erps = 0;
-    ui32_interpolation_angle_step = (SVM_TABLE_LEN_x1024) / PWM_CYCLES_COUNTER_MAX;
-    ui32_interpolation_sum = 0;
-    ui32_speed_inverse = 0xffffffff;
+    ui8_PWM_cycles_counter = 0;
+    ui8_last_counter_value = 0;
+    ui8_PWM_cycles_counter1 = 0;
+    ui16_interpolation_angle_step = 0xffff; //(SVM_TABLE_LEN_x1024) / PWM_CYCLES_COUNTER_MAX;
+    ui8_speed_inverse = 0xff;
   }
 
 #define DO_INTERPOLATION 1 // may be usefull when debugging
 #if DO_INTERPOLATION == 1
   // calculate the interpolation angle
   // interpolation seems a problem when motor starts, so avoid to do it at very low speed
-  if ((ui8_duty_cycle > 10) && (ui32_speed_inverse < 312))
+  if ((ui8_duty_cycle > 10) && (ui8_speed_inverse < 75))
   {
     if (ui8_interpolation_angle < ANGLE_60) // interpolate only for angle <= 60º
     {
-      if (((ui32_PWM_cycles_counter1 - ui32_last_counter_value) << 10) > ui32_interpolation_angle_step)
+      if (((uint16_t) ((ui8_PWM_cycles_counter1 - ui8_last_counter_value) << 8)) > ui16_interpolation_angle_step)
       {
 	ui8_interpolation_angle++;
-	ui32_last_counter_value = ui32_PWM_cycles_counter1;
+	ui8_last_counter_value = ui8_PWM_cycles_counter1;
       }
 
       ui8_motor_rotor_position = (uint8_t) (ui8_motor_rotor_absolute_position + ui8_position_correction_value + ui8_interpolation_angle);
@@ -627,7 +605,7 @@ int main (void)
 	  ui32_cruise_counter++;
 	  ui8_duty_cycle = ui8_temp;
 
-	  if (ui32_cruise_counter > 50)
+	  if (ui32_cruise_counter > 100)
 	  {
 	    ui8_cruise_state = 1;
 	    ui8_duty_cycle = ui8_temp;
