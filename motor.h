@@ -15,6 +15,10 @@
 #define RIGHT 		1
 #define LEFT 		2
 
+#define SVM 1
+#define SINE 2
+
+#define SVM_TABLE SINE
 
 extern uint8_t ui8_svm_table [SVM_TABLE_LEN];
 
