@@ -16,7 +16,8 @@
 #define LEFT 		2
 
 #define SVM 1
-#define SINE 2
+#define SINE_SVM 2
+#define SINE 3
 
 #define SVM_TABLE SVM
 
