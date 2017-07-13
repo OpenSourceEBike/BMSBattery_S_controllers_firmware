@@ -36,6 +36,8 @@ uint8_t ui8_interpolation_angle_temp = 0;
 uint8_t ui8_interpolation_angle_old = 0;
 uint8_t ui8_last_counter_value = 0;
 
+uint16_t ui16_motor_speed_erps = 0;
+
 uint8_t ui8_debug = 0;
 uint16_t ui16_debug = 0;
 
@@ -227,7 +229,7 @@ void hall_sensors_read_and_action (void)
     switch (hall_sensors)
     {
       case 3:
-	debug_pin_set ();
+//	debug_pin_set ();
 	ui8_motor_rotor_absolute_position = ANGLE_210;
 	ui8_adc_current_phase_B_flag = 1;
 	ui16_adc_current_phase_B_temp = 512; // 2.5V, 0 amps
@@ -235,6 +237,9 @@ void hall_sensors_read_and_action (void)
 
 	ui16_interpolation_angle_step = ui16_PWM_cycles_counter >> 1; // (ui16_PWM_cycles_counter / 256) * 127
 	ui16_speed_inverse = ui16_PWM_cycles_counter;
+	debug_pin_set ();
+	ui16_motor_speed_erps = PWM_CYCLES_SECOND / ui16_PWM_cycles_counter; // this division takes ~4.2us
+	debug_pin_reset ();
 	ui16_PWM_cycles_counter = 0;
 
 	ui8_motor_rotor_absolute_position = (uint8_t) (ui8_motor_rotor_absolute_position + MOTOR_ROTOR_DELTA_PHASE_ANGLE_RIGHT);
@@ -274,7 +279,7 @@ void hall_sensors_read_and_action (void)
 //	debug_pin_set ();
 	ui8_adc_current_phase_B_flag = 0;
 	ui16_adc_current_phase_B = ui16_adc_current_phase_B_temp;
-	debug_pin_reset ();
+//	debug_pin_reset ();
       break;
 
       case 6:
@@ -693,7 +698,7 @@ int main (void)
 //      printf("%d\n", (uint16_t) ui32_LPF_temp);
 
 //      printf("%d\n", ui16_PWM_cycles_counter_value_temp);
-      printf("%d\n", ui8_PWM_cycles_counter_value_t);
+      printf("%d\n", ui16_motor_speed_erps);
     }
 
 
