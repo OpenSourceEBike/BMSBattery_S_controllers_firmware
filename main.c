@@ -17,6 +17,7 @@
 #include "stm8s_tim1.h"
 #include "stm8s_tim2.h"
 #include "motor.h"
+#include "uart.h"
 
 uint16_t ui16_LPF_angle_adjust = 0;
 uint16_t ui16_LPF_angle_adjust_temp = 0;
@@ -55,7 +56,8 @@ uint8_t adc_total_current = 0;
 uint8_t ui8_adc_total_current_busy_flag = 0;
 uint8_t adc_throttle = 0;
 uint8_t adc_throttle_busy_flag = 0;
-uint8_t ui8_cruise_state = 0;
+
+extern uint8_t ui8_cruise_state;
 
 /////////////////////////////////////////////////////////////////////////////////////////////
 //// Functions prototypes
@@ -550,38 +552,6 @@ void hall_sensor_init (void)
 //			    EXTI_SENSITIVITY_RISE_FALL);
 }
 
-void uart_init (void)
-{
-  UART2_DeInit();
-  UART2_Init((uint32_t)115200,
-	     UART2_WORDLENGTH_8D,
-	     UART2_STOPBITS_1,
-	     UART2_PARITY_NO,
-	     UART2_SYNCMODE_CLOCK_DISABLE,
-	     UART2_MODE_TXRX_ENABLE);
-}
-
-void putchar(char c)
-{
-  //Write a character to the UART2
-  UART2_SendData8(c);
-
-  //Loop until the end of transmission
-  while (UART2_GetFlagStatus(UART2_FLAG_TXE) == RESET);
-}
-
-char getchar(void)
-{
-  uint8_t c = 0;
-
-  /* Loop until the Read data register flag is SET */
-  while (UART2_GetFlagStatus(UART2_FLAG_RXNE) == RESET) ;
-
-  c = UART2_ReceiveData8();
-
-  return (c);
-}
-
 int main (void)
 {
   static uint32_t ui32_cruise_counter = 0;
@@ -592,40 +562,45 @@ int main (void)
   //set clock at the max 16MHz
   CLK_HSIPrescalerConfig(CLK_PRESCALER_HSIDIV1);
 
-  gpio_init ();
-  brake_init ();
-  while (brake_is_set()) ; // hold here while brake is pressed -- this is a protection for development
-  debug_pin_init ();
+//  gpio_init ();
+//  brake_init ();
+//  while (brake_is_set()) ; // hold here while brake is pressed -- this is a protection for development
+//  debug_pin_init ();
   uart_init ();
-  hall_sensor_init ();
-  pwm_init ();
-  adc_init ();
+//  hall_sensor_init ();
+//  pwm_init ();
+//  adc_init ();
 
 //  ITC_SetSoftwarePriority (ITC_IRQ_PORTE, ITC_PRIORITYLEVEL_1); // hall sensors interrupt have the most priority
 //  ITC_SetSoftwarePriority (ITC_IRQ_TIM1_OVF, ITC_PRIORITYLEVEL_2);
-
-  enableInterrupts();
-#if (SVM_TABLE == SVM)
-  TIM1_SetCompare1(126 << 1);
-  TIM1_SetCompare2(126 << 1);
-  TIM1_SetCompare3(126 << 1);
-#elif (SVM_TABLE == SINE) || (SVM_TABLE == SINE_SVM)
-  TIM1_SetCompare1(126 << 2);
-  TIM1_SetCompare2(126 << 2);
-  TIM1_SetCompare3(126 << 2);
-#endif
-
-  hall_sensors_read_and_action (); // needed to start the motor
+//
+//  enableInterrupts();
+//#if (SVM_TABLE == SVM)
+//  TIM1_SetCompare1(126 << 1);
+//  TIM1_SetCompare2(126 << 1);
+//  TIM1_SetCompare3(126 << 1);
+//#elif (SVM_TABLE == SINE) || (SVM_TABLE == SINE_SVM)
+//  TIM1_SetCompare1(126 << 2);
+//  TIM1_SetCompare2(126 << 2);
+//  TIM1_SetCompare3(126 << 2);
+//#endif
+//
+//  hall_sensors_read_and_action (); // needed to start the motor
 
   while (1)
   {
+
+      while (1)
+    {
+	printf("testing UART...");
+    }
 //    static uint16_t c;
     static uint32_t ui32_counter = 0;
     uint16_t ui16_temp = 0;
     uint16_t ui32_temp = 0;
-    int8_t i8_buffer[64];
-    uint8_t ui8_value;
-    int objects_readed;
+//    int8_t i8_buffer[64];
+//    uint8_t ui8_value;
+//    int objects_readed;
     static uint32_t ui32_LPF_running_average = 0;
     static uint32_t ui32_LPF_temp = 0;
     static float f_temp = 0;

@@ -23,6 +23,7 @@ HEX2BIN = hex2bin
 #Folders **** MAKE SURE TO CHANGE ACCORDING TO YOUR STRUCTURE!!! ****
 #Output directory for intermediate and final compiled file(s)
 ODIR = bin
+ODIR_ELF = elf
 #Directory for helpers
 IDIR = StdPeriphLib/inc
 SDIR = StdPeriphLib/src
@@ -38,9 +39,13 @@ EXTRASRCS = \
 	$(SDIR)/stm8s_exti.c \
 	$(SDIR)/stm8s_uart2.c \
 	$(SDIR)/stm8s_tim1.c \
+	$(SDIR)/stm8s_tim2.c \
 	$(SDIR)/stm8s_adc1.c \
 	gpio.c \
+	cruise_control.c \
 	motor.c \
+	uart.c \
+
 
 # The list of .rel files can be derived from the list of their source files
 RELS = $(EXTRASRCS:.c=.rel)
@@ -61,14 +66,17 @@ $(PNAME): $(MAINSRC) $(RELS)
 	@mkdir -p $(ODIR)
 	$(CC) $(INCLUDES) $(CFLAGS) $(IHX_FLAGS) $(LIBS) -L/usr/local/share/sdcc/lib/stm8/stm8.lib -I/usr/local/share/sdcc/include $(MAINSRC) $(wildcard $(ODIR)/*.rel) -o$(ODIR)/
 	$(HEX2BIN) -p 00 $(ODIR)/$(PNAME).ihx
-	$(CC) $(INCLUDES) $(CFLAGS) $(ELF_FLAGS) $(LIBS) $(MAINSRC) $(wildcard $(ODIR)/*.rel) -o$(ODIR)/
-	$(SIZE) $(ODIR)/$(PNAME).elf
+	@mkdir -p $(ODIR_ELF)
+	$(CC) $(INCLUDES) $(CFLAGS) $(ELF_FLAGS) $(LIBS) -L/usr/local/share/sdcc/lib/stm8/stm8.lib -I/usr/local/share/sdcc/include $(MAINSRC) $(wildcard $(ODIR_ELF)/*.rel) -o$(ODIR_ELF)/
+	$(SIZE) $(ODIR_ELF)/$(PNAME).elf
 
 # How to build any .rel file from its corresponding .c file
 # GNU would have you use a pattern rule for this, but that's GNU-specific
 .c.rel:
 	@mkdir -p $(ODIR)
 	$(CC) -c $(INCLUDES) $(CFLAGS) $(IHX_FLAGS) $(LIBS) $< -o$(ODIR)/
+	@mkdir -p $(ODIR_ELF)
+	$(CC) -c $(INCLUDES) $(CFLAGS) $(ELF_FLAGS) $(LIBS) $< -o$(ODIR_ELF)/
 
 # Suffixes appearing in suffix rules we care about.
 # Necessary because .rel is not one of the standard suffixes.
@@ -82,6 +90,7 @@ $(PNAME): $(MAINSRC) $(RELS)
 clean:
 	@echo "Removing $(ODIR)..."
 	@rm -rf $(ODIR)
+	@rm -rf $(ODIR_ELF)
 	@echo "Done."
 flash:
 	stm8flash -cstlinkv2 -pstm8s105?6 -w$(ODIR)/$(PNAME).ihx
