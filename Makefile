@@ -4,12 +4,10 @@
 #Copyright 2016
 #LICENSE:	GNU-LGPL
 
-
-# We're assuming POSIX conformance
-.POSIX:
-
 #Compiler
 CC = /home/cas/software/stm8-binutils/bin/sdcc
+OBJCOPY = stm8-objcopy
+SIZE = stm8-size
 
 #Platform
 PLATFORM = stm8
@@ -17,19 +15,14 @@ PLATFORM = stm8
 #Product name
 PNAME = main
 
-SIZE = size
-HEX2BIN = hex2bin
-
-#Folders **** MAKE SURE TO CHANGE ACCORDING TO YOUR STRUCTURE!!! ****
-#Output directory for intermediate and final compiled file(s)
-ODIR = bin
-ODIR_ELF = elf
 #Directory for helpers
 IDIR = StdPeriphLib/inc
 SDIR = StdPeriphLib/src
 
 # In case you ever want a different name for the main source file
 MAINSRC = $(PNAME).c
+
+ELF_SECTIONS_TO_REMOVE = -R DATA -R INITIALIZED -R SSEG -R .debug_line -R .debug_loc -R .debug_abbrev -R .debug_info -R .debug_pubnames -R .debug_frame
 
 # These are the sources that must be compiled to .rel files:
 EXTRASRCS = \
@@ -51,47 +44,56 @@ EXTRASRCS = \
 RELS = $(EXTRASRCS:.c=.rel)
 
 INCLUDES = -I$(IDIR) -I. 
-#CFLAGS   = -m$(PLATFORM) -I/usr/local/share/sdcc/include -I/usr/local/share/sdcc/lib/ --nogcse --noinvariant --noinduction --noloopreverse --nolabelopt --nooverlay --no-peep --nolospre
 CFLAGS   = -m$(PLATFORM) -I/usr/local/share/sdcc/include -I/usr/local/share/sdcc/lib/ --std-c99 --nolospre
-IHX_FLAGS = --out-fmt-ihx --debug
 ELF_FLAGS = --out-fmt-elf --debug
 LIBS     = -l$(PLATFORM)
 
 # This just provides the conventional target name "all"; it is optional
 # Note: I assume you set PNAME via some means not exhibited in your original file
-all: clean $(PNAME)
+all: $(PNAME)
 
 # How to build the overall program
 $(PNAME): $(MAINSRC) $(RELS)
-	@mkdir -p $(ODIR)
-	$(CC) $(INCLUDES) $(CFLAGS) $(IHX_FLAGS) $(LIBS) -L/usr/local/share/sdcc/lib/stm8/stm8.lib -I/usr/local/share/sdcc/include $(MAINSRC) $(wildcard $(ODIR)/*.rel) -o$(ODIR)/
-	$(HEX2BIN) -p 00 $(ODIR)/$(PNAME).ihx
-	@mkdir -p $(ODIR_ELF)
-	$(CC) $(INCLUDES) $(CFLAGS) $(ELF_FLAGS) $(LIBS) -L/usr/local/share/sdcc/lib/stm8/stm8.lib -I/usr/local/share/sdcc/include $(MAINSRC) $(wildcard $(ODIR_ELF)/*.rel) -o$(ODIR_ELF)/
-	$(SIZE) $(ODIR_ELF)/$(PNAME).elf
+	$(CC) $(INCLUDES) $(CFLAGS) $(ELF_FLAGS) $(LIBS) $(MAINSRC) $(RELS)
+	$(SIZE) $(PNAME).elf
+	$(OBJCOPY) -O binary $(ELF_SECTIONS_TO_REMOVE) $(PNAME).elf $(PNAME).bin
 
 # How to build any .rel file from its corresponding .c file
 # GNU would have you use a pattern rule for this, but that's GNU-specific
-.c.rel:
-	@mkdir -p $(ODIR)
-	$(CC) -c $(INCLUDES) $(CFLAGS) $(IHX_FLAGS) $(LIBS) $< -o$(ODIR)/
-	@mkdir -p $(ODIR_ELF)
-	$(CC) -c $(INCLUDES) $(CFLAGS) $(ELF_FLAGS) $(LIBS) $< -o$(ODIR_ELF)/
+%.rel: %.c
+	$(CC) -c $(INCLUDES) $(CFLAGS) $(ELF_FLAGS) $(LIBS) -o$< $<
 
 # Suffixes appearing in suffix rules we care about.
 # Necessary because .rel is not one of the standard suffixes.
 .SUFFIXES: .c .rel
 
+hex:
+	$(OBJCOPY) -O ihex $(ELF_SECTIONS_TO_REMOVE) $(PNAME).elf $(PNAME).ihx
 
-#phonies
-
-.PHONY:	clean flash
+flash:
+	stm8flash -cstlinkv2 -pstm8s105?6 -w$(PNAME).ihx
 
 clean:
-	@echo "Removing $(ODIR)..."
-	@rm -rf $(ODIR)
-	@rm -rf $(ODIR_ELF)
+	@echo "Cleaning files..."
+	@rm -rf $(SDIR)/*.asm
+	@rm -rf $(SDIR)/*.rel
+	@rm -rf $(SDIR)/*.lk
+	@rm -rf $(SDIR)/*.lst
+	@rm -rf $(SDIR)/*.rst
+	@rm -rf $(SDIR)/*.sym
+	@rm -rf $(SDIR)/*.cdb
+	@rm -rf $(SDIR)/*.map
+	@rm -rf $(SDIR)/*.elf
+	@rm -rf $(SDIR)/*.bin
+	@rm -rf *.asm
+	@rm -rf *.rel
+	@rm -rf *.lk
+	@rm -rf *.lst
+	@rm -rf *.rst
+	@rm -rf *.sym
+	@rm -rf *.cdb
+	@rm -rf *.map
+	@rm -rf *.elf
+	@rm -rf main.bin
+	@rm -rf *.ihx
 	@echo "Done."
-flash:
-	stm8flash -cstlinkv2 -pstm8s105?6 -w$(ODIR)/$(PNAME).ihx
-
