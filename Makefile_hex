@@ -1,0 +1,60 @@
+# These are the sources that must be compiled to .rel files:
+EXTRASRCS = \
+	$(SDIR)/stm8s_itc.c \
+	$(SDIR)/stm8s_clk.c \
+	$(SDIR)/stm8s_gpio.c \
+	$(SDIR)/stm8s_exti.c \
+	$(SDIR)/stm8s_uart2.c \
+	$(SDIR)/stm8s_tim1.c \
+	$(SDIR)/stm8s_tim2.c \
+	$(SDIR)/stm8s_adc1.c \
+	gpio.c \
+	cruise_control.c \
+	motor.c \
+	uart.c \
+
+
+CC = /home/cas/software/stm8-binutils/bin/sdcc
+
+PLATFORM = stm8
+
+PNAME = main
+
+SIZE = size
+HEX2BIN = hex2bin
+
+ODIR_BIN = bin
+
+IDIR = StdPeriphLib/inc
+SDIR = StdPeriphLib/src
+
+MAINSRC = $(PNAME).c
+
+RELS = $(EXTRASRCS:.c=.rel)
+
+INCLUDES = -I$(IDIR) -I. 
+CFLAGS   = -m$(PLATFORM) -I/usr/local/share/sdcc/include -I/usr/local/share/sdcc/lib/ --std-c99 --nolospre
+IHX_FLAGS = --out-fmt-ihx
+LIBS     = -l$(PLATFORM)
+
+all: $(PNAME)
+
+$(PNAME): $(MAINSRC) $(RELS)
+	$(CC) $(INCLUDES) $(CFLAGS) $(IHX_FLAGS) $(LIBS) $(MAINSRC) $(RELS) -o$(ODIR_BIN)/
+	$(HEX2BIN) -p 00 $(ODIR_BIN)/$(PNAME).ihx
+
+%.rel : %.c 
+	$(CC) -c $(INCLUDES) $(CFLAGS) $(IHX_FLAGS) $(LIBS) -o$< $<
+
+clean:
+	@echo "Removing $(ODIR_BIN)..."
+	@rm -rf $(ODIR_BIN)
+	@mkdir -p $(ODIR_BIN)
+	@rm -rf $(SDIR)/*.rst
+	@rm -rf $(SDIR)/*.sym
+	@rm -rf $(SDIR)/*.rel
+	@rm -rf $(SDIR)/*.lst
+	@rm -rf $(SDIR)/*.asm
+	@rm -rf $(SDIR)/*.adb
+	@echo "Done."
+
