@@ -10,6 +10,7 @@
 #define _MOTOR_H
 
 #include "main.h"
+#include "interrupts.h"
 
 // direction of motor movement
 #define RIGHT 		1
@@ -23,6 +24,12 @@
 
 extern uint8_t ui8_svm_table [SVM_TABLE_LEN];
 
+void hall_sensor_init (void);
+void hall_sensors_read_and_action (void);
+void pwm_init (void);
+void set_duty_cycle (uint8_t value);
+void apply_duty_cycle (uint8_t ui8_duty_cycle_value);
+void motor_fast_loop (void);
 int8_t get_motor_rotation_direction (void);
 
 #endif /* _MOTOR_H_ */

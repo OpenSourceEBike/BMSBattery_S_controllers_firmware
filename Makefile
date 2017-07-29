@@ -35,9 +35,12 @@ EXTRASRCS = \
 	$(SDIR)/stm8s_tim2.c \
 	$(SDIR)/stm8s_adc1.c \
 	gpio.c \
+	utils.c \
 	cruise_control.c \
 	motor.c \
 	uart.c \
+	adc.c \
+	brake.c \
 
 
 # The list of .rel files can be derived from the list of their source files
