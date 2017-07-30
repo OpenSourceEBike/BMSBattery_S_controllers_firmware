@@ -30,13 +30,7 @@
 //static uint16_t ui16_value;
 //
 //
-//uint16_t ui16_adc_current_phase_B = 0;
-//uint8_t ui8_adc_current_phase_B_flag = 0;
-//uint16_t ui16_adc_current_phase_B_temp = 0;
-//uint8_t adc_total_current = 0;
-//uint8_t ui8_adc_total_current_busy_flag = 0;
-//uint8_t adc_throttle = 0;
-//uint8_t adc_throttle_busy_flag = 0;
+
 //
 //extern uint8_t ui8_cruise_state;
 
@@ -50,7 +44,7 @@ int main (void);
 void EXTI_PORTA_IRQHandler(void) __interrupt(EXTI_PORTA_IRQHANDLER);
 
 // Timer1/PWM period interrupt
-//extern void TIM1_UPD_OVF_TRG_BRK_IRQHandler(void) __interrupt(TIM1_UPD_OVF_TRG_BRK_IRQHANDLER);
+void TIM1_UPD_OVF_TRG_BRK_IRQHandler(void) __interrupt(TIM1_UPD_OVF_TRG_BRK_IRQHANDLER);
 
 /////////////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////////////
@@ -82,8 +76,8 @@ int main (void)
   debug_pin_init ();
 
   uart_init ();
-//  hall_sensor_init ();
-//  pwm_init ();
+  pwm_init ();
+  hall_sensor_init ();
 //  adc_init ();
 
 //  ITC_SetSoftwarePriority (ITC_IRQ_PORTE, ITC_PRIORITYLEVEL_1); // hall sensors interrupt have the most priority
@@ -107,7 +101,7 @@ int main (void)
     while (1)
     {
 	debug_pin_set ();
-	printf("testing UART after build optimize 1..fdhgdfhfgdhjdfjdfgjdfjfhnjchnhyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyy");
+	printf("testing UART");
 
 	debug_pin_reset ();
     }
