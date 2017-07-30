@@ -47,7 +47,7 @@ EXTRASRCS = \
 RELS = $(EXTRASRCS:.c=.rel)
 
 INCLUDES = -I$(IDIR) -I. 
-CFLAGS   = -m$(PLATFORM) -I/usr/local/share/sdcc/include -I/usr/local/share/sdcc/lib/ --std-c99 --nolospre
+CFLAGS   = -m$(PLATFORM) -I/usr/local/share/sdcc/include -I/usr/local/share/sdcc/lib/ --std-c99 --nolospre --opt-code-size --max-allocs-per-node 10000000 
 ELF_FLAGS = --out-fmt-elf --debug
 LIBS     = -l$(PLATFORM)
 
