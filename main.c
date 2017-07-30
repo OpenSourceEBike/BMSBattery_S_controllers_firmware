@@ -79,9 +79,9 @@ int main (void)
   gpio_init ();
   brake_init ();
   while (brake_is_set()) ; // hold here while brake is pressed -- this is a protection for development
-//  debug_pin_init ();
+  debug_pin_init ();
 
-//  uart_init ();
+  uart_init ();
 //  hall_sensor_init ();
 //  pwm_init ();
 //  adc_init ();
@@ -106,8 +106,10 @@ int main (void)
   {
     while (1)
     {
-//	printf("testing UART after build optimize 1...\n");
-	;
+	debug_pin_set ();
+	printf("testing UART after build optimize 1..fdhgdfhfgdhjdfjdfgjdfjfhnjchnhyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyy");
+
+	debug_pin_reset ();
     }
 
 //    //    static uint16_t c;
