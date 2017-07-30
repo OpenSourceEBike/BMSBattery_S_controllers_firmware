@@ -11,6 +11,8 @@
 
 #include "main.h"
 
+extern uint8_t adc_throttle_busy_flag;
+
 void adc_init (void);
 uint8_t adc_read_throttle (void);
 

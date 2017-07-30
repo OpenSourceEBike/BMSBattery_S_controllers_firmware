@@ -64,8 +64,8 @@ int main (void)
 {
 //  static uint32_t ui32_cruise_counter = 0;
 //  static uint8_t ui8_cruise_duty_cycle = 0;
-//  static uint16_t ui16_adc_value;
-//  static uint8_t ui8_temp = 0;
+  static uint16_t ui16_adc_value;
+  static uint8_t ui8_temp = 0;
 
   //set clock at the max 16MHz
   CLK_HSIPrescalerConfig(CLK_PRESCALER_HSIDIV1);
@@ -78,33 +78,25 @@ int main (void)
   uart_init ();
   pwm_init ();
   hall_sensor_init ();
-//  adc_init ();
+  adc_init ();
 
-//  ITC_SetSoftwarePriority (ITC_IRQ_PORTE, ITC_PRIORITYLEVEL_1); // hall sensors interrupt have the most priority
 //  ITC_SetSoftwarePriority (ITC_IRQ_TIM1_OVF, ITC_PRIORITYLEVEL_2);
-//
+
   enableInterrupts();
-//#if (SVM_TABLE == SVM)
-//  TIM1_SetCompare1(126 << 1);
-//  TIM1_SetCompare2(126 << 1);
-//  TIM1_SetCompare3(126 << 1);
-//#elif (SVM_TABLE == SINE) || (SVM_TABLE == SINE_SVM)
-//  TIM1_SetCompare1(126 << 2);
-//  TIM1_SetCompare2(126 << 2);
-//  TIM1_SetCompare3(126 << 2);
-//#endif
-//
-//  hall_sensors_read_and_action (); // needed to start the motor
+#if (SVM_TABLE == SVM)
+  TIM1_SetCompare1(126 << 1);
+  TIM1_SetCompare2(126 << 1);
+  TIM1_SetCompare3(126 << 1);
+#elif (SVM_TABLE == SINE) || (SVM_TABLE == SINE_SVM)
+  TIM1_SetCompare1(126 << 2);
+  TIM1_SetCompare2(126 << 2);
+  TIM1_SetCompare3(126 << 2);
+#endif
+
+  hall_sensors_read_and_action (); // needed to start the motor
 
   while (1)
   {
-    while (1)
-    {
-	debug_pin_set ();
-	printf("testing UART");
-
-	debug_pin_reset ();
-    }
 
 //    //    static uint16_t c;
 //        static uint32_t ui32_counter = 0;
@@ -125,11 +117,16 @@ int main (void)
 //          ui32_counter = 0;
 //          while (ui8_adc_total_current_busy_flag) ;
 //
-//          /****************************************************************************/
-//          // read throttle and execute cruise control
-//          //
-//          ui16_adc_value = (uint16_t) adc_read_throttle ();
-//          ui8_temp = (uint8_t) map (ui16_adc_value, ADC_THROTTLE_MIN_VALUE, ADC_THROTTLE_MAX_VALUE, 0, 237);
+          /****************************************************************************/
+          // read throttle and execute cruise control
+          //
+          ui16_adc_value = (uint16_t) adc_read_throttle ();
+          ui8_temp = (uint8_t) map (ui16_adc_value, ADC_THROTTLE_MIN_VALUE, ADC_THROTTLE_MAX_VALUE, 0, 237);
+
+	  debug_pin_set ();
+	  printf("%d\n", ui8_temp);
+
+	  debug_pin_reset ();
 //
 //          // Cruise control
 //          if (ui8_cruise_state == 0)

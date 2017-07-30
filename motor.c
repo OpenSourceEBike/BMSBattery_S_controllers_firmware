@@ -825,7 +825,6 @@ uint16_t ui16_adc_current_phase_B_temp = 0;
 uint8_t adc_total_current = 0;
 uint8_t ui8_adc_total_current_busy_flag = 0;
 uint8_t adc_throttle = 0;
-uint8_t adc_throttle_busy_flag = 0;
 
 void set_duty_cycle (uint8_t value)
 {
