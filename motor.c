@@ -823,7 +823,6 @@ uint16_t ui16_adc_current_phase_B = 0;
 uint8_t ui8_adc_current_phase_B_flag = 0;
 uint16_t ui16_adc_current_phase_B_temp = 0;
 uint8_t adc_total_current = 0;
-uint8_t ui8_adc_total_current_busy_flag = 0;
 uint8_t adc_throttle = 0;
 
 void set_duty_cycle (uint8_t value)
@@ -848,9 +847,9 @@ void TIM1_UPD_OVF_TRG_BRK_IRQHandler(void) __interrupt(TIM1_UPD_OVF_TRG_BRK_IRQH
 ////      ui8_PWM_cycles_counter_value = ui8_PWM_cycles_counter_1;
 //    }
 //  }
-
-  hall_sensors_read_and_action ();
-
+//
+//  hall_sensors_read_and_action ();
+//
 //  /****************************************************************
 //  * Motor control: angle interpolation and PWM control
 //  */

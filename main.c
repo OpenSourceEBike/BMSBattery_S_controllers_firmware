@@ -40,15 +40,6 @@
 // main -- start of firmware and main loop
 int main (void);
 
-// Brake signal interrupt
-void EXTI_PORTA_IRQHandler(void) __interrupt(EXTI_PORTA_IRQHANDLER);
-
-// Timer1/PWM period interrupt
-void TIM1_UPD_OVF_TRG_BRK_IRQHandler(void) __interrupt(TIM1_UPD_OVF_TRG_BRK_IRQHANDLER);
-
-/////////////////////////////////////////////////////////////////////////////////////////////
-/////////////////////////////////////////////////////////////////////////////////////////////
-
 //With SDCC, interrupt service routine function prototypes must be placed in the file that contains main ()
 //in order for an vector for the interrupt to be placed in the the interrupt vector space.  It's acceptable
 //to place the function prototype in a header file as long as the header file is included in the file that
@@ -58,7 +49,14 @@ void TIM1_UPD_OVF_TRG_BRK_IRQHandler(void) __interrupt(TIM1_UPD_OVF_TRG_BRK_IRQH
 //Calling a function from interrupt not always works, SDCC manual says to avoid it. Maybe the best is to put
 //all the code inside the interrupt
 
+// Brake signal interrupt
+void EXTI_PORTA_IRQHandler(void) __interrupt(EXTI_PORTA_IRQHANDLER);
 
+// Timer1/PWM period interrupt
+void TIM1_UPD_OVF_TRG_BRK_IRQHandler(void) __interrupt(TIM1_UPD_OVF_TRG_BRK_IRQHANDLER);
+
+/////////////////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////////////////
 
 int main (void)
 {
@@ -98,92 +96,54 @@ int main (void)
   while (1)
   {
 
-//    //    static uint16_t c;
-//        static uint32_t ui32_counter = 0;
-//        uint16_t ui16_temp = 0;
-//        uint16_t ui32_temp = 0;
-//    //    int8_t i8_buffer[64];
-//    //    uint8_t ui8_value;
-//    //    int objects_readed;
-//        static uint32_t ui32_LPF_running_average = 0;
-//        static uint32_t ui32_LPF_temp = 0;
-//        static float f_temp = 0;
-//
-//    //    debug_pin_reset ();
-//
-//        ui32_counter++;
-//        if (ui32_counter > 10000) // 25ms
-//        {
-//          ui32_counter = 0;
-//          while (ui8_adc_total_current_busy_flag) ;
-//
+  //    static uint16_t c;
+      static uint32_t ui32_counter = 0;
+      uint16_t ui16_temp = 0;
+      uint16_t ui32_temp = 0;
+  //    int8_t i8_buffer[64];
+  //    uint8_t ui8_value;
+  //    int objects_readed;
+      static uint32_t ui32_LPF_running_average = 0;
+      static uint32_t ui32_LPF_temp = 0;
+      static float f_temp = 0;
+
+
+        ui32_counter++;
+        if (ui32_counter > 10000) // 25ms
+        {
+          ui32_counter = 0;
+
           /****************************************************************************/
           // read throttle and execute cruise control
           //
           ui16_adc_value = (uint16_t) adc_read_throttle ();
           ui8_temp = (uint8_t) map (ui16_adc_value, ADC_THROTTLE_MIN_VALUE, ADC_THROTTLE_MAX_VALUE, 0, 237);
 
-	  debug_pin_set ();
-	  printf("%d\n", ui8_temp);
+          ui8_temp = cruise_control (ui8_temp);
+          printf("%d\n", ui8_temp);
 
-	  debug_pin_reset ();
-//
-//          // Cruise control
-//          if (ui8_cruise_state == 0)
-//          {
-//            if ((ui8_temp > 25) &&
-//                ((ui8_temp > (ui8_cruise_duty_cycle - 25)) || (ui8_temp < (ui8_cruise_duty_cycle + 25))))
-//            {
-//    	  ui32_cruise_counter++;
-//    	  ui8_duty_cycle = ui8_temp;
-//
-//    	  if (ui32_cruise_counter > 100)
-//    	  {
-//    	    ui8_cruise_state = 1;
-//    	    ui8_duty_cycle = ui8_temp;
-//    	    ui32_cruise_counter = 0;
-//    	    ui8_cruise_duty_cycle = 0;
-//    	  }
-//            }
-//            else
-//            {
-//    	  ui32_cruise_counter = 0;
-//    	  ui8_cruise_duty_cycle = ui8_temp;
-//    	  ui8_duty_cycle = ui8_cruise_duty_cycle;
-//            }
-//          }
-//          else if (ui8_cruise_state == 1)
-//          {
-//            if (ui8_temp < 25) { ui8_cruise_state = 2; }
-//          }
-//          else if (ui8_cruise_state == 2)
-//          {
-//            if (ui8_temp > 25)
-//            {
-//              ui8_cruise_state = 0;
-//              ui8_duty_cycle = ui8_temp;
-//            }
-//          }
-//          /****************************************************************************/
-//
+          //ui8_duty_cycle = ui8_temp;
+
+	  /****************************************************************************/
+
 //          // low pass filter using running average
 //          ui32_temp = ui32_LPF_running_average >> 2; // ui32_LPF_running_average / 8
 //          ui32_LPF_running_average -= ui32_temp; // ui32_LPF_running_average is now reduced to 7/8 of the original ui32_LPF_running_average
 //          ui32_LPF_running_average += (uint32_t) (ui16_adc_current_phase_B >> 2); //add 1/8 a to get the new average
-
-    //      disableInterrupts();
-    //      ui32_LPF_running_average = (uint32_t) ui16_adc_current_phase_B;
-    //      enableInterrupts();
-
-    //      printf("%d\n", (uint16_t) ui16_debug);
-
-    //      ui32_LPF_temp = 512 - ui32_LPF_running_average;
-    //      ui32_LPF_temp = ui32_LPF_temp * ADC_PHASE_B_CURRENT_STEP;
-    //      printf("%d\n", (uint16_t) ui32_LPF_temp);
-
-    //      printf("%d\n", ui16_PWM_cycles_counter_value_temp);
+//
+//          disableInterrupts();
+//          ui32_LPF_running_average = (uint32_t) ui16_adc_current_phase_B;
+//          enableInterrupts();
+//
+//          printf("%d\n", (uint16_t) ui16_debug);
+//
+//          ui32_LPF_temp = 512 - ui32_LPF_running_average;
+//          ui32_LPF_temp = ui32_LPF_temp * ADC_PHASE_B_CURRENT_STEP;
+//          printf("%d\n", (uint16_t) ui32_LPF_temp);
+//
+//          printf("%d\n", ui16_PWM_cycles_counter_value_temp);
 //          printf("%d\n", ui16_motor_speed_erps);
-//        }
+        }
 
 
 
