@@ -20,6 +20,7 @@
 #include "brake.h"
 #include "utils.h"
 #include "cruise_control.h"
+#include "timers.h"
 
 //uint16_t ui16_LPF_angle_adjust = 0;
 //uint16_t ui16_LPF_angle_adjust_temp = 0;
@@ -63,6 +64,7 @@ int main (void)
   brake_init ();
   while (brake_is_set()) ; // hold here while brake is pressed -- this is a protection for development
   debug_pin_init ();
+  timer2_init ();
   uart_init ();
   pwm_init ();
   hall_sensor_init ();
@@ -88,6 +90,10 @@ int main (void)
 
   //    static uint16_t c;
       static uint32_t ui32_counter = 0;
+
+      static uint16_t ui16_throttle_counter = 0;
+      uint16_t ui16_temp_delay = 0;
+
       uint16_t ui16_temp = 0;
       uint16_t ui32_temp = 0;
   //    int8_t i8_buffer[64];
@@ -97,11 +103,10 @@ int main (void)
       static uint32_t ui32_LPF_temp = 0;
       static float f_temp = 0;
 
-
-        ui32_counter++;
-        if (ui32_counter > 10000) // 25ms
+	ui16_temp_delay = TIM2_GetCounter ();
+	if ((ui16_temp_delay - ui16_throttle_counter) > 25)
         {
-          ui32_counter = 0;
+	  ui16_throttle_counter = ui16_temp_delay;
 
           /****************************************************************************/
           // read throttle and execute cruise control

@@ -41,6 +41,7 @@ EXTRASRCS = \
 	uart.c \
 	adc.c \
 	brake.c \
+	timers.c \
 
 
 # The list of .rel files can be derived from the list of their source files
