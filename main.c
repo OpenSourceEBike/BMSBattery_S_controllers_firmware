@@ -23,16 +23,7 @@
 
 //uint16_t ui16_LPF_angle_adjust = 0;
 //uint16_t ui16_LPF_angle_adjust_temp = 0;
-//
-//uint8_t ui8_debug = 0;
-//uint16_t ui16_debug = 0;
-//
-//static uint16_t ui16_value;
-//
-//
 
-//
-//extern uint8_t ui8_cruise_state;
 
 /////////////////////////////////////////////////////////////////////////////////////////////
 //// Functions prototypes
@@ -72,7 +63,6 @@ int main (void)
   brake_init ();
   while (brake_is_set()) ; // hold here while brake is pressed -- this is a protection for development
   debug_pin_init ();
-
   uart_init ();
   pwm_init ();
   hall_sensor_init ();
@@ -120,10 +110,7 @@ int main (void)
           ui8_temp = (uint8_t) map (ui16_adc_value, ADC_THROTTLE_MIN_VALUE, ADC_THROTTLE_MAX_VALUE, 0, 237);
 
           ui8_temp = cruise_control (ui8_temp);
-          printf("%d\n", ui8_temp);
-
-          //ui8_duty_cycle = ui8_temp;
-
+          set_duty_cycle (ui8_temp);
 	  /****************************************************************************/
 
 //          // low pass filter using running average

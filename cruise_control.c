@@ -11,7 +11,6 @@
 #include "cruise_control.h"
 
 uint8_t ui8_cruise_state = 0;
-
 uint8_t ui8_cruise_value = 0;
 uint8_t ui8_cruise_output = 0;
 uint32_t ui32_cruise_counter = 0;
