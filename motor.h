@@ -27,6 +27,7 @@ extern uint8_t ui8_svm_table [SVM_TABLE_LEN];
 void hall_sensor_init (void);
 void hall_sensors_read_and_action (void);
 void pwm_init (void);
+void pwm_duty_cycle_controller (void);
 void set_duty_cycle (uint8_t value);
 void apply_duty_cycle (uint8_t ui8_duty_cycle_value);
 void motor_fast_loop (void);

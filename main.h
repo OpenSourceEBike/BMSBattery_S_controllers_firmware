@@ -32,31 +32,28 @@
 #define ADC_PHASE_B_CURRENT_STEP 21 // 0.021 * 1000 = 21
 
 #if MOTOR_TYPE == MOTOR_TYPE_Q85
-#define MOTOR_ROTOR_DELTA_PHASE_ANGLE_RIGHT 56//46// best value found (at max speed, minimum current and power supply voltage keeps the same)
-//#define MOTOR_ROTOR_DELTA_PHASE_ANGLE_RIGHT 56//46// best value found (at max speed, minimum current and power supply voltage keeps the same)
+#define MOTOR_ROTOR_DELTA_PHASE_ANGLE_RIGHT 77// best value found (at max speed, minimum current and power supply voltage keeps the same)
 #elif MOTOR_TYPE == MOTOR_TYPE_EUC2
-#define MOTOR_ROTOR_DELTA_PHASE_ANGLE_RIGHT 71 // best value found
+#define MOTOR_ROTOR_DELTA_PHASE_ANGLE_RIGHT 92 // best value found
 #endif
 
 #define PWM_CYCLES_COUNTER_MAX 625
-
 #define PWM_CYCLES_SECOND 15625 // 1 / 64us(PWM period)
+
+// 2 seconds to get up to max PWM duty cycle value of 255 (127 * 255 * 64us ~= 2 seconds)
+#define PWM_DUTY_CYCLE_CONTROLLER_COUNTER 127
 
 #define SPEED_INVERSE_INTERPOLATION 250
 
 #define PWM_VALUE_DUTY_CYCLE_MAX (256 - 1)
 #define MIDDLE_PWM_VALUE_DUTY_CYCLE_MAX (PWM_VALUE_DUTY_CYCLE_MAX/2)
 
-#define ANGLE_30 21 //(360/256) / 300
-#define ANGLE_90 64
-#define ANGLE_150 107
-#define ANGLE_210 149
-#define ANGLE_270 192
-#define ANGLE_330 235
-
-#define ANGLE_30 21
-#define ANGLE_45 32
-#define ANGLE_60 43
+#define ANGLE_1 0 //(360/256) / 300
+#define ANGLE_60 42
+#define ANGLE_120 85
+#define ANGLE_180 127
+#define ANGLE_240 167
+#define ANGLE_300 212
 #define ANGLE_360 255
 
 #endif
