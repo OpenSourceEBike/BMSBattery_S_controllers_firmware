@@ -15,6 +15,7 @@
 #include "brake.h"
 #include "cruise_control.h"
 #include "motor.h"
+#include "pwm.h"
 
 // Brake signal
 void EXTI_PORTA_IRQHandler(void) __interrupt(EXTI_PORTA_IRQHANDLER)
@@ -27,7 +28,7 @@ void EXTI_PORTA_IRQHandler(void) __interrupt(EXTI_PORTA_IRQHANDLER)
   else
   {
     brake_coast_disable ();
-    set_duty_cycle (0);
+    pwm_set_duty_cycle (0);
     stop_cruise_control ();
   }
 }

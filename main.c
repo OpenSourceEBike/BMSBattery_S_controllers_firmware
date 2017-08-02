@@ -21,6 +21,7 @@
 #include "utils.h"
 #include "cruise_control.h"
 #include "timers.h"
+#include "pwm.h"
 
 //uint16_t ui16_LPF_angle_adjust = 0;
 //uint16_t ui16_LPF_angle_adjust_temp = 0;
@@ -114,8 +115,11 @@ int main (void)
           ui16_adc_value = (uint16_t) adc_read_throttle ();
           ui8_temp = (uint8_t) map (ui16_adc_value, ADC_THROTTLE_MIN_VALUE, ADC_THROTTLE_MAX_VALUE, 0, 237);
 
+//#define DO_CRUISE_CONTROL 1
+#if DO_CRUISE_CONTROL == 1
           ui8_temp = cruise_control (ui8_temp);
-          set_duty_cycle (ui8_temp);
+#endif
+          pwm_set_duty_cycle (ui8_temp);
 	  /****************************************************************************/
 
 //          // low pass filter using running average

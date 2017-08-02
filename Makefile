@@ -37,12 +37,12 @@ EXTRASRCS = \
 	gpio.c \
 	utils.c \
 	cruise_control.c \
-	motor.c \
 	uart.c \
 	adc.c \
 	brake.c \
 	timers.c \
-
+	pwm.c \
+	motor.c \
 
 # The list of .rel files can be derived from the list of their source files
 RELS = $(EXTRASRCS:.c=.rel)
@@ -59,7 +59,7 @@ all: $(PNAME)
 
 # How to build the overall program
 $(PNAME): $(MAINSRC) $(RELS)
-	$(CC) $(INCLUDES) $(CFLAGS) $(ELF_FLAGS) $(LIBS) $(MAINSRC) $(RELS)
+	$(CC) $(INCLUDES) $(CFLAGS) -Wl-r $(ELF_FLAGS) $(LIBS) $(MAINSRC) $(RELS)
 	$(SIZE) $(PNAME).elf
 	$(OBJCOPY) -O binary $(ELF_SECTIONS_TO_REMOVE) $(PNAME).elf $(PNAME).bin
 

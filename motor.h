@@ -16,20 +16,15 @@
 #define RIGHT 		1
 #define LEFT 		2
 
-#define SVM 1
-#define SINE_SVM 2
-#define SINE 3
+// motor states
+#define MOTOR_STATE_COAST 0
+#define MOTOR_STATE_RUNNING_VERY_SLOW 1
+#define MOTOR_STATE_RUNNING 2
 
-#define SVM_TABLE SVM
-
-extern uint8_t ui8_svm_table [SVM_TABLE_LEN];
+extern uint8_t ui8_motor_rotor_position;
 
 void hall_sensor_init (void);
 void hall_sensors_read_and_action (void);
-void pwm_init (void);
-void pwm_duty_cycle_controller (void);
-void set_duty_cycle (uint8_t value);
-void apply_duty_cycle (uint8_t ui8_duty_cycle_value);
 void motor_fast_loop (void);
 int8_t get_motor_rotation_direction (void);
 
