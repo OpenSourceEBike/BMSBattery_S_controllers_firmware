@@ -48,8 +48,11 @@ EXTRASRCS = \
 RELS = $(EXTRASRCS:.c=.rel)
 
 INCLUDES = -I$(IDIR) -I. 
+
+#CFLAGS   = -m$(PLATFORM) -I/usr/local/share/sdcc/include -I/usr/local/share/sdcc/lib/ --nogcse --noinvariant --noinduction --noloopreverse --nolabelopt --nooverlay --no-peep --nolospre
 #CFLAGS   = -m$(PLATFORM) -I/usr/local/share/sdcc/include -I/usr/local/share/sdcc/lib/ --std-c99 --nolospre --opt-code-size
-CFLAGS   = -m$(PLATFORM) -I/usr/local/share/sdcc/include -I/usr/local/share/sdcc/lib/ --std-c99 --nolospre
+CFLAGS   = -m$(PLATFORM) -I/usr/local/share/sdcc/include -I/usr/local/share/sdcc/lib/ --std-c99 --nooverlay --stack-auto
+
 ELF_FLAGS = --out-fmt-elf --debug
 LIBS     = -l$(PLATFORM)
 
@@ -59,7 +62,7 @@ all: $(PNAME)
 
 # How to build the overall program
 $(PNAME): $(MAINSRC) $(RELS)
-	$(CC) $(INCLUDES) $(CFLAGS) -Wl-r $(ELF_FLAGS) $(LIBS) $(MAINSRC) $(RELS)
+	$(CC) $(INCLUDES) $(CFLAGS) $(ELF_FLAGS) $(LIBS) $(MAINSRC) $(RELS)
 	$(SIZE) $(PNAME).elf
 	$(OBJCOPY) -O binary $(ELF_SECTIONS_TO_REMOVE) $(PNAME).elf $(PNAME).bin
 

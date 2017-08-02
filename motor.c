@@ -36,8 +36,8 @@ uint16_t ui16_adc_current_phase_B = 0;
 uint8_t ui8_adc_current_phase_B_flag = 0;
 uint16_t ui16_adc_current_phase_B_temp = 0;
 
-//uint8_t motor_state = MOTOR_STATE_RUNNING_VERY_SLOW;
-uint8_t motor_state = MOTOR_STATE_RUNNING;
+uint8_t motor_state = MOTOR_STATE_RUNNING_VERY_SLOW;
+//uint8_t motor_state = MOTOR_STATE_RUNNING;
 
 int8_t hall_sensors;
 int8_t hall_sensors_last = 0;
@@ -87,6 +87,7 @@ void hall_sensors_read_and_action (void)
   // read hall sensors signal pins and mask other pins
   hall_sensors = (GPIO_ReadInputData (HALL_SENSORS__PORT) & (HALL_SENSORS_MASK));
   if ((hall_sensors != hall_sensors_last) || (motor_state == MOTOR_STATE_COAST))
+//  if (hall_sensors != hall_sensors_last)
   {
     hall_sensors_last = hall_sensors;
 
@@ -96,124 +97,77 @@ void hall_sensors_read_and_action (void)
 //	ui8_adc_current_phase_B_flag = 1;
 //	ui16_adc_current_phase_B_temp = 512; // 2.5V, 0 amps
 
-      ui16_interpolation_angle_step = ui16_PWM_cycles_counter >> 1; // (ui16_PWM_cycles_counter / 256) * 127
-      ui16_speed_inverse = ui16_PWM_cycles_counter;
+	ui16_interpolation_angle_step = ui16_PWM_cycles_counter >> 1; // (ui16_PWM_cycles_counter / 256) * 127
+	ui16_speed_inverse = ui16_PWM_cycles_counter;
 
-      // update motor state based on motor speed
-      if (ui16_speed_inverse > SPEED_INVERSE_INTERPOLATION)
-      {
-//	motor_state = MOTOR_STATE_RUNNING_VERY_SLOW;
-      }
-      else
-      {
-	motor_state = MOTOR_STATE_RUNNING;
-      }
+	// update motor state based on motor speed
+	if (ui16_speed_inverse > SPEED_INVERSE_INTERPOLATION)
+	{
+	  motor_state = MOTOR_STATE_RUNNING_VERY_SLOW;
+	}
+	else
+	{
+	  motor_state = MOTOR_STATE_RUNNING;
+	}
 
-      ui16_motor_speed_erps = PWM_CYCLES_SECOND / ui16_PWM_cycles_counter; // this division takes ~4.2us
-      ui16_PWM_cycles_counter = 0;
+	ui16_motor_speed_erps = PWM_CYCLES_SECOND / ui16_PWM_cycles_counter; // this division takes ~4.2us
+	ui16_PWM_cycles_counter = 0;
 
-      ui8_interpolation_angle = 0;
-      ui8_last_counter_value = 0;
-
-      if (motor_state == MOTOR_STATE_RUNNING_VERY_SLOW)
-      {
-	pwm_phase_a_enable ();
-	pwm_phase_b_enable ();
-	pwm_phase_c_enable ();
+	ui8_interpolation_angle = 0;
+	ui8_last_counter_value = 0;
 
 	ui8_motor_rotor_absolute_position = ANGLE_180;
 	ui8_motor_rotor_absolute_position = (uint8_t) (ui8_motor_rotor_absolute_position + MOTOR_ROTOR_DELTA_PHASE_ANGLE_RIGHT);
 	ui8_motor_rotor_position = (uint8_t) (ui8_motor_rotor_absolute_position + ui8_position_correction_value);
-      }
-      else if (motor_state == MOTOR_STATE_RUNNING)
-      {
-	pwm_phase_a_enable_pwm ();
-	pwm_phase_b_disable ();
-	pwm_phase_c_enable_low ();
-      }
       break;
 
       case 1:
-      if (motor_state == MOTOR_STATE_RUNNING_VERY_SLOW)
-      {
-	pwm_phase_a_enable ();
-	pwm_phase_b_enable ();
-	pwm_phase_c_enable ();
-
-	ui8_motor_rotor_absolute_position = ANGLE_240;
-	ui8_motor_rotor_absolute_position = (uint8_t) (ui8_motor_rotor_absolute_position + MOTOR_ROTOR_DELTA_PHASE_ANGLE_RIGHT);
-	ui8_motor_rotor_position = (uint8_t) (ui8_motor_rotor_absolute_position + ui8_position_correction_value);
-      }
-      else if (motor_state == MOTOR_STATE_RUNNING)
-      {
-	pwm_phase_a_enable_pwm ();
-	pwm_phase_b_enable_low ();
-	pwm_phase_c_disable ();
-      }
-      break;
+	if (motor_state != MOTOR_STATE_RUNNING)
+	{
+	  ui8_motor_rotor_absolute_position = ANGLE_240;
+	  ui8_motor_rotor_absolute_position = (uint8_t) (ui8_motor_rotor_absolute_position + MOTOR_ROTOR_DELTA_PHASE_ANGLE_RIGHT);
+	  ui8_motor_rotor_position = (uint8_t) (ui8_motor_rotor_absolute_position + ui8_position_correction_value);
+	}
+	break;
 
       case 5:
-      if (motor_state == MOTOR_STATE_RUNNING_VERY_SLOW)
-      {
-	ui8_motor_rotor_absolute_position = ANGLE_300;
-	ui8_motor_rotor_absolute_position = (uint8_t) (ui8_motor_rotor_absolute_position + MOTOR_ROTOR_DELTA_PHASE_ANGLE_RIGHT);
-	ui8_motor_rotor_position = (uint8_t) (ui8_motor_rotor_absolute_position + ui8_position_correction_value);
-      }
-      else if (motor_state == MOTOR_STATE_RUNNING)
-      {
-	pwm_phase_a_disable ();
-	pwm_phase_b_enable_low ();
-	pwm_phase_c_enable_pwm ();
-      }
-      break;
+	if (motor_state != MOTOR_STATE_RUNNING)
+	{
+	  ui8_motor_rotor_absolute_position = ANGLE_300;
+	  ui8_motor_rotor_absolute_position = (uint8_t) (ui8_motor_rotor_absolute_position + MOTOR_ROTOR_DELTA_PHASE_ANGLE_RIGHT);
+	  ui8_motor_rotor_position = (uint8_t) (ui8_motor_rotor_absolute_position + ui8_position_correction_value);
+	}
+	break;
 
       case 4:
-      if (motor_state == MOTOR_STATE_RUNNING_VERY_SLOW)
-      {
-	ui8_motor_rotor_absolute_position = ANGLE_1;
-	ui8_motor_rotor_absolute_position = (uint8_t) (ui8_motor_rotor_absolute_position + MOTOR_ROTOR_DELTA_PHASE_ANGLE_RIGHT);
-	ui8_motor_rotor_position = (uint8_t) (ui8_motor_rotor_absolute_position + ui8_position_correction_value);
-      }
-      else if (motor_state == MOTOR_STATE_RUNNING)
-      {
-	pwm_phase_a_enable_low ();
-	pwm_phase_b_disable ();
-	pwm_phase_c_enable_pwm ();
-      }
+	if (motor_state != MOTOR_STATE_RUNNING)
+	{
+	  ui8_motor_rotor_absolute_position = ANGLE_1;
+	  ui8_motor_rotor_absolute_position = (uint8_t) (ui8_motor_rotor_absolute_position + MOTOR_ROTOR_DELTA_PHASE_ANGLE_RIGHT);
+	  ui8_motor_rotor_position = (uint8_t) (ui8_motor_rotor_absolute_position + ui8_position_correction_value);
+	}
 
 //	ui8_adc_current_phase_B_flag = 0;
 //	ui16_adc_current_phase_B = ui16_adc_current_phase_B_temp;
-      break;
+	break;
 
       case 6:
-      if (motor_state == MOTOR_STATE_RUNNING_VERY_SLOW)
-      {
-	ui8_motor_rotor_absolute_position = ANGLE_60;
-	ui8_motor_rotor_absolute_position = (uint8_t) (ui8_motor_rotor_absolute_position + MOTOR_ROTOR_DELTA_PHASE_ANGLE_RIGHT);
-	ui8_motor_rotor_position = (uint8_t) (ui8_motor_rotor_absolute_position + ui8_position_correction_value);
-      }
-      else if (motor_state == MOTOR_STATE_RUNNING)
-      {
-	pwm_phase_a_enable_low ();
-	pwm_phase_b_enable_pwm ();
-	pwm_phase_c_disable ();
-      }
-      break;
+	if (motor_state != MOTOR_STATE_RUNNING)
+	{
+	  ui8_motor_rotor_absolute_position = ANGLE_60;
+	  ui8_motor_rotor_absolute_position = (uint8_t) (ui8_motor_rotor_absolute_position + MOTOR_ROTOR_DELTA_PHASE_ANGLE_RIGHT);
+	  ui8_motor_rotor_position = (uint8_t) (ui8_motor_rotor_absolute_position + ui8_position_correction_value);
+	}
+	break;
 
       case 2:
-      if (motor_state == MOTOR_STATE_RUNNING_VERY_SLOW)
-      {
-	ui8_motor_rotor_absolute_position = ANGLE_120;
-	ui8_motor_rotor_absolute_position = (uint8_t) (ui8_motor_rotor_absolute_position + MOTOR_ROTOR_DELTA_PHASE_ANGLE_RIGHT);
-	ui8_motor_rotor_position = (uint8_t) (ui8_motor_rotor_absolute_position + ui8_position_correction_value);
-      }
-      else if (motor_state == MOTOR_STATE_RUNNING)
-      {
-	pwm_phase_a_disable ();
-	pwm_phase_b_enable_pwm ();
-	pwm_phase_c_enable_low ();
-      }
-      break;
+	if (motor_state != MOTOR_STATE_RUNNING)
+	{
+	  ui8_motor_rotor_absolute_position = ANGLE_120;
+	  ui8_motor_rotor_absolute_position = (uint8_t) (ui8_motor_rotor_absolute_position + MOTOR_ROTOR_DELTA_PHASE_ANGLE_RIGHT);
+	  ui8_motor_rotor_position = (uint8_t) (ui8_motor_rotor_absolute_position + ui8_position_correction_value);
+	}
+	break;
 
       default:
       return;
@@ -224,6 +178,11 @@ void hall_sensors_read_and_action (void)
   //  ui16_debug = ui16_interpolation_angle_step;
 
   //  ui16_debug = ui8_PWM_cycles_counter_value / ((uint8_t) (ui16_interpolation_angle_step >> 8));
+    if (motor_state != MOTOR_STATE_RUNNING)
+    {
+	ui8_motor_rotor_position -=  20;
+    }
+
   }
 }
 
@@ -241,6 +200,11 @@ void motor_fast_loop (void)
     ui8_last_counter_value = 0;
     ui16_interpolation_angle_step = 0xffff; //(SVM_TABLE_LEN_x1024) / PWM_CYCLES_COUNTER_MAX;
     ui16_speed_inverse = 0xffff;
+
+    // next code is need for motor startup correctly
+    ui8_interpolation_angle = 0;
+    motor_state = MOTOR_STATE_COAST;
+    hall_sensors_read_and_action ();
   }
 
 #define DO_INTERPOLATION 1 // may be usefull when debugging
@@ -250,8 +214,8 @@ void motor_fast_loop (void)
 //  if ((ui8_duty_cycle > 10) && (ui16_speed_inverse < 300))
   if (motor_state == MOTOR_STATE_RUNNING)
   {
-    if (ui8_interpolation_angle < ANGLE_360) // interpolate only for angle <= 360º
-    {
+//    if (ui8_interpolation_angle < ANGLE_360) // interpolate only for angle <= 360º
+//    {
       uint16_t ui16_temp;
 
       ui16_temp = (uint16_t) ui16_PWM_cycles_counter << 7;
@@ -265,7 +229,7 @@ void motor_fast_loop (void)
 //      }
 
       ui8_motor_rotor_position = (uint8_t) (ui8_motor_rotor_absolute_position + ui8_position_correction_value + ui8_interpolation_angle);
-    }
+//    }
   }
 #endif
 

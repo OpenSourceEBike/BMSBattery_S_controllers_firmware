@@ -1115,7 +1115,12 @@ void pwm_duty_cycle_controller (void)
     else if (ui8_duty_cycle_target < ui8_duty_cycle) { ui8_duty_cycle--; }
   }
 
+//#define DO_DUTY_CYCLE_RAMP 1
+#if DO_DUTY_CYCLE_RAMP == 1
   pwm_apply_duty_cycle (ui8_duty_cycle);
+#else
+  pwm_apply_duty_cycle (ui8_duty_cycle_target);
+#endif
 }
 
 void pwm_apply_duty_cycle (uint8_t ui8_duty_cycle_value)
