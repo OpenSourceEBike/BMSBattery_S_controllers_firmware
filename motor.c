@@ -24,7 +24,7 @@ uint16_t ui16_speed_inverse = 0;
 uint8_t ui8_motor_rotor_position = 0; // in 360/256 degrees
 uint8_t ui8_motor_rotor_absolute_position = 0; // in 360/256 degrees
 uint8_t ui8_position_correction_value = 0; // in 360/256 degrees
-uint16_t ui16_interpolation_angle_step = 0; // x1000
+uint16_t ui16_PWM_cycles_counter_total = 0;
 uint8_t ui8_interpolation_angle = 0;
 uint8_t ui8_interpolation_angle_temp = 0;
 uint8_t ui8_interpolation_angle_old = 0;
@@ -86,7 +86,8 @@ void hall_sensors_read_and_action (void)
 {
   // read hall sensors signal pins and mask other pins
   hall_sensors = (GPIO_ReadInputData (HALL_SENSORS__PORT) & (HALL_SENSORS_MASK));
-  if ((hall_sensors != hall_sensors_last) || (motor_state == MOTOR_STATE_COAST))
+  if ((hall_sensors != hall_sensors_last) ||
+      (motor_state == MOTOR_STATE_COAST)) // let's run the code when motor is stopped/coast so it can pick right motor position for correct startup
   {
     hall_sensors_last = hall_sensors;
 
@@ -96,7 +97,8 @@ void hall_sensors_read_and_action (void)
 //	ui8_adc_current_phase_B_flag = 1;
 //	ui16_adc_current_phase_B_temp = 512; // 2.5V, 0 amps
 
-	ui16_interpolation_angle_step = ui16_PWM_cycles_counter >> 1; // (ui16_PWM_cycles_counter / 256) * 127
+	ui16_PWM_cycles_counter_total = ui16_PWM_cycles_counter;
+
 	if (motor_state != MOTOR_STATE_COAST)
 	{
 	  ui16_speed_inverse = ui16_PWM_cycles_counter;
@@ -151,6 +153,8 @@ void hall_sensors_read_and_action (void)
 
 //	ui8_adc_current_phase_B_flag = 0;
 //	ui16_adc_current_phase_B = ui16_adc_current_phase_B_temp;
+
+debug_pin_set ();
 	break;
 
       case 6:
@@ -160,6 +164,7 @@ void hall_sensors_read_and_action (void)
 	  ui8_motor_rotor_absolute_position = (uint8_t) (ui8_motor_rotor_absolute_position + MOTOR_ROTOR_DELTA_PHASE_ANGLE_RIGHT);
 	  ui8_motor_rotor_position = (uint8_t) (ui8_motor_rotor_absolute_position + ui8_position_correction_value);
 	}
+debug_pin_reset ();
 	break;
 
       case 2:
@@ -176,8 +181,8 @@ void hall_sensors_read_and_action (void)
       break;
     }
 
-  //  ui16_debug = ((uint8_t) (ui16_interpolation_angle_step >> 8));
-  //  ui16_debug = ui16_interpolation_angle_step;
+  //  ui16_debug = ((uint8_t) (ui16_PWM_cycles_counter_total >> 8));
+  //  ui16_debug = ui16_PWM_cycles_counter_total;
   }
 }
 
@@ -193,7 +198,7 @@ void motor_fast_loop (void)
   {
     ui16_PWM_cycles_counter = 0;
     ui8_last_counter_value = 0;
-    ui16_interpolation_angle_step = 0xffff; //(SVM_TABLE_LEN_x1024) / PWM_CYCLES_COUNTER_MAX;
+    ui16_PWM_cycles_counter_total = 0xffff; //(SVM_TABLE_LEN_x1024) / PWM_CYCLES_COUNTER_MAX;
     ui16_speed_inverse = 0xffff;
 
     // next code is need for motor startup correctly
@@ -208,10 +213,7 @@ void motor_fast_loop (void)
   // interpolation seems a problem when motor starts, so avoid to do it at very low speed
   if (motor_state == MOTOR_STATE_RUNNING)
   {
-    uint16_t ui16_temp;
-
-    ui16_temp = (uint16_t) ui16_PWM_cycles_counter << 7;
-    ui8_interpolation_angle = (uint8_t) (ui16_temp / ui16_interpolation_angle_step);
+    ui8_interpolation_angle = (uint8_t) ((ui16_PWM_cycles_counter << 8) / ui16_PWM_cycles_counter_total);
 
     ui8_motor_rotor_position = (uint8_t) (ui8_motor_rotor_absolute_position + ui8_position_correction_value + ui8_interpolation_angle);
   }

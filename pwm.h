@@ -25,17 +25,4 @@ void pwm_duty_cycle_controller (void);
 void pwm_set_duty_cycle (uint8_t value);
 void pwm_apply_duty_cycle (uint8_t ui8_duty_cycle_value);
 
-void pwm_phase_a_enable (void);
-void pwm_phase_a_disable (void);
-void pwm_phase_a_enable_pwm (void);
-void pwm_phase_a_enable_low (void);
-void pwm_phase_b_enable (void);
-void pwm_phase_b_disable (void);
-void pwm_phase_b_enable_pwm (void);
-void pwm_phase_b_enable_low (void);
-void pwm_phase_c_enable (void);
-void pwm_phase_c_disable (void);
-void pwm_phase_c_enable_pwm (void);
-void pwm_phase_c_enable_low (void);
-
 #endif /* _PWM_H_ */
