@@ -43,7 +43,7 @@
 // 2 seconds to get up to max PWM duty cycle value of 255 (127 * 255 * 64us ~= 2 seconds)
 #define PWM_DUTY_CYCLE_CONTROLLER_COUNTER 127
 
-#define SPEED_INVERSE_INTERPOLATION 250
+#define SPEED_INVERSE_INTERPOLATION 350 // experimental value; min speed aftwer which interpolation starts
 
 #define PWM_VALUE_DUTY_CYCLE_MAX (256 - 1)
 #define MIDDLE_PWM_VALUE_DUTY_CYCLE_MAX (PWM_VALUE_DUTY_CYCLE_MAX/2)

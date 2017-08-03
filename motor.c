@@ -86,10 +86,9 @@ void hall_sensors_read_and_action (void)
 {
   // read hall sensors signal pins and mask other pins
   hall_sensors = (GPIO_ReadInputData (HALL_SENSORS__PORT) & (HALL_SENSORS_MASK));
-//  if ((hall_sensors != hall_sensors_last) || (motor_state == MOTOR_STATE_COAST))
-////  if (hall_sensors != hall_sensors_last)
-//  {
-//    hall_sensors_last = hall_sensors;
+  if ((hall_sensors != hall_sensors_last) || (motor_state == MOTOR_STATE_COAST))
+  {
+    hall_sensors_last = hall_sensors;
 
     switch (hall_sensors)
     {
@@ -98,17 +97,20 @@ void hall_sensors_read_and_action (void)
 //	ui16_adc_current_phase_B_temp = 512; // 2.5V, 0 amps
 
 	ui16_interpolation_angle_step = ui16_PWM_cycles_counter >> 1; // (ui16_PWM_cycles_counter / 256) * 127
-	ui16_speed_inverse = ui16_PWM_cycles_counter;
+	if (motor_state != MOTOR_STATE_COAST)
+	{
+	  ui16_speed_inverse = ui16_PWM_cycles_counter;
+	}
 
-//	// update motor state based on motor speed
-//	if (ui16_speed_inverse > SPEED_INVERSE_INTERPOLATION)
-//	{
-//	  motor_state = MOTOR_STATE_RUNNING_VERY_SLOW;
-//	}
-//	else
-//	{
-//	  motor_state = MOTOR_STATE_RUNNING;
-//	}
+	// update motor state based on motor speed
+	if (ui16_speed_inverse > SPEED_INVERSE_INTERPOLATION)
+	{
+	  motor_state = MOTOR_STATE_RUNNING_VERY_SLOW;
+	}
+	else
+	{
+	  motor_state = MOTOR_STATE_RUNNING;
+	}
 
 	ui16_motor_speed_erps = PWM_CYCLES_SECOND / ui16_PWM_cycles_counter; // this division takes ~4.2us
 	ui16_PWM_cycles_counter = 0;
@@ -122,51 +124,51 @@ void hall_sensors_read_and_action (void)
       break;
 
       case 1:
-//	if (motor_state != MOTOR_STATE_RUNNING)
-//	{
+	if (motor_state != MOTOR_STATE_RUNNING)
+	{
 	  ui8_motor_rotor_absolute_position = ANGLE_240;
 	  ui8_motor_rotor_absolute_position = (uint8_t) (ui8_motor_rotor_absolute_position + MOTOR_ROTOR_DELTA_PHASE_ANGLE_RIGHT);
 	  ui8_motor_rotor_position = (uint8_t) (ui8_motor_rotor_absolute_position + ui8_position_correction_value);
-//	}
+	}
 	break;
 
       case 5:
-//	if (motor_state != MOTOR_STATE_RUNNING)
-//	{
+	if (motor_state != MOTOR_STATE_RUNNING)
+	{
 	  ui8_motor_rotor_absolute_position = ANGLE_300;
 	  ui8_motor_rotor_absolute_position = (uint8_t) (ui8_motor_rotor_absolute_position + MOTOR_ROTOR_DELTA_PHASE_ANGLE_RIGHT);
 	  ui8_motor_rotor_position = (uint8_t) (ui8_motor_rotor_absolute_position + ui8_position_correction_value);
-//	}
+	}
 	break;
 
       case 4:
-//	if (motor_state != MOTOR_STATE_RUNNING)
-//	{
+	if (motor_state != MOTOR_STATE_RUNNING)
+	{
 	  ui8_motor_rotor_absolute_position = ANGLE_1;
 	  ui8_motor_rotor_absolute_position = (uint8_t) (ui8_motor_rotor_absolute_position + MOTOR_ROTOR_DELTA_PHASE_ANGLE_RIGHT);
 	  ui8_motor_rotor_position = (uint8_t) (ui8_motor_rotor_absolute_position + ui8_position_correction_value);
-//	}
+	}
 
 //	ui8_adc_current_phase_B_flag = 0;
 //	ui16_adc_current_phase_B = ui16_adc_current_phase_B_temp;
 	break;
 
       case 6:
-//	if (motor_state != MOTOR_STATE_RUNNING)
-//	{
+	if (motor_state != MOTOR_STATE_RUNNING)
+	{
 	  ui8_motor_rotor_absolute_position = ANGLE_60;
 	  ui8_motor_rotor_absolute_position = (uint8_t) (ui8_motor_rotor_absolute_position + MOTOR_ROTOR_DELTA_PHASE_ANGLE_RIGHT);
 	  ui8_motor_rotor_position = (uint8_t) (ui8_motor_rotor_absolute_position + ui8_position_correction_value);
-//	}
+	}
 	break;
 
       case 2:
 	if (motor_state != MOTOR_STATE_RUNNING)
-//	{
+	{
 	  ui8_motor_rotor_absolute_position = ANGLE_120;
 	  ui8_motor_rotor_absolute_position = (uint8_t) (ui8_motor_rotor_absolute_position + MOTOR_ROTOR_DELTA_PHASE_ANGLE_RIGHT);
 	  ui8_motor_rotor_position = (uint8_t) (ui8_motor_rotor_absolute_position + ui8_position_correction_value);
-//	}
+	}
 	break;
 
       default:
@@ -176,14 +178,7 @@ void hall_sensors_read_and_action (void)
 
   //  ui16_debug = ((uint8_t) (ui16_interpolation_angle_step >> 8));
   //  ui16_debug = ui16_interpolation_angle_step;
-
-  //  ui16_debug = ui8_PWM_cycles_counter_value / ((uint8_t) (ui16_interpolation_angle_step >> 8));
-//    if (motor_state != MOTOR_STATE_RUNNING)
-//    {
-//	ui8_motor_rotor_position -=  20;
-//    }
-
-//  }
+  }
 }
 
 // runs every 64us (PWM frequency)
@@ -207,29 +202,18 @@ void motor_fast_loop (void)
     hall_sensors_read_and_action ();
   }
 
-#define DO_INTERPOLATION 0 // may be usefull when debugging
+#define DO_INTERPOLATION 1 // may be usefull when debugging
 #if DO_INTERPOLATION == 1
   // calculate the interpolation angle
   // interpolation seems a problem when motor starts, so avoid to do it at very low speed
-//  if ((ui8_duty_cycle > 10) && (ui16_speed_inverse < 300))
   if (motor_state == MOTOR_STATE_RUNNING)
   {
-//    if (ui8_interpolation_angle < ANGLE_360) // interpolate only for angle <= 360º
-//    {
-      uint16_t ui16_temp;
+    uint16_t ui16_temp;
 
-      ui16_temp = (uint16_t) ui16_PWM_cycles_counter << 7;
-      ui8_interpolation_angle = (uint8_t) (ui16_temp / ui16_interpolation_angle_step);
+    ui16_temp = (uint16_t) ui16_PWM_cycles_counter << 7;
+    ui8_interpolation_angle = (uint8_t) (ui16_temp / ui16_interpolation_angle_step);
 
-//      if (ui8_interpolation_angle != ui8_interpolation_angle_old)
-//      {
-//	debug_pin_set ();
-//	debug_pin_reset ();
-//	ui8_interpolation_angle_old = ui8_interpolation_angle;
-//      }
-
-      ui8_motor_rotor_position = (uint8_t) (ui8_motor_rotor_absolute_position + ui8_position_correction_value + ui8_interpolation_angle);
-//    }
+    ui8_motor_rotor_position = (uint8_t) (ui8_motor_rotor_absolute_position + ui8_position_correction_value + ui8_interpolation_angle);
   }
 #endif
 
