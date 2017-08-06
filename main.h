@@ -32,6 +32,7 @@
 #define ADC_PHASE_B_CURRENT_STEP 21 // 0.021 * 1000 = 21
 
 #if MOTOR_TYPE == MOTOR_TYPE_Q85
+//#define MOTOR_ROTOR_DELTA_PHASE_ANGLE_RIGHT 77// best value found (at max speed, minimum current and power supply voltage keeps the same)
 #define MOTOR_ROTOR_DELTA_PHASE_ANGLE_RIGHT 77// best value found (at max speed, minimum current and power supply voltage keeps the same)
 #elif MOTOR_TYPE == MOTOR_TYPE_EUC2
 #define MOTOR_ROTOR_DELTA_PHASE_ANGLE_RIGHT 92 // best value found
@@ -55,5 +56,10 @@
 #define ANGLE_240 167
 #define ANGLE_300 212
 #define ANGLE_360 255
+
+extern uint16_t ui16_log1;
+extern uint16_t ui16_log2;
+extern uint8_t ui8_log;
+extern uint8_t ui8_adc_read_throttle_busy;
 
 #endif

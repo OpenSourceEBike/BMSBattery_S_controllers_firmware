@@ -26,6 +26,11 @@
 //uint16_t ui16_LPF_angle_adjust = 0;
 //uint16_t ui16_LPF_angle_adjust_temp = 0;
 
+uint16_t ui16_log1 = 0;
+uint16_t ui16_log2 = 0;
+uint8_t ui8_log = 0;
+
+uint8_t ui8_adc_read_throttle_busy = 0;
 
 /////////////////////////////////////////////////////////////////////////////////////////////
 //// Functions prototypes
@@ -112,7 +117,9 @@ int main (void)
           /****************************************************************************/
           // read throttle and execute cruise control
           //
+	  ui8_adc_read_throttle_busy = 1;
           ui16_adc_value = (uint16_t) adc_read_throttle ();
+          ui8_adc_read_throttle_busy = 0;
           ui8_temp = (uint8_t) map (ui16_adc_value, ADC_THROTTLE_MIN_VALUE, ADC_THROTTLE_MAX_VALUE, 0, 237);
 
 #define DO_CRUISE_CONTROL 1
@@ -138,7 +145,7 @@ int main (void)
 //          printf("%d\n", (uint16_t) ui32_LPF_temp);
 //
 //          printf("%d\n", ui16_PWM_cycles_counter_value_temp);
-//          printf("%d\n", ui16_motor_speed_erps);
+          printf("%d, %d\n", ui16_log1, ui16_log2);
         }
 
 

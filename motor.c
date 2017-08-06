@@ -25,6 +25,8 @@ uint8_t ui8_motor_rotor_position = 0; // in 360/256 degrees
 uint8_t ui8_motor_rotor_absolute_position = 0; // in 360/256 degrees
 uint8_t ui8_position_correction_value = 0; // in 360/256 degrees
 uint16_t ui16_PWM_cycles_counter_total = 0;
+uint16_t ui16_PWM_cycles_counter_total_filtered = 0;
+uint16_t ui16_PWM_cycles_counter_total_accumulated = 0;
 uint8_t ui8_interpolation_angle = 0;
 uint8_t ui8_interpolation_angle_temp = 0;
 uint8_t ui8_interpolation_angle_old = 0;
@@ -42,15 +44,18 @@ uint8_t motor_state = MOTOR_STATE_RUNNING_VERY_SLOW;
 int8_t hall_sensors;
 int8_t hall_sensors_last = 0;
 
+uint8_t ui8_angle_track_flag = 0;
+
+
 //uint8_t ui8_debug = 0;
 //uint16_t ui16_debug = 0;
 
 void TIM1_UPD_OVF_TRG_BRK_IRQHandler(void) __interrupt(TIM1_UPD_OVF_TRG_BRK_IRQHANDLER)
 {
-//  uint8_t ui8_temp;
-//  uint16_t ui16_temp;
-//  static uint16_t ui16_last_value;
-//
+  uint8_t ui8_temp;
+  uint16_t ui16_temp;
+  static uint16_t ui16_last_value;
+
 ////  ui8_PWM_cycles_counter_1++;
 //  if (ui8_adc_current_phase_B_flag == 1)
 //  {
@@ -62,6 +67,29 @@ void TIM1_UPD_OVF_TRG_BRK_IRQHandler(void) __interrupt(TIM1_UPD_OVF_TRG_BRK_IRQH
 ////      ui8_PWM_cycles_counter_value = ui8_PWM_cycles_counter_1;
 //    }
 //  }
+
+  if ((ui8_angle_track_flag == 1) && (ui8_adc_read_throttle_busy == 0))
+  {
+    // find the adc_current_phase_B minimum value
+    ui16_temp = ADC1_GetConversionValue ();
+    if (ui16_temp > 512) // should happen when ui8_motor_rotor_position = 67
+    {
+      debug_pin_reset ();
+      ui8_angle_track_flag = 0;
+
+      ui16_PWM_cycles_counter_total_accumulated -= ui16_PWM_cycles_counter_total_accumulated >> 6;
+      ui16_PWM_cycles_counter_total_accumulated += ui16_PWM_cycles_counter;
+      ui16_PWM_cycles_counter_total_filtered = ui16_PWM_cycles_counter_total_accumulated >> 6;
+
+ui16_log1 = ui16_motor_speed_erps;
+ui16_log2 = ui8_motor_rotor_position;
+    }
+  }
+
+  if (ui16_PWM_cycles_counter == ui16_PWM_cycles_counter_total_filtered)
+  {
+    ui8_motor_rotor_absolute_position = 206; //210; 205
+  }
 
   hall_sensors_read_and_action ();
 
@@ -99,6 +127,19 @@ void hall_sensors_read_and_action (void)
 
 	ui16_PWM_cycles_counter_total = ui16_PWM_cycles_counter;
 
+	// filter
+	// out = accum >> k
+	// accum = accum - out + in
+//	ui32_PWM_cycles_counter_total_accumulated = ui32_PWM_cycles_counter_total_accumulated - (ui32_PWM_cycles_counter_total_accumulated >> 12);
+//	ui32_PWM_cycles_counter_total_accumulated = ui32_PWM_cycles_counter_total_accumulated + ((uint32_t) ui16_PWM_cycles_counter);
+//	ui16_PWM_cycles_counter_total_filtered = (uint16_t) (ui32_PWM_cycles_counter_total_accumulated >> 12);
+//
+//	ui16_log1 = ui16_PWM_cycles_counter_total;
+
+//	ui16_PWM_cycles_counter_total = ui16_PWM_cycles_counter_total_filtered;
+
+//	ui16_log2 = ui16_PWM_cycles_counter_total_filtered;
+
 	if (motor_state != MOTOR_STATE_COAST)
 	{
 	  ui16_speed_inverse = ui16_PWM_cycles_counter;
@@ -120,9 +161,12 @@ void hall_sensors_read_and_action (void)
 	ui8_interpolation_angle = 0;
 	ui8_last_counter_value = 0;
 
-	ui8_motor_rotor_absolute_position = ANGLE_180;
-	ui8_motor_rotor_absolute_position = (uint8_t) (ui8_motor_rotor_absolute_position + MOTOR_ROTOR_DELTA_PHASE_ANGLE_RIGHT);
-	ui8_motor_rotor_position = (uint8_t) (ui8_motor_rotor_absolute_position + ui8_position_correction_value);
+	if (motor_state != MOTOR_STATE_RUNNING)
+	{
+	  ui8_motor_rotor_absolute_position = ANGLE_180;
+	  ui8_motor_rotor_absolute_position = (uint8_t) (ui8_motor_rotor_absolute_position + MOTOR_ROTOR_DELTA_PHASE_ANGLE_RIGHT);
+	  ui8_motor_rotor_position = (uint8_t) (ui8_motor_rotor_absolute_position + ui8_position_correction_value);
+	}
       break;
 
       case 1:
@@ -141,6 +185,8 @@ void hall_sensors_read_and_action (void)
 	  ui8_motor_rotor_absolute_position = (uint8_t) (ui8_motor_rotor_absolute_position + MOTOR_ROTOR_DELTA_PHASE_ANGLE_RIGHT);
 	  ui8_motor_rotor_position = (uint8_t) (ui8_motor_rotor_absolute_position + ui8_position_correction_value);
 	}
+debug_pin_set ();
+ui8_angle_track_flag = 1;
 	break;
 
       case 4:
@@ -153,8 +199,6 @@ void hall_sensors_read_and_action (void)
 
 //	ui8_adc_current_phase_B_flag = 0;
 //	ui16_adc_current_phase_B = ui16_adc_current_phase_B_temp;
-
-debug_pin_set ();
 	break;
 
       case 6:
@@ -165,6 +209,7 @@ debug_pin_set ();
 	  ui8_motor_rotor_position = (uint8_t) (ui8_motor_rotor_absolute_position + ui8_position_correction_value);
 	}
 debug_pin_reset ();
+ui8_angle_track_flag = 0;
 	break;
 
       case 2:
