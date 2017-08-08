@@ -75,7 +75,6 @@ void TIM1_UPD_OVF_TRG_BRK_IRQHandler(void) __interrupt(TIM1_UPD_OVF_TRG_BRK_IRQH
     ui16_temp = ADC1_GetConversionValue ();
     if (ui16_temp > 512) // should happen when ui8_motor_rotor_position = 67
     {
-      debug_pin_reset ();
       ui8_angle_track_flag = 0;
 
       ui16_PWM_cycles_counter_total_accumulated -= ui16_PWM_cycles_counter_total_accumulated >> 6;
@@ -99,7 +98,6 @@ void TIM1_UPD_OVF_TRG_BRK_IRQHandler(void) __interrupt(TIM1_UPD_OVF_TRG_BRK_IRQH
 //    ui16_log2 = (uint16_t) ui8_position_correction_value;
   }
   else { /* debug_pin_reset (); */ }
-
 
 
   hall_sensors_read_and_action ();
@@ -130,11 +128,53 @@ void hall_sensors_read_and_action (void)
   {
     hall_sensors_last = hall_sensors;
 
-    if (motor_state != MOTOR_STATE_RUNNING) { ui8_position_correction_value = 0; }
+//    if (motor_state != MOTOR_STATE_RUNNING) { ui8_position_correction_value = 0; }
 
     switch (hall_sensors)
     {
       case 3:
+	if (motor_state != MOTOR_STATE_RUNNING)
+	{
+	  ui8_motor_rotor_absolute_position = ANGLE_120;
+	  ui8_motor_rotor_absolute_position = (uint8_t) (ui8_motor_rotor_absolute_position + MOTOR_ROTOR_DELTA_PHASE_ANGLE_RIGHT);
+	  ui8_motor_rotor_position = (uint8_t) (ui8_motor_rotor_absolute_position + ui8_position_correction_value);
+	}
+      break;
+
+      case 1:
+	if (motor_state != MOTOR_STATE_RUNNING)
+	{
+	  ui8_motor_rotor_absolute_position = ANGLE_180;
+	  ui8_motor_rotor_absolute_position = (uint8_t) (ui8_motor_rotor_absolute_position + MOTOR_ROTOR_DELTA_PHASE_ANGLE_RIGHT);
+	  ui8_motor_rotor_position = (uint8_t) (ui8_motor_rotor_absolute_position + ui8_position_correction_value);
+	}
+
+	ui8_angle_track_flag = 1;
+	break;
+
+      case 5:
+	if (motor_state != MOTOR_STATE_RUNNING)
+	{
+	  ui8_motor_rotor_absolute_position = ANGLE_240;
+	  ui8_motor_rotor_absolute_position = (uint8_t) (ui8_motor_rotor_absolute_position + MOTOR_ROTOR_DELTA_PHASE_ANGLE_RIGHT);
+	  ui8_motor_rotor_position = (uint8_t) (ui8_motor_rotor_absolute_position + ui8_position_correction_value);
+	}
+	break;
+
+      case 4:
+	if (motor_state != MOTOR_STATE_RUNNING)
+	{
+	  ui8_motor_rotor_absolute_position = ANGLE_300;
+	  ui8_motor_rotor_absolute_position = (uint8_t) (ui8_motor_rotor_absolute_position + MOTOR_ROTOR_DELTA_PHASE_ANGLE_RIGHT);
+	  ui8_motor_rotor_position = (uint8_t) (ui8_motor_rotor_absolute_position + ui8_position_correction_value);
+	}
+
+	ui8_angle_track_flag = 0;
+//	ui8_adc_current_phase_B_flag = 0;
+//	ui16_adc_current_phase_B = ui16_adc_current_phase_B_temp;
+	break;
+
+      case 6:
 //	ui8_adc_current_phase_B_flag = 1;
 //	ui16_adc_current_phase_B_temp = 512; // 2.5V, 0 amps
 
@@ -176,59 +216,16 @@ void hall_sensors_read_and_action (void)
 
 //	if (motor_state != MOTOR_STATE_RUNNING)
 //	{
-	  ui8_motor_rotor_absolute_position = ANGLE_180;
-	  ui8_motor_rotor_absolute_position = (uint8_t) (ui8_motor_rotor_absolute_position + MOTOR_ROTOR_DELTA_PHASE_ANGLE_RIGHT);
-	  ui8_motor_rotor_position = (uint8_t) (ui8_motor_rotor_absolute_position + ui8_position_correction_value);
-//	}
-      break;
-
-      case 1:
-	if (motor_state != MOTOR_STATE_RUNNING)
-	{
-	  ui8_motor_rotor_absolute_position = ANGLE_240;
-	  ui8_motor_rotor_absolute_position = (uint8_t) (ui8_motor_rotor_absolute_position + MOTOR_ROTOR_DELTA_PHASE_ANGLE_RIGHT);
-	  ui8_motor_rotor_position = (uint8_t) (ui8_motor_rotor_absolute_position + ui8_position_correction_value);
-	}
-	break;
-
-      case 5:
-	if (motor_state != MOTOR_STATE_RUNNING)
-	{
-	  ui8_motor_rotor_absolute_position = ANGLE_300;
-	  ui8_motor_rotor_absolute_position = (uint8_t) (ui8_motor_rotor_absolute_position + MOTOR_ROTOR_DELTA_PHASE_ANGLE_RIGHT);
-	  ui8_motor_rotor_position = (uint8_t) (ui8_motor_rotor_absolute_position + ui8_position_correction_value);
-	}
-//debug_pin_set ();
-ui8_angle_track_flag = 1;
-	break;
-
-      case 4:
-	if (motor_state != MOTOR_STATE_RUNNING)
-	{
 	  ui8_motor_rotor_absolute_position = ANGLE_1;
 	  ui8_motor_rotor_absolute_position = (uint8_t) (ui8_motor_rotor_absolute_position + MOTOR_ROTOR_DELTA_PHASE_ANGLE_RIGHT);
 	  ui8_motor_rotor_position = (uint8_t) (ui8_motor_rotor_absolute_position + ui8_position_correction_value);
-	}
-
-//	ui8_adc_current_phase_B_flag = 0;
-//	ui16_adc_current_phase_B = ui16_adc_current_phase_B_temp;
-	break;
-
-      case 6:
-	if (motor_state != MOTOR_STATE_RUNNING)
-	{
-	  ui8_motor_rotor_absolute_position = ANGLE_60;
-	  ui8_motor_rotor_absolute_position = (uint8_t) (ui8_motor_rotor_absolute_position + MOTOR_ROTOR_DELTA_PHASE_ANGLE_RIGHT);
-	  ui8_motor_rotor_position = (uint8_t) (ui8_motor_rotor_absolute_position + ui8_position_correction_value);
-	}
-//debug_pin_reset ();
-ui8_angle_track_flag = 0;
-	break;
+//	}
+	  break;
 
       case 2:
 	if (motor_state != MOTOR_STATE_RUNNING)
 	{
-	  ui8_motor_rotor_absolute_position = ANGLE_120;
+	  ui8_motor_rotor_absolute_position = ANGLE_60;
 	  ui8_motor_rotor_absolute_position = (uint8_t) (ui8_motor_rotor_absolute_position + MOTOR_ROTOR_DELTA_PHASE_ANGLE_RIGHT);
 	  ui8_motor_rotor_position = (uint8_t) (ui8_motor_rotor_absolute_position + ui8_position_correction_value);
 	}
