@@ -24,9 +24,10 @@ uint16_t ui16_speed_inverse = 0;
 uint8_t ui8_motor_rotor_position = 0; // in 360/256 degrees
 uint8_t ui8_motor_rotor_absolute_position = 0; // in 360/256 degrees
 uint8_t ui8_position_correction_value = 0; // in 360/256 degrees
+uint8_t ui16_PWM_cycles_correction_value = 0; // in 360/256 degrees
 uint16_t ui16_PWM_cycles_counter_total = 0;
-uint16_t ui16_PWM_cycles_counter_total_filtered = 0;
-uint16_t ui16_PWM_cycles_counter_total_accumulated = 0;
+uint16_t ui16_PWM_cycles_counter_angle_track_filtered = 0;
+uint16_t ui16_PWM_cycles_counter_angle_track_accumulated = 0;
 uint8_t ui8_interpolation_angle = 0;
 uint8_t ui8_interpolation_angle_temp = 0;
 uint8_t ui8_interpolation_angle_old = 0;
@@ -45,7 +46,8 @@ int8_t hall_sensors;
 int8_t hall_sensors_last = 0;
 
 uint8_t ui8_angle_track_flag = 0;
-
+uint16_t ui16_position_correction_value_accumulated = 0;
+uint16_t ui16_position_correction_value_filtered = 0;
 
 //uint8_t ui8_debug = 0;
 //uint16_t ui16_debug = 0;
@@ -77,27 +79,27 @@ void TIM1_UPD_OVF_TRG_BRK_IRQHandler(void) __interrupt(TIM1_UPD_OVF_TRG_BRK_IRQH
     {
       ui8_angle_track_flag = 0;
 
-      ui16_PWM_cycles_counter_total_accumulated -= ui16_PWM_cycles_counter_total_accumulated >> 6;
-      ui16_PWM_cycles_counter_total_accumulated += ui16_PWM_cycles_counter;
-      ui16_PWM_cycles_counter_total_filtered = ui16_PWM_cycles_counter_total_accumulated >> 6;
+      ui16_PWM_cycles_counter_angle_track_accumulated -= ui16_PWM_cycles_counter_angle_track_accumulated >> 6;
+      ui16_PWM_cycles_counter_angle_track_accumulated += ui16_PWM_cycles_counter;
+      ui16_PWM_cycles_counter_angle_track_filtered = ui16_PWM_cycles_counter_angle_track_accumulated >> 6;
 
 //ui16_log1 = ui16_motor_speed_erps;
-//ui16_log2 = ui8_motor_rotor_position;
+//ui16_log2 = ui16_PWM_cycles_counter_angle_track_filtered;
     }
   }
 
 
-  ui16_temp = (ui16_PWM_cycles_counter_total_filtered >> 1) + (ui16_PWM_cycles_counter_total_filtered >> 2); // 3/4
-  if (ui16_PWM_cycles_counter == ui16_temp)
-  {
-//    debug_pin_set ();
-    ui16_log1 = ui16_PWM_cycles_counter_total_filtered - ui16_PWM_cycles_counter;
-
-    ui16_log2 = ((ui16_log1 << 8) / ui16_PWM_cycles_counter_total);
-
-//    ui16_log2 = (uint16_t) ui8_position_correction_value;
-  }
-  else { /* debug_pin_reset (); */ }
+//  ui16_temp = (ui16_PWM_cycles_counter_angle_track_filtered >> 1) + (ui16_PWM_cycles_counter_angle_track_filtered >> 2); // 3/4
+//  if (ui16_PWM_cycles_counter == ui16_temp)
+//  {
+////    debug_pin_set ();
+//    ui16_log1 = ui16_PWM_cycles_counter_angle_track_filtered - ui16_PWM_cycles_counter;
+//
+//    ui16_log2 = ((ui16_log1 << 8) / ui16_PWM_cycles_counter_total);
+//
+////    ui16_log2 = (uint16_t) ui8_position_correction_value;
+//  }
+//  else { /* debug_pin_reset (); */ }
 
 
   hall_sensors_read_and_action ();
@@ -121,6 +123,9 @@ void hall_sensor_init (void)
 
 void hall_sensors_read_and_action (void)
 {
+  uint8_t ui8_temp;
+  uint16_t ui16_temp;
+
   // read hall sensors signal pins and mask other pins
   hall_sensors = (GPIO_ReadInputData (HALL_SENSORS__PORT) & (HALL_SENSORS_MASK));
   if ((hall_sensors != hall_sensors_last) ||
@@ -153,6 +158,24 @@ void hall_sensors_read_and_action (void)
 	break;
 
       case 5:
+	// find the phase current B lag
+//	ui16_temp = ui16_PWM_cycles_counter_angle_track_filtered - ui16_PWM_cycles_counter;
+//	ui8_temp = (uint8_t) ((ui16_temp << 8) / ui16_PWM_cycles_counter_total);
+
+//	ui16_position_correction_value_accumulated -= ui16_position_correction_value_accumulated >> 3;
+//	ui16_position_correction_value_accumulated += (uint16_t) ui8_temp;
+//	ui16_position_correction_value_filtered = ui16_position_correction_value_accumulated >> 3;
+//
+//
+//	ui8_position_correction_value = ui16_position_correction_value_filtered - 10;
+
+	ui16_PWM_cycles_correction_value = ui16_PWM_cycles_counter_angle_track_filtered - ui16_PWM_cycles_counter;
+
+
+//ui16_log1 = ui16_PWM_cycles_counter;
+//ui16_log2 = ui16_PWM_cycles_counter_angle_track_filtered;
+
+
 	if (motor_state != MOTOR_STATE_RUNNING)
 	{
 	  ui8_motor_rotor_absolute_position = ANGLE_240;
@@ -244,6 +267,8 @@ void hall_sensors_read_and_action (void)
 // runs every 64us (PWM frequency)
 void motor_fast_loop (void)
 {
+  uint16_t ui16_temp;
+
   // count number of fast loops / PWM cycles
   if (ui16_PWM_cycles_counter < PWM_CYCLES_COUNTER_MAX)
   {
@@ -268,9 +293,14 @@ void motor_fast_loop (void)
   // interpolation seems a problem when motor starts, so avoid to do it at very low speed
   if (motor_state == MOTOR_STATE_RUNNING)
   {
-    ui8_interpolation_angle = (uint8_t) ((ui16_PWM_cycles_counter << 8) / ui16_PWM_cycles_counter_total);
+//    ui16_temp = ui16_PWM_cycles_counter + ui16_PWM_cycles_correction_value;
+    ui16_temp = ui16_PWM_cycles_counter;
+    ui8_interpolation_angle = (uint8_t) ((ui16_temp << 8) / ui16_PWM_cycles_counter_total);
 
     ui8_motor_rotor_position = (uint8_t) (ui8_motor_rotor_absolute_position + ui8_position_correction_value + ui8_interpolation_angle);
+
+ui16_log1 = ui16_PWM_cycles_counter_total;
+ui16_log2 = ui16_PWM_cycles_correction_value;
   }
 #endif
 

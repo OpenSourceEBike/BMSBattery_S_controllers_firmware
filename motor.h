@@ -22,6 +22,7 @@
 #define MOTOR_STATE_RUNNING 2
 
 extern uint8_t ui8_motor_rotor_position;
+extern uint8_t ui8_position_correction_value;
 
 void hall_sensor_init (void);
 void hall_sensors_read_and_action (void);

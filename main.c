@@ -110,7 +110,8 @@ int main (void)
       static float f_temp = 0;
 
 	ui16_temp_delay = TIM2_GetCounter ();
-	if ((ui16_temp_delay - ui16_throttle_counter) > 25)
+//	if ((ui16_temp_delay - ui16_throttle_counter) > 25)
+	if ((ui16_temp_delay - ui16_throttle_counter) > 100)
         {
 	  ui16_throttle_counter = ui16_temp_delay;
 
@@ -145,7 +146,14 @@ int main (void)
 //          printf("%d\n", (uint16_t) ui32_LPF_temp);
 //
 //          printf("%d\n", ui16_PWM_cycles_counter_value_temp);
-          printf("%d, %d\n", ui16_log1, ui16_log2);
+
+
+
+//          printf("%d, %d\n", ui16_log1, ui16_log2);
+
+          getchar1 ();
+
+          printf("%d\n", ui8_position_correction_value);
         }
 
 
