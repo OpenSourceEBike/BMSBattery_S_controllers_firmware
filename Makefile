@@ -4,6 +4,8 @@
 #Copyright 2016
 #LICENSE:	GNU-LGPL
 
+.PHONY: all clean
+
 #Compiler
 CC = sdcc
 OBJCOPY = stm8-objcopy
@@ -44,14 +46,15 @@ EXTRASRCS = \
 	pwm.c \
 	motor.c \
 
+HEADERS = adc.h  brake.h  cruise_control.h  gpio.h  interrupts.h  main.h  motor.h  pwm.h  timers.h  uart.h  utils.h
 
 # The list of .rel files can be derived from the list of their source files
 RELS = $(EXTRASRCS:.c=.rel)
 
-INCLUDES = -I. -I$(IDIR) -I/usr/local/share/sdcc/include -I/usr/local/share/sdcc/lib/ 
+INCLUDES = -I$(IDIR) -I. 
 CFLAGS   = -m$(PLATFORM) --std-c99 --nolospre
 ELF_FLAGS = --out-fmt-elf --debug
-LIBS     = -l$(PLATFORM)
+LIBS     = 
 
 # This just provides the conventional target name "all"; it is optional
 # Note: I assume you set PNAME via some means not exhibited in your original file
@@ -65,7 +68,7 @@ $(PNAME): $(MAINSRC) $(RELS)
 
 # How to build any .rel file from its corresponding .c file
 # GNU would have you use a pattern rule for this, but that's GNU-specific
-%.rel: %.c
+%.rel: %.c $(HEADERS)
 	$(CC) -c $(INCLUDES) $(CFLAGS) $(ELF_FLAGS) $(LIBS) -o$< $<
 
 # Suffixes appearing in suffix rules we care about.
