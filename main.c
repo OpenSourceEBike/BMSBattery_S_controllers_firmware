@@ -75,8 +75,6 @@ void TIM1_UPD_OVF_TRG_BRK_IRQHandler(void) __interrupt(TIM1_UPD_OVF_TRG_BRK_IRQH
 int32_t map (int32_t x, int32_t in_min, int32_t in_max, int32_t out_min, int32_t out_max);
 
 void uart_init (void);
-void putchar(char c);
-char getchar(void);
 
 void adc_init (void);
 uint16_t adc_read_throttle (void);
@@ -480,15 +478,29 @@ void uart_init (void)
 	     UART2_MODE_TXRX_ENABLE);
 }
 
+// Since SDCC #9624, SDCC uses a standard-conforming putchar()-prototype.
+#if __SDCC_REVISION < 9624
 void putchar(char c)
 {
   //Write a character to the UART2
   UART2_SendData8(c);
 
   //Loop until the end of transmission
-  while (UART2_GetFlagStatus(UART2_FLAG_TXE) == RESET);
+  while(UART2_GetFlagStatus(UART2_FLAG_TXE) == RESET);
 }
+int putchar(int c)
+{
+  //Write a character to the UART2
+  UART2_SendData8(c);
 
+  //Loop until the end of transmission
+  while(UART2_GetFlagStatus(UART2_FLAG_TXE) == RESET);
+
+  return(c);
+}
+#endif
+
+// As of revision #9987 SDCC still has a non-compliant getchar()-prototype.
 char getchar(void)
 {
   uint8_t c = 0;
