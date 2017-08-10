@@ -49,10 +49,10 @@ EXTRASRCS = \
 RELS = $(EXTRASRCS:.c=.rel)
 
 INCLUDES = -I$(IDIR) -I. 
-#CFLAGS   = -m$(PLATFORM) -I/usr/local/share/sdcc/include -I/usr/local/share/sdcc/lib/ --std-c99 --nolospre --all-callee-saves --stack-auto --fverbose-asm  --float-reent --no-peep
-CFLAGS   = -m$(PLATFORM) -I/usr/local/share/sdcc/include -I/usr/local/share/sdcc/lib/ --std-c99 --nolospre
+#CFLAGS   = -m$(PLATFORM) --std-c99 --nolospre --fverbose-asm --no-peep
+CFLAGS   = -m$(PLATFORM) --std-c99 --nolospre
 ELF_FLAGS = --out-fmt-elf --debug
-LIBS     = -l$(PLATFORM)
+LIBS     = 
 
 # This just provides the conventional target name "all"; it is optional
 # Note: I assume you set PNAME via some means not exhibited in your original file
