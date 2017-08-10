@@ -12,8 +12,6 @@
 #include "main.h"
 
 void uart_init (void);
-void putchar(char c);
-char getchar(void);
 char getchar1(void);
 
 #endif /* _UART_H */

@@ -5,7 +5,7 @@
 #LICENSE:	GNU-LGPL
 
 #Compiler
-CC = /home/cas/software/stm8-binutils/bin/sdcc
+CC = sdcc
 OBJCOPY = stm8-objcopy
 SIZE = stm8-size
 
