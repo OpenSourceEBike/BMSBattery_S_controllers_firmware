@@ -488,6 +488,7 @@ void putchar(char c)
   //Loop until the end of transmission
   while(UART2_GetFlagStatus(UART2_FLAG_TXE) == RESET);
 }
+#else
 int putchar(int c)
 {
   //Write a character to the UART2
