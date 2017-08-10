@@ -7,6 +7,8 @@
  */
 
 #include <stdint.h>
+#include <stdio.h>
+
 #include "stm8s.h"
 #include "stm8s_uart2.h"
 #include "motor.h"
@@ -22,6 +24,7 @@ void uart_init (void)
 	     UART2_MODE_TXRX_ENABLE);
 }
 
+#if __SDCC_REVISION < 9624
 void putchar(char c)
 {
   //Write a character to the UART2
@@ -30,8 +33,24 @@ void putchar(char c)
   //Loop until the end of transmission
   while (UART2_GetFlagStatus(UART2_FLAG_TXE) == RESET);
 }
+#else
+int putchar(int c)
+{
+  //Write a character to the UART2
+  UART2_SendData8(c);
 
+  //Loop until the end of transmission
+  while (UART2_GetFlagStatus(UART2_FLAG_TXE) == RESET);
+
+  return((unsigned char)c);
+}
+#endif
+
+#if __SDCC_REVISION < 9989
 char getchar(void)
+#else
+int getchar(void)
+#endif
 {
   uint8_t c = 0;
 
