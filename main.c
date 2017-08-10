@@ -478,7 +478,7 @@ void uart_init (void)
 	     UART2_MODE_TXRX_ENABLE);
 }
 
-// Since SDCC #9624, SDCC uses a standard-conforming putchar()-prototype.
+// Since revision #9624, SDCC uses a standard-conforming putchar()-prototype.
 #if __SDCC_REVISION < 9624
 void putchar(char c)
 {
@@ -500,8 +500,12 @@ int putchar(int c)
 }
 #endif
 
-// As of revision #9987 SDCC still has a non-compliant getchar()-prototype.
+// Since revision #9989, SDCC uses a standard-conforming getchar()-prototype.
+#if __SDCC_REVISION < 9989
 char getchar(void)
+#else
+int getchar(void)
+#endif
 {
   uint8_t c = 0;
 
@@ -512,7 +516,6 @@ char getchar(void)
 
   return (c);
 }
-
 
 int main (void)
 {
