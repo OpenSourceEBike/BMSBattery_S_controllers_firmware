@@ -153,7 +153,7 @@ int main (void)
 
           getchar1 ();
 
-          printf("%d, %d\n", ui16_speed_inverse, ui8_position_correction_value);
+          printf("%d, %d\n", ui16_speed_inverse, i16_position_correction_value);
         }
 
 

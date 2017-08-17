@@ -18,12 +18,12 @@
 uint16_t ui16_PWM_cycles_counter = 0;
 uint16_t ui16_motor_speed_erps = 0;
 uint16_t ui16_speed_inverse = 0;
-uint8_t ui8_motor_rotor_position = 0; // in 360/256 degrees
-uint8_t ui8_motor_rotor_absolute_position = 0; // in 360/256 degrees
-uint8_t ui8_position_correction_value = 127; // in 360/256 degrees
+int16_t i16_motor_rotor_position = 0; // in 0.25 degrees
+int16_t i16_motor_rotor_absolute_position = 0; // in 360/256 degrees
+int16_t i16_position_correction_value = 720; // in 360/256 degrees
 uint16_t ui16_PWM_cycles_counter_total = 0;
 uint16_t ui16_PWM_cycles_counter_total_div_4 = 0;
-uint8_t ui8_interpolation_angle = 0;
+int16_t i16_interpolation_angle = 0;
 
 uint16_t ui16_adc_current_phase_B = 0;
 uint16_t ui16_adc_current_phase_B_accumulated = 0;
@@ -67,7 +67,7 @@ void hall_sensors_read_and_action (void)
 
     if (motor_state != MOTOR_STATE_RUNNING) // needed to reset ui8_position_correction_value
     {
-      ui8_position_correction_value = 127;
+      i16_position_correction_value = 720;
     }
 
     switch (hall_sensors)
@@ -75,24 +75,24 @@ void hall_sensors_read_and_action (void)
       case 3:
 	if (motor_state != MOTOR_STATE_RUNNING)
 	{
-	  ui8_motor_rotor_absolute_position = (uint8_t) (ANGLE_120 + MOTOR_ROTOR_DELTA_PHASE_ANGLE_RIGHT);
-	  ui8_motor_rotor_position = (uint8_t) (ui8_motor_rotor_absolute_position + ui8_position_correction_value);
+	  i16_motor_rotor_absolute_position = i16_mod_angle_degrees(ANGLE_120 + MOTOR_ROTOR_DELTA_PHASE_ANGLE_RIGHT);
+	  i16_motor_rotor_position = i16_mod_angle_degrees(i16_motor_rotor_absolute_position + i16_position_correction_value);
 	}
 	break;
 
       case 1:
 	if (motor_state != MOTOR_STATE_RUNNING)
 	{
-	  ui8_motor_rotor_absolute_position = (uint8_t) (ANGLE_180 + MOTOR_ROTOR_DELTA_PHASE_ANGLE_RIGHT);
-	  ui8_motor_rotor_position = (uint8_t) (ui8_motor_rotor_absolute_position + ui8_position_correction_value);
+	  i16_motor_rotor_absolute_position = i16_mod_angle_degrees(ANGLE_180 + MOTOR_ROTOR_DELTA_PHASE_ANGLE_RIGHT);
+	  i16_motor_rotor_position = i16_mod_angle_degrees(i16_motor_rotor_absolute_position + i16_position_correction_value);
 	}
 	break;
 
       case 5:
 	if (motor_state != MOTOR_STATE_RUNNING)
 	{
-	  ui8_motor_rotor_absolute_position = (uint8_t) (ANGLE_240 + MOTOR_ROTOR_DELTA_PHASE_ANGLE_RIGHT);
-	  ui8_motor_rotor_position = (uint8_t) (ui8_motor_rotor_absolute_position + ui8_position_correction_value);
+	  i16_motor_rotor_absolute_position = i16_mod_angle_degrees(ANGLE_240 + MOTOR_ROTOR_DELTA_PHASE_ANGLE_RIGHT);
+	  i16_motor_rotor_position = i16_mod_angle_degrees(i16_motor_rotor_absolute_position + i16_position_correction_value);
 	}
 	break;
 
@@ -101,7 +101,7 @@ void hall_sensors_read_and_action (void)
 	ui16_PWM_cycles_counter_total = ui16_PWM_cycles_counter;
 	ui16_PWM_cycles_counter_total_div_4 = ui16_PWM_cycles_counter_total >> 2;
 	ui16_PWM_cycles_counter = 0;
-	ui8_interpolation_angle = 0;
+	i16_interpolation_angle = 0;
 	ui16_motor_speed_erps = PWM_CYCLES_SECOND / ui16_PWM_cycles_counter_total; // this division takes ~4.2us
 
 	if (motor_state != MOTOR_STATE_COAST)
@@ -139,26 +139,23 @@ void hall_sensors_read_and_action (void)
 //	}
 //debug_pin_reset();
 
-	ui8_motor_rotor_absolute_position = ANGLE_300;
-	ui8_motor_rotor_absolute_position = (uint8_t) (ui8_motor_rotor_absolute_position + MOTOR_ROTOR_DELTA_PHASE_ANGLE_RIGHT);
-	ui8_motor_rotor_position = (uint8_t) (ui8_motor_rotor_absolute_position + ui8_position_correction_value);
+	i16_motor_rotor_absolute_position = i16_mod_angle_degrees(ANGLE_300 + i16_motor_rotor_absolute_position + MOTOR_ROTOR_DELTA_PHASE_ANGLE_RIGHT);
+	i16_motor_rotor_position = i16_mod_angle_degrees(i16_motor_rotor_absolute_position + i16_position_correction_value);
 	break;
 
       case 6:
 	if (motor_state != MOTOR_STATE_RUNNING)
 	{
-	  ui8_motor_rotor_absolute_position = ANGLE_1;
-	  ui8_motor_rotor_absolute_position = (uint8_t) (ui8_motor_rotor_absolute_position + MOTOR_ROTOR_DELTA_PHASE_ANGLE_RIGHT);
-	  ui8_motor_rotor_position = (uint8_t) (ui8_motor_rotor_absolute_position + ui8_position_correction_value);
+	  i16_motor_rotor_absolute_position = i16_mod_angle_degrees(ANGLE_1 + i16_motor_rotor_absolute_position + MOTOR_ROTOR_DELTA_PHASE_ANGLE_RIGHT);
+	  i16_motor_rotor_position = i16_mod_angle_degrees(i16_motor_rotor_absolute_position + i16_position_correction_value);
 	}
 	break;
 
       case 2:
 	if (motor_state != MOTOR_STATE_RUNNING)
 	{
-	  ui8_motor_rotor_absolute_position = ANGLE_60;
-	  ui8_motor_rotor_absolute_position = (uint8_t) (ui8_motor_rotor_absolute_position + MOTOR_ROTOR_DELTA_PHASE_ANGLE_RIGHT);
-	  ui8_motor_rotor_position = (uint8_t) (ui8_motor_rotor_absolute_position + ui8_position_correction_value);
+	  i16_motor_rotor_absolute_position = i16_mod_angle_degrees(ANGLE_60 + i16_motor_rotor_absolute_position + MOTOR_ROTOR_DELTA_PHASE_ANGLE_RIGHT);
+	  i16_motor_rotor_position = i16_mod_angle_degrees(i16_motor_rotor_absolute_position + i16_position_correction_value);
 	}
 	break;
 
@@ -186,7 +183,7 @@ void motor_fast_loop (void)
     ui16_speed_inverse = 0xffff;
 
     // next code is need for motor startup correctly
-    ui8_interpolation_angle = 0;
+    i16_interpolation_angle = 0;
     motor_state = MOTOR_STATE_COAST;
     hall_sensors_read_and_action ();
   }
@@ -200,7 +197,7 @@ void motor_fast_loop (void)
     if (ui16_PWM_cycles_counter == 1) // can't read ADC if is busy
     {
       // at this time, phase B current sinusoid should be crossing zero
-      // see if is positive or negative: adjust the ui8_position_correction_value according to
+      // see if is positive or negative: adjust the ui16_position_correction_value according to
     debug_pin_set();
 //      // find the adc_current_phase_B zero cross
 //      ui16_temp = ADC1_GetConversionValue ();
@@ -212,15 +209,16 @@ void motor_fast_loop (void)
 //      else if (ui16_temp < (512))
 //      {
 ////	ui8_position_correction_value++;
-//	ui8_position_correction_value += 6;
+//	ui16_position_correction_value += 6;
 //      }
     debug_pin_reset();
     }
 
     // calculate the interpolation angle
     // interpolation seems a problem when motor starts, so don't do it at very low speed
-    ui8_interpolation_angle = (uint8_t) ((ui16_PWM_cycles_counter << 8) / ui16_PWM_cycles_counter_total);
-    ui8_motor_rotor_position = (uint8_t) (ui8_motor_rotor_absolute_position + ui8_position_correction_value + ui8_interpolation_angle);
+    i16_interpolation_angle = (int16_t) (ui16_PWM_cycles_counter * 1440);
+    i16_interpolation_angle = (int16_t) (i16_interpolation_angle / ((int16_t) ui16_PWM_cycles_counter_total));
+    i16_motor_rotor_position = i16_mod_angle_degrees(i16_motor_rotor_absolute_position + i16_position_correction_value + i16_interpolation_angle);
 
     // Read phase B current only at max value of sinusoid
     if (ui16_PWM_cycles_counter == ui16_PWM_cycles_counter_total_div_4)
@@ -234,7 +232,7 @@ void motor_fast_loop (void)
       }
     }
 //ui16_log1 = ui16_motor_speed_erps;
-//ui16_log2 = ui8_position_correction_value;
+//ui16_log2 = ui16_position_correction_value;
   }
   else
   {
@@ -250,4 +248,24 @@ void motor_fast_loop (void)
 int8_t get_motor_rotation_direction (void)
 {
   return LEFT;
+}
+
+//uint16_t i16_mod_angle_degrees (uint16_t value)
+//{
+//  int16_t temp;
+//  int16_t ret;
+//
+//  temp = (int16_t) value;
+//  ret = (temp % 360);
+//  if(ret < 0)
+//    ret += 360;
+//  return ((uint16_t) ret);
+//}
+
+int16_t i16_mod_angle_degrees (int16_t value)
+{
+  int16_t ret = value % 1440;
+  if(ret < 0)
+    ret += 1440;
+  return ret;
 }
