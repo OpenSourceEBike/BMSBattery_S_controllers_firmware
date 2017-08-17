@@ -20,7 +20,7 @@ uint16_t ui16_motor_speed_erps = 0;
 uint16_t ui16_speed_inverse = 0;
 uint8_t ui8_motor_rotor_position = 0; // in 360/256 degrees
 uint8_t ui8_motor_rotor_absolute_position = 0; // in 360/256 degrees
-uint8_t ui8_position_correction_value = 0; // in 360/256 degrees
+uint8_t ui8_position_correction_value = 127; // in 360/256 degrees
 uint16_t ui16_PWM_cycles_counter_total = 0;
 uint16_t ui16_PWM_cycles_counter_total_div_4 = 0;
 uint8_t ui8_interpolation_angle = 0;
@@ -58,8 +58,6 @@ void hall_sensor_init (void)
 
 void hall_sensors_read_and_action (void)
 {
-  uint16_t ui16_temp;
-
   // read hall sensors signal pins and mask other pins
   hall_sensors = (GPIO_ReadInputData (HALL_SENSORS__PORT) & (HALL_SENSORS_MASK));
   if ((hall_sensors != hall_sensors_last) ||
@@ -69,7 +67,7 @@ void hall_sensors_read_and_action (void)
 
     if (motor_state != MOTOR_STATE_RUNNING) // needed to reset ui8_position_correction_value
     {
-      ui8_position_correction_value = 0;
+      ui8_position_correction_value = 127;
     }
 
     switch (hall_sensors)
@@ -121,23 +119,25 @@ void hall_sensors_read_and_action (void)
 	  motor_state = MOTOR_STATE_RUNNING;
 	}
 
-	// at this time, phase B current sinusoid should be crossing zero
-	// see if is positive or negative: adjust the ui8_position_correction_value according to
-	//
-	if ((motor_state == MOTOR_STATE_RUNNING) &&
-	    (ui8_adc_read_throttle_busy == 0)) // can't read ADC if is busy
-	{
-	  // find the adc_current_phase_B zero cross
-	  ui16_temp = ADC1_GetConversionValue ();
-	  if (ui16_temp > (512 + 6)) // 512 is the middle value --> zero crossing
-	  {
-	    ui8_position_correction_value++;
-	  }
-	  else if (ui16_temp < (512 - 6))
-	  {
-	    ui8_position_correction_value--;
-	  }
-	}
+//debug_pin_set();
+//	// at this time, phase B current sinusoid should be crossing zero
+//	// see if is positive or negative: adjust the ui8_position_correction_value according to
+//	//
+//	if ((motor_state == MOTOR_STATE_RUNNING) &&
+//	    (ui8_adc_read_throttle_busy == 0)) // can't read ADC if is busy
+//	{
+//	  // find the adc_current_phase_B zero cross
+//	  ui16_temp = ADC1_GetConversionValue ();
+//	  if (ui16_temp > (512 + 6)) // 512 is the middle value --> zero crossing
+//	  {
+//	    ui8_position_correction_value--;
+//	  }
+//	  else if (ui16_temp < (512 - 6))
+//	  {
+//	    ui8_position_correction_value++;
+//	  }
+//	}
+//debug_pin_reset();
 
 	ui8_motor_rotor_absolute_position = ANGLE_300;
 	ui8_motor_rotor_absolute_position = (uint8_t) (ui8_motor_rotor_absolute_position + MOTOR_ROTOR_DELTA_PHASE_ANGLE_RIGHT);
@@ -172,6 +172,8 @@ void hall_sensors_read_and_action (void)
 // runs every 64us (PWM frequency)
 void motor_fast_loop (void)
 {
+//  uint16_t ui16_temp;
+
   // count number of fast loops / PWM cycles
   if (ui16_PWM_cycles_counter < PWM_CYCLES_COUNTER_MAX)
   {
@@ -194,6 +196,27 @@ void motor_fast_loop (void)
 
   if (motor_state == MOTOR_STATE_RUNNING)
   {
+//    if (ui16_PWM_cycles_counter == (ui16_PWM_cycles_counter_total - 1)) // can't read ADC if is busy
+    if (ui16_PWM_cycles_counter == 1) // can't read ADC if is busy
+    {
+      // at this time, phase B current sinusoid should be crossing zero
+      // see if is positive or negative: adjust the ui8_position_correction_value according to
+    debug_pin_set();
+//      // find the adc_current_phase_B zero cross
+//      ui16_temp = ADC1_GetConversionValue ();
+//      if (ui16_temp > (512)) // 512 is the middle value --> zero crossing
+//      {
+////	ui8_position_correction_value--;
+//	ui8_position_correction_value -= 6;
+//      }
+//      else if (ui16_temp < (512))
+//      {
+////	ui8_position_correction_value++;
+//	ui8_position_correction_value += 6;
+//      }
+    debug_pin_reset();
+    }
+
     // calculate the interpolation angle
     // interpolation seems a problem when motor starts, so don't do it at very low speed
     ui8_interpolation_angle = (uint8_t) ((ui16_PWM_cycles_counter << 8) / ui16_PWM_cycles_counter_total);

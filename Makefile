@@ -7,7 +7,8 @@
 .PHONY: all clean
 
 #Compiler
-CC = sdcc
+#CC = sdcc
+CC = /home/cas/software/stm8-binutils/bin/sdcc
 OBJCOPY = stm8-objcopy
 SIZE = stm8-size
 

@@ -83,7 +83,7 @@ int main (void)
   TIM1_SetCompare1(126 << 1);
   TIM1_SetCompare2(126 << 1);
   TIM1_SetCompare3(126 << 1);
-#elif (SVM_TABLE == SINE) || (SVM_TABLE == SINE_SVM)
+#elif (SVM_TABLE == SINE) || (SVM_TABLE == SINE_SVM_ORIGINAL)
   TIM1_SetCompare1(126 << 2);
   TIM1_SetCompare2(126 << 2);
   TIM1_SetCompare3(126 << 2);
@@ -111,7 +111,7 @@ int main (void)
 
 	ui16_temp_delay = TIM2_GetCounter ();
 //	if ((ui16_temp_delay - ui16_throttle_counter) > 25)
-	if ((ui16_temp_delay - ui16_throttle_counter) > 100)
+	if ((ui16_temp_delay - ui16_throttle_counter) > 50)
         {
 	  ui16_throttle_counter = ui16_temp_delay;
 
@@ -153,7 +153,7 @@ int main (void)
 
           getchar1 ();
 
-          printf("%d\n", ui8_position_correction_value);
+          printf("%d, %d\n", ui16_speed_inverse, ui8_position_correction_value);
         }
 
 
