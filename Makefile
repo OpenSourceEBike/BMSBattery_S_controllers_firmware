@@ -93,6 +93,7 @@ clean:
 	@rm -rf $(SDIR)/*.map
 	@rm -rf $(SDIR)/*.elf
 	@rm -rf $(SDIR)/*.bin
+	@rm -rf $(SDIR)/*.adb
 	@rm -rf *.asm
 	@rm -rf *.rel
 	@rm -rf *.lk
@@ -101,6 +102,7 @@ clean:
 	@rm -rf *.sym
 	@rm -rf *.cdb
 	@rm -rf *.map
+	@rm -rf *.adb
 	@rm -rf *.elf
 	@rm -rf main.bin
 	@rm -rf *.ihx
