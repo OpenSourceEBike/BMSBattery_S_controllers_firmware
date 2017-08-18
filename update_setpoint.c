@@ -22,10 +22,10 @@
 static uint16_t ui16_setpoint;
 static uint32_t ui32_SPEED_km_h;
 
-uint8_t update_setpoint (int16_t speed, int16_t PAS, int16_t sumtorque, int16_t setpoint_old)
+uint8_t update_setpoint (uint16_t speed, uint16_t PAS, uint16_t sumtorque, uint16_t setpoint_old)
 {
-  ui16_setpoint=fummelfaktor*sumtorque/PAS; 			//calculate setpoint
-  ui32_SPEED_km_h=wheel_circumference*36*15625/(10000*speed); 	//calculate speed in km/h conversion from sec to hour --> *3600, conversion from mm to km --> /1000000, tic frequency 15625 Hz
+  ui16_setpoint=(fummelfaktor*sumtorque)/PAS; 			//calculate setpoint
+  ui32_SPEED_km_h=(wheel_circumference*36*15625)/(10000*(uint32_t)speed);	//calculate speed in km/h conversion fr	om sec to hour --> *3600, conversion from mm to km --> /1000000, tic frequency 15625 Hz
   if (ui32_SPEED_km_h>limit){ui16_setpoint=setpoint_old-1;} 	//reduce old setpoint, if you are riding too fast
   if (ui16_PAS_Counter>timeout){ui16_setpoint=0;}		//stop motor if not pedaling for delay defined in "timeout"
 
