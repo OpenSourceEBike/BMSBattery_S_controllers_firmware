@@ -61,5 +61,10 @@ extern uint16_t ui16_log1;
 extern uint16_t ui16_log2;
 extern uint8_t ui8_log;
 extern uint8_t ui8_adc_read_throttle_busy;
+extern uint16_t ui16_SPEED_Counter; 	//Counter for bike speed
+extern uint16_t ui16_PAS_Counter;	//Counter for cadence
+extern uint8_t ui8_PAS_Flag;		//Flag for PAS Interrupt detected
+extern uint8_t ui8_SPEED_Flag;		//Flag for PAS Interrupt detected
+
 
 #endif

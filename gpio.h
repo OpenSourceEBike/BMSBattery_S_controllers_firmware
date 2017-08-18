@@ -37,6 +37,8 @@
  * PA4                | in  | ??  | brake
  * PB4  (ADC_AIN4)    | in  | ??  | throttle
  * PD0                | in  | ??  | PAS
+ * PC5                | in  | ??  | SPEED
+ *
  *
  */
 
@@ -94,6 +96,9 @@
 #define PAS__PIN                  GPIO_PIN_0
 #define PAS__PORT                 GPIOD
 
+#define SPEED__PIN                  GPIO_PIN_5
+#define SPEED__PORT                 GPIOC
+
 #define DEBUG__PIN                  GPIO_PIN_2
 #define DEBUG__PORT                 GPIOD
 
@@ -101,5 +106,7 @@ void gpio_init (void);
 void debug_pin_init (void);
 void debug_pin_set (void);
 void debug_pin_reset (void);
+void PAS_init (void);
+void SPEED_init (void);
 
 #endif /* GPIO_H_ */
