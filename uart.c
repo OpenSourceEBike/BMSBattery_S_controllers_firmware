@@ -79,9 +79,19 @@ char getchar1(void)
   }
 
   if (c == '1')
-	  {
-	    i16_position_correction_value++;
-	  }
+  {
+    i16_position_correction_value -= 5;
+  }
+
+  if (c == '2')
+  {
+    i16_position_correction_value += 5;
+  }
+
+  if (c == '3')
+  {
+    i16_position_correction_value++;
+  }
 
   return (c);
 }

@@ -67,7 +67,7 @@ void hall_sensors_read_and_action (void)
 
     if (motor_state != MOTOR_STATE_RUNNING) // needed to reset ui8_position_correction_value
     {
-      i16_position_correction_value = 720;
+//      i16_position_correction_value = 720;
     }
 
     switch (hall_sensors)
