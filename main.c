@@ -154,17 +154,17 @@ int main (void)
 //          printf("%d, %d\n", ui16_log1, ui16_log2);
 
           c++;
-          if (c < 700)
+          if (c < 231)
           {
             motor_fast_loop ();
           }
           else
           {
-            c = 0;
+            c = 1;
             hall_sensors_read_and_action ();
           }
 
-          printf("%d, %d\n", ui16_PWM_cycles_counter, ui8_motor_rotor_position);
+          printf("%d, %d\n", ui16_PWM_cycles_counter, ui8_interpolation_angle);
 
 //          getchar1 ();
 //

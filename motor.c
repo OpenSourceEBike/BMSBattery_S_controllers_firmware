@@ -238,8 +238,8 @@ void motor_fast_loop (void)
     // interpolation seems a problem when motor starts, so don't do it at very low speed
     ui8_interpolation_angle = (uint8_t) ((((uint32_t) ui16_PWM_cycles_counter) << 8) / ui16_PWM_cycles_counter_total);
 
-    ui32_temp = (((uint32_t) ui16_PWM_cycles_counter) << 8);
-    ui8_interpolation_angle = (uint8_t) (ui32_temp / ((uint32_t) ui16_PWM_cycles_counter_total));
+//    ui32_temp = (((uint32_t) ui16_PWM_cycles_counter) << 8);
+//    ui8_interpolation_angle = (uint8_t) (ui32_temp / ((uint32_t) ui16_PWM_cycles_counter_total));
 
     ui8_motor_rotor_position = (uint8_t) (ui8_motor_rotor_absolute_position + ui8_position_correction_value + ui8_interpolation_angle);
 
