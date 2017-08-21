@@ -15,13 +15,15 @@
 #include "stm8s_adc1.h"
 #include "stm8s_tim1.h"
 #include "motor.h"
+#include "cruise_control.h"
+#include "timers.h"
 
 int32_t i32_motor_speed_erps = 0; // motor speed in electronic rotations per second
 uint8_t ui8_flag_count_speed = 0;
 int32_t i32_PWM_cycles_counter = 0;
 int16_t i16_motor_rotor_position = 0; // in degrees
 int16_t i16_motor_rotor_absolute_position = 0; // in degrees
-int16_t i16_position_correction_value = 0; // in degrees
+int16_t i16_position_correction_value = 180; // in degrees
 int32_t i32_interpolation_angle_step = 0; // x1000
 int32_t i32_interpolation_sum = 0; // x1000
 int16_t i16_interpolation_angle = 0;
@@ -172,15 +174,15 @@ void hall_sensors_read_and_action (void)
   switch (hall_sensors)
   {
     case 3:
-      i16_motor_rotor_absolute_position = ANGLE_30;
+      i16_motor_rotor_absolute_position = ANGLE_120;
     break;
 
     case 1:
-      i16_motor_rotor_absolute_position = ANGLE_90;
+      i16_motor_rotor_absolute_position = ANGLE_180;
     break;
 
     case 5:
-      i16_motor_rotor_absolute_position = ANGLE_150;
+      i16_motor_rotor_absolute_position = ANGLE_240;
 
       // count speed only when motor did rotate half of 1 electronic rotation
       if (ui8_flag_count_speed)
@@ -193,15 +195,15 @@ void hall_sensors_read_and_action (void)
     break;
 
     case 4:
-      i16_motor_rotor_absolute_position = ANGLE_210;
+      i16_motor_rotor_absolute_position = ANGLE_300;
     break;
 
     case 6:
-      i16_motor_rotor_absolute_position = ANGLE_270;
+      i16_motor_rotor_absolute_position = ANGLE_1;
     break;
 
     case 2:
-      i16_motor_rotor_absolute_position = ANGLE_330;
+      i16_motor_rotor_absolute_position = ANGLE_60;
 
       ui8_flag_count_speed = 1;
     break;
@@ -440,6 +442,29 @@ char getchar(void)
   return (c);
 }
 
+char getchar1(void)
+{
+  uint8_t c = 0;
+
+  if (UART2_GetFlagStatus(UART2_FLAG_RXNE) == RESET)
+  {
+    return 255;
+  }
+
+  c = UART2_ReceiveData8();
+
+  if (c == '0')
+  {
+    i16_position_correction_value--;
+  }
+
+  if (c == '1')
+  {
+    i16_position_correction_value++;
+  }
+
+  return (c);
+}
 
 int main (void)
 {
@@ -450,6 +475,7 @@ int main (void)
   brake_init ();
   while (brake_is_set()) ; // hold here while brake is pressed -- this is a protection for development
   debug_pin_init ();
+  timer2_init ();
   uart_init ();
   hall_sensor_init ();
   pwm_init ();
@@ -464,47 +490,24 @@ int main (void)
   while (1)
   {
     static uint32_t ui32_value;
-    static uint16_t c;
     static uint16_t ui16_adc_value;
-    int8_t i8_buffer[64];
-    uint8_t ui8_value;
-    int objects_readed;
+    static uint16_t ui16_throttle_counter = 0;
+    uint16_t ui16_temp_delay = 0;
 
-    ui16_adc_value = adc_read_throttle ();
-    ui32_value = ui32_map ((uint32_t) ui16_adc_value, ADC_THROTTLE_MIN_VALUE, ADC_THROTTLE_MAX_VALUE, 0, 511);
-    i16_duty_cycle = (int16_t) ui32_value;
+    ui16_temp_delay = TIM2_GetCounter ();
+    if ((ui16_temp_delay - ui16_throttle_counter) > 50)
+    {
+      ui16_throttle_counter = ui16_temp_delay;
+      ui16_adc_value = adc_read_throttle ();
+      ui32_value = ui32_map ((uint32_t) ui16_adc_value, ADC_THROTTLE_MIN_VALUE, ADC_THROTTLE_MAX_VALUE, 0, 511);
 
-//    i16_duty_cycle = 255;
+      i16_duty_cycle = ((uint16_t) cruise_control ((uint8_t) ui32_value >> 1) << 1);
 
-//    printf("%d\n", i16_duty_cycle);
+//      i16_duty_cycle = (uint16_t) ui32_value;
 
-//    c++;
-//    if (c < 250)
-//    {
-//      motor_fast_loop ();
-//    }
-//    else
-//    {
-//      c = 0;
-//      hall_sensors_read_and_action ();
-//    }
-//    printf("%d, %d, %d, %d\n", i16_motor_rotor_position, (uint16_t) i32_value_a, (uint16_t) i32_value_b, (uint16_t) i32_value_c);
+      getchar1 ();
 
-//   fflush(stdin); // needed to unblock scanf() after a not expected formatted data
-//   objects_readed = scanf("%s %d", &i8_buffer, &ui8_value);
-//
-//   if (objects_readed > 0)
-//   {
-//     switch (i8_buffer[0])
-//     {
-//      case 'a':
-//	printf("a = %d\n", ui8_value);
-//	ui8_position_correction_value = ui8_value;
-//	break;
-//
-//      default:
-//	break;
-//     }
-//   }
+      printf("%d, %d\n", (uint16_t) i32_motor_speed_erps, i16_position_correction_value);
+    }
   }
 }
