@@ -20,7 +20,7 @@ uint16_t ui16_motor_speed_erps = 0;
 uint16_t ui16_speed_inverse = 0;
 uint8_t ui8_motor_rotor_position = 0; // in 360/256 degrees
 uint8_t ui8_motor_rotor_absolute_position = 0; // in 360/256 degrees
-uint8_t ui8_position_correction_value = 127; // in 360/256 degrees
+uint8_t ui8_position_correction_value = 0; // in 360/256 degrees
 uint16_t ui16_PWM_cycles_counter_total = 0;
 uint16_t ui16_PWM_cycles_counter_total_div_4 = 0;
 uint8_t ui8_interpolation_angle = 0;
@@ -67,7 +67,7 @@ void hall_sensors_read_and_action (void)
 
     if (motor_state != MOTOR_STATE_RUNNING) // needed to reset ui8_position_correction_value
     {
-      ui8_position_correction_value = 127;
+//      ui8_position_correction_value = 127;
     }
 
     switch (hall_sensors)
@@ -219,7 +219,7 @@ void motor_fast_loop (void)
 
     // calculate the interpolation angle
     // interpolation seems a problem when motor starts, so don't do it at very low speed
-    ui8_interpolation_angle = (uint8_t) ((ui16_PWM_cycles_counter << 8) / ui16_PWM_cycles_counter_total);
+    ui8_interpolation_angle = (uint8_t) ((((uint32_t) ui16_PWM_cycles_counter) << 8) / ui16_PWM_cycles_counter_total);
     ui8_motor_rotor_position = (uint8_t) (ui8_motor_rotor_absolute_position + ui8_position_correction_value + ui8_interpolation_angle);
 
     // Read phase B current only at max value of sinusoid
