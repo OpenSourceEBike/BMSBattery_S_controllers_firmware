@@ -828,7 +828,7 @@ void pwm_init (void)
 #endif
 
 
-//#define DISABLE_PWM_CHANNELS_1_3
+#define DISABLE_PWM_CHANNELS_1_3
 
   TIM1_OC1Init(TIM1_OCMODE_PWM1,
 #ifdef DISABLE_PWM_CHANNELS_1_3

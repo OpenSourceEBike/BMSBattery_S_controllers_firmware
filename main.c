@@ -101,7 +101,7 @@ int main (void)
       uint16_t ui16_temp_delay = 0;
 
       uint16_t ui16_temp = 0;
-      uint16_t ui32_temp = 0;
+//      uint32_t ui32_temp = 0;
   //    int8_t i8_buffer[64];
   //    uint8_t ui8_value;
   //    int objects_readed;
@@ -109,9 +109,11 @@ int main (void)
       static uint32_t ui32_LPF_temp = 0;
       static float f_temp = 0;
 
+      static uint16_t c;
+
 	ui16_temp_delay = TIM2_GetCounter ();
-//	if ((ui16_temp_delay - ui16_throttle_counter) > 25)
-	if ((ui16_temp_delay - ui16_throttle_counter) > 50)
+	if ((ui16_temp_delay - ui16_throttle_counter) > 2)
+//	if ((ui16_temp_delay - ui16_throttle_counter) > 50)
         {
 	  ui16_throttle_counter = ui16_temp_delay;
 
@@ -123,7 +125,7 @@ int main (void)
           ui8_adc_read_throttle_busy = 0;
           ui8_temp = (uint8_t) map (ui16_adc_value, ADC_THROTTLE_MIN_VALUE, ADC_THROTTLE_MAX_VALUE, 0, 237);
 
-#define DO_CRUISE_CONTROL 1
+//#define DO_CRUISE_CONTROL 1
 #if DO_CRUISE_CONTROL == 1
           ui8_temp = cruise_control (ui8_temp);
 #endif
@@ -151,10 +153,24 @@ int main (void)
 
 //          printf("%d, %d\n", ui16_log1, ui16_log2);
 
-          getchar1 ();
+          c++;
+          if (c < 700)
+          {
+            motor_fast_loop ();
+          }
+          else
+          {
+            c = 0;
+            hall_sensors_read_and_action ();
+          }
 
-          printf("%d, %d\n", ui16_speed_inverse, ui8_position_correction_value);
+          printf("%d, %d\n", ui16_PWM_cycles_counter, ui8_motor_rotor_position);
+
+//          getchar1 ();
+//
+//          printf("%d, %d\n", ui16_speed_inverse, ui8_position_correction_value);
         }
+
 
 
 
