@@ -142,9 +142,7 @@ void TIM1_UPD_OVF_TRG_BRK_IRQHandler(void) __interrupt(TIM1_UPD_OVF_TRG_BRK_IRQH
 {
   TIM1_ITConfig(TIM1_IT_UPDATE, DISABLE);
 
-  debug_pin_set ();
   motor_fast_loop ();
-  debug_pin_reset ();
 
   TIM1_ITConfig(TIM1_IT_UPDATE, ENABLE);
 
@@ -175,6 +173,7 @@ void hall_sensors_read_and_action (void)
   {
     case 3:
       i16_motor_rotor_absolute_position = ANGLE_120;
+      debug_pin_set ();
     break;
 
     case 1:
@@ -196,6 +195,7 @@ void hall_sensors_read_and_action (void)
 
     case 4:
       i16_motor_rotor_absolute_position = ANGLE_300;
+      debug_pin_reset ();
     break;
 
     case 6:
@@ -501,9 +501,9 @@ int main (void)
       ui16_adc_value = adc_read_throttle ();
       ui32_value = ui32_map ((uint32_t) ui16_adc_value, ADC_THROTTLE_MIN_VALUE, ADC_THROTTLE_MAX_VALUE, 0, 511);
 
-      i16_duty_cycle = ((uint16_t) cruise_control ((uint8_t) ui32_value >> 1) << 1);
+//      i16_duty_cycle = ((uint16_t) cruise_control ((uint8_t) ui32_value >> 1) << 1);
 
-//      i16_duty_cycle = (uint16_t) ui32_value;
+      i16_duty_cycle = (uint16_t) ui32_value;
 
       getchar1 ();
 
