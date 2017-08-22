@@ -47,9 +47,9 @@ uint16_t ui16_temp_delay = 0;
 
 uint8_t ui8_adc_read_throttle_busy = 0;
 uint16_t ui16_SPEED_Counter = 0; 	//time tics for speed measurement
-uint16_t ui16_SPEED = 0; 		//speed in timetics
+uint16_t ui16_SPEED = 32000; 		//speed in timetics
 uint16_t ui16_PAS_Counter = 0; 		//time tics for cadence measurement
-uint16_t ui16_PAS = 0; 			//cadence in timetics
+uint16_t ui16_PAS = 32000;		//cadence in timetics
 uint8_t ui8_PAS_Flag = 0; 		//flag for PAS interrupt
 uint8_t ui8_SPEED_Flag = 0; 		//flag for SPEED interrupt
 
@@ -117,7 +117,12 @@ int main (void)
 #endif
 
   hall_sensors_read_and_action (); // needed to start the motor
+printf("Back in Main.c\n");
 
+	  for(a = 0; a < 32;a++) {			// array init
+  	       ui16_torque[a]=0;
+  	       }
+printf("Torquearray initialized\n");
   while (1)
   {
 
@@ -135,9 +140,7 @@ int main (void)
       static uint32_t ui32_LPF_running_average = 0;
       static uint32_t ui32_LPF_temp = 0;
       static float f_temp = 0;
-      for(a = 0; a < 32;) {			// array init
-      	       ui16_torque[a]=0;
-      	       }
+
 
 //	Update speed after speed interrupt occurrence
 	if (ui8_SPEED_Flag == 1)
@@ -145,12 +148,14 @@ int main (void)
 	    ui16_SPEED=ui16_SPEED_Counter; 	//save recent speed
 	    ui16_SPEED_Counter=0;		//reset speed counter
 	    ui8_SPEED_Flag =0; 			//reset interrupt flag
+	    //printf("SPEEDtic\n");
 	}
 
 //	Update cadence and torque after PAS interrupt occurrence
 	if (ui8_PAS_Flag == 1)
         {
 	  ui16_PAS=ui16_PAS_Counter; 		//save recent cadence
+	  //printf("PAStic %d\n", ui16_PAS_Counter);
 	  ui16_PAS_Counter=0;			//reset PAS Counter
 
 	  ui8_PAS_Flag =0; 			//reset interrupt flag
@@ -171,20 +176,22 @@ int main (void)
 
 // scheduled update of setpoint and duty cycle (every 100ms)
 	ui16_temp_delay = TIM2_GetCounter ();
+
 	if ((ui16_temp_delay - ui16_throttle_counter) > 100)
         {
 	  ui16_throttle_counter = ui16_temp_delay;
+	  //printf("Timetic!");
 
-	  ui16_setpoint = (uint16_t) update_setpoint (ui16_SPEED,ui16_PAS,ui16_sum_torque,ui16_setpoint); //update setpoint
+	  ui16_setpoint = (uint16_t)update_setpoint (ui16_SPEED,ui16_PAS,ui16_sum_torque,ui16_setpoint); //update setpoint
 
-          ui8_temp = (uint8_t) map (ui16_setpoint, ADC_THROTTLE_MIN_VALUE, ADC_THROTTLE_MAX_VALUE, 0, 237); //map setpoints to limits
+          ui8_temp = (uint8_t) map (ui16_setpoint, ADC_THROTTLE_MIN_VALUE, ADC_THROTTLE_MAX_VALUE, 0, 237); //map setpoint to limits
 
-/*
-#define DO_CRUISE_CONTROL 1
+
+//#define DO_CRUISE_CONTROL 1
 #if DO_CRUISE_CONTROL == 1
           ui8_temp = cruise_control (ui8_temp);
 #endif
-*/
+
           pwm_set_duty_cycle (ui8_temp);
 	  /****************************************************************************/
 
@@ -209,9 +216,11 @@ int main (void)
 
 //          printf("%d, %d\n", ui16_log1, ui16_log2);
 
-          getchar1 ();
 
-          printf("%d\n", ui8_position_correction_value);
+          getchar1 ();
+          printf("Main: spd %d, pas %d, sumtor %d, setpoint %d\n", ui16_SPEED, ui16_PAS, ui16_sum_torque, ui16_setpoint);
+
+          //printf("%d\n", ui8_position_correction_value);
         }
 
 
