@@ -87,7 +87,6 @@ int main (void)
 //  static uint8_t ui8_cruise_duty_cycle = 0;
   static uint16_t ui16_setpoint;
   static uint8_t ui8_temp = 0;
-  static uint8_t ui8_follower = 0;
 
   //set clock at the max 16MHz
   CLK_HSIPrescalerConfig(CLK_PRESCALER_HSIDIV1);
@@ -127,7 +126,7 @@ printf("Torquearray initialized\n");
   while (1)
   {
 
-      //    static uint16_t c;
+  //    static uint16_t c;
       static uint32_t ui32_counter = 0;
 
  //     static uint16_t ui16_throttle_counter = 0;
@@ -176,7 +175,6 @@ printf("Torquearray initialized\n");
 
 
 // scheduled update of setpoint and duty cycle (every 100ms)
-
 	ui16_temp_delay = TIM2_GetCounter ();
 
 	if ((ui16_temp_delay - ui16_throttle_counter) > 100)
@@ -185,13 +183,7 @@ printf("Torquearray initialized\n");
 	  //printf("Timetic!");
 
 	  ui16_setpoint = (uint16_t)update_setpoint (ui16_SPEED,ui16_PAS,ui16_sum_torque,ui16_setpoint); //update setpoint
-/*
-//Read in throttle for debugging to test, if motor runs with additional interrupts from PAS and SPEEDk
-	  ui8_adc_read_throttle_busy = 1;
-	  ui16_setpoint = (uint16_t) adc_read_throttle (); //read in recent torque value
-	  ui8_adc_read_throttle_busy = 0;
 
-*/
           ui8_temp = (uint8_t) map (ui16_setpoint, ADC_THROTTLE_MIN_VALUE, ADC_THROTTLE_MAX_VALUE, 0, 237); //map setpoint to limits
 
 
@@ -199,13 +191,8 @@ printf("Torquearray initialized\n");
 #if DO_CRUISE_CONTROL == 1
           ui8_temp = cruise_control (ui8_temp);
 #endif
-          if (ui8_follower<ui8_temp){
-              ui8_follower++;
-          }
-          else if(ui8_follower>ui8_temp){
-              ui8_follower--;
-          }
-          pwm_set_duty_cycle (ui8_follower);
+
+          pwm_set_duty_cycle (ui8_temp);
 	  /****************************************************************************/
 
 //          // low pass filter using running average
@@ -233,10 +220,10 @@ printf("Torquearray initialized\n");
           getchar1 ();
           printf("Main: spd %d, pas %d, sumtor %d, setpoint %d\n", ui16_SPEED, ui16_PAS, ui16_sum_torque, ui16_setpoint);
 
-         printf("%d, %d\n", ui16_speed_inverse, ui8_position_correction_value);
+          //printf("%d\n", ui8_position_correction_value);
         }
 
-	//  printf("main loop running\n");
+
 
     //    ui8_duty_cycle = 80;
 
@@ -270,5 +257,4 @@ printf("Torquearray initialized\n");
     //     }
     //   }
   }
-
 }

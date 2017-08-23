@@ -10,7 +10,7 @@
 #define _update_setpoint_H
 #define limit 25 			// speed limit in km/h
 #define wheel_circumference 2000L 	// wheel circumference for calculation speed, "L" for assigning a "long" variable
-#define fummelfaktor 128L		//factor to bring setpoint in right range
+#define fummelfaktor 16L		//factor to bring setpoint in right range
 #define timeout 3125 			//time after that motor stops, if you are not pedaling
 
 #include "main.h"
