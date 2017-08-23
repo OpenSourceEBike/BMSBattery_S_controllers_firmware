@@ -964,6 +964,10 @@ void pwm_apply_duty_cycle (uint8_t ui8_duty_cycle_value)
   TIM1_SetCompare1((uint16_t) (ui8_value_a << 1));
   TIM1_SetCompare2((uint16_t) (ui8_value_c << 1));
   TIM1_SetCompare3((uint16_t) (ui8_value_b << 1));
+
+//  TIM1_SetCompare1((uint16_t) (ui8_value_b << 1));
+//  TIM1_SetCompare2((uint16_t) (ui8_value_a << 1));
+//  TIM1_SetCompare3((uint16_t) (ui8_value_c << 1));
 #elif (SVM_TABLE == SINE) || (SVM_TABLE == SINE_SVM_ORIGINAL)
   // scale and apply _duty_cycle
   ui8_value_a = ui8_svm_table[ui8_motor_rotor_position];

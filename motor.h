@@ -18,12 +18,13 @@
 
 // motor states
 #define MOTOR_STATE_COAST 0
-#define MOTOR_STATE_RUNNING_VERY_SLOW 1
+#define MOTOR_STATE_STARTUP 1
 #define MOTOR_STATE_RUNNING 2
 
 extern uint8_t ui8_motor_rotor_position;
 extern uint8_t ui8_position_correction_value;
 extern uint16_t ui16_speed_inverse;
+extern uint16_t ui16_PWM_cycles_counter_total;
 
 void hall_sensor_init (void);
 void hall_sensors_read_and_action (void);

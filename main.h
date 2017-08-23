@@ -36,16 +36,17 @@
 //#define MOTOR_ROTOR_DELTA_PHASE_ANGLE_RIGHT 246// 119 + 127// best value found (at max speed, minimum current and power supply voltage keeps the same)
 #define MOTOR_ROTOR_DELTA_PHASE_ANGLE_RIGHT 9// 119 + 127// best value found (at max speed, minimum current and power supply voltage keeps the same)
 #elif MOTOR_TYPE == MOTOR_TYPE_EUC2
-#define MOTOR_ROTOR_DELTA_PHASE_ANGLE_RIGHT 149 // best value found
+//#define MOTOR_ROTOR_DELTA_PHASE_ANGLE_RIGHT 190//190// best value found
+#define MOTOR_ROTOR_DELTA_PHASE_ANGLE_RIGHT 0//25//190// best value found
 #endif
 
-#define PWM_CYCLES_COUNTER_MAX 1875
+#define PWM_CYCLES_COUNTER_MAX 2500
 #define PWM_CYCLES_SECOND 15625 // 1 / 64us(PWM period)
 
 // 2 seconds to get up to max PWM duty cycle value of 255 (127 * 255 * 64us ~= 2 seconds)
 #define PWM_DUTY_CYCLE_CONTROLLER_COUNTER 127
 
-#define SPEED_INVERSE_INTERPOLATION 800 // experimental value; min speed aftwer which interpolation starts
+#define SPEED_INVERSE_INTERPOLATION 600 //1200 // experimental value; min speed aftwer which interpolation starts
 
 #define PWM_VALUE_DUTY_CYCLE_MAX (256 - 1)
 #define MIDDLE_PWM_VALUE_DUTY_CYCLE_MAX (PWM_VALUE_DUTY_CYCLE_MAX/2)

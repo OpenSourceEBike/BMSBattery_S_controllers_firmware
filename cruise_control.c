@@ -26,7 +26,7 @@ uint8_t cruise_control (uint8_t ui8_value)
       ui32_cruise_counter++;
       ui8_cruise_output = ui8_value;
 
-      if (ui32_cruise_counter > 25) // 100 time control: time to lock cruise control
+      if (ui32_cruise_counter > 100) // 100 time control: time to lock cruise control
       {
 	ui8_cruise_state = 1;
 	ui8_cruise_output = ui8_value;
