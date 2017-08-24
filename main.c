@@ -72,22 +72,14 @@ int main (void)
   debug_pin_init ();
   timer2_init ();
   uart_init ();
-  pwm_init ();
+  pwm_init_6_steps ();
+  motor_state = MOTOR_STATE_STARTUP;
   hall_sensor_init ();
   adc_init ();
 
 //  ITC_SetSoftwarePriority (ITC_IRQ_TIM1_OVF, ITC_PRIORITYLEVEL_2);
 
   enableInterrupts();
-#if (SVM_TABLE == SVM)
-  TIM1_SetCompare1(126 << 1);
-  TIM1_SetCompare2(126 << 1);
-  TIM1_SetCompare3(126 << 1);
-#elif (SVM_TABLE == SINE) || (SVM_TABLE == SINE_SVM_ORIGINAL)
-  TIM1_SetCompare1(126 << 2);
-  TIM1_SetCompare2(126 << 2);
-  TIM1_SetCompare3(126 << 2);
-#endif
 
   hall_sensors_read_and_action (); // needed to start the motor
 

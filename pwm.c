@@ -15,7 +15,6 @@
 #include "motor.h"
 #include "pwm.h"
 
-#if (SVM_TABLE == SVM)
 uint8_t ui8_svm_table [SVM_TABLE_LEN] =
 {
     127	,
@@ -275,527 +274,6 @@ uint8_t ui8_svm_table [SVM_TABLE_LEN] =
     116	,
     122
 };
-#elif (SVM_TABLE == SINE_SVM_ORIGINAL)
-uint8_t ui8_svm_table [SVM_TABLE_LEN] =
-{
-    0	,
-    8	,
-    17	,
-    25	,
-    33	,
-    41	,
-    49	,
-    58	,
-    66	,
-    74	,
-    82	,
-    90	,
-    98	,
-    106	,
-    114	,
-    122	,
-    130	,
-    137	,
-    145	,
-    153	,
-    161	,
-    168	,
-    176	,
-    183	,
-    191	,
-    198	,
-    205	,
-    213	,
-    220	,
-    223	,
-    225	,
-    227	,
-    229	,
-    232	,
-    233	,
-    235	,
-    237	,
-    239	,
-    240	,
-    242	,
-    243	,
-    245	,
-    246	,
-    247	,
-    248	,
-    249	,
-    250	,
-    251	,
-    252	,
-    253	,
-    253	,
-    254	,
-    254	,
-    255	,
-    255	,
-    255	,
-    255	,
-    255	,
-    255	,
-    255	,
-    255	,
-    254	,
-    254	,
-    253	,
-    253	,
-    252	,
-    251	,
-    250	,
-    249	,
-    248	,
-    247	,
-    246	,
-    244	,
-    243	,
-    242	,
-    240	,
-    238	,
-    237	,
-    235	,
-    233	,
-    231	,
-    229	,
-    227	,
-    224	,
-    222	,
-    222	,
-    224	,
-    227	,
-    229	,
-    231	,
-    233	,
-    235	,
-    237	,
-    238	,
-    240	,
-    241	,
-    243	,
-    244	,
-    246	,
-    247	,
-    248	,
-    249	,
-    250	,
-    251	,
-    252	,
-    253	,
-    253	,
-    254	,
-    254	,
-    255	,
-    255	,
-    255	,
-    255	,
-    255	,
-    255	,
-    255	,
-    255	,
-    254	,
-    254	,
-    253	,
-    253	,
-    252	,
-    251	,
-    250	,
-    249	,
-    248	,
-    247	,
-    246	,
-    245	,
-    243	,
-    242	,
-    240	,
-    239	,
-    237	,
-    235	,
-    233	,
-    232	,
-    230	,
-    227	,
-    225	,
-    223	,
-    220	,
-    213	,
-    205	,
-    198	,
-    191	,
-    183	,
-    176	,
-    168	,
-    161	,
-    153	,
-    145	,
-    138	,
-    130	,
-    122	,
-    114	,
-    106	,
-    98	,
-    90	,
-    82	,
-    74	,
-    66	,
-    58	,
-    50	,
-    41	,
-    33	,
-    25	,
-    17	,
-    9	,
-    0	,
-    0	,
-    0	,
-    0	,
-    0	,
-    0	,
-    0	,
-    0	,
-    0	,
-    0	,
-    0	,
-    0	,
-    0	,
-    0	,
-    0	,
-    0	,
-    0	,
-    0	,
-    0	,
-    0	,
-    0	,
-    0	,
-    0	,
-    0	,
-    0	,
-    0	,
-    0	,
-    0	,
-    0	,
-    0	,
-    0	,
-    0	,
-    0	,
-    0	,
-    0	,
-    0	,
-    0	,
-    0	,
-    0	,
-    0	,
-    0	,
-    0	,
-    0	,
-    0	,
-    0	,
-    0	,
-    0	,
-    0	,
-    0	,
-    0	,
-    0	,
-    0	,
-    0	,
-    0	,
-    0	,
-    0	,
-    0	,
-    0	,
-    0	,
-    0	,
-    0	,
-    0	,
-    0	,
-    0	,
-    0	,
-    0	,
-    0	,
-    0	,
-    0	,
-    0	,
-    0	,
-    0	,
-    0	,
-    0	,
-    0	,
-    0	,
-    0	,
-    0	,
-    0	,
-    0	,
-    0	,
-    0	,
-    0	,
-    0	,
-    0	,
-    0	,
-    0
-};
-#elif (SVM_TABLE == SINE)
-uint8_t ui8_svm_table [SVM_TABLE_LEN] =
-{
-    5	,
-    12	,
-    18	,
-    24	,
-    30	,
-    37	,
-    43	,
-    49	,
-    55	,
-    61	,
-    67	,
-    73	,
-    79	,
-    85	,
-    91	,
-    97	,
-    103	,
-    108	,
-    114	,
-    120	,
-    125	,
-    131	,
-    136	,
-    141	,
-    146	,
-    151	,
-    156	,
-    161	,
-    166	,
-    171	,
-    176	,
-    180	,
-    184	,
-    189	,
-    193	,
-    197	,
-    201	,
-    205	,
-    208	,
-    212	,
-    215	,
-    219	,
-    222	,
-    225	,
-    228	,
-    231	,
-    233	,
-    236	,
-    238	,
-    240	,
-    243	,
-    244	,
-    246	,
-    248	,
-    249	,
-    251	,
-    252	,
-    253	,
-    254	,
-    255	,
-    255	,
-    256	,
-    256	,
-    256	,
-    256	,
-    256	,
-    255	,
-    255	,
-    254	,
-    253	,
-    253	,
-    251	,
-    250	,
-    249	,
-    247	,
-    246	,
-    244	,
-    242	,
-    240	,
-    237	,
-    235	,
-    232	,
-    230	,
-    227	,
-    224	,
-    221	,
-    217	,
-    214	,
-    211	,
-    207	,
-    203	,
-    199	,
-    195	,
-    191	,
-    187	,
-    183	,
-    178	,
-    174	,
-    169	,
-    164	,
-    159	,
-    154	,
-    149	,
-    144	,
-    139	,
-    134	,
-    128	,
-    123	,
-    117	,
-    112	,
-    106	,
-    100	,
-    94	,
-    89	,
-    83	,
-    77	,
-    71	,
-    65	,
-    59	,
-    53	,
-    46	,
-    40	,
-    34	,
-    28	,
-    22	,
-    15	,
-    9	,
-    3	,
-    0	,
-    0	,
-    0	,
-    0	,
-    0	,
-    0	,
-    0	,
-    0	,
-    0	,
-    0	,
-    0	,
-    0	,
-    0	,
-    0	,
-    0	,
-    0	,
-    0	,
-    0	,
-    0	,
-    0	,
-    0	,
-    0	,
-    0	,
-    0	,
-    0	,
-    0	,
-    0	,
-    0	,
-    0	,
-    0	,
-    0	,
-    0	,
-    0	,
-    0	,
-    0	,
-    0	,
-    0	,
-    0	,
-    0	,
-    0	,
-    0	,
-    0	,
-    0	,
-    0	,
-    0	,
-    0	,
-    0	,
-    0	,
-    0	,
-    0	,
-    0	,
-    0	,
-    0	,
-    0	,
-    0	,
-    0	,
-    0	,
-    0	,
-    0	,
-    0	,
-    0	,
-    0	,
-    0	,
-    0	,
-    0	,
-    0	,
-    0	,
-    0	,
-    0	,
-    0	,
-    0	,
-    0	,
-    0	,
-    0	,
-    0	,
-    0	,
-    0	,
-    0	,
-    0	,
-    0	,
-    0	,
-    0	,
-    0	,
-    0	,
-    0	,
-    0	,
-    0	,
-    0	,
-    0	,
-    0	,
-    0	,
-    0	,
-    0	,
-    0	,
-    0	,
-    0	,
-    0	,
-    0	,
-    0	,
-    0	,
-    0	,
-    0	,
-    0	,
-    0	,
-    0	,
-    0	,
-    0	,
-    0	,
-    0	,
-    0	,
-    0	,
-    0	,
-    0	,
-    0	,
-    0	,
-    0	,
-    0	,
-    0	,
-    0	,
-    0	,
-    0	,
-    0	,
-    0	,
-    0	,
-    0	,
-    0	,
-    0	,
-    0
-};
-#endif
 
 uint8_t ui8_duty_cycle = 0;
 uint8_t ui8_duty_cycle_target = 0;
@@ -809,26 +287,19 @@ void pwm_set_duty_cycle (uint8_t value)
   ui8_duty_cycle_target = value;
 }
 
-void pwm_init (void)
+void pwm_init_bipolar_4q (void)
 {
 // TIM1 Peripheral Configuration
   TIM1_DeInit();
 
-#if (SVM_TABLE == SVM)
   TIM1_TimeBaseInit(0, // TIM1_Prescaler = 0
 		    TIM1_COUNTERMODE_CENTERALIGNED1,
 		    (512 - 1), // clock = 16MHz; counter period = 1024; PWM freq = 16MHz / 1024 = 15.625kHz;
 		    //(BUT PWM center aligned mode needs twice the frequency)
 		    1); // will fire the TIM1_IT_UPDATE at every PWM period cycle
-#elif (SVM_TABLE == SINE) || (SVM_TABLE == SINE_SVM_ORIGINAL)
-  TIM1_TimeBaseInit(0, // TIM1_Prescaler = 0
-		    TIM1_COUNTERMODE_UP,
-		    (1024 - 1), // clock = 16MHz; counter period = 1024; PWM freq = 16MHz / 1024 = 15.625kHz;
-		    0); // will fire the TIM1_IT_UPDATE at every PWM period
-#endif
 
 
-//#define DISABLE_PWM_CHANNELS_1_3
+#define DISABLE_PWM_CHANNELS_1_3
 
   TIM1_OC1Init(TIM1_OCMODE_PWM1,
 #ifdef DISABLE_PWM_CHANNELS_1_3
@@ -838,20 +309,20 @@ void pwm_init (void)
 	       TIM1_OUTPUTSTATE_ENABLE,
 	       TIM1_OUTPUTNSTATE_ENABLE,
 #endif
-	       0, // initial duty_cycle value
+	       255, // initial duty_cycle value
 	       TIM1_OCPOLARITY_HIGH,
 	       TIM1_OCNPOLARITY_LOW,
 	       TIM1_OCIDLESTATE_RESET,
 	       TIM1_OCNIDLESTATE_SET);
 
   TIM1_OC2Init(TIM1_OCMODE_PWM1,
-	       TIM1_OUTPUTSTATE_ENABLE,
-	       TIM1_OUTPUTNSTATE_ENABLE,
-	       0, // initial duty_cycle value
+	       TIM1_OUTPUTSTATE_DISABLE,
+	       TIM1_OUTPUTNSTATE_DISABLE,
+	       255, // initial duty_cycle value
 	       TIM1_OCPOLARITY_HIGH,
 	       TIM1_OCNPOLARITY_LOW,
-	       TIM1_OCIDLESTATE_RESET,
-	       TIM1_OCNIDLESTATE_SET);
+	       TIM1_OCIDLESTATE_SET,
+	       TIM1_OCIDLESTATE_SET);
 
   TIM1_OC3Init(TIM1_OCMODE_PWM1,
 #ifdef DISABLE_PWM_CHANNELS_1_3
@@ -861,7 +332,7 @@ void pwm_init (void)
 	       TIM1_OUTPUTSTATE_ENABLE,
 	       TIM1_OUTPUTNSTATE_ENABLE,
 #endif
-	       0, // initial duty_cycle value
+	       255, // initial duty_cycle value
 	       TIM1_OCPOLARITY_HIGH,
 	       TIM1_OCNPOLARITY_LOW,
 	       TIM1_OCIDLESTATE_RESET,
@@ -870,6 +341,58 @@ void pwm_init (void)
   TIM1_OC1PreloadConfig (ENABLE);
   TIM1_OC2PreloadConfig (ENABLE);
   TIM1_OC3PreloadConfig (ENABLE);
+
+  // break, dead time and lock configuration
+  TIM1_BDTRConfig(TIM1_OSSISTATE_ENABLE,
+		  TIM1_LOCKLEVEL_OFF,
+		  // hardware nees a dead time of 1us
+		  16, // DTG = 0; dead time in 62.5 ns steps; 1us/62.5ns = 16
+		  TIM1_BREAK_DISABLE,
+		  TIM1_BREAKPOLARITY_LOW,
+		  TIM1_AUTOMATICOUTPUT_DISABLE);
+
+  TIM1_ITConfig(TIM1_IT_UPDATE, ENABLE);
+
+  TIM1_Cmd(ENABLE); // TIM1 counter enable
+  TIM1_CtrlPWMOutputs(ENABLE); // main Output Enable
+}
+
+void pwm_init_6_steps (void)
+{
+// TIM1 Peripheral Configuration
+  TIM1_DeInit();
+
+  TIM1_TimeBaseInit(0, // TIM1_Prescaler = 0
+		     TIM1_COUNTERMODE_UP,
+		     (1024 - 1), // clock = 16MHz; counter period = 1024; PWM freq = 16MHz / 1024 = 15.625kHz
+		     0); // TIM1_RepetitionCounter = 0
+
+  TIM1_OC1Init(TIM1_OCMODE_PWM1,
+	       TIM1_OUTPUTSTATE_ENABLE,
+	       TIM1_OUTPUTNSTATE_DISABLE,
+	       0, // initial duty_cycle value
+	       TIM1_OCPOLARITY_HIGH,
+	       TIM1_OCNPOLARITY_LOW,
+	       TIM1_OCIDLESTATE_RESET,
+	       TIM1_OCNIDLESTATE_SET);
+
+  TIM1_OC2Init(TIM1_OCMODE_PWM1,
+	       TIM1_OUTPUTSTATE_ENABLE,
+	       TIM1_OUTPUTNSTATE_DISABLE,
+	       0, // initial duty_cycle value
+	       TIM1_OCPOLARITY_HIGH,
+	       TIM1_OCNPOLARITY_LOW,
+	       TIM1_OCIDLESTATE_RESET,
+	       TIM1_OCNIDLESTATE_SET);
+
+  TIM1_OC3Init(TIM1_OCMODE_PWM1,
+	       TIM1_OUTPUTSTATE_ENABLE,
+	       TIM1_OUTPUTNSTATE_DISABLE,
+	       0, // initial duty_cycle value
+	       TIM1_OCPOLARITY_HIGH,
+	       TIM1_OCNPOLARITY_LOW,
+	       TIM1_OCIDLESTATE_RESET,
+	       TIM1_OCNIDLESTATE_SET);
 
   // break, dead time and lock configuration
   TIM1_BDTRConfig(TIM1_OSSISTATE_ENABLE,
@@ -909,85 +432,250 @@ void pwm_duty_cycle_controller (void)
 
 void pwm_apply_duty_cycle (uint8_t ui8_duty_cycle_value)
 {
-#if (SVM_TABLE == SVM)
   static uint8_t ui8__duty_cycle;
   static uint8_t ui8_temp;
 
   ui8__duty_cycle = ui8_duty_cycle_value;
 
-  // scale and apply _duty_cycle
-  ui8_temp = ui8_svm_table[ui8_motor_rotor_position];
-  if (ui8_temp > MIDDLE_PWM_VALUE_DUTY_CYCLE_MAX)
+  if (motor_state == MOTOR_STATE_STARTUP)
   {
-    ui16_value = ((uint16_t) (ui8_temp - MIDDLE_PWM_VALUE_DUTY_CYCLE_MAX)) * ui8__duty_cycle;
-    ui8_temp = (uint8_t) (ui16_value >> 8);
-    ui8_value_a = MIDDLE_PWM_VALUE_DUTY_CYCLE_MAX + ui8_temp;
+    TIM1_SetCompare1((uint16_t) (ui8__duty_cycle << 2));
+    TIM1_SetCompare2((uint16_t) (ui8__duty_cycle << 2));
+    TIM1_SetCompare3((uint16_t) (ui8__duty_cycle << 2));
   }
-  else
+  else if (motor_state == MOTOR_STATE_RUNNING)
   {
-    ui16_value = ((uint16_t) (MIDDLE_PWM_VALUE_DUTY_CYCLE_MAX - ui8_temp)) * ui8__duty_cycle;
-    ui8_temp = (uint8_t) (ui16_value >> 8);
-    ui8_value_a = MIDDLE_PWM_VALUE_DUTY_CYCLE_MAX - ui8_temp;
+    // scale and apply _duty_cycle
+    ui8_temp = ui8_svm_table[ui8_motor_rotor_position];
+    if (ui8_temp > MIDDLE_PWM_VALUE_DUTY_CYCLE_MAX)
+    {
+      ui16_value = ((uint16_t) (ui8_temp - MIDDLE_PWM_VALUE_DUTY_CYCLE_MAX)) * ui8__duty_cycle;
+      ui8_temp = (uint8_t) (ui16_value >> 8);
+      ui8_value_a = MIDDLE_PWM_VALUE_DUTY_CYCLE_MAX + ui8_temp;
+    }
+    else
+    {
+      ui16_value = ((uint16_t) (MIDDLE_PWM_VALUE_DUTY_CYCLE_MAX - ui8_temp)) * ui8__duty_cycle;
+      ui8_temp = (uint8_t) (ui16_value >> 8);
+      ui8_value_a = MIDDLE_PWM_VALUE_DUTY_CYCLE_MAX - ui8_temp;
+    }
+
+    // add 120 degrees and limit
+    ui8_temp = ui8_svm_table[(uint8_t) (ui8_motor_rotor_position + 85 /* 120º */)];
+    if (ui8_temp > MIDDLE_PWM_VALUE_DUTY_CYCLE_MAX)
+    {
+      ui16_value = ((uint16_t) (ui8_temp - MIDDLE_PWM_VALUE_DUTY_CYCLE_MAX)) * ui8__duty_cycle;
+      ui8_temp = (uint8_t) (ui16_value >> 8);
+      ui8_value_b = MIDDLE_PWM_VALUE_DUTY_CYCLE_MAX + ui8_temp;
+    }
+    else
+    {
+      ui16_value = ((uint16_t) (MIDDLE_PWM_VALUE_DUTY_CYCLE_MAX - ui8_temp)) * ui8__duty_cycle;
+      ui8_temp = (uint8_t) (ui16_value >> 8);
+      ui8_value_b = MIDDLE_PWM_VALUE_DUTY_CYCLE_MAX - ui8_temp;
+    }
+
+    // subtract 120 degrees and limit
+    ui8_temp = ui8_svm_table[(uint8_t) (ui8_motor_rotor_position + 171 /* 240º */)];
+    if (ui8_temp > MIDDLE_PWM_VALUE_DUTY_CYCLE_MAX)
+    {
+      ui16_value = ((uint16_t) (ui8_temp - MIDDLE_PWM_VALUE_DUTY_CYCLE_MAX)) * ui8__duty_cycle;
+      ui8_temp = (uint8_t) (ui16_value >> 8);
+      ui8_value_c = MIDDLE_PWM_VALUE_DUTY_CYCLE_MAX + ui8_temp;
+    }
+    else
+    {
+      ui16_value = ((uint16_t) (MIDDLE_PWM_VALUE_DUTY_CYCLE_MAX - ui8_temp)) * ui8__duty_cycle;
+      ui8_temp = (uint8_t) (ui16_value >> 8);
+      ui8_value_c = MIDDLE_PWM_VALUE_DUTY_CYCLE_MAX - ui8_temp;
+    }
+
+    // set final duty_cycle value
+    TIM1_SetCompare1((uint16_t) (ui8_value_a << 1));
+    TIM1_SetCompare2((uint16_t) (ui8_value_c << 1));
+    TIM1_SetCompare3((uint16_t) (ui8_value_b << 1));
   }
-
-  // add 120 degrees and limit
-  ui8_temp = ui8_svm_table[(uint8_t) (ui8_motor_rotor_position + 85 /* 120º */)];
-  if (ui8_temp > MIDDLE_PWM_VALUE_DUTY_CYCLE_MAX)
-  {
-    ui16_value = ((uint16_t) (ui8_temp - MIDDLE_PWM_VALUE_DUTY_CYCLE_MAX)) * ui8__duty_cycle;
-    ui8_temp = (uint8_t) (ui16_value >> 8);
-    ui8_value_b = MIDDLE_PWM_VALUE_DUTY_CYCLE_MAX + ui8_temp;
-  }
-  else
-  {
-    ui16_value = ((uint16_t) (MIDDLE_PWM_VALUE_DUTY_CYCLE_MAX - ui8_temp)) * ui8__duty_cycle;
-    ui8_temp = (uint8_t) (ui16_value >> 8);
-    ui8_value_b = MIDDLE_PWM_VALUE_DUTY_CYCLE_MAX - ui8_temp;
-  }
-
-  // subtract 120 degrees and limit
-  ui8_temp = ui8_svm_table[(uint8_t) (ui8_motor_rotor_position + 171 /* 240º */)];
-  if (ui8_temp > MIDDLE_PWM_VALUE_DUTY_CYCLE_MAX)
-  {
-    ui16_value = ((uint16_t) (ui8_temp - MIDDLE_PWM_VALUE_DUTY_CYCLE_MAX)) * ui8__duty_cycle;
-    ui8_temp = (uint8_t) (ui16_value >> 8);
-    ui8_value_c = MIDDLE_PWM_VALUE_DUTY_CYCLE_MAX + ui8_temp;
-  }
-  else
-  {
-    ui16_value = ((uint16_t) (MIDDLE_PWM_VALUE_DUTY_CYCLE_MAX - ui8_temp)) * ui8__duty_cycle;
-    ui8_temp = (uint8_t) (ui16_value >> 8);
-    ui8_value_c = MIDDLE_PWM_VALUE_DUTY_CYCLE_MAX - ui8_temp;
-  }
-
-  // set final duty_cycle value
-  TIM1_SetCompare1((uint16_t) (ui8_value_a << 1));
-  TIM1_SetCompare2((uint16_t) (ui8_value_c << 1));
-  TIM1_SetCompare3((uint16_t) (ui8_value_b << 1));
-
-//  TIM1_SetCompare1((uint16_t) (ui8_value_b << 1));
-//  TIM1_SetCompare2((uint16_t) (ui8_value_a << 1));
-//  TIM1_SetCompare3((uint16_t) (ui8_value_c << 1));
-#elif (SVM_TABLE == SINE) || (SVM_TABLE == SINE_SVM_ORIGINAL)
-  // scale and apply _duty_cycle
-  ui8_value_a = ui8_svm_table[ui8_motor_rotor_position];
-  ui16_value = (uint16_t) (ui8_value_a * ui8_duty_cycle_value);
-  ui8_value_a = (uint8_t) (ui16_value >> 8);
-
-  // add 120 degrees and limit
-  ui8_value_b = ui8_svm_table[(uint8_t) (ui8_motor_rotor_position + 85 /* 120º */)];
-  ui16_value = (uint16_t) (ui8_value_b * ui8_duty_cycle_value);
-  ui8_value_b = (uint8_t) (ui16_value >> 8);
-
-  // subtract 120 degrees and limit
-  ui8_value_c = ui8_svm_table[(uint8_t) (ui8_motor_rotor_position + 171 /* 240º */)];
-  ui16_value = (uint16_t) (ui8_value_c * ui8_duty_cycle_value);
-  ui8_value_c = (uint8_t) (ui16_value >> 8);
-
-  // set final duty_cycle value
-  TIM1_SetCompare1((uint16_t) (ui8_value_a << 2));
-  TIM1_SetCompare2((uint16_t) (ui8_value_c << 2));
-  TIM1_SetCompare3((uint16_t) (ui8_value_b << 2));
-#endif
 }
 
+void pwm_phase_a_disable (uint8_t _duty_cycle_value)
+{
+  TIM1_OC3Init(TIM1_OCMODE_PWM1,
+	       TIM1_OUTPUTNSTATE_DISABLE,
+  	       TIM1_OUTPUTNSTATE_DISABLE,
+	       _duty_cycle_value,
+  	       TIM1_OCPOLARITY_HIGH,
+  	       TIM1_OCNPOLARITY_LOW,
+  	       TIM1_OCIDLESTATE_RESET,
+  	       TIM1_OCNIDLESTATE_SET);
+
+  // disable pin
+  GPIO_Init(PMW_PHASE_A_HIGH__PORT,
+	    PMW_PHASE_A_HIGH__PIN,
+	    GPIO_MODE_OUT_PP_LOW_FAST);
+
+  // disable pin
+  GPIO_Init(PMW_PHASE_A_LOW__PORT,
+	    PMW_PHASE_A_LOW__PIN,
+	    GPIO_MODE_OUT_PP_HIGH_FAST);
+}
+
+void pwm_phase_a_enable_pwm (uint8_t _duty_cycle_value)
+{
+  TIM1_OC3Init(TIM1_OCMODE_PWM1,
+	       TIM1_OUTPUTSTATE_ENABLE,
+	       TIM1_OUTPUTNSTATE_DISABLE,
+	       _duty_cycle_value,
+	       TIM1_OCPOLARITY_HIGH,
+	       TIM1_OCNPOLARITY_LOW,
+	       TIM1_OCIDLESTATE_RESET,
+	       TIM1_OCNIDLESTATE_SET);
+
+  // disable pin
+  GPIO_Init(PMW_PHASE_A_LOW__PORT,
+	    PMW_PHASE_A_LOW__PIN,
+	    GPIO_MODE_OUT_PP_HIGH_FAST);
+}
+
+void pwm_phase_a_enable_low (uint8_t _duty_cycle_value)
+{
+  TIM1_OC3Init(TIM1_OCMODE_PWM1,
+	       TIM1_OUTPUTNSTATE_DISABLE,
+  	       TIM1_OUTPUTNSTATE_DISABLE,
+	       _duty_cycle_value,
+	       TIM1_OCPOLARITY_HIGH,
+	       TIM1_OCNPOLARITY_LOW,
+	       TIM1_OCIDLESTATE_RESET,
+	       TIM1_OCNIDLESTATE_SET);
+
+  // disable pin
+  GPIO_Init(PMW_PHASE_A_HIGH__PORT,
+	    PMW_PHASE_A_HIGH__PIN,
+	    GPIO_MODE_OUT_PP_LOW_FAST);
+
+  // enable pin
+  GPIO_Init(PMW_PHASE_A_LOW__PORT,
+	    PMW_PHASE_A_LOW__PIN,
+	    GPIO_MODE_OUT_PP_LOW_FAST);
+}
+
+void pwm_phase_b_disable (uint8_t _duty_cycle_value)
+{
+  TIM1_OC2Init(TIM1_OCMODE_PWM1,
+	       TIM1_OUTPUTNSTATE_DISABLE,
+  	       TIM1_OUTPUTNSTATE_DISABLE,
+	       _duty_cycle_value,
+  	       TIM1_OCPOLARITY_HIGH,
+  	       TIM1_OCNPOLARITY_LOW,
+  	       TIM1_OCIDLESTATE_RESET,
+  	       TIM1_OCNIDLESTATE_SET);
+
+  // disable pin
+  GPIO_Init(PMW_PHASE_B_HIGH__PORT,
+	    PMW_PHASE_B_HIGH__PIN,
+	    GPIO_MODE_OUT_PP_LOW_FAST);
+
+  // disable pin
+  GPIO_Init(PMW_PHASE_B_LOW__PORT,
+	    PMW_PHASE_B_LOW__PIN,
+	    GPIO_MODE_OUT_PP_HIGH_FAST);
+}
+
+void pwm_phase_b_enable_pwm (uint8_t _duty_cycle_value)
+{
+  TIM1_OC2Init(TIM1_OCMODE_PWM1,
+	       TIM1_OUTPUTSTATE_ENABLE,
+	       TIM1_OUTPUTNSTATE_DISABLE,
+	       _duty_cycle_value,
+	       TIM1_OCPOLARITY_HIGH,
+	       TIM1_OCNPOLARITY_LOW,
+	       TIM1_OCIDLESTATE_RESET,
+	       TIM1_OCNIDLESTATE_SET);
+
+  // disable pin
+  GPIO_Init(PMW_PHASE_B_LOW__PORT,
+	    PMW_PHASE_B_LOW__PIN,
+	    GPIO_MODE_OUT_PP_HIGH_FAST);
+}
+
+void pwm_phase_b_enable_low (uint8_t _duty_cycle_value)
+{
+  TIM1_OC2Init(TIM1_OCMODE_PWM1,
+	       TIM1_OUTPUTNSTATE_DISABLE,
+  	       TIM1_OUTPUTNSTATE_DISABLE,
+	       _duty_cycle_value,
+	       TIM1_OCPOLARITY_HIGH,
+	       TIM1_OCNPOLARITY_LOW,
+	       TIM1_OCIDLESTATE_RESET,
+	       TIM1_OCNIDLESTATE_SET);
+
+  // disable pin
+  GPIO_Init(PMW_PHASE_B_HIGH__PORT,
+	    PMW_PHASE_B_HIGH__PIN,
+	    GPIO_MODE_OUT_PP_LOW_FAST);
+
+  // enable pin
+  GPIO_Init(PMW_PHASE_B_LOW__PORT,
+	    PMW_PHASE_B_LOW__PIN,
+	    GPIO_MODE_OUT_PP_LOW_FAST);
+}
+
+void pwm_phase_c_disable (uint8_t _duty_cycle_value)
+{
+  TIM1_OC1Init(TIM1_OCMODE_PWM1,
+	       TIM1_OUTPUTNSTATE_DISABLE,
+  	       TIM1_OUTPUTNSTATE_DISABLE,
+	       _duty_cycle_value,
+  	       TIM1_OCPOLARITY_HIGH,
+  	       TIM1_OCNPOLARITY_LOW,
+  	       TIM1_OCIDLESTATE_RESET,
+  	       TIM1_OCNIDLESTATE_SET);
+
+  // disable pin
+  GPIO_Init(PMW_PHASE_C_HIGH__PORT,
+	    PMW_PHASE_C_HIGH__PIN,
+	    GPIO_MODE_OUT_PP_LOW_FAST);
+
+  // disable pin
+  GPIO_Init(PMW_PHASE_C_LOW__PORT,
+	    PMW_PHASE_C_LOW__PIN,
+	    GPIO_MODE_OUT_PP_HIGH_FAST);
+}
+
+void pwm_phase_c_enable_pwm (uint8_t _duty_cycle_value)
+{
+  TIM1_OC1Init(TIM1_OCMODE_PWM1,
+	       TIM1_OUTPUTSTATE_ENABLE,
+	       TIM1_OUTPUTNSTATE_DISABLE,
+	       _duty_cycle_value,
+	       TIM1_OCPOLARITY_HIGH,
+	       TIM1_OCNPOLARITY_LOW,
+	       TIM1_OCIDLESTATE_RESET,
+	       TIM1_OCNIDLESTATE_SET);
+
+  // disable pin
+  GPIO_Init(PMW_PHASE_C_LOW__PORT,
+	    PMW_PHASE_C_LOW__PIN,
+	    GPIO_MODE_OUT_PP_HIGH_FAST);
+}
+
+void pwm_phase_c_enable_low (uint8_t _duty_cycle_value)
+{
+  TIM1_OC1Init(TIM1_OCMODE_PWM1,
+	       TIM1_OUTPUTNSTATE_DISABLE,
+  	       TIM1_OUTPUTNSTATE_DISABLE,
+	       _duty_cycle_value,
+	       TIM1_OCPOLARITY_HIGH,
+	       TIM1_OCNPOLARITY_LOW,
+	       TIM1_OCIDLESTATE_RESET,
+	       TIM1_OCNIDLESTATE_SET);
+
+  // disable pin
+  GPIO_Init(PMW_PHASE_C_HIGH__PORT,
+	    PMW_PHASE_C_HIGH__PIN,
+	    GPIO_MODE_OUT_PP_LOW_FAST);
+
+  // enable pin
+  GPIO_Init(PMW_PHASE_C_LOW__PORT,
+	    PMW_PHASE_C_LOW__PIN,
+	    GPIO_MODE_OUT_PP_LOW_FAST);
+}
