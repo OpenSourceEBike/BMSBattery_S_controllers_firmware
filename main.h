@@ -17,8 +17,10 @@
 #define SVM_TABLE_LEN 256
 #define SVM_TABLE_LEN_x1024 262144 //(256 * 1024)
 
-#define ADC_THROTTLE_MIN_VALUE 43//175
-#define ADC_THROTTLE_MAX_VALUE 182//730
+
+#define SETPOINT_MAX_VALUE 237		//maximum value for setpoint, taken from map function
+
+#define NUMBER_OF_PAS_MAGS 16 //16 for sensor from BMSBattery, 32 for Sempu-Sensor
 
 #define ADC_MOTOR_TOTAL_CURRENT_ZERO_AMPS 81 // 1.59V; 325 (10bits) = 81 (8bits)
 #define ADC_MOTOR_TOTAL_CURRENT_MAX 20 // 20 (8bits) ~ 2 Amps
@@ -39,7 +41,7 @@
 #endif
 
 #define PWM_CYCLES_COUNTER_MAX 625
-#define PWM_CYCLES_SECOND 15625 // 1 / 64us(PWM period)
+#define PWM_CYCLES_SECOND 15625L // 1 / 64us(PWM period)
 
 // 2 seconds to get up to max PWM duty cycle value of 255 (127 * 255 * 64us ~= 2 seconds)
 #define PWM_DUTY_CYCLE_CONTROLLER_COUNTER 127

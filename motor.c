@@ -14,6 +14,7 @@
 #include "gpio.h"
 #include "motor.h"
 #include "pwm.h"
+#include "config.h"
 
 uint16_t ui16_PWM_cycles_counter = 0;
 uint16_t ui16_motor_speed_erps = 0;

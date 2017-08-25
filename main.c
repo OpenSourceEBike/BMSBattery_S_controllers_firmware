@@ -25,6 +25,7 @@
 #include "PAS.h"
 #include "SPEED.h"
 #include "update_setpoint.h"
+#include "config.h"
 
 
 //uint16_t ui16_LPF_angle_adjust = 0;
@@ -33,11 +34,11 @@
 uint16_t ui16_log1 = 0;
 uint16_t ui16_log2 = 0;
 uint8_t ui8_log = 0;
-uint8_t ui8_i= 0; 		//counter for ... next loop
-uint16_t ui16_torque[32]; 	//array for torque values of one crank revolution
-uint16_t ui16_sum_torque = 0; 	//sum of array elements
-uint8_t ui8_torque_index=0 ; 	//counter for torque array
-uint8_t a = 0; 			//loop counter
+uint8_t ui8_i= 0; 				//counter for ... next loop
+uint16_t ui16_torque[NUMBER_OF_PAS_MAGS]; 	//array for torque values of one crank revolution
+uint16_t ui16_sum_torque = 0; 			//sum of array elements
+uint8_t ui8_torque_index=0 ; 			//counter for torque array
+uint8_t a = 0; 					//loop counter
 
 static uint16_t ui16_throttle_counter = 0;
 uint16_t ui16_temp_delay = 0;
@@ -85,9 +86,9 @@ int main (void)
 {
 //  static uint32_t ui32_cruise_counter = 0;
 //  static uint8_t ui8_cruise_duty_cycle = 0;
-  static uint16_t ui16_setpoint;
+  static uint16_t ui16_setpoint = ADC_THROTTLE_MIN_VALUE;
   static uint8_t ui8_temp = 0;
-  static uint8_t ui8_follower = 0;
+
 
   //set clock at the max 16MHz
   CLK_HSIPrescalerConfig(CLK_PRESCALER_HSIDIV1);
@@ -120,7 +121,7 @@ int main (void)
   hall_sensors_read_and_action (); // needed to start the motor
 printf("Back in Main.c\n");
 
-	  for(a = 0; a < 32;a++) {			// array init
+	  for(a = 0; a < NUMBER_OF_PAS_MAGS;a++) {			// array init
   	       ui16_torque[a]=0;
   	       }
 printf("Torquearray initialized\n");
@@ -162,15 +163,15 @@ printf("Torquearray initialized\n");
 	  ui8_PAS_Flag =0; 			//reset interrupt flag
 
 	  ui8_adc_read_throttle_busy = 1;
-	  ui16_torque[ui8_torque_index] = (uint16_t) adc_read_throttle (); //read in recent torque value
+	  ui8_temp = adc_read_throttle (); //read in recent torque value
 	  ui8_adc_read_throttle_busy = 0;
-
+	  ui16_torque[ui8_torque_index]= (uint8_t) map (ui8_temp , ADC_THROTTLE_MIN_VALUE, ADC_THROTTLE_MAX_VALUE, 0, SETPOINT_MAX_VALUE); //map throttle to limits
 	  ui16_sum_torque = 0;
-	  for(a = 0; a < 32; a++) {			// sum up array content
+	  for(a = 0; a < NUMBER_OF_PAS_MAGS; a++) {			// sum up array content
 	       ui16_sum_torque+= ui16_torque[a];
 	       }
 	  ui8_torque_index++;
-	  if (ui8_torque_index>31){ui8_torque_index=0;} //reset index counter
+	  if (ui8_torque_index>NUMBER_OF_PAS_MAGS-1){ui8_torque_index=0;} //reset index counter
 
         }
 
@@ -192,20 +193,15 @@ printf("Torquearray initialized\n");
 	  ui8_adc_read_throttle_busy = 0;
 
 */
-          ui8_temp = (uint8_t) map (ui16_setpoint, ADC_THROTTLE_MIN_VALUE, ADC_THROTTLE_MAX_VALUE, 0, 237); //map setpoint to limits
+
 
 
 //#define DO_CRUISE_CONTROL 1
 #if DO_CRUISE_CONTROL == 1
           ui8_temp = cruise_control (ui8_temp);
 #endif
-          if (ui8_follower<ui8_temp){
-              ui8_follower++;
-          }
-          else if(ui8_follower>ui8_temp){
-              ui8_follower--;
-          }
-          pwm_set_duty_cycle (ui8_follower);
+
+          pwm_set_duty_cycle ((uint8_t)ui16_setpoint);
 	  /****************************************************************************/
 
 //          // low pass filter using running average
@@ -231,7 +227,7 @@ printf("Torquearray initialized\n");
 
 
           getchar1 ();
-          printf("Main: spd %d, pas %d, sumtor %d, setpoint %d\n", ui16_SPEED, ui16_PAS, ui16_sum_torque, ui16_setpoint);
+         // printf("Main: spd %d, pas %d, sumtor %d, setpoint %d\n", ui16_SPEED, ui16_PAS, ui16_sum_torque, ui16_setpoint);
 
          printf("%d, %d\n", ui16_speed_inverse, ui8_position_correction_value);
         }
