@@ -442,8 +442,10 @@ void pwm_apply_duty_cycle (uint8_t ui8_duty_cycle_value)
     TIM1_SetCompare1((uint16_t) (ui8__duty_cycle << 2));
     TIM1_SetCompare2((uint16_t) (ui8__duty_cycle << 2));
     TIM1_SetCompare3((uint16_t) (ui8__duty_cycle << 2));
+
+    TIM1_CtrlPWMOutputs(ENABLE); // main Output Enable
   }
-  else if (motor_state == MOTOR_STATE_RUNNING)
+  if (motor_state == MOTOR_STATE_RUNNING)
   {
     // scale and apply _duty_cycle
     ui8_temp = ui8_svm_table[ui8_motor_rotor_position];
@@ -494,6 +496,8 @@ void pwm_apply_duty_cycle (uint8_t ui8_duty_cycle_value)
     TIM1_SetCompare1((uint16_t) (ui8_value_a << 1));
     TIM1_SetCompare2((uint16_t) (ui8_value_c << 1));
     TIM1_SetCompare3((uint16_t) (ui8_value_b << 1));
+
+    TIM1_CtrlPWMOutputs(ENABLE); // main Output Enable
   }
 }
 

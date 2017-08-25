@@ -106,12 +106,13 @@ void hall_sensors_read_and_action (void)
         motor_state = MOTOR_STATE_STARTUP;
         pwm_init_6_steps ();
       }
-//      if ((motor_state != MOTOR_STATE_RUNNING) &&
-//	  (ui16_PWM_cycles_counter_total <= SPEED_INVERSE_MOTOR_START_RUN))
-//      {
-//        motor_state = MOTOR_STATE_RUNNING;
-//        pwm_init_bipolar_4q ();
-//      }
+      if ((motor_state != MOTOR_STATE_RUNNING) &&
+	  (ui16_PWM_cycles_counter_total <= SPEED_INVERSE_MOTOR_START_RUN))
+      {
+        motor_state = MOTOR_STATE_RUNNING;
+        pwm_init_bipolar_4q ();
+        ui16_PWM_cycles_counter = 0;
+      }
 
       if (motor_state == MOTOR_STATE_STARTUP)
       {
@@ -119,7 +120,7 @@ void hall_sensors_read_and_action (void)
 	pwm_phase_b_disable (ui8_duty_cycle);
 	pwm_phase_c_enable_pwm (ui8_duty_cycle);
       }
-      else if (motor_state == MOTOR_STATE_RUNNING)
+      if (motor_state == MOTOR_STATE_RUNNING)
       {
 	ui8_motor_rotor_absolute_position = (uint8_t) (ANGLE_300 + MOTOR_ROTOR_DELTA_PHASE_ANGLE_RIGHT);
       }
@@ -168,6 +169,8 @@ void motor_fast_loop (void)
     ui8_interpolation_angle = 0;
     motor_state = MOTOR_STATE_STARTUP;
 //    pwm_init_6_steps ();
+    hall_sensors_last = 0;
+    hall_sensors_read_and_action ();
   }
 
 #define DO_INTERPOLATION 1 // may be usefull when debugging
@@ -180,7 +183,6 @@ void motor_fast_loop (void)
     ui8_interpolation_angle = (uint8_t) ((((uint32_t) ui16_PWM_cycles_counter) << 8) / ui16_PWM_cycles_counter_total);
     ui8_motor_rotor_position = (uint8_t) (ui8_motor_rotor_absolute_position + ui8_position_correction_value + ui8_interpolation_angle);
   }
-  else
 #endif
 
   pwm_duty_cycle_controller ();
