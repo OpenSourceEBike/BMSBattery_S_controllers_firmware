@@ -69,17 +69,19 @@ void hall_sensors_read_and_action (void)
       case 3:
       if (motor_state == MOTOR_STATE_STARTUP)
       {
-	pwm_phase_a_enable_pwm (ui8_duty_cycle);
+	//1
+	pwm_phase_a_enable_low (ui8_duty_cycle);
 	pwm_phase_b_disable (ui8_duty_cycle);
-	pwm_phase_c_enable_low (ui8_duty_cycle);
+	pwm_phase_c_enable_pwm (ui8_duty_cycle);
       }
       break;
 
       case 1:
       if (motor_state == MOTOR_STATE_STARTUP)
       {
-	pwm_phase_a_enable_pwm (ui8_duty_cycle);
-	pwm_phase_b_enable_low (ui8_duty_cycle);
+	//2
+	pwm_phase_a_enable_low (ui8_duty_cycle);
+	pwm_phase_b_enable_pwm (ui8_duty_cycle);
 	pwm_phase_c_disable (ui8_duty_cycle);
       }
       break;
@@ -87,9 +89,10 @@ void hall_sensors_read_and_action (void)
       case 5:
       if (motor_state == MOTOR_STATE_STARTUP)
       {
+	//3
 	pwm_phase_a_disable (ui8_duty_cycle);
-	pwm_phase_b_enable_low (ui8_duty_cycle);
-	pwm_phase_c_enable_pwm (ui8_duty_cycle);
+	pwm_phase_b_enable_pwm (ui8_duty_cycle);
+	pwm_phase_c_enable_low (ui8_duty_cycle);
       }
       break;
 
@@ -111,14 +114,14 @@ void hall_sensors_read_and_action (void)
       {
         motor_state = MOTOR_STATE_RUNNING;
         pwm_init_bipolar_4q ();
-        ui16_PWM_cycles_counter = 0;
       }
 
       if (motor_state == MOTOR_STATE_STARTUP)
       {
-	pwm_phase_a_enable_low (ui8_duty_cycle);
+	//4
+	pwm_phase_a_enable_pwm (ui8_duty_cycle);
 	pwm_phase_b_disable (ui8_duty_cycle);
-	pwm_phase_c_enable_pwm (ui8_duty_cycle);
+	pwm_phase_c_enable_low (ui8_duty_cycle);
       }
       if (motor_state == MOTOR_STATE_RUNNING)
       {
@@ -129,8 +132,9 @@ void hall_sensors_read_and_action (void)
       case 6:
       if (motor_state == MOTOR_STATE_STARTUP)
       {
-	pwm_phase_a_enable_low (ui8_duty_cycle);
-	pwm_phase_b_enable_pwm (ui8_duty_cycle);
+	//5
+	pwm_phase_a_enable_pwm (ui8_duty_cycle);
+	pwm_phase_b_enable_low (ui8_duty_cycle);
 	pwm_phase_c_disable (ui8_duty_cycle);
       }
       break;
@@ -138,9 +142,10 @@ void hall_sensors_read_and_action (void)
       case 2:
       if (motor_state == MOTOR_STATE_STARTUP)
       {
+	//6
 	pwm_phase_a_disable (ui8_duty_cycle);
-	pwm_phase_b_enable_pwm (ui8_duty_cycle);
-	pwm_phase_c_enable_low (ui8_duty_cycle);
+	pwm_phase_b_enable_low (ui8_duty_cycle);
+	pwm_phase_c_enable_pwm (ui8_duty_cycle);
       }
       break;
 

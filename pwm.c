@@ -290,7 +290,9 @@ void pwm_set_duty_cycle (uint8_t value)
 void pwm_init_bipolar_4q (void)
 {
 // TIM1 Peripheral Configuration
-  TIM1_DeInit();
+//  TIM1_DeInit();
+
+//  TIM1_CtrlPWMOutputs(ENABLE); // main Output Enable
 
   TIM1_TimeBaseInit(0, // TIM1_Prescaler = 0
 		    TIM1_COUNTERMODE_CENTERALIGNED1,
@@ -299,7 +301,7 @@ void pwm_init_bipolar_4q (void)
 		    1); // will fire the TIM1_IT_UPDATE at every PWM period cycle
 
 
-#define DISABLE_PWM_CHANNELS_1_3
+//#define DISABLE_PWM_CHANNELS_1_3
 
   TIM1_OC1Init(TIM1_OCMODE_PWM1,
 #ifdef DISABLE_PWM_CHANNELS_1_3
@@ -354,7 +356,7 @@ void pwm_init_bipolar_4q (void)
   TIM1_ITConfig(TIM1_IT_UPDATE, ENABLE);
 
   TIM1_Cmd(ENABLE); // TIM1 counter enable
-  TIM1_CtrlPWMOutputs(ENABLE); // main Output Enable
+//  TIM1_CtrlPWMOutputs(ENABLE); // main Output Enable
 }
 
 void pwm_init_6_steps (void)
