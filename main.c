@@ -73,7 +73,7 @@ int main (void)
   timer2_init ();
   uart_init ();
   pwm_init_6_steps ();
-  motor_state = MOTOR_STATE_STARTUP;
+  ui8_motor_state = MOTOR_STATE_STARTUP;
   hall_sensor_init ();
   adc_init ();
 
@@ -92,14 +92,32 @@ int main (void)
       static uint16_t ui16_throttle_counter = 0;
       uint16_t ui16_temp_delay = 0;
 
-      uint16_t ui16_temp = 0;
-      uint16_t ui32_temp = 0;
+      static uint16_t ui16_temp = 0;
+      static uint16_t ui32_temp = 0;
   //    int8_t i8_buffer[64];
   //    uint8_t ui8_value;
   //    int objects_readed;
       static uint32_t ui32_LPF_running_average = 0;
       static uint32_t ui32_LPF_temp = 0;
       static float f_temp = 0;
+
+
+      if (ui16_log_counter > (LOG_COUNTER_MAX - 2))
+      {
+	ui16_temp = 0;
+	ui16_log_counter = 0;
+
+	while (ui16_temp < (LOG_COUNTER_MAX - 1))
+	{
+//	  printf("%d,", ui16_log_time[ui16_temp]);
+	  printf("%d,", ui8_log_motor_state[ui16_temp]);
+	  printf("%d,", ui16_log_PWM_cycles_counter[ui16_temp]);
+	  printf("%d,", ui16_log_PWM_cycles_counter_total[ui16_temp]);
+	  printf("%d\n", ui8_log_motor_rotor_position[ui16_temp]);
+	  ui16_temp++;
+	}
+      }
+
 
 	ui16_temp_delay = TIM2_GetCounter ();
 //	if ((ui16_temp_delay - ui16_throttle_counter) > 25)
@@ -145,7 +163,7 @@ int main (void)
 
           getchar1 ();
 
-          printf("%d, %d\n", ui16_PWM_cycles_counter_total, ui8_position_correction_value);
+//          printf("%d, %d\n", ui16_PWM_cycles_counter_total, ui8_position_correction_value);
         }
 
 

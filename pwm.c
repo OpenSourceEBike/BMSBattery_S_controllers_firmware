@@ -289,10 +289,10 @@ void pwm_set_duty_cycle (uint8_t value)
 
 void pwm_init_bipolar_4q (void)
 {
-// TIM1 Peripheral Configuration
-//  TIM1_DeInit();
+  TIM1_CtrlPWMOutputs(DISABLE);
 
-//  TIM1_CtrlPWMOutputs(ENABLE); // main Output Enable
+// TIM1 Peripheral Configuration
+  TIM1_DeInit();
 
   TIM1_TimeBaseInit(0, // TIM1_Prescaler = 0
 		    TIM1_COUNTERMODE_CENTERALIGNED1,
@@ -439,7 +439,7 @@ void pwm_apply_duty_cycle (uint8_t ui8_duty_cycle_value)
 
   ui8__duty_cycle = ui8_duty_cycle_value;
 
-  if (motor_state == MOTOR_STATE_STARTUP)
+  if (ui8_motor_state == MOTOR_STATE_STARTUP)
   {
     TIM1_SetCompare1((uint16_t) (ui8__duty_cycle << 2));
     TIM1_SetCompare2((uint16_t) (ui8__duty_cycle << 2));
@@ -447,7 +447,7 @@ void pwm_apply_duty_cycle (uint8_t ui8_duty_cycle_value)
 
     TIM1_CtrlPWMOutputs(ENABLE); // main Output Enable
   }
-  if (motor_state == MOTOR_STATE_RUNNING)
+  if (ui8_motor_state == MOTOR_STATE_RUNNING)
   {
     // scale and apply _duty_cycle
     ui8_temp = ui8_svm_table[ui8_motor_rotor_position];
