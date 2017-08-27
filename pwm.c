@@ -888,7 +888,7 @@ void pwm_init (void)
 
 void pwm_duty_cycle_controller (void)
 {
-  // limit PWM increase/decrease rate
+  // limit PWM increase/decrease rate --- comment from stancecoke: this part does just nothing? ui8_counter is never increased?!
   static uint8_t ui8_counter;
   if (ui8_counter++ > PWM_DUTY_CYCLE_CONTROLLER_COUNTER)
   {

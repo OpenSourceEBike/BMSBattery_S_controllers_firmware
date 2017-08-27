@@ -153,6 +153,8 @@ printf("Torquearray initialized\n");
 	    //printf("SPEEDtic\n");
 	}
 
+
+#ifdef TORQUESENSOR
 //	Update cadence and torque after PAS interrupt occurrence
 	if (ui8_PAS_Flag == 1)
         {
@@ -175,7 +177,13 @@ printf("Torquearray initialized\n");
 
         }
 
+#else // just read in throttle value
+	ui8_adc_read_throttle_busy = 1;
+	ui8_temp= adc_read_throttle (); //read in recent torque value
+	ui16_sum_torque = (uint8_t) map (ui8_temp , ADC_THROTTLE_MIN_VALUE, ADC_THROTTLE_MAX_VALUE, 0, SETPOINT_MAX_VALUE); //map throttle to limits
+	ui8_adc_read_throttle_busy = 0;
 
+#endif
 // scheduled update of setpoint and duty cycle (every 100ms)
 
 	ui16_temp_delay = TIM2_GetCounter ();
@@ -228,7 +236,7 @@ printf("Torquearray initialized\n");
 
           getchar1 ();
          // printf("Main: spd %d, pas %d, sumtor %d, setpoint %d\n", ui16_SPEED, ui16_PAS, ui16_sum_torque, ui16_setpoint);
-
+         if(ui16_speed_inverse != 0xffff) { ui8_position_correction_value = 135-(ui16_speed_inverse/19);}
          printf("%d, %d\n", ui16_speed_inverse, ui8_position_correction_value);
         }
 
