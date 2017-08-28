@@ -102,21 +102,21 @@ int main (void)
       static float f_temp = 0;
 
 
-      if (ui16_log_counter > (LOG_COUNTER_MAX - 2))
-      {
-	ui16_temp = 0;
-	ui16_log_counter = 0;
-
-	while (ui16_temp < (LOG_COUNTER_MAX - 1))
-	{
-//	  printf("%d,", ui16_log_time[ui16_temp]);
-	  printf("%d,", ui8_log_motor_state[ui16_temp]);
-	  printf("%d,", ui16_log_PWM_cycles_counter[ui16_temp]);
-	  printf("%d,", ui16_log_PWM_cycles_counter_total[ui16_temp]);
-	  printf("%d\n", ui8_log_motor_rotor_position[ui16_temp]);
-	  ui16_temp++;
-	}
-      }
+//      if (ui16_log_counter > (LOG_COUNTER_MAX - 2))
+//      {
+//	ui16_temp = 0;
+//	ui16_log_counter = 0;
+//
+//	while (ui16_temp < (LOG_COUNTER_MAX - 1))
+//	{
+////	  printf("%d,", ui16_log_time[ui16_temp]);
+//	  printf("%d,", ui8_log_motor_state[ui16_temp]);
+//	  printf("%d,", ui16_log_PWM_cycles_counter[ui16_temp]);
+//	  printf("%d,", ui16_log_PWM_cycles_counter_total[ui16_temp]);
+//	  printf("%d\n", ui8_log_motor_rotor_position[ui16_temp]);
+//	  ui16_temp++;
+//	}
+//      }
 
 
 	ui16_temp_delay = TIM2_GetCounter ();
@@ -164,8 +164,10 @@ int main (void)
           getchar1 ();
 
 //          printf("%d, %d\n", ui16_PWM_cycles_counter_total, ui8_position_correction_value);
-        }
 
+
+        }
+//	  printf("%d, %d, %d\n", ui8_motor_state, ui8_duty_cycle_target, ui16_motor_speed_erps);
 
 
     //    ui8_duty_cycle = 80;

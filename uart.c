@@ -12,6 +12,7 @@
 #include "stm8s.h"
 #include "stm8s_uart2.h"
 #include "motor.h"
+#include "pwm.h"
 
 void uart_init (void)
 {
@@ -65,6 +66,7 @@ int getchar(void)
 char getchar1(void)
 {
   uint8_t c = 0;
+  static uint8_t ui8_temp = 0;
 
   if (UART2_GetFlagStatus(UART2_FLAG_RXNE) == RESET)
   {
@@ -75,13 +77,35 @@ char getchar1(void)
 
   if (c == '0')
   {
-    ui8_position_correction_value--;
+      ui8_startup = 1;
   }
 
   if (c == '1')
-	  {
-	    ui8_position_correction_value++;
-	  }
+  {
+      ui8_run = 1;
+  }
+
+  if (c == '2')
+  {
+    ui8_temp--;
+    pwm_set_duty_cycle (ui8_temp);
+  }
+
+  if (c == '3')
+  {
+    ui8_temp++;
+    pwm_set_duty_cycle (ui8_temp);
+  }
+
+  if (c == '4')
+  {
+    pwm_set_duty_cycle (38);
+  }
+
+  if (c == '5')
+  {
+    pwm_set_duty_cycle (47);
+  }
 
   return (c);
 }

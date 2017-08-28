@@ -449,6 +449,9 @@ void pwm_apply_duty_cycle (uint8_t ui8_duty_cycle_value)
   }
   if (ui8_motor_state == MOTOR_STATE_RUNNING)
   {
+//    ui8__duty_cycle = ui8__duty_cycle * 1.15;
+
+
     // scale and apply _duty_cycle
     ui8_temp = ui8_svm_table[ui8_motor_rotor_position];
     if (ui8_temp > MIDDLE_PWM_VALUE_DUTY_CYCLE_MAX)

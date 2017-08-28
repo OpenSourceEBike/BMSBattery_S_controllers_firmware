@@ -41,6 +41,11 @@ uint16_t ui16_adc_current_phase_B_filtered = 0;
 uint8_t ui8_motor_state;
 //uint8_t ui8_motor_state = MOTOR_STATE_RUNNING;
 
+uint8_t ui8_startup_counter = 0;
+
+uint8_t ui8_startup = 0;
+uint8_t ui8_run = 0;
+
 int8_t hall_sensors;
 int8_t hall_sensors_last = 0;
 
@@ -111,20 +116,46 @@ void hall_sensors_read_and_action (void)
       ui16_PWM_cycles_counter_total_div_4 = ui16_PWM_cycles_counter_total >> 2;
       ui16_PWM_cycles_counter = 0;
 
+      ui16_motor_speed_erps = PWM_CYCLES_SECOND / ui16_PWM_cycles_counter_total; // this division takes ~4.2us
+
+//      // update MOTOR_STATE_RUNNING based on motor speed
+//      if ((ui8_motor_state != MOTOR_STATE_STARTUP) &&
+//	  (ui16_PWM_cycles_counter_total > SPEED_INVERSE_MOTOR_START_RUN))
+//      {
+//        ui8_motor_state = MOTOR_STATE_STARTUP;
+//        pwm_init_6_steps ();
+//
+//        ui8_startup_counter = 0;
+//      }
+//      else if ((ui8_motor_state != MOTOR_STATE_RUNNING) &&
+//	  (ui8_startup_counter > 16))
+//      {
+//debug_pin_set ();
+//        ui8_motor_state = MOTOR_STATE_RUNNING;
+//        pwm_init_bipolar_4q ();
+//debug_pin_reset ();
+//      }
+
+
       // update MOTOR_STATE_RUNNING based on motor speed
-      if ((ui8_motor_state != MOTOR_STATE_STARTUP) &&
-	  (ui16_PWM_cycles_counter_total > SPEED_INVERSE_MOTOR_START_RUN))
+      if (ui8_startup == 1)
       {
+	ui8_startup = 0;
         ui8_motor_state = MOTOR_STATE_STARTUP;
         pwm_init_6_steps ();
+
+        ui8_startup_counter = 0;
       }
-      if ((ui8_motor_state != MOTOR_STATE_RUNNING) &&
-	  (ui16_PWM_cycles_counter_total <= SPEED_INVERSE_MOTOR_START_RUN))
+      if (ui8_run == 1)
       {
+	ui8_run = 0;
+debug_pin_set ();
         ui8_motor_state = MOTOR_STATE_RUNNING;
         pwm_init_bipolar_4q ();
-        ui16_PWM_cycles_counter_total = ui16_PWM_cycles_counter_total >> 2;
+debug_pin_reset ();
       }
+
+      ui8_startup_counter++;
 
       if (ui8_motor_state == MOTOR_STATE_STARTUP)
       {
@@ -180,12 +211,21 @@ void motor_fast_loop (void)
     ui16_PWM_cycles_counter_total = 0xffff; //(SVM_TABLE_LEN_x1024) / PWM_CYCLES_COUNTER_MAX;
     ui16_speed_inverse = 0xffff;
 
-    // next code is need for motor startup correctly
-    ui8_interpolation_angle = 0;
-    ui8_motor_state = MOTOR_STATE_STARTUP;
-//    pwm_init_6_steps ();
-    hall_sensors_last = 0;
-    hall_sensors_read_and_action ();
+    if (ui8_startup == 1)
+    {
+      ui8_interpolation_angle = 0;
+      ui8_motor_state = MOTOR_STATE_STARTUP;
+  //    pwm_init_6_steps ();
+      hall_sensors_last = 0;
+      hall_sensors_read_and_action ();
+    }
+
+//    // next code is need for motor startup correctly
+//    ui8_interpolation_angle = 0;
+//    ui8_motor_state = MOTOR_STATE_STARTUP;
+////    pwm_init_6_steps ();
+//    hall_sensors_last = 0;
+//    hall_sensors_read_and_action ();
   }
 
 #define DO_INTERPOLATION 1 // may be usefull when debugging
