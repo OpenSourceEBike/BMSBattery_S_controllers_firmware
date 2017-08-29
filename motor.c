@@ -88,6 +88,11 @@ void hall_sensors_read_and_action (void)
 	pwm_phase_b_disable (ui8_duty_cycle);
 	pwm_phase_c_enable_pwm (ui8_duty_cycle);
       }
+      else
+      {
+	ui8_motor_rotor_absolute_position = (uint8_t) (ANGLE_120 + MOTOR_ROTOR_DELTA_PHASE_ANGLE_RIGHT);
+	ui8_motor_rotor_position = ui8_motor_rotor_absolute_position;
+      }
       break;
 
       case 1:
@@ -98,6 +103,11 @@ void hall_sensors_read_and_action (void)
 	pwm_phase_b_enable_pwm (ui8_duty_cycle);
 	pwm_phase_c_disable (ui8_duty_cycle);
       }
+      else
+      {
+	ui8_motor_rotor_absolute_position = (uint8_t) (ANGLE_180 + MOTOR_ROTOR_DELTA_PHASE_ANGLE_RIGHT);
+	ui8_motor_rotor_position = ui8_motor_rotor_absolute_position;
+      }
       break;
 
       case 5:
@@ -107,6 +117,11 @@ void hall_sensors_read_and_action (void)
 	pwm_phase_a_disable (ui8_duty_cycle);
 	pwm_phase_b_enable_pwm (ui8_duty_cycle);
 	pwm_phase_c_enable_low (ui8_duty_cycle);
+      }
+      else
+      {
+	ui8_motor_rotor_absolute_position = (uint8_t) (ANGLE_240 + MOTOR_ROTOR_DELTA_PHASE_ANGLE_RIGHT);
+	ui8_motor_rotor_position = ui8_motor_rotor_absolute_position;
       }
       break;
 
@@ -164,9 +179,10 @@ debug_pin_reset ();
 	pwm_phase_b_disable (ui8_duty_cycle);
 	pwm_phase_c_enable_low (ui8_duty_cycle);
       }
-      if (ui8_motor_state == MOTOR_STATE_RUNNING)
+      else
       {
 	ui8_motor_rotor_absolute_position = (uint8_t) (ANGLE_300 + MOTOR_ROTOR_DELTA_PHASE_ANGLE_RIGHT);
+	ui8_motor_rotor_position = ui8_motor_rotor_absolute_position;
       }
       break;
 
@@ -178,6 +194,11 @@ debug_pin_reset ();
 	pwm_phase_b_enable_low (ui8_duty_cycle);
 	pwm_phase_c_disable (ui8_duty_cycle);
       }
+      else
+      {
+	ui8_motor_rotor_absolute_position = (uint8_t) (ANGLE_1 + MOTOR_ROTOR_DELTA_PHASE_ANGLE_RIGHT);
+	ui8_motor_rotor_position = ui8_motor_rotor_absolute_position;
+      }
       break;
 
       case 2:
@@ -187,6 +208,11 @@ debug_pin_reset ();
 	pwm_phase_a_disable (ui8_duty_cycle);
 	pwm_phase_b_enable_low (ui8_duty_cycle);
 	pwm_phase_c_enable_pwm (ui8_duty_cycle);
+      }
+      else
+      {
+	ui8_motor_rotor_absolute_position = (uint8_t) (ANGLE_60 + MOTOR_ROTOR_DELTA_PHASE_ANGLE_RIGHT);
+	ui8_motor_rotor_position = ui8_motor_rotor_absolute_position;
       }
       break;
 
@@ -228,7 +254,7 @@ void motor_fast_loop (void)
 //    hall_sensors_read_and_action ();
   }
 
-#define DO_INTERPOLATION 1 // may be usefull when debugging
+//#define DO_INTERPOLATION 1 // may be usefull when debugging
 #if DO_INTERPOLATION == 1
 
   if (ui8_motor_state == MOTOR_STATE_RUNNING)
