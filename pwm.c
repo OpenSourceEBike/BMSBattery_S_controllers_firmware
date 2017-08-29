@@ -449,7 +449,7 @@ void pwm_apply_duty_cycle (uint8_t ui8_duty_cycle_value)
   }
   if (ui8_motor_state == MOTOR_STATE_RUNNING)
   {
-//    ui8__duty_cycle = (uint8_t) (((float) ui8__duty_cycle) * 1.5);
+    ui8__duty_cycle = (uint8_t) (((float) ui8__duty_cycle) * 1.5);
 
 
     // scale and apply _duty_cycle

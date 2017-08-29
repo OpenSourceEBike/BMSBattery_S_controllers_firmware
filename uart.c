@@ -87,14 +87,12 @@ char getchar1(void)
 
   if (c == '2')
   {
-    ui8_temp--;
-    pwm_set_duty_cycle (ui8_temp);
+      ui8_interpolation = 1;
   }
 
   if (c == '3')
   {
-    ui8_temp++;
-    pwm_set_duty_cycle (ui8_temp);
+      ui8_interpolation = 0;
   }
 
   if (c == '4')

@@ -39,6 +39,7 @@ extern uint8_t ui8_log_motor_rotor_position[LOG_COUNTER_MAX];
 
 extern uint8_t ui8_startup;
 extern uint8_t ui8_run;
+extern uint8_t ui8_interpolation;
 
 
 void hall_sensor_init (void);

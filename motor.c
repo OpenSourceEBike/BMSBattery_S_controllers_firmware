@@ -45,6 +45,7 @@ uint8_t ui8_startup_counter = 0;
 
 uint8_t ui8_startup = 0;
 uint8_t ui8_run = 0;
+uint8_t ui8_interpolation = 0;
 
 int8_t hall_sensors;
 int8_t hall_sensors_last = 0;
@@ -254,10 +255,11 @@ void motor_fast_loop (void)
 //    hall_sensors_read_and_action ();
   }
 
-//#define DO_INTERPOLATION 1 // may be usefull when debugging
+#define DO_INTERPOLATION 1 // may be usefull when debugging
 #if DO_INTERPOLATION == 1
 
-  if (ui8_motor_state == MOTOR_STATE_RUNNING)
+//  if (ui8_motor_state == MOTOR_STATE_RUNNING)
+  if (ui8_interpolation == 1)
   {
     // calculate the interpolation angle
     // interpolation seems a problem when motor starts, so don't do it at very low speed
