@@ -206,7 +206,7 @@ printf("Torquearray initialized\n");
 
 //#define DO_CRUISE_CONTROL 1
 #if DO_CRUISE_CONTROL == 1
-          ui8_temp = cruise_control (ui8_temp);
+	  ui16_setpoint = cruise_control (ui16_setpoint);
 #endif
 
           pwm_set_duty_cycle ((uint8_t)ui16_setpoint);
@@ -236,7 +236,8 @@ printf("Torquearray initialized\n");
 
           getchar1 ();
          // printf("Main: spd %d, pas %d, sumtor %d, setpoint %d\n", ui16_SPEED, ui16_PAS, ui16_sum_torque, ui16_setpoint);
-         if(ui16_speed_inverse != 0xffff) { ui8_position_correction_value = 135-(ui16_speed_inverse/19);}
+         if(ui16_speed_inverse < 60 ) { ui8_position_correction_value = 152-((ui16_speed_inverse*44)/100);}
+         else {ui8_position_correction_value=127;}
          printf("%d, %d\n", ui16_speed_inverse, ui8_position_correction_value);
         }
 

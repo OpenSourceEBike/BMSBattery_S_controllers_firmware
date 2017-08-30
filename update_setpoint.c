@@ -25,16 +25,22 @@
 static uint32_t ui32_setpoint;
 static uint32_t ui32_SPEED_km_h;
 static int16_t i16_delta;
+int8_t uint_PWM_Enable=0;
 
 uint16_t update_setpoint (uint16_t speed, uint16_t PAS, uint16_t sumtorque, uint16_t setpoint_old)
 {
 
   if(ui8_BatteryVoltage<BATTERY_VOLTAGE_MIN_VALUE){
       ui32_setpoint=0; 	// highest priority: Stop motor for undervoltage protection
+      TIM1_CtrlPWMOutputs(DISABLE);
+            uint_PWM_Enable=0;
+            ui32_setpoint=0; 	// highest priority: Stop motor for undervoltage protection
       printf("Neu Low voltage! %d\n",ui8_BatteryVoltage);
 
 #ifndef THROTTLE
   }else if (ui16_PAS_Counter>timeout){
+      TIM1_CtrlPWMOutputs(DISABLE);
+            uint_PWM_Enable=0;
       ui32_setpoint=0;			// next priority: Stop motor if not pedaling
       printf("you are not pedaling!");
 #endif
@@ -59,6 +65,17 @@ uint16_t update_setpoint (uint16_t speed, uint16_t PAS, uint16_t sumtorque, uint
 #endif
 
 #ifdef THROTTLE
+  if (sumtorque>10 && setpoint_old-10>sumtorque){
+      TIM1_CtrlPWMOutputs(DISABLE);
+      uint_PWM_Enable=0;
+      printf("Floating!");
+  }
+  else if (!uint_PWM_Enable && sumtorque>setpoint_old){
+      TIM1_CtrlPWMOutputs(ENABLE);
+      uint_PWM_Enable=1;
+      printf("PWM enabled!");
+  }
+
   ui32_setpoint=sumtorque;
 #endif
 
