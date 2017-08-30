@@ -184,7 +184,7 @@ void motor_fast_loop (void)
   }
   else
   {
-    ui16_PWM_cycles_counter = 0;
+    ui16_PWM_cycles_counter = 0xffff;
     ui16_PWM_cycles_counter_total = 0xffff; //(SVM_TABLE_LEN_x1024) / PWM_CYCLES_COUNTER_MAX;
     ui16_speed_inverse = 0xffff;
 
@@ -220,9 +220,13 @@ void motor_fast_loop (void)
     debug_pin_reset();
     }
 
-    // calculate the interpolation angle
-    // interpolation seems a problem when motor starts, so don't do it at very low speed
-    ui8_interpolation_angle = (uint8_t) ((ui16_PWM_cycles_counter << 8) / ui16_PWM_cycles_counter_total);
+    // calculate the interpolation angle, to avoid overflow use 127 steps at low speed
+
+    if(ui16_PWM_cycles_counter_total>255){
+	ui8_interpolation_angle = (uint8_t) ((ui16_PWM_cycles_counter << 7) / (ui16_PWM_cycles_counter_total>>1));}
+    else {
+	ui8_interpolation_angle = (uint8_t) ((ui16_PWM_cycles_counter << 8) / (ui16_PWM_cycles_counter_total));}
+
     ui8_motor_rotor_position = (uint8_t) (ui8_motor_rotor_absolute_position + ui8_position_correction_value + ui8_interpolation_angle);
 
     // Read phase B current only at max value of sinusoid

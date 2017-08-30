@@ -35,12 +35,12 @@
 
 #if MOTOR_TYPE == MOTOR_TYPE_Q85
 //#define MOTOR_ROTOR_DELTA_PHASE_ANGLE_RIGHT 77// best value found (at max speed, minimum current and power supply voltage keeps the same)
-#define MOTOR_ROTOR_DELTA_PHASE_ANGLE_RIGHT 27// value for ui8_position_correction_value = 0 initially @ shenyi middrive motor
+#define MOTOR_ROTOR_DELTA_PHASE_ANGLE_RIGHT 4// value for ui8_position_correction_value = 0 initially @ shenyi middrive motor
 #elif MOTOR_TYPE == MOTOR_TYPE_EUC2
 #define MOTOR_ROTOR_DELTA_PHASE_ANGLE_RIGHT 92 // best value found
 #endif
 
-#define PWM_CYCLES_COUNTER_MAX 625
+#define PWM_CYCLES_COUNTER_MAX 625 // bei höheren Werten wird angenommen, der Motor steht.
 #define PWM_CYCLES_SECOND 15625L // 1 / 64us(PWM period)
 
 // 2 seconds to get up to max PWM duty cycle value of 255 (127 * 255 * 64us ~= 2 seconds)
@@ -55,7 +55,7 @@
 #define ANGLE_60 42
 #define ANGLE_120 85
 #define ANGLE_180 127
-#define ANGLE_240 167
+#define ANGLE_240 170
 #define ANGLE_300 212
 #define ANGLE_360 255
 
