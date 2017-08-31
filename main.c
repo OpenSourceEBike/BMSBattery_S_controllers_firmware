@@ -69,6 +69,10 @@ int main (void);
 //Calling a function from interrupt not always works, SDCC manual says to avoid it. Maybe the best is to put
 //all the code inside the interrupt
 
+// Local VS global variables
+// Sometimes I got the following error when compiling the firmware: motor.asm:750: Error: <r> relocation error
+// and the solution was to avoid using local variables and define them as global instead
+
 // Brake signal interrupt
 void EXTI_PORTA_IRQHandler(void) __interrupt(EXTI_PORTA_IRQHANDLER);
 // Speed signal interrupt
@@ -121,78 +125,67 @@ int main (void)
   hall_sensors_read_and_action (); // needed to start the motor
 printf("Back in Main.c\n");
 
-	  for(a = 0; a < NUMBER_OF_PAS_MAGS;a++) {			// array init
-  	       ui16_torque[a]=0;
-  	       }
+  for(a = 0; a < NUMBER_OF_PAS_MAGS;a++) {// array init
+   ui16_torque[a]=0;
+  }
 printf("Torquearray initialized\n");
   while (1)
   {
+    static uint32_t ui32_counter = 0;
+    uint16_t ui16_temp = 0;
+    uint16_t ui32_temp = 0;
+    static float f_temp = 0;
 
-      //    static uint16_t c;
-      static uint32_t ui32_counter = 0;
-
- //     static uint16_t ui16_throttle_counter = 0;
- //     uint16_t ui16_temp_delay = 0;
-
-      uint16_t ui16_temp = 0;
-      uint16_t ui32_temp = 0;
-  //    int8_t i8_buffer[64];
-  //    uint8_t ui8_value;
-  //    int objects_readed;
-      static uint32_t ui32_LPF_running_average = 0;
-      static uint32_t ui32_LPF_temp = 0;
-      static float f_temp = 0;
-
-
-//	Update speed after speed interrupt occurrence
-	if (ui8_SPEED_Flag == 1)
-        {
-	    ui16_SPEED=ui16_SPEED_Counter; 	//save recent speed
-	    ui16_SPEED_Counter=0;		//reset speed counter
-	    ui8_SPEED_Flag =0; 			//reset interrupt flag
-	    //printf("SPEEDtic\n");
-	}
+    // Update speed after speed interrupt occurrence
+    if (ui8_SPEED_Flag == 1)
+    {
+	ui16_SPEED=ui16_SPEED_Counter; 	//save recent speed
+	ui16_SPEED_Counter=0;		//reset speed counter
+	ui8_SPEED_Flag =0; 			//reset interrupt flag
+	//printf("SPEEDtic\n");
+    }
 
 
 #ifdef TORQUESENSOR
-//	Update cadence and torque after PAS interrupt occurrence
-	if (ui8_PAS_Flag == 1)
-        {
-	  ui16_PAS=ui16_PAS_Counter; 		//save recent cadence
-	  //printf("PAStic %d\n", ui16_PAS_Counter);
-	  ui16_PAS_Counter=0;			//reset PAS Counter
+    //	Update cadence and torque after PAS interrupt occurrence
+    if (ui8_PAS_Flag == 1)
+    {
+      ui16_PAS=ui16_PAS_Counter; 		//save recent cadence
+      //printf("PAStic %d\n", ui16_PAS_Counter);
+      ui16_PAS_Counter=0;			//reset PAS Counter
 
-	  ui8_PAS_Flag =0; 			//reset interrupt flag
+      ui8_PAS_Flag =0; 			//reset interrupt flag
 
-	  ui8_adc_read_throttle_busy = 1;
-	  ui8_temp = adc_read_throttle (); //read in recent torque value
-	  ui8_adc_read_throttle_busy = 0;
-	  ui16_torque[ui8_torque_index]= (uint8_t) map (ui8_temp , ADC_THROTTLE_MIN_VALUE, ADC_THROTTLE_MAX_VALUE, 0, SETPOINT_MAX_VALUE); //map throttle to limits
-	  ui16_sum_torque = 0;
-	  for(a = 0; a < NUMBER_OF_PAS_MAGS; a++) {			// sum up array content
-	       ui16_sum_torque+= ui16_torque[a];
-	       }
-	  ui8_torque_index++;
-	  if (ui8_torque_index>NUMBER_OF_PAS_MAGS-1){ui8_torque_index=0;} //reset index counter
+      ui8_adc_read_throttle_busy = 1;
+      ui8_temp = adc_read_throttle (); //read in recent torque value
+      ui8_adc_read_throttle_busy = 0;
+      ui16_torque[ui8_torque_index]= (uint8_t) map (ui8_temp , ADC_THROTTLE_MIN_VALUE, ADC_THROTTLE_MAX_VALUE, 0, SETPOINT_MAX_VALUE); //map throttle to limits
+      ui16_sum_torque = 0;
+      for(a = 0; a < NUMBER_OF_PAS_MAGS; a++) {			// sum up array content
+	   ui16_sum_torque+= ui16_torque[a];
+	   }
+      ui8_torque_index++;
+      if (ui8_torque_index>NUMBER_OF_PAS_MAGS-1){ui8_torque_index=0;} //reset index counter
 
-        }
+    }
 
 #else // just read in throttle value
-	ui8_adc_read_throttle_busy = 1;
-	ui8_temp= adc_read_throttle (); //read in recent torque value
-	ui16_sum_torque = (uint8_t) map (ui8_temp , ADC_THROTTLE_MIN_VALUE, ADC_THROTTLE_MAX_VALUE, 0, SETPOINT_MAX_VALUE); //map throttle to limits
-	ui8_adc_read_throttle_busy = 0;
+    ui8_adc_read_throttle_busy = 1;
+    ui8_temp= adc_read_throttle (); //read in recent torque value
+    ui16_sum_torque = (uint8_t) map (ui8_temp , ADC_THROTTLE_MIN_VALUE, ADC_THROTTLE_MAX_VALUE, 0, SETPOINT_MAX_VALUE); //map throttle to limits
+    ui8_adc_read_throttle_busy = 0;
 
 #endif
 // scheduled update of setpoint and duty cycle (every 100ms)
+    ui16_temp_delay = TIM2_GetCounter ();
 
-	ui16_temp_delay = TIM2_GetCounter ();
+    if ((ui16_temp_delay - ui16_throttle_counter) > 100)
+    {
+      ui16_throttle_counter = ui16_temp_delay;
+      //printf("Timetic!");
 
-	if ((ui16_temp_delay - ui16_throttle_counter) > 100)
-        {
-	  ui16_throttle_counter = ui16_temp_delay;
-	  //printf("Timetic!");
-
+//#define DO_CRUISE_CONTROL 1
+#if DO_CRUISE_CONTROL == 1
 	  ui16_setpoint = (uint16_t)update_setpoint (ui16_SPEED,ui16_PAS,ui16_sum_torque,ui16_setpoint); //update setpoint
 /*
 //Read in throttle for debugging to test, if motor runs with additional interrupts from PAS and SPEEDk
@@ -201,79 +194,22 @@ printf("Torquearray initialized\n");
 	  ui8_adc_read_throttle_busy = 0;
 
 */
-
-
-
-//#define DO_CRUISE_CONTROL 1
-#if DO_CRUISE_CONTROL == 1
 	  ui16_setpoint = cruise_control (ui16_setpoint);
 #endif
 
-          pwm_set_duty_cycle ((uint8_t)ui16_setpoint);
-	  /****************************************************************************/
+#ifdef TORQUESENSOR
+	pwm_set_duty_cycle ((uint8_t)ui16_setpoint);
+#else if THROTTLE
+	pwm_set_duty_cycle ((uint8_t)ui16_sum_torque);
+#endif
 
-//          // low pass filter using running average
-//          ui32_temp = ui32_LPF_running_average >> 2; // ui32_LPF_running_average / 8
-//          ui32_LPF_running_average -= ui32_temp; // ui32_LPF_running_average is now reduced to 7/8 of the original ui32_LPF_running_average
-//          ui32_LPF_running_average += (uint32_t) (ui16_adc_current_phase_B >> 2); //add 1/8 a to get the new average
-//
-//          disableInterrupts();
-//          ui32_LPF_running_average = (uint32_t) ui16_adc_current_phase_B;
-//          enableInterrupts();
-//
-//          printf("%d\n", (uint16_t) ui16_debug);
-//
-//          ui32_LPF_temp = 512 - ui32_LPF_running_average;
-//          ui32_LPF_temp = ui32_LPF_temp * ADC_PHASE_B_CURRENT_STEP;
-//          printf("%d\n", (uint16_t) ui32_LPF_temp);
-//
-//          printf("%d\n", ui16_PWM_cycles_counter_value_temp);
+      getchar1 ();
 
+      // printf("Main: spd %d, pas %d, sumtor %d, setpoint %d\n", ui16_SPEED, ui16_PAS, ui16_sum_torque, ui16_setpoint);
+      if(ui16_speed_inverse < 60 ) { ui8_position_correction_value = 152-((ui16_speed_inverse*44)/100);}
+      else {ui8_position_correction_value=127;}
 
-
-//          printf("%d, %d\n", ui16_log1, ui16_log2);
-
-
-          getchar1 ();
-         // printf("Main: spd %d, pas %d, sumtor %d, setpoint %d\n", ui16_SPEED, ui16_PAS, ui16_sum_torque, ui16_setpoint);
-         if(ui16_speed_inverse < 60 ) { ui8_position_correction_value = 152-((ui16_speed_inverse*44)/100);}
-         else {ui8_position_correction_value=127;}
-         printf("%d, %d\n", ui16_speed_inverse, ui8_position_correction_value);
-        }
-
-	//  printf("main loop running\n");
-
-    //    ui8_duty_cycle = 80;
-
-    //    apply_duty_cycle (ui8_duty_cycle);
-
-    //    c++;
-    //    if (c < 43)
-    //    {
-    //      motor_fast_loop ();
-    //    }
-    //    else
-    //    {
-    //      c = 0;
-    //      hall_sensors_read_and_action ();
-    //    }
-
-    //   fflush(stdin); // needed to unblock scanf() after a not expected formatted data
-    //   objects_readed = scanf("%s %d", &i8_buffer, &ui8_value);
-    //
-    //   if (objects_readed > 0)
-    //   {
-    //     switch (i8_buffer[0])
-    //     {
-    //      case 'a':
-    //	printf("a = %d\n", ui8_value);
-    //	ui8_position_correction_value = ui8_value;
-    //	break;
-    //
-    //      default:
-    //	break;
-    //     }
-    //   }
+      printf("%d, %d\n", ui16_speed_inverse, ui8_position_correction_value);
+    }
   }
-
 }
