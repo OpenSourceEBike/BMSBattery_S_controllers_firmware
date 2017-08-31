@@ -197,10 +197,10 @@ printf("Torquearray initialized\n");
 	  ui16_setpoint = cruise_control (ui16_setpoint);
 #endif
 
-#ifdef TORQUESENSOR
-	pwm_set_duty_cycle ((uint8_t)ui16_setpoint);
+#if TORQUESENSOR
+      pwm_set_duty_cycle ((uint8_t)ui16_setpoint);
 #else if THROTTLE
-	pwm_set_duty_cycle ((uint8_t)ui16_sum_torque);
+      pwm_set_duty_cycle ((uint8_t)ui16_sum_torque);
 #endif
 
       getchar1 ();
@@ -209,7 +209,8 @@ printf("Torquearray initialized\n");
       if(ui16_speed_inverse < 60 ) { ui8_position_correction_value = 152-((ui16_speed_inverse*44)/100);}
       else {ui8_position_correction_value=127;}
 
-      printf("%d, %d\n", ui16_speed_inverse, ui8_position_correction_value);
+//      printf("%d, %d\n", ui16_speed_inverse, ui8_position_correction_value);
+      printf("%d, %d\n", ui8_motor_state, ui16_PWM_cycles_counter_total);
     }
   }
 }
