@@ -176,6 +176,16 @@ printf("Torquearray initialized\n");
     ui8_adc_read_throttle_busy = 0;
 
 #endif
+
+//    if (ui16_speed_inverse < 60 )
+//    {
+//      ui8_position_correction_value = 152-((ui16_speed_inverse*44)/100);
+//    }
+//    else
+//    {
+//      ui8_position_correction_value=127;
+//    }
+
 // scheduled update of setpoint and duty cycle (every 100ms)
     ui16_temp_delay = TIM2_GetCounter ();
 
@@ -186,7 +196,7 @@ printf("Torquearray initialized\n");
 
 //#define DO_CRUISE_CONTROL 1
 #if DO_CRUISE_CONTROL == 1
-	  ui16_setpoint = (uint16_t)update_setpoint (ui16_SPEED,ui16_PAS,ui16_sum_torque,ui16_setpoint); //update setpoint
+//	  ui16_setpoint = (uint16_t)update_setpoint (ui16_SPEED,ui16_PAS,ui16_sum_torque,ui16_setpoint); //update setpoint
 /*
 //Read in throttle for debugging to test, if motor runs with additional interrupts from PAS and SPEEDk
 	  ui8_adc_read_throttle_busy = 1;
@@ -194,23 +204,35 @@ printf("Torquearray initialized\n");
 	  ui8_adc_read_throttle_busy = 0;
 
 */
-	  ui16_setpoint = cruise_control (ui16_setpoint);
+      ui8_temp = cruise_control ((uint8_t) ui16_sum_torque);
 #endif
 
 #if TORQUESENSOR
       pwm_set_duty_cycle ((uint8_t)ui16_setpoint);
 #else if THROTTLE
-      pwm_set_duty_cycle ((uint8_t)ui16_sum_torque);
+      pwm_set_duty_cycle (ui16_sum_torque);
 #endif
 
       getchar1 ();
 
+//      // printf("Main: spd %d, pas %d, sumtor %d, setpoint %d\n", ui16_SPEED, ui16_PAS, ui16_sum_torque, ui16_setpoint);
+
+      if (ui16_motor_speed_erps < 6)
+      {
+	ui8_position_correction_value = 0;
+      }
+      else
+      {
+	// Equation found with experimental values:
+	// ui8_position_correction_value = ui16_motor_speed_erps * 0.784
+	// 100 ~= 0.784 << 127
+	ui8_position_correction_value = (uint8_t) ((ui16_motor_speed_erps * 100) >> 7);
+      }
+
       // printf("Main: spd %d, pas %d, sumtor %d, setpoint %d\n", ui16_SPEED, ui16_PAS, ui16_sum_torque, ui16_setpoint);
-      if(ui16_speed_inverse < 60 ) { ui8_position_correction_value = 152-((ui16_speed_inverse*44)/100);}
-      else {ui8_position_correction_value=127;}
 
 //      printf("%d, %d\n", ui16_speed_inverse, ui8_position_correction_value);
-      printf("%d, %d\n", ui8_motor_state, ui16_PWM_cycles_counter_total);
+      printf("%d, %d, %d, %d\n", ui8_motor_state, ui16_motor_speed_erps, ui16_PWM_cycles_counter_total, ui8_position_correction_value);
     }
   }
 }

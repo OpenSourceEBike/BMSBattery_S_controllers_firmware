@@ -12,6 +12,7 @@
 #include "stm8s.h"
 #include "stm8s_uart2.h"
 #include "motor.h"
+#include "pwm.h"
 
 void uart_init (void)
 {
@@ -79,9 +80,19 @@ char getchar1(void)
   }
 
   if (c == '1')
-	  {
-	    ui8_position_correction_value++;
-	  }
+  {
+    ui8_position_correction_value++;
+  }
+
+  if (c == '2')
+  {
+    ui8_duty_cycle_target--;
+  }
+
+  if (c == '3')
+  {
+    ui8_duty_cycle_target++;
+  }
 
   return (c);
 }

@@ -65,9 +65,12 @@ void hall_sensors_read_and_action (void)
   {
     hall_sensors_last = hall_sensors;
 
+    if (ui8_motor_state == MOTOR_STATE_COAST) { ui8_motor_state = MOTOR_STATE_RUNNING_VERY_SLOW; }
+
     switch (hall_sensors)
     {
       case 3:
+	debug_pin_reset ();
 	if (ui8_motor_state != MOTOR_STATE_RUNNING)
 	{
 	  ui8_motor_rotor_absolute_position = (uint8_t) (ANGLE_120 + MOTOR_ROTOR_DELTA_PHASE_ANGLE_RIGHT);
@@ -93,23 +96,15 @@ void hall_sensors_read_and_action (void)
 
       // start of phase B current sinusoid
       case 4:
+	debug_pin_set ();
 	ui16_PWM_cycles_counter_total = ui16_PWM_cycles_counter;
 	ui16_PWM_cycles_counter_total_div_4 = ui16_PWM_cycles_counter_total >> 2;
 	ui16_PWM_cycles_counter = 0;
 	ui8_interpolation_angle = 0;
 	ui16_motor_speed_erps = PWM_CYCLES_SECOND / ui16_PWM_cycles_counter_total; // this division takes ~4.2us
 
-//	if (motor_state != MOTOR_STATE_COAST)
-//	{
-//	  ui16_speed_inverse = ui16_PWM_cycles_counter_total;
-//	}
-
 	// update motor state based on motor speed
-	if (ui16_PWM_cycles_counter_total > SPEED_INVERSE_INTERPOLATION)
-	{
-	  ui8_motor_state = MOTOR_STATE_RUNNING_VERY_SLOW;
-	}
-	else
+	if (ui16_motor_speed_erps > 25)
 	{
 	  ui8_motor_state = MOTOR_STATE_RUNNING;
 	}
@@ -162,7 +157,6 @@ void motor_fast_loop (void)
     ui16_speed_inverse = 0xffff;
 
     // next code is need for motor startup correctly
-    ui8_interpolation_angle = 0;
     ui8_motor_state = MOTOR_STATE_COAST;
     hall_sensors_read_and_action ();
   }
@@ -179,12 +173,6 @@ void motor_fast_loop (void)
 	ui8_interpolation_angle = (uint8_t) ((ui16_PWM_cycles_counter << 8) / (ui16_PWM_cycles_counter_total));}
 
     ui8_motor_rotor_position = (uint8_t) (ui8_motor_rotor_absolute_position + ui8_position_correction_value - ui8_interpolation_angle);
-  }
-  else
-  {
-    // reset phase B current value as at very low speeds it has no meaning
-    ui16_adc_current_phase_B_accumulated = 0;
-    ui16_adc_current_phase_B_filtered = 0;
   }
 #endif
 
