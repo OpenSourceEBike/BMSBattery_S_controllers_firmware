@@ -37,7 +37,7 @@
 //#define MOTOR_ROTOR_DELTA_PHASE_ANGLE_RIGHT 77// best value found (at max speed, minimum current and power supply voltage keeps the same)
 #define MOTOR_ROTOR_DELTA_PHASE_ANGLE_RIGHT 4// value for ui8_position_correction_value = 0 initially @ shenyi middrive motor
 #elif MOTOR_TYPE == MOTOR_TYPE_EUC2
-#define MOTOR_ROTOR_DELTA_PHASE_ANGLE_RIGHT 136// best value found
+#define MOTOR_ROTOR_DELTA_PHASE_ANGLE_RIGHT 30// best value found
 #endif
 
 #define PWM_CYCLES_COUNTER_MAX 4000 // bei h�heren Werten wird angenommen, der Motor steht.

@@ -16,12 +16,17 @@
 #include "pwm.h"
 #include "config.h"
 
+uint8_t ui8_counter = 0;
+
 uint16_t ui16_PWM_cycles_counter = 0;
 uint16_t ui16_motor_speed_erps = 0;
 uint16_t ui16_speed_inverse = 0;
 uint8_t ui8_motor_rotor_position = 0; // in 360/256 degrees
 uint8_t ui8_motor_rotor_absolute_position = 0; // in 360/256 degrees
 uint8_t ui8_position_correction_value = 127; // in 360/256 degrees
+
+uint8_t ui8_position_correction_value1 = 0; // in 360/256 degrees
+
 uint16_t ui16_PWM_cycles_counter_total = 0;
 uint16_t ui16_PWM_cycles_counter_total_div_4 = 0;
 uint8_t ui8_interpolation_angle = 0;
@@ -58,6 +63,8 @@ void hall_sensor_init (void)
 
 void hall_sensors_read_and_action (void)
 {
+  uint16_t ui16_temp;
+
   // read hall sensors signal pins and mask other pins
   hall_sensors = (GPIO_ReadInputData (HALL_SENSORS__PORT) & (HALL_SENSORS_MASK));
   if ((hall_sensors != hall_sensors_last) ||
@@ -70,12 +77,44 @@ void hall_sensors_read_and_action (void)
     switch (hall_sensors)
     {
       case 3:
-	debug_pin_reset ();
+debug_pin_reset ();
 	if (ui8_motor_state != MOTOR_STATE_RUNNING)
 	{
 	  ui8_motor_rotor_absolute_position = (uint8_t) (ANGLE_120 + MOTOR_ROTOR_DELTA_PHASE_ANGLE_RIGHT);
 	  ui8_motor_rotor_position = (uint8_t) (ui8_motor_rotor_absolute_position + ui8_position_correction_value);
 	}
+
+	// read here the phase B current
+//	if (ui8_motor_state == MOTOR_STATE_RUNNING)
+//	{
+//	  if (ui8_adc_read_throttle_busy == 0)
+//	  {
+////	    #define POSITIVE_THRESHOLDER 516 // 512 + 4
+////	    #define NEGATIVE_THRESHOLDER 508 // 512 - 4
+//
+//#define POSITIVE_THRESHOLDER ((512 + 13) + 10) // 512 + 4
+//#define NEGATIVE_THRESHOLDER ((512 - 13) + 10) // 512 - 4
+//debug_pin_set ();
+//	    ui16_temp = ADC1_GetConversionValue ();
+//	    if (ui16_temp > POSITIVE_THRESHOLDER)
+//	    {
+//	      if (ui8_counter++ > 10)
+//	      {
+//		ui8_position_correction_value--;
+//		ui8_counter = 0;
+//	      }
+//	    }
+//	    else if (ui16_temp < NEGATIVE_THRESHOLDER)
+//	    {
+//	      if (ui8_counter++ > 10)
+//	      {
+//		ui8_position_correction_value--;
+//		ui8_counter = 0;
+//	      }
+//	    }
+//debug_pin_reset ();
+//	  }
+//	}
 	break;
 
       case 1:
@@ -96,7 +135,7 @@ void hall_sensors_read_and_action (void)
 
       // start of phase B current sinusoid
       case 4:
-	debug_pin_set ();
+debug_pin_set ();
 	ui16_PWM_cycles_counter_total = ui16_PWM_cycles_counter;
 	ui16_PWM_cycles_counter_total_div_4 = ui16_PWM_cycles_counter_total >> 2;
 	ui16_PWM_cycles_counter = 0;
@@ -155,6 +194,8 @@ void motor_fast_loop (void)
     ui16_PWM_cycles_counter = 0xffff;
     ui16_PWM_cycles_counter_total = 0xffff; //(SVM_TABLE_LEN_x1024) / PWM_CYCLES_COUNTER_MAX;
     ui16_speed_inverse = 0xffff;
+
+    ui8_position_correction_value = 127;
 
     // next code is need for motor startup correctly
     ui8_motor_state = MOTOR_STATE_COAST;
