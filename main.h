@@ -30,14 +30,15 @@
 // Phase current: max of +-15.5 amps
 // 512 --> 15.5 amps
 // 1 ADC increment --> 0.030A
-// 1 ADC RMS --> 0.03 * 0.707 -- > 0.021A
-#define ADC_PHASE_B_CURRENT_STEP 21 // 0.021 * 1000 = 21
+// RMS value --> max value * 0.707
+#define ADC_PHASE_B_CURRENT_FACTOR_MA 21 // 0,030273437 * 1000 * 0.707
 
 #if MOTOR_TYPE == MOTOR_TYPE_Q85
 //#define MOTOR_ROTOR_DELTA_PHASE_ANGLE_RIGHT 77// best value found (at max speed, minimum current and power supply voltage keeps the same)
 #define MOTOR_ROTOR_DELTA_PHASE_ANGLE_RIGHT 4// value for ui8_position_correction_value = 0 initially @ shenyi middrive motor
 #elif MOTOR_TYPE == MOTOR_TYPE_EUC2
-#define MOTOR_ROTOR_DELTA_PHASE_ANGLE_RIGHT 30// best value found
+//#define MOTOR_ROTOR_DELTA_PHASE_ANGLE_RIGHT 30// best value found
+#define MOTOR_ROTOR_DELTA_PHASE_ANGLE_RIGHT 40// best value found
 #endif
 
 #define PWM_CYCLES_COUNTER_MAX 4000 // bei h�heren Werten wird angenommen, der Motor steht.
