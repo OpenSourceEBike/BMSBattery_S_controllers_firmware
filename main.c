@@ -143,21 +143,21 @@ int main (void)
       getchar1 ();
 
 
-//      i16_temp = (((int16_t) ui16_ADC_iq_current_filtered) - 511) * ADC_PHASE_B_CURRENT_FACTOR_MA;
-      printf("%d, %d, %d\n", ui16_motor_speed_erps, ui16_ADC_iq_current_filtered, ui8_position_correction_value);
+      i16_temp = (((int16_t) ui16_ADC_iq_current_filtered) - 511) * ADC_PHASE_B_CURRENT_FACTOR_MA;
+      printf("%d, %d, %d\n", ui16_motor_speed_erps, i16_temp, ui8_position_correction_value);
 //      printf("%d, %d, %d\n", ui8_motor_state, ui16_motor_speed_erps, ui8_position_correction_value);
 
-//      if (ui16_motor_speed_erps > 7)
-//      {
-//	if (ui16_ADC_iq_current_filtered > 512)
-//	{
-//	  ui8_position_correction_value++;
-//	}
-//	else if (ui16_ADC_iq_current_filtered < 504)
-//	{
-//	  ui8_position_correction_value--;
-//	}
-//      }
+      if (ui16_motor_speed_erps > 7)
+      {
+	if (ui16_ADC_iq_current_filtered > 512)
+	{
+	  ui8_position_correction_value++;
+	}
+	else if (ui16_ADC_iq_current_filtered < 504)
+	{
+	  ui8_position_correction_value--;
+	}
+      }
     }
   }
 }
