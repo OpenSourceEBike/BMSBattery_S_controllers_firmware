@@ -34,8 +34,7 @@
 #define ADC_PHASE_B_CURRENT_FACTOR_MA 21 // 0,030273437 * 1000 * 0.707
 
 #if MOTOR_TYPE == MOTOR_TYPE_Q85
-//#define MOTOR_ROTOR_DELTA_PHASE_ANGLE_RIGHT 45// best value found (at max speed, minimum current and power supply voltage keeps the same)
-#define MOTOR_ROTOR_DELTA_PHASE_ANGLE_RIGHT 77// best value found (at max speed, minimum current and power supply voltage keeps the same)
+#define MOTOR_ROTOR_DELTA_PHASE_ANGLE_RIGHT 204// best value found (at max speed, minimum current and power supply voltage keeps the same)
 #elif MOTOR_TYPE == MOTOR_TYPE_EUC2
 #define MOTOR_ROTOR_DELTA_PHASE_ANGLE_RIGHT 45 // best value found
 #endif
