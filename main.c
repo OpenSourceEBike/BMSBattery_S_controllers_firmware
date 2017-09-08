@@ -160,17 +160,17 @@ int main (void)
 	}
       }
 #elif (MOTOR_TYPE == MOTOR_TYPE_Q85)
-//      if (ui16_motor_speed_erps > 7)
-//      {
-//	if (ui16_ADC_iq_current_filtered > 512)
-//	{
-//	  ui8_position_correction_value++;
-//	}
-//	else if (ui16_ADC_iq_current_filtered < 504)
-//	{
-//	  ui8_position_correction_value--;
-//	}
-//      }
+      if (ui16_motor_speed_erps > 7)
+      {
+	if (ui16_ADC_iq_current_filtered > 510)
+	{
+	  ui8_position_correction_value++;
+	}
+	else if (ui16_ADC_iq_current_filtered < 508)
+	{
+	  ui8_position_correction_value--;
+	}
+      }
 #endif
     }
   }

@@ -18,6 +18,10 @@
 #define MOTOR_STATE_RUNNING_SINE_NO_INTERPOLATION 2
 #define MOTOR_STATE_RUNNING_SINE_INTERPOLATION 3
 
+#define MOTOR_STATE_COAST 0
+#define MOTOR_STATE_RUNNING_VERY_SLOW 1
+#define MOTOR_STATE_RUNNING 2
+
 extern uint8_t ui8_motor_rotor_position;
 extern uint8_t ui8_position_correction_value;
 extern uint8_t ui8_position_correction_value1;
