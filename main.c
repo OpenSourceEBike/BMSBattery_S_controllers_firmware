@@ -147,6 +147,7 @@ int main (void)
       printf("%d, %d, %d\n", ui16_motor_speed_erps, i16_temp, ui8_position_correction_value);
 //      printf("%d, %d, %d\n", ui8_motor_state, ui16_motor_speed_erps, ui8_position_correction_value);
 
+#if (MOTOR_TYPE == MOTOR_TYPE_EUC2)
       if (ui16_motor_speed_erps > 7)
       {
 	if (ui16_ADC_iq_current_filtered > 512)
@@ -158,6 +159,19 @@ int main (void)
 	  ui8_position_correction_value--;
 	}
       }
+#elif (MOTOR_TYPE == MOTOR_TYPE_Q85)
+//      if (ui16_motor_speed_erps > 7)
+//      {
+//	if (ui16_ADC_iq_current_filtered > 512)
+//	{
+//	  ui8_position_correction_value++;
+//	}
+//	else if (ui16_ADC_iq_current_filtered < 504)
+//	{
+//	  ui8_position_correction_value--;
+//	}
+//      }
+#endif
     }
   }
 }
