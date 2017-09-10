@@ -144,7 +144,7 @@ int main (void)
 
 
       i16_temp = (((int16_t) ui16_ADC_iq_current_filtered) - 511) * ADC_PHASE_B_CURRENT_FACTOR_MA;
-      printf("%d, %d, %d, %d\n", ui8_motor_state, ui16_motor_speed_erps, i16_temp, ui8_position_correction_value);
+      printf("%d, %d, %d\n", ui16_motor_speed_erps, i16_temp, ui8_position_correction_value);
 //      printf("%d, %d, %d\n", ui8_motor_state, ui16_motor_speed_erps, ui8_position_correction_value);
 
 #if (MOTOR_TYPE == MOTOR_TYPE_EUC2)
