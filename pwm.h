@@ -18,12 +18,12 @@
 
 #define SVM_TABLE SVM
 
-extern uint16_t i16_svm_table [SVM_TABLE_LEN];
-extern uint16_t ui16_duty_cycle_target;
+extern uint8_t ui8_svm_table [SVM_TABLE_LEN];
+extern uint8_t ui8_duty_cycle_target;
 
 void pwm_init (void);
 void pwm_duty_cycle_controller (void);
-void pwm_set_duty_cycle (uint16_t value);
-void pwm_apply_duty_cycle (int16_t i16_duty_cycle_value);
+void pwm_set_duty_cycle (uint8_t value);
+void pwm_apply_duty_cycle (uint8_t ui8_duty_cycle_value);
 
 #endif /* _PWM_H_ */

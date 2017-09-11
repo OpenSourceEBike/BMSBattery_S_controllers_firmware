@@ -86,12 +86,12 @@ char getchar1(void)
 
   if (c == '2')
   {
-    ui16_duty_cycle_target--;
+    ui8_duty_cycle_target--;
   }
 
   if (c == '3')
   {
-    ui16_duty_cycle_target++;
+    ui8_duty_cycle_target++;
   }
 
   return (c);

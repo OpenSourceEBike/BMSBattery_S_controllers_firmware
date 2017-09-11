@@ -88,6 +88,7 @@ int main (void)
 //  static uint32_t ui32_cruise_counter = 0;
 //  static uint8_t ui8_cruise_duty_cycle = 0;
   static uint16_t ui16_setpoint = ADC_THROTTLE_MIN_VALUE;
+  static uint8_t ui8_temp = 0;
   static uint16_t ui16_adc_value;
 
 
@@ -130,13 +131,13 @@ int main (void)
       // read throttle and execute cruise control
       //
       ui16_adc_value = (uint16_t) adc_read_throttle ();
-      ui16_temp = (uint16_t) map (ui16_adc_value, ADC_THROTTLE_MIN_VALUE, ADC_THROTTLE_MAX_VALUE, 0, 511);
+      ui8_temp = (uint8_t) map (ui16_adc_value, ADC_THROTTLE_MIN_VALUE, ADC_THROTTLE_MAX_VALUE, 0, 237);
 
 //#define DO_CRUISE_CONTROL 1
 #if DO_CRUISE_CONTROL == 1
       ui8_temp = cruise_control (ui8_temp);
 #endif
-      pwm_set_duty_cycle (ui16_temp);
+      pwm_set_duty_cycle (ui8_temp);
       /****************************************************************************/
 
       getchar1 ();

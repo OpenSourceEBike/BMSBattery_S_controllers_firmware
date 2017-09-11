@@ -47,8 +47,8 @@
 
 #define SPEED_INVERSE_INTERPOLATION 625 // experimental value; min speed aftwer which interpolation starts
 
-#define PWM_VALUE_DUTY_CYCLE_MAX 511
-#define MIDDLE_PWM_VALUE_DUTY_CYCLE_MAX 255//(PWM_VALUE_DUTY_CYCLE_MAX/2)
+#define PWM_VALUE_DUTY_CYCLE_MAX (256 - 1)
+#define MIDDLE_PWM_VALUE_DUTY_CYCLE_MAX (PWM_VALUE_DUTY_CYCLE_MAX/2)
 
 #define ANGLE_1 0 //(360/256) / 300
 #define ANGLE_60 42
