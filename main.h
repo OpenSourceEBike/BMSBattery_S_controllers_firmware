@@ -12,9 +12,9 @@
 #define MOTOR_TYPE_Q85 1
 #define MOTOR_TYPE_EUC2 2
 
-#define MOTOR_TYPE MOTOR_TYPE_EUC2
+#define MOTOR_TYPE MOTOR_TYPE_Q85
 
-#define SVM_TABLE_LEN 256
+#define SVM_TABLE_LEN 1440
 #define SVM_TABLE_LEN_x1024 262144 //(256 * 1024)
 
 
@@ -34,9 +34,10 @@
 #define ADC_PHASE_B_CURRENT_FACTOR_MA 21 // 0,030273437 * 1000 * 0.707
 
 #if MOTOR_TYPE == MOTOR_TYPE_Q85
-#define MOTOR_ROTOR_DELTA_PHASE_ANGLE_RIGHT 204// best value found (at max speed, minimum current and power supply voltage keeps the same)
+#define MOTOR_ROTOR_DELTA_PHASE_ANGLE_RIGHT 1152//204// best value found (at max speed, minimum current and power supply voltage keeps the same)
 #elif MOTOR_TYPE == MOTOR_TYPE_EUC2
-#define MOTOR_ROTOR_DELTA_PHASE_ANGLE_RIGHT 235 // best value found
+//#define MOTOR_ROTOR_DELTA_PHASE_ANGLE_RIGHT 1320//235 // best value found
+#define MOTOR_ROTOR_DELTA_PHASE_ANGLE_RIGHT 0
 #endif
 
 #define PWM_CYCLES_COUNTER_MAX 4000 // bei h�heren Werten wird angenommen, der Motor steht.
@@ -50,13 +51,13 @@
 #define PWM_VALUE_DUTY_CYCLE_MAX (256 - 1)
 #define MIDDLE_PWM_VALUE_DUTY_CYCLE_MAX (PWM_VALUE_DUTY_CYCLE_MAX/2)
 
-#define ANGLE_1 0 //(360/256) / 300
-#define ANGLE_60 42
-#define ANGLE_120 85
-#define ANGLE_180 127
-#define ANGLE_240 170
-#define ANGLE_300 212
-#define ANGLE_360 255
+#define ANGLE_1 0
+#define ANGLE_60 236
+#define ANGLE_120 476
+#define ANGLE_180 716
+#define ANGLE_240 956
+#define ANGLE_300 1196
+#define ANGLE_360 1436
 
 extern uint16_t ui16_log1;
 extern uint16_t ui16_log2;

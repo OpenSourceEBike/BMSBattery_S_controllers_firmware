@@ -20,10 +20,12 @@
 
 extern uint8_t ui8_svm_table [SVM_TABLE_LEN];
 extern uint8_t ui8_duty_cycle_target;
+extern uint8_t ui8_value_a;
 
 void pwm_init (void);
 void pwm_duty_cycle_controller (void);
 void pwm_set_duty_cycle (uint8_t value);
 void pwm_apply_duty_cycle (uint8_t ui8_duty_cycle_value);
+int16_t i16_mod_angle_degrees (int16_t value);
 
 #endif /* _PWM_H_ */

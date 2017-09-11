@@ -23,14 +23,12 @@ uint16_t ui16_PWM_cycles_counter_6 = 0;
 uint16_t ui16_PWM_cycles_counter_total = 0;
 
 uint16_t ui16_motor_speed_erps = 0;
-uint8_t ui8_motor_rotor_position = 0; // in 360/256 degrees
-uint8_t ui8_motor_rotor_absolute_position = 0; // in 360/256 degrees
-uint8_t ui8_position_correction_value = 127; // in 360/256 degrees
-
-uint8_t ui8_position_correction_value1 = 0; // in 360/256 degrees
+int16_t i16_motor_rotor_position = 0;
+int16_t i16_motor_rotor_absolute_position = 0;
+int16_t i16_position_correction_value = 720;
 
 uint16_t ui16_PWM_cycles_counter_total_div_4 = 0;
-uint8_t ui8_interpolation_angle = 0;
+int16_t i16_interpolation_angle = 0;
 
 uint16_t ui16_adc_current_phase_B = 0;
 uint16_t ui16_adc_current_phase_B_accumulated = 0;
@@ -117,20 +115,20 @@ debug_pin_set ();
       }
 #endif
 
-      ui8_motor_rotor_absolute_position = ANGLE_180 + MOTOR_ROTOR_DELTA_PHASE_ANGLE_RIGHT;
+      i16_motor_rotor_absolute_position = i16_mod_angle_degrees (ANGLE_180 + MOTOR_ROTOR_DELTA_PHASE_ANGLE_RIGHT);
       break;
 
       case 1:
       if (ui8_motor_state != MOTOR_STATE_RUNNING_INTERPOLATION_360_DEGREES)
       {
-	ui8_motor_rotor_absolute_position = ANGLE_240 + MOTOR_ROTOR_DELTA_PHASE_ANGLE_RIGHT;
+	i16_motor_rotor_absolute_position = i16_mod_angle_degrees (ANGLE_240 + MOTOR_ROTOR_DELTA_PHASE_ANGLE_RIGHT);
       }
       break;
 
       case 5:
       if (ui8_motor_state != MOTOR_STATE_RUNNING_INTERPOLATION_360_DEGREES)
       {
-	ui8_motor_rotor_absolute_position = ANGLE_300 + MOTOR_ROTOR_DELTA_PHASE_ANGLE_RIGHT;
+	i16_motor_rotor_absolute_position = i16_mod_angle_degrees (ANGLE_300 + MOTOR_ROTOR_DELTA_PHASE_ANGLE_RIGHT);
       }
       break;
 
@@ -138,21 +136,21 @@ debug_pin_set ();
 debug_pin_reset ();
       if (ui8_motor_state != MOTOR_STATE_RUNNING_INTERPOLATION_360_DEGREES)
       {
-	ui8_motor_rotor_absolute_position = ANGLE_1 + MOTOR_ROTOR_DELTA_PHASE_ANGLE_RIGHT;
+	i16_motor_rotor_absolute_position = i16_mod_angle_degrees (ANGLE_1 + MOTOR_ROTOR_DELTA_PHASE_ANGLE_RIGHT);
       }
       break;
 
       case 6:
       if (ui8_motor_state != MOTOR_STATE_RUNNING_INTERPOLATION_360_DEGREES)
       {
-	ui8_motor_rotor_absolute_position = ANGLE_60 + MOTOR_ROTOR_DELTA_PHASE_ANGLE_RIGHT;
+	i16_motor_rotor_absolute_position = i16_mod_angle_degrees (ANGLE_60 + MOTOR_ROTOR_DELTA_PHASE_ANGLE_RIGHT);
       }
       break;
 
       case 2:
       if (ui8_motor_state != MOTOR_STATE_RUNNING_INTERPOLATION_360_DEGREES)
       {
-	ui8_motor_rotor_absolute_position = ANGLE_120 + MOTOR_ROTOR_DELTA_PHASE_ANGLE_RIGHT;
+	i16_motor_rotor_absolute_position = i16_mod_angle_degrees (ANGLE_120 + MOTOR_ROTOR_DELTA_PHASE_ANGLE_RIGHT);
       }
       break;
 
@@ -179,7 +177,7 @@ void motor_fast_loop (void)
     ui16_PWM_cycles_counter = 0;
     ui16_PWM_cycles_counter_6 = 0;
     ui16_PWM_cycles_counter_total = 0; //(SVM_TABLE_LEN_x1024) / PWM_CYCLES_COUNTER_MAX;
-    ui8_position_correction_value = 127;
+    i16_position_correction_value = 720;
 
     // next code is need for motor startup correctly
     ui8_motor_state = MOTOR_STATE_COAST;
@@ -192,26 +190,18 @@ void motor_fast_loop (void)
 //  // interpolation seems a problem when motor starts, so avoid to do it at very low speed
   if (ui8_motor_state == MOTOR_STATE_RUNNING_INTERPOLATION_60_DEGREES)
   {
-    ui8_interpolation_angle = (ui16_PWM_cycles_counter_6 << 8) / ui16_PWM_cycles_counter_total;
-#if MOTOR_TYPE == MOTOR_TYPE_Q85
-    ui8_motor_rotor_position = ui8_motor_rotor_absolute_position + ui8_position_correction_value + ui8_interpolation_angle;
-#elif MOTOR_TYPE == MOTOR_TYPE_EUC2
-    ui8_motor_rotor_position = ui8_motor_rotor_absolute_position + ui8_position_correction_value - ui8_interpolation_angle;
-#endif
+    i16_interpolation_angle = (((uint32_t) ui16_PWM_cycles_counter_6) * 1436) / ui16_PWM_cycles_counter_total;
+    i16_motor_rotor_position = i16_mod_angle_degrees (i16_motor_rotor_absolute_position + i16_position_correction_value + i16_interpolation_angle);
   }
   else if (ui8_motor_state == MOTOR_STATE_RUNNING_INTERPOLATION_360_DEGREES)
   {
-    ui8_interpolation_angle = (ui16_PWM_cycles_counter << 8) / ui16_PWM_cycles_counter_total;
-#if MOTOR_TYPE == MOTOR_TYPE_Q85
-    ui8_motor_rotor_position = ui8_motor_rotor_absolute_position + ui8_position_correction_value + ui8_interpolation_angle;
-#elif MOTOR_TYPE == MOTOR_TYPE_EUC2
-    ui8_motor_rotor_position = ui8_motor_rotor_absolute_position + ui8_position_correction_value - ui8_interpolation_angle;
-#endif
+    i16_interpolation_angle = (((uint32_t) ui16_PWM_cycles_counter) * 1436) / ui16_PWM_cycles_counter_total;
+    i16_motor_rotor_position = i16_mod_angle_degrees (i16_motor_rotor_absolute_position + i16_position_correction_value + i16_interpolation_angle);
   }
   else // MOTOR_STATE_COAST || MOTOR_STATE_RUNNING_NO_INTERPOLATION_60_DEGREES
 #endif
   {
-    ui8_motor_rotor_position = ui8_motor_rotor_absolute_position + ui8_position_correction_value;
+    i16_motor_rotor_position = i16_mod_angle_degrees (i16_motor_rotor_absolute_position + i16_position_correction_value);
   }
 
   pwm_duty_cycle_controller ();
