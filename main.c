@@ -22,9 +22,6 @@
 #include "cruise_control.h"
 #include "timers.h"
 #include "pwm.h"
-#include "PAS.h"
-#include "SPEED.h"
-#include "update_setpoint.h"
 #include "config.h"
 
 
@@ -72,10 +69,6 @@ int main (void);
 
 // Brake signal interrupt
 void EXTI_PORTA_IRQHandler(void) __interrupt(EXTI_PORTA_IRQHANDLER);
-// Speed signal interrupt
-void EXTI_PORTC_IRQHandler(void) __interrupt(EXTI_PORTC_IRQHANDLER);
-// PAS signal interrupt
-void EXTI_PORTD_IRQHandler(void) __interrupt(EXTI_PORTD_IRQHANDLER);
 
 // Timer1/PWM period interrupt
 void TIM1_UPD_OVF_TRG_BRK_IRQHandler(void) __interrupt(TIM1_UPD_OVF_TRG_BRK_IRQHANDLER);
@@ -107,9 +100,9 @@ int main (void)
 
   enableInterrupts();
 
-  TIM1_SetCompare1(126 << 1);
-  TIM1_SetCompare2(126 << 1);
-  TIM1_SetCompare3(126 << 1);
+  TIM1_SetCompare1(255);
+  TIM1_SetCompare2(255);
+  TIM1_SetCompare3(255);
 
   hall_sensors_read_and_action (); // needed to start the motor
 
@@ -133,13 +126,13 @@ int main (void)
       // read throttle and execute cruise control
       //
       ui16_adc_value = (uint16_t) adc_read_throttle ();
-      ui8_temp = (uint8_t) map (ui16_adc_value, ADC_THROTTLE_MIN_VALUE, ADC_THROTTLE_MAX_VALUE, 0, 237);
+      ui16_temp = (uint16_t) map (ui16_adc_value, ADC_THROTTLE_MIN_VALUE, ADC_THROTTLE_MAX_VALUE, 0, 511);
 
-#define DO_CRUISE_CONTROL 1
+//#define DO_CRUISE_CONTROL 1
 #if DO_CRUISE_CONTROL == 1
       ui8_temp = cruise_control (ui8_temp);
 #endif
-      pwm_set_duty_cycle (ui8_temp);
+      pwm_set_duty_cycle (ui16_temp);
       /****************************************************************************/
 
       getchar1 ();

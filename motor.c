@@ -46,12 +46,14 @@ uint16_t ui16_iq_current_ma = 0;
 
 void TIM1_UPD_OVF_TRG_BRK_IRQHandler(void) __interrupt(TIM1_UPD_OVF_TRG_BRK_IRQHANDLER)
 {
+debug_pin_set ();
   hall_sensors_read_and_action ();
 
   motor_fast_loop ();
 
   // clear the interrupt pending bit for TIM1
   TIM1_ClearITPendingBit(TIM1_IT_UPDATE);
+debug_pin_reset ();
 }
 
 void hall_sensor_init (void)
@@ -78,7 +80,7 @@ void hall_sensors_read_and_action (void)
       // read here the phase B current
       if (ui8_adc_read_throttle_busy == 0)
       {
-debug_pin_set ();
+//debug_pin_set ();
 	ui16_ADC_iq_current = ADC1_GetConversionValue ();
 	ui16_ADC_iq_current_accumulated -= ui16_ADC_iq_current_accumulated >> 2;
 	ui16_ADC_iq_current_accumulated += ui16_ADC_iq_current;
@@ -133,7 +135,7 @@ debug_pin_set ();
       break;
 
       case 4:
-debug_pin_reset ();
+//debug_pin_reset ();
       if (ui8_motor_state != MOTOR_STATE_RUNNING_INTERPOLATION_360_DEGREES)
       {
 	i16_motor_rotor_absolute_position = i16_mod_angle_degrees (ANGLE_1 + MOTOR_ROTOR_DELTA_PHASE_ANGLE_RIGHT);
@@ -190,12 +192,12 @@ void motor_fast_loop (void)
 //  // interpolation seems a problem when motor starts, so avoid to do it at very low speed
   if (ui8_motor_state == MOTOR_STATE_RUNNING_INTERPOLATION_60_DEGREES)
   {
-    i16_interpolation_angle = (((uint32_t) ui16_PWM_cycles_counter_6) * 1439) / ui16_PWM_cycles_counter_total;
+    i16_interpolation_angle = (((uint32_t) ui16_PWM_cycles_counter_6) * 1436) / ui16_PWM_cycles_counter_total;
     i16_motor_rotor_position = i16_mod_angle_degrees (i16_motor_rotor_absolute_position + i16_position_correction_value + i16_interpolation_angle);
   }
   else if (ui8_motor_state == MOTOR_STATE_RUNNING_INTERPOLATION_360_DEGREES)
   {
-    i16_interpolation_angle = (((uint32_t) ui16_PWM_cycles_counter) * 1439) / ui16_PWM_cycles_counter_total;
+    i16_interpolation_angle = (((uint32_t) ui16_PWM_cycles_counter) * 1436) / ui16_PWM_cycles_counter_total;
     i16_motor_rotor_position = i16_mod_angle_degrees (i16_motor_rotor_absolute_position + i16_position_correction_value + i16_interpolation_angle);
   }
   else // MOTOR_STATE_COAST || MOTOR_STATE_RUNNING_NO_INTERPOLATION_60_DEGREES
