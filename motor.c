@@ -190,12 +190,12 @@ void motor_fast_loop (void)
 //  // interpolation seems a problem when motor starts, so avoid to do it at very low speed
   if (ui8_motor_state == MOTOR_STATE_RUNNING_INTERPOLATION_60_DEGREES)
   {
-    i16_interpolation_angle = (((uint32_t) ui16_PWM_cycles_counter_6) * 1436) / ui16_PWM_cycles_counter_total;
+    i16_interpolation_angle = (((uint32_t) ui16_PWM_cycles_counter_6) * 1439) / ui16_PWM_cycles_counter_total;
     i16_motor_rotor_position = i16_mod_angle_degrees (i16_motor_rotor_absolute_position + i16_position_correction_value + i16_interpolation_angle);
   }
   else if (ui8_motor_state == MOTOR_STATE_RUNNING_INTERPOLATION_360_DEGREES)
   {
-    i16_interpolation_angle = (((uint32_t) ui16_PWM_cycles_counter) * 1436) / ui16_PWM_cycles_counter_total;
+    i16_interpolation_angle = (((uint32_t) ui16_PWM_cycles_counter) * 1439) / ui16_PWM_cycles_counter_total;
     i16_motor_rotor_position = i16_mod_angle_degrees (i16_motor_rotor_absolute_position + i16_position_correction_value + i16_interpolation_angle);
   }
   else // MOTOR_STATE_COAST || MOTOR_STATE_RUNNING_NO_INTERPOLATION_60_DEGREES

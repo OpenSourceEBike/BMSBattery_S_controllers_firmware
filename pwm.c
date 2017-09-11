@@ -1626,8 +1626,8 @@ void pwm_apply_duty_cycle (uint8_t ui8_duty_cycle_value)
 
 int16_t i16_mod_angle_degrees (int16_t value)
 {
-  int16_t ret = value % 1436;
+  int16_t ret = value % 1439;
   if(ret < 0)
-    ret += 1436;
+    ret += 1439;
   return ret;
 }

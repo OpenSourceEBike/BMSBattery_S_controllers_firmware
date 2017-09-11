@@ -125,8 +125,7 @@ int main (void)
 
     ui16_temp_delay = TIM2_GetCounter ();
 
-//    if ((ui16_temp_delay - ui16_throttle_counter) > 100)
-    if ((ui16_temp_delay - ui16_throttle_counter) > 5)
+    if ((ui16_temp_delay - ui16_throttle_counter) > 100)
     {
       ui16_throttle_counter = ui16_temp_delay;
 
@@ -136,7 +135,7 @@ int main (void)
       ui16_adc_value = (uint16_t) adc_read_throttle ();
       ui8_temp = (uint8_t) map (ui16_adc_value, ADC_THROTTLE_MIN_VALUE, ADC_THROTTLE_MAX_VALUE, 0, 237);
 
-//#define DO_CRUISE_CONTROL 1
+#define DO_CRUISE_CONTROL 1
 #if DO_CRUISE_CONTROL == 1
       ui8_temp = cruise_control (ui8_temp);
 #endif
