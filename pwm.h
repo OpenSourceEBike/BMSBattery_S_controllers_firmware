@@ -16,7 +16,7 @@
 #define SINE_SVM_ORIGINAL 2
 #define SINE 3
 
-#define SVM_TABLE SVM
+#define SVM_TABLE SINE_SVM_ORIGINAL
 
 extern uint8_t ui8_svm_table [SVM_TABLE_LEN];
 extern uint8_t ui8_duty_cycle_target;
