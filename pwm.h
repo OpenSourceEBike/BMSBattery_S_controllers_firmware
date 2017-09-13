@@ -18,7 +18,7 @@
 
 #define SVM_TABLE SINE_SVM_ORIGINAL
 
-extern uint8_t ui8_svm_table [SVM_TABLE_LEN];
+extern uint16_t ui16_svm_table [SVM_TABLE_LEN];
 extern uint8_t ui8_duty_cycle_target;
 
 void pwm_init (void);

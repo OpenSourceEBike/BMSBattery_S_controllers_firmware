@@ -16,7 +16,7 @@
 #include "pwm.h"
 
 #if (SVM_TABLE == SVM)
-uint8_t ui8_svm_table [SVM_TABLE_LEN] =
+uint8_t ui16_svm_table [SVM_TABLE_LEN] =
 {
     127	,
     133	,
@@ -276,177 +276,177 @@ uint8_t ui8_svm_table [SVM_TABLE_LEN] =
     122
 };
 #elif (SVM_TABLE == SINE_SVM_ORIGINAL)
-uint8_t ui8_svm_table [SVM_TABLE_LEN] =
+uint16_t ui16_svm_table [SVM_TABLE_LEN] =
 {
     0	,
-    6	,
-    13	,
-    19	,
-    25	,
-    31	,
-    37	,
-    44	,
-    50	,
-    56	,
-    62	,
-    68	,
-    74	,
-    80	,
+    17	,
+    34	,
+    51	,
+    69	,
     86	,
-    92	,
-    98	,
     103	,
-    109	,
-    115	,
     120	,
-    126	,
-    131	,
     136	,
-    142	,
-    147	,
-    152	,
-    157	,
-    162	,
-    167	,
-    171	,
-    176	,
-    180	,
-    185	,
-    189	,
-    193	,
-    197	,
-    201	,
-    205	,
-    208	,
-    212	,
-    215	,
-    219	,
-    222	,
-    225	,
-    228	,
-    231	,
-    233	,
-    236	,
-    238	,
-    240	,
-    242	,
-    244	,
-    246	,
-    247	,
-    249	,
-    250	,
-    251	,
-    252	,
-    253	,
-    254	,
-    254	,
-    255	,
-    255	,
-    255	,
-    255	,
-    255	,
-    254	,
-    254	,
-    253	,
-    252	,
-    251	,
-    250	,
-    249	,
-    247	,
-    246	,
-    244	,
-    242	,
-    240	,
-    238	,
-    236	,
-    233	,
-    231	,
-    228	,
-    225	,
-    226	,
-    229	,
-    232	,
-    234	,
-    237	,
-    239	,
-    241	,
-    243	,
-    245	,
-    247	,
-    248	,
-    249	,
-    251	,
-    252	,
-    253	,
-    253	,
-    254	,
-    255	,
-    255	,
-    255	,
-    255	,
-    255	,
-    255	,
-    254	,
-    253	,
-    253	,
-    252	,
-    251	,
-    250	,
-    248	,
-    247	,
-    245	,
-    243	,
-    241	,
-    239	,
-    237	,
-    234	,
-    232	,
-    229	,
-    226	,
-    223	,
-    220	,
-    217	,
-    214	,
-    210	,
-    207	,
+    153	,
+    170	,
+    186	,
     203	,
-    199	,
+    219	,
+    235	,
+    252	,
+    267	,
+    283	,
+    299	,
+    314	,
+    330	,
+    345	,
+    359	,
+    374	,
+    388	,
+    402	,
+    416	,
+    430	,
+    443	,
+    457	,
+    469	,
+    482	,
+    494	,
+    506	,
+    518	,
+    529	,
+    540	,
+    551	,
+    561	,
+    571	,
+    581	,
+    591	,
+    600	,
+    608	,
+    616	,
+    624	,
+    632	,
+    639	,
+    646	,
+    652	,
+    658	,
+    664	,
+    669	,
+    674	,
+    678	,
+    682	,
+    686	,
+    689	,
+    691	,
+    694	,
+    696	,
+    697	,
+    698	,
+    699	,
+    699	,
+    699	,
+    698	,
+    697	,
+    696	,
+    694	,
+    691	,
+    689	,
+    686	,
+    682	,
+    678	,
+    674	,
+    669	,
+    664	,
+    658	,
+    652	,
+    646	,
+    639	,
+    632	,
+    624	,
+    616	,
+    620	,
+    628	,
+    635	,
+    642	,
+    649	,
+    655	,
+    661	,
+    666	,
+    671	,
+    676	,
+    680	,
+    684	,
+    687	,
+    690	,
+    693	,
+    695	,
+    696	,
+    698	,
+    699	,
+    699	,
+    699	,
+    699	,
+    698	,
+    696	,
+    695	,
+    693	,
+    690	,
+    687	,
+    684	,
+    680	,
+    676	,
+    671	,
+    667	,
+    661	,
+    655	,
+    649	,
+    643	,
+    636	,
+    628	,
+    621	,
+    613	,
+    604	,
+    595	,
+    586	,
+    577	,
+    567	,
+    557	,
+    546	,
+    535	,
+    524	,
+    513	,
+    501	,
+    489	,
+    476	,
+    463	,
+    450	,
+    437	,
+    424	,
+    410	,
+    396	,
+    382	,
+    367	,
+    352	,
+    338	,
+    322	,
+    307	,
+    292	,
+    276	,
+    260	,
+    244	,
+    228	,
+    212	,
     195	,
-    191	,
-    187	,
-    183	,
-    178	,
-    174	,
-    169	,
-    164	,
-    160	,
-    155	,
-    150	,
-    144	,
-    139	,
-    134	,
+    179	,
+    162	,
+    145	,
     129	,
-    123	,
-    118	,
     112	,
-    106	,
-    101	,
     95	,
-    89	,
-    83	,
-    77	,
-    71	,
-    65	,
-    59	,
-    53	,
-    47	,
-    41	,
-    35	,
-    28	,
-    22	,
-    16	,
-    10	,
-    3	,
+    78	,
+    61	,
+    43	,
+    26	,
+    9	,
     0	,
     0	,
     0	,
@@ -536,7 +536,7 @@ uint8_t ui8_svm_table [SVM_TABLE_LEN] =
     0
 };
 #elif (SVM_TABLE == SINE)
-uint8_t ui8_svm_table [SVM_TABLE_LEN] =
+uint8_t ui16_svm_table [SVM_TABLE_LEN] =
 {
     5	,
     12	,
@@ -799,10 +799,10 @@ uint8_t ui8_svm_table [SVM_TABLE_LEN] =
 
 uint8_t ui8_duty_cycle = 0;
 uint8_t ui8_duty_cycle_target = 0;
-uint8_t ui8_value_a;
-uint8_t ui8_value_b;
-uint8_t ui8_value_c;
-uint16_t ui16_value;
+uint16_t ui16_value_a;
+uint16_t ui16_value_b;
+uint16_t ui16_value_c;
+uint32_t ui32_value;
 
 void pwm_set_duty_cycle (uint8_t value)
 {
@@ -916,7 +916,7 @@ void pwm_apply_duty_cycle (uint8_t ui8_duty_cycle_value)
   ui8__duty_cycle = ui8_duty_cycle_value;
 
   // scale and apply _duty_cycle
-  ui8_temp = ui8_svm_table[ui8_motor_rotor_position];
+  ui8_temp = ui16_svm_table[ui8_motor_rotor_position];
   if (ui8_temp > MIDDLE_PWM_VALUE_DUTY_CYCLE_MAX)
   {
     ui16_value = ((uint16_t) (ui8_temp - MIDDLE_PWM_VALUE_DUTY_CYCLE_MAX)) * ui8__duty_cycle;
@@ -931,7 +931,7 @@ void pwm_apply_duty_cycle (uint8_t ui8_duty_cycle_value)
   }
 
   // add 120 degrees and limit
-  ui8_temp = ui8_svm_table[(uint8_t) (ui8_motor_rotor_position + 85 /* 120º */)];
+  ui8_temp = ui16_svm_table[(uint8_t) (ui8_motor_rotor_position + 85 /* 120º */)];
   if (ui8_temp > MIDDLE_PWM_VALUE_DUTY_CYCLE_MAX)
   {
     ui16_value = ((uint16_t) (ui8_temp - MIDDLE_PWM_VALUE_DUTY_CYCLE_MAX)) * ui8__duty_cycle;
@@ -946,7 +946,7 @@ void pwm_apply_duty_cycle (uint8_t ui8_duty_cycle_value)
   }
 
   // subtract 120 degrees and limit
-  ui8_temp = ui8_svm_table[(uint8_t) (ui8_motor_rotor_position + 171 /* 240º */)];
+  ui8_temp = ui16_svm_table[(uint8_t) (ui8_motor_rotor_position + 171 /* 240º */)];
   if (ui8_temp > MIDDLE_PWM_VALUE_DUTY_CYCLE_MAX)
   {
     ui16_value = ((uint16_t) (ui8_temp - MIDDLE_PWM_VALUE_DUTY_CYCLE_MAX)) * ui8__duty_cycle;
@@ -966,24 +966,24 @@ void pwm_apply_duty_cycle (uint8_t ui8_duty_cycle_value)
   TIM1_SetCompare3((uint16_t) (ui8_value_b << 1));
 #elif (SVM_TABLE == SINE) || (SVM_TABLE == SINE_SVM_ORIGINAL)
   // scale and apply _duty_cycle
-  ui8_value_a = ui8_svm_table[ui8_motor_rotor_position];
-  ui16_value = (uint16_t) (ui8_value_a * ui8_duty_cycle_value);
-  ui8_value_a = (uint8_t) (ui16_value >> 8);
+  ui16_value_a = ui16_svm_table[ui8_motor_rotor_position];
+  ui32_value = ui16_value_a * (uint32_t) (ui8_duty_cycle_value);
+  ui16_value_a = ui32_value >> 8;
 
   // add 120 degrees and limit
-  ui8_value_b = ui8_svm_table[(uint8_t) (ui8_motor_rotor_position + 85 /* 120º */)];
-  ui16_value = (uint16_t) (ui8_value_b * ui8_duty_cycle_value);
-  ui8_value_b = (uint8_t) (ui16_value >> 8);
+  ui16_value_b = ui16_svm_table[(uint8_t) (ui8_motor_rotor_position + 85 /* 120º */)];
+  ui32_value = ui16_value_b * (uint32_t) (ui8_duty_cycle_value);
+  ui16_value_b = ui32_value >> 8;
 
   // subtract 120 degrees and limit
-  ui8_value_c = ui8_svm_table[(uint8_t) (ui8_motor_rotor_position + 171 /* 240º */)];
-  ui16_value = (uint16_t) (ui8_value_c * ui8_duty_cycle_value);
-  ui8_value_c = (uint8_t) (ui16_value >> 8);
+  ui16_value_c = ui16_svm_table[(uint8_t) (ui8_motor_rotor_position + 171 /* 240º */)];
+  ui32_value = ui16_value_c * (uint32_t) (ui8_duty_cycle_value);
+  ui16_value_c = ui32_value >> 8;
 
   // set final duty_cycle value
-  TIM1_SetCompare1((uint16_t) (ui8_value_a << 2));
-  TIM1_SetCompare2((uint16_t) (ui8_value_c << 2));
-  TIM1_SetCompare3((uint16_t) (ui8_value_b << 2));
+  TIM1_SetCompare1(ui16_value_a);
+  TIM1_SetCompare2(ui16_value_c);
+  TIM1_SetCompare3(ui16_value_b);
 #endif
 }
 
