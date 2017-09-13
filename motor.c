@@ -48,12 +48,14 @@ uint16_t ui16_iq_current_ma = 0;
 
 void TIM1_UPD_OVF_TRG_BRK_IRQHandler(void) __interrupt(TIM1_UPD_OVF_TRG_BRK_IRQHANDLER)
 {
+//debug_pin_set ();
   hall_sensors_read_and_action ();
 
   motor_fast_loop ();
 
   // clear the interrupt pending bit for TIM1
   TIM1_ClearITPendingBit(TIM1_IT_UPDATE);
+//debug_pin_reset ();
 }
 
 void hall_sensor_init (void)

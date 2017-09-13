@@ -823,7 +823,7 @@ void pwm_init (void)
 #elif (SVM_TABLE == SINE) || (SVM_TABLE == SINE_SVM_ORIGINAL)
   TIM1_TimeBaseInit(0, // TIM1_Prescaler = 0
 		    TIM1_COUNTERMODE_UP,
-		    (1024 - 1), // clock = 16MHz; counter period = 1024; PWM freq = 16MHz / 1024 = 15.625kHz;
+		    (700 - 1), // clock = 16MHz; counter period = 1024; PWM freq = 16MHz / 700 = 22.857kHz;
 		    0); // will fire the TIM1_IT_UPDATE at every PWM period
 #endif
 
