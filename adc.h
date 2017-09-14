@@ -12,6 +12,8 @@
 #include "main.h"
 
 extern uint8_t adc_throttle_busy_flag;
+extern uint8_t ui8_BatteryVoltage;
+extern uint8_t ui8_BatteryCurrent;
 
 void adc_init (void);
 uint8_t adc_read_throttle (void);

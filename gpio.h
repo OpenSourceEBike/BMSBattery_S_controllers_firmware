@@ -18,7 +18,7 @@
  * PB5  (ADC_AIN5)    | in  | ??  | current_phase_B
  * PB6  (ADC_AIN6)    | in  | ??  | total_current
  *
- * ??   (ADC12_IN4)   | in  | ??  | battery_voltage
+ * PE6  (ADC_AIN9)     | in  | ??  | battery_voltage
  *
  * PE0                | in  | ??  | Hall_sensor_A
  * PE1                | in  | ??  | Hall_sensor_B
@@ -37,6 +37,8 @@
  * PA4                | in  | ??  | brake
  * PB4  (ADC_AIN4)    | in  | ??  | throttle
  * PD0                | in  | ??  | PAS
+ * PC5                | in  | ??  | SPEED
+ *
  *
  */
 
@@ -51,8 +53,8 @@
 #define CURRENT_TOTAL__PIN        GPIO_PIN_6
 #define CURRENT_TOTAL__PORT       GPIOB
 
-#define BATTERY_VOLTAGE__PIN      GPIO_PIN_4
-#define BATTERY_VOLTAGE__PORT     GPIOA
+#define BATTERY_VOLTAGE__PIN      GPIO_PIN_6
+#define BATTERY_VOLTAGE__PORT     GPIOE
 
 #if ((MOTOR_TYPE == MOTOR_TYPE_Q85) || (MOTOR_TYPE == MOTOR_TYPE_EUC2))
   #define HALL_SENSOR_A__PIN      GPIO_PIN_0
@@ -94,6 +96,9 @@
 #define PAS__PIN                  GPIO_PIN_0
 #define PAS__PORT                 GPIOD
 
+#define SPEED__PIN                  GPIO_PIN_5
+#define SPEED__PORT                 GPIOC
+
 #define DEBUG__PIN                  GPIO_PIN_2
 #define DEBUG__PORT                 GPIOD
 
@@ -101,5 +106,7 @@ void gpio_init (void);
 void debug_pin_init (void);
 void debug_pin_set (void);
 void debug_pin_reset (void);
+void PAS_init (void);
+void SPEED_init (void);
 
 #endif /* GPIO_H_ */

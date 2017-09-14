@@ -13,7 +13,7 @@
 #include "interrupts.h"
 
 #define SVM 1
-#define SINE_SVM 2
+#define SINE_SVM_ORIGINAL 2
 #define SINE 3
 
 #define SVM_TABLE SVM
