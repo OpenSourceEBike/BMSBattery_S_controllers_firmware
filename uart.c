@@ -76,12 +76,12 @@ char getchar1(void)
 
   if (c == '0')
   {
-    ui8_position_correction_value--;
+    ui8_tune++;
   }
 
   if (c == '1')
   {
-    ui8_position_correction_value++;
+    ui8_tune--;
   }
 
   if (c == '2')

@@ -51,6 +51,8 @@ uint16_t ui16_PAS = 32000;		//cadence in timetics
 uint8_t ui8_PAS_Flag = 0; 		//flag for PAS interrupt
 uint8_t ui8_SPEED_Flag = 0; 		//flag for SPEED interrupt
 
+uint8_t ui8_tune = 100;
+
 /////////////////////////////////////////////////////////////////////////////////////////////
 //// Functions prototypes
 
@@ -144,17 +146,17 @@ int main (void)
 
 
       i16_temp = (((int16_t) ui16_ADC_iq_current_filtered) - 511) * ADC_PHASE_B_CURRENT_FACTOR_MA;
-      printf("%d, %d, %d\n", ui16_motor_speed_erps, i16_temp, ui8_position_correction_value);
+      printf("%d, %d, %d, %d\n", ui16_motor_speed_erps, i16_temp, ui8_position_correction_value, ui8_tune);
 //      printf("%d, %d, %d\n", ui8_motor_state, ui16_motor_speed_erps, ui8_position_correction_value);
 
 #if (MOTOR_TYPE == MOTOR_TYPE_EUC2)
       if (ui16_motor_speed_erps > 7)
       {
-	if (ui16_ADC_iq_current_filtered > 512)
+	if (ui16_ADC_iq_current_filtered > (413 + ui8_tune))
 	{
 	  ui8_position_correction_value++;
 	}
-	else if (ui16_ADC_iq_current_filtered < 504)
+	else if (ui16_ADC_iq_current_filtered < (409 + ui8_tune))
 	{
 	  ui8_position_correction_value--;
 	}
@@ -162,11 +164,11 @@ int main (void)
 #elif (MOTOR_TYPE == MOTOR_TYPE_Q85)
       if (ui16_motor_speed_erps > 7)
       {
-	if (ui16_ADC_iq_current_filtered > 510)
+	if (ui16_ADC_iq_current_filtered > (511 + 2))
 	{
 	  ui8_position_correction_value++;
 	}
-	else if (ui16_ADC_iq_current_filtered < 508)
+	else if (ui16_ADC_iq_current_filtered < (507 + 2))
 	{
 	  ui8_position_correction_value--;
 	}

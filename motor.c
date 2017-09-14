@@ -36,6 +36,9 @@ uint16_t ui16_adc_current_phase_B = 0;
 uint16_t ui16_adc_current_phase_B_accumulated = 0;
 uint16_t ui16_adc_current_phase_B_filtered = 0;
 
+uint16_t ui16_PWM_cycles_counter_average_accumulated = 0;
+uint16_t ui16_PWM_cycles_counter_average_filtered = 0;
+
 uint8_t ui8_motor_state = MOTOR_STATE_COAST;
 
 int8_t hall_sensors;
@@ -89,7 +92,20 @@ debug_pin_set ();
 	ui16_ADC_iq_current_filtered = ui16_ADC_iq_current_accumulated >> 2;
       }
 
-      ui16_PWM_cycles_counter_total = ui16_PWM_cycles_counter;
+
+      ui16_PWM_cycles_counter_average_accumulated -= ui16_PWM_cycles_counter_average_accumulated >> 2;
+      ui16_PWM_cycles_counter_average_accumulated += ui16_PWM_cycles_counter;
+      ui16_PWM_cycles_counter_average_filtered = ui16_PWM_cycles_counter_average_accumulated >> 2;
+
+      if (ui8_motor_state == MOTOR_STATE_RUNNING_INTERPOLATION_60_DEGREES)
+      {
+	ui16_PWM_cycles_counter_total = ui16_PWM_cycles_counter_average_filtered;
+      }
+      else
+      {
+	ui16_PWM_cycles_counter_total = ui16_PWM_cycles_counter;
+      }
+
       ui16_PWM_cycles_counter = 0;
       ui16_PWM_cycles_counter_total_div_4 = ui16_PWM_cycles_counter_total >> 2;
       ui16_motor_speed_erps = PWM_CYCLES_SECOND / ui16_PWM_cycles_counter_total; // this division takes ~4.2us
