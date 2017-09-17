@@ -12,7 +12,7 @@
 #define MOTOR_TYPE_Q85 1
 #define MOTOR_TYPE_EUC2 2
 
-#define MOTOR_TYPE MOTOR_TYPE_EUC2
+#define MOTOR_TYPE MOTOR_TYPE_Q85
 
 #define SVM_TABLE_LEN 256
 #define SVM_TABLE_LEN_x1024 262144 //(256 * 1024)
@@ -37,16 +37,16 @@
 //#define MOTOR_ROTOR_DELTA_PHASE_ANGLE_RIGHT 77// best value found (at max speed, minimum current and power supply voltage keeps the same)
 #define MOTOR_ROTOR_DELTA_PHASE_ANGLE_RIGHT 4// value for ui8_position_correction_value = 0 initially @ shenyi middrive motor
 #elif MOTOR_TYPE == MOTOR_TYPE_EUC2
-#define MOTOR_ROTOR_DELTA_PHASE_ANGLE_RIGHT 35// best value found
+#define MOTOR_ROTOR_DELTA_PHASE_ANGLE_RIGHT 92 // best value found
 #endif
 
-#define PWM_CYCLES_COUNTER_MAX 625 // bei hï¿½heren Werten wird angenommen, der Motor steht.
+#define PWM_CYCLES_COUNTER_MAX 625 // bei höheren Werten wird angenommen, der Motor steht.
 #define PWM_CYCLES_SECOND 15625L // 1 / 64us(PWM period)
 
 // 2 seconds to get up to max PWM duty cycle value of 255 (127 * 255 * 64us ~= 2 seconds)
 #define PWM_DUTY_CYCLE_CONTROLLER_COUNTER 127
 
-#define SPEED_INVERSE_INTERPOLATION 16000 // experimental value; min speed aftwer which interpolation starts
+#define SPEED_INVERSE_INTERPOLATION 350 // experimental value; min speed aftwer which interpolation starts
 
 #define PWM_VALUE_DUTY_CYCLE_MAX (256 - 1)
 #define MIDDLE_PWM_VALUE_DUTY_CYCLE_MAX (PWM_VALUE_DUTY_CYCLE_MAX/2)

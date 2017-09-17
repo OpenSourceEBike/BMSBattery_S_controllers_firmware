@@ -155,7 +155,7 @@ printf("Torquearray initialized\n");
       ui16_PAS_Counter=0;			//reset PAS Counter
 
       ui8_PAS_Flag =0; 			//reset interrupt flag
-
+      if(!ui8_logging_active){
       ui8_adc_read_throttle_busy = 1;
       ui8_temp = adc_read_throttle (); //read in recent torque value
       ui8_adc_read_throttle_busy = 0;
@@ -166,26 +166,28 @@ printf("Torquearray initialized\n");
 	   }
       ui8_torque_index++;
       if (ui8_torque_index>NUMBER_OF_PAS_MAGS-1){ui8_torque_index=0;} //reset index counter
+      }
 
     }
 
 #else // just read in throttle value
+
+    if(!ui8_logging_active){
     ui8_adc_read_throttle_busy = 1;
     ui8_temp= adc_read_throttle (); //read in recent torque value
-    ui16_sum_torque = (uint8_t) map (ui8_temp , ADC_THROTTLE_MIN_VALUE, ADC_THROTTLE_MAX_VALUE, 0, SETPOINT_MAX_VALUE); //map throttle to limits
     ui8_adc_read_throttle_busy = 0;
+    ui16_sum_torque = (uint8_t) map (ui8_temp , ADC_THROTTLE_MIN_VALUE, ADC_THROTTLE_MAX_VALUE, 0, SETPOINT_MAX_VALUE); //map throttle to limits
+    }
 
 #endif
 // scheduled update of setpoint and duty cycle (every 100ms)
-    ui16_temp_delay = TIM2_GetCounter ();
+	ui16_temp_delay = TIM2_GetCounter ();
 
-    if ((ui16_temp_delay - ui16_throttle_counter) > 100)
+	if ((ui16_temp_delay - ui16_throttle_counter) > 100)
     {
-      ui16_throttle_counter = ui16_temp_delay;
-      //printf("Timetic!");
+	  ui16_throttle_counter = ui16_temp_delay;
+	  //printf("Timetic!");
 
-//#define DO_CRUISE_CONTROL 1
-#if DO_CRUISE_CONTROL == 1
 	  ui16_setpoint = (uint16_t)update_setpoint (ui16_SPEED,ui16_PAS,ui16_sum_torque,ui16_setpoint); //update setpoint
 /*
 //Read in throttle for debugging to test, if motor runs with additional interrupts from PAS and SPEEDk
@@ -194,23 +196,29 @@ printf("Torquearray initialized\n");
 	  ui8_adc_read_throttle_busy = 0;
 
 */
+
+
+
+#define DO_CRUISE_CONTROL 1
+#if DO_CRUISE_CONTROL == 1
 	  ui16_setpoint = cruise_control (ui16_setpoint);
 #endif
 
-#if TORQUESENSOR
       pwm_set_duty_cycle ((uint8_t)ui16_setpoint);
-#else if THROTTLE
-      pwm_set_duty_cycle ((uint8_t)ui16_sum_torque);
-#endif
+	  /****************************************************************************/
 
       getchar1 ();
+     // printf("Main: spd %d, pas %d, sumtor %d, setpoint %d\n", ui16_SPEED, ui16_PAS, ui16_sum_torque, ui16_setpoint);
+     /*
+     if(ui16_speed_inverse < 60 ) { ui8_position_correction_value = 152-((ui16_speed_inverse*44)/100);}
+     else {ui8_position_correction_value=127;}
+     */
 
-      // printf("Main: spd %d, pas %d, sumtor %d, setpoint %d\n", ui16_SPEED, ui16_PAS, ui16_sum_torque, ui16_setpoint);
-      if(ui16_speed_inverse < 60 ) { ui8_position_correction_value = 152-((ui16_speed_inverse*44)/100);}
-      else {ui8_position_correction_value=127;}
-
-//      printf("%d, %d\n", ui16_speed_inverse, ui8_position_correction_value);
-      printf("%d, %d\n", ui8_motor_state, ui16_PWM_cycles_counter_total);
+      if (ui8_adc_read_throttle_busy == 0)
+          	    {
+	  ui16_log1= ADC1_GetConversionValue ();  //read in phaseB current and store it into array
+          	    }
+     printf("%d, %d, %d\n", ui16_speed_inverse, ui16_log1, ui8_position_correction_value);
     }
   }
 }

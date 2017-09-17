@@ -13,6 +13,8 @@
 #include "stm8s_uart2.h"
 #include "motor.h"
 
+uint8_t ui8_array_flag=0;
+
 void uart_init (void)
 {
   UART2_DeInit();
@@ -54,6 +56,8 @@ int getchar(void)
 {
   uint8_t c = 0;
 
+
+
   /* Loop until the Read data register flag is SET */
   while (UART2_GetFlagStatus(UART2_FLAG_RXNE) == RESET) ;
 
@@ -65,6 +69,7 @@ int getchar(void)
 char getchar1(void)
 {
   uint8_t c = 0;
+  uint8_t a = 0;
 
   if (UART2_GetFlagStatus(UART2_FLAG_RXNE) == RESET)
   {
@@ -78,10 +83,26 @@ char getchar1(void)
     ui8_position_correction_value--;
   }
 
+
   if (c == '1')
+  	  {
+  	    ui8_position_correction_value++;
+  	  }
+
+  if (c == '2')
 	  {
-	    ui8_position_correction_value++;
+	    ui8_array_flag=1;
 	  }
 
+  if (c == '3')
+
+    {
+
+	  for(a = 0; a < ui16_Phase_current_array[0]; a++) {			// print the Phase B current array to UART, this will stop the motor from running, i guess
+	      printf("%d\n", ui16_Phase_current_array[a]);
+	   }
+
+
+	  }
   return (c);
 }

@@ -11,6 +11,8 @@
 
 #include "main.h"
 
+extern uint8_t ui8_array_flag;
+
 void uart_init (void);
 char getchar1(void);
 

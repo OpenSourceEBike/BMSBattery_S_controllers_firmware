@@ -29,7 +29,7 @@ int8_t uint_PWM_Enable=0;
 
 uint16_t update_setpoint (uint16_t speed, uint16_t PAS, uint16_t sumtorque, uint16_t setpoint_old)
 {
-
+  ui32_SPEED_km_h=(wheel_circumference*PWM_CYCLES_SECOND*36L)/(100000L*(uint32_t)speed);			//calculate speed in km/h conversion fr	om sec to hour --> *3600, conversion from mm to km --> /1000000, tic frequency 15625 Hz
   if(ui8_BatteryVoltage<BATTERY_VOLTAGE_MIN_VALUE){
       ui32_setpoint=0; 	// highest priority: Stop motor for undervoltage protection
       TIM1_CtrlPWMOutputs(DISABLE);
@@ -57,7 +57,7 @@ uint16_t update_setpoint (uint16_t speed, uint16_t PAS, uint16_t sumtorque, uint
 #ifdef TORQUESENSOR
   ui32_setpoint=(fummelfaktor*sumtorque)/PAS; 						//calculate setpoint
   //printf("vor: spd %d, pas %d, sumtor %d, setpoint %lu\n", speed, PAS, sumtorque, ui32_setpoint);
-  ui32_SPEED_km_h=(wheel_circumference*PWM_CYCLES_SECOND*36L)/(100000L*(uint32_t)speed);			//calculate speed in km/h conversion fr	om sec to hour --> *3600, conversion from mm to km --> /1000000, tic frequency 15625 Hz
+
   i16_delta=(ui32_setpoint-setpoint_old)/p_factor; 					//simple p-controller to avoid big steps in setpoint value course
   if (i16_delta>max_change){i16_delta=max_change;}					//limit max change of setpoint to avoid motor stopping by fault
   if (i16_delta<setpoint_old){ui32_setpoint=(uint32_t)setpoint_old+(uint32_t)i16_delta;}				//adjust setpoint relatively to the old setpoint
