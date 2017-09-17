@@ -29,7 +29,8 @@ int8_t uint_PWM_Enable=0;
 
 uint16_t update_setpoint (uint16_t speed, uint16_t PAS, uint16_t sumtorque, uint16_t setpoint_old)
 {
-  ui32_SPEED_km_h=(wheel_circumference*PWM_CYCLES_SECOND*36L)/(100000L*(uint32_t)speed);			//calculate speed in km/h conversion fr	om sec to hour --> *3600, conversion from mm to km --> /1000000, tic frequency 15625 Hz
+   ui32_SPEED_km_h=(wheel_circumference*PWM_CYCLES_SECOND*36L)/(100000L*(uint32_t)speed);			//calculate speed in km/h conversion fr	om sec to hour --> *3600, conversion from mm to km --> /1000000, tic frequency 15625 Hz
+
   if(ui8_BatteryVoltage<BATTERY_VOLTAGE_MIN_VALUE){
       ui32_setpoint=0; 	// highest priority: Stop motor for undervoltage protection
       TIM1_CtrlPWMOutputs(DISABLE);
@@ -44,7 +45,7 @@ uint16_t update_setpoint (uint16_t speed, uint16_t PAS, uint16_t sumtorque, uint
       ui32_setpoint=0;			// next priority: Stop motor if not pedaling
       printf("you are not pedaling!");
 #endif
-
+      ui32_SPEED_km_h=(wheel_circumference*PWM_CYCLES_SECOND*36L)/(100000L*(uint32_t)speed);			//calculate speed in km/h conversion fr	om sec to hour --> *3600, conversion from mm to km --> /1000000, tic frequency 15625 Hz
   }else if(ui8_BatteryCurrent>BATTERY_CURRENT_MAX_VALUE){
       ui32_setpoint=setpoint_old--;  //next priority: reduce (old) setpoint if battery current is too high
       printf("Battery Current too high!");

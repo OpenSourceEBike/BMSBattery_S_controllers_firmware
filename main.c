@@ -92,6 +92,7 @@ int main (void)
 //  static uint8_t ui8_cruise_duty_cycle = 0;
   static uint16_t ui16_setpoint = ADC_THROTTLE_MIN_VALUE;
   static uint8_t ui8_temp = 0;
+  static int16_t i16_temp = 0;
 
 
   //set clock at the max 16MHz
@@ -170,14 +171,6 @@ printf("Torquearray initialized\n");
 
     }
 
-#else // just read in throttle value
-
-    if(!ui8_logging_active){
-    ui8_adc_read_throttle_busy = 1;
-    ui8_temp= adc_read_throttle (); //read in recent torque value
-    ui8_adc_read_throttle_busy = 0;
-    ui16_sum_torque = (uint8_t) map (ui8_temp , ADC_THROTTLE_MIN_VALUE, ADC_THROTTLE_MAX_VALUE, 0, SETPOINT_MAX_VALUE); //map throttle to limits
-    }
 
 #endif
 // scheduled update of setpoint and duty cycle (every 100ms)
@@ -187,7 +180,12 @@ printf("Torquearray initialized\n");
     {
 	  ui16_throttle_counter = ui16_temp_delay;
 	  //printf("Timetic!");
-
+#ifndef TORQUESENSOR
+	  ui8_adc_read_throttle_busy = 1;
+	      ui8_temp= adc_read_throttle (); //read in recent torque value
+	      ui8_adc_read_throttle_busy = 0;
+	      ui16_sum_torque = (uint8_t) map (ui8_temp , ADC_THROTTLE_MIN_VALUE, ADC_THROTTLE_MAX_VALUE, 0, SETPOINT_MAX_VALUE); //map throttle to limits
+#endif
 	  ui16_setpoint = (uint16_t)update_setpoint (ui16_SPEED,ui16_PAS,ui16_sum_torque,ui16_setpoint); //update setpoint
 /*
 //Read in throttle for debugging to test, if motor runs with additional interrupts from PAS and SPEEDk
@@ -199,7 +197,7 @@ printf("Torquearray initialized\n");
 
 
 
-#define DO_CRUISE_CONTROL 1
+//#define DO_CRUISE_CONTROL 1
 #if DO_CRUISE_CONTROL == 1
 	  ui16_setpoint = cruise_control (ui16_setpoint);
 #endif
@@ -208,17 +206,24 @@ printf("Torquearray initialized\n");
 	  /****************************************************************************/
 
       getchar1 ();
-     // printf("Main: spd %d, pas %d, sumtor %d, setpoint %d\n", ui16_SPEED, ui16_PAS, ui16_sum_torque, ui16_setpoint);
-     /*
-     if(ui16_speed_inverse < 60 ) { ui8_position_correction_value = 152-((ui16_speed_inverse*44)/100);}
-     else {ui8_position_correction_value=127;}
-     */
+      i16_temp = (((int16_t) ui16_ADC_iq_current_filtered) - 511) * ADC_PHASE_B_CURRENT_FACTOR_MA;
+            printf("%d, %d, %d\n", ui16_motor_speed_erps, i16_temp, ui8_position_correction_value);
+      //      printf("%d, %d, %d\n", ui8_motor_state, ui16_motor_speed_erps, ui8_position_correction_value);
 
-      if (ui8_adc_read_throttle_busy == 0)
-          	    {
-	  ui16_log1= ADC1_GetConversionValue ();  //read in phaseB current and store it into array
-          	    }
-     printf("%d, %d, %d\n", ui16_speed_inverse, ui16_log1, ui8_position_correction_value);
+
+
+      if (ui16_motor_speed_erps > 7)
+            {
+      	if (ui16_ADC_iq_current_filtered > 510)
+      	{
+      	  ui8_position_correction_value++;
+      	}
+      	else if (ui16_ADC_iq_current_filtered < 508)
+      	{
+      	  ui8_position_correction_value--;
+      	}
+            }
+
     }
   }
 }

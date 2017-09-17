@@ -12,25 +12,26 @@
 #include "main.h"
 #include "interrupts.h"
 
-// direction of motor movement
-#define RIGHT 		1
-#define LEFT 		2
-
 // motor states
 #define MOTOR_STATE_COAST 0
-#define MOTOR_STATE_RUNNING_VERY_SLOW 1
-#define MOTOR_STATE_RUNNING 2
+#define MOTOR_STATE_RUNNING_NO_INTERPOLATION_60_DEGREES 1
+#define MOTOR_STATE_RUNNING_INTERPOLATION_60_DEGREES 2
+#define MOTOR_STATE_RUNNING_INTERPOLATION_360_DEGREES 3
 
 extern uint8_t ui8_motor_rotor_position;
 extern uint8_t ui8_position_correction_value;
+extern uint8_t ui8_position_correction_value1;
 extern uint16_t ui16_speed_inverse;
-extern uint8_t motor_state;
-extern uint16_t ui16_Phase_current_array[350];
-extern uint8_t ui8_logging_active;
+extern uint8_t ui8_motor_state;
+extern uint16_t ui16_PWM_cycles_counter_total;
+extern uint16_t ui16_motor_speed_erps;
+extern uint16_t ui16_ADC_iq_current;
+extern uint16_t ui16_iq_current_ma;
+extern uint16_t ui16_ADC_iq_current_filtered;
+extern uint16_t ui16_log;
 
 void hall_sensor_init (void);
 void hall_sensors_read_and_action (void);
 void motor_fast_loop (void);
-int8_t get_motor_rotation_direction (void);
 
 #endif /* _MOTOR_H_ */

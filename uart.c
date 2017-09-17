@@ -89,20 +89,8 @@ char getchar1(void)
   	    ui8_position_correction_value++;
   	  }
 
-  if (c == '2')
-	  {
-	    ui8_array_flag=1;
-	  }
-
-  if (c == '3')
-
-    {
-
-	  for(a = 0; a < ui16_Phase_current_array[0]; a++) {			// print the Phase B current array to UART, this will stop the motor from running, i guess
-	      printf("%d\n", ui16_Phase_current_array[a]);
-	   }
 
 
-	  }
+
   return (c);
 }
