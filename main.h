@@ -26,7 +26,7 @@
 // at 8 bits ADC, 1A = 16
 #define ADC_MOTOR_TOTAL_CURRENT_ZERO_AMPS 81 // 1.59V; 325 (10bits) = 81 (8bits)
 #define ADC_MOTOR_TOTAL_CURRENT_MAX 32 // 32 (8bits) ~ 2 Amps
-#define ADC_MOTOR_TOTAL_CURRENT_MAX_POSITIVE 86//86 // +2A
+#define ADC_MOTOR_TOTAL_CURRENT_MAX_POSITIVE 92//86 // +2A
 #define ADC_MOTOR_TOTAL_CURRENT_MIN_NEGATIVE 76//76 // -2A
 
 // Phase current: max of +-15.5 amps
@@ -45,7 +45,8 @@
 #define PWM_CYCLES_SECOND 15625L // 1 / 64us(PWM period)
 
 // 2 seconds to get up to max PWM duty cycle value of 255 (127 * 255 * 64us ~= 2 seconds)
-#define PWM_DUTY_CYCLE_CONTROLLER_COUNTER 127
+//#define PWM_DUTY_CYCLE_CONTROLLER_COUNTER 127
+#define PWM_DUTY_CYCLE_CONTROLLER_COUNTER 2
 
 #define SPEED_INVERSE_INTERPOLATION 625 // experimental value; min speed aftwer which interpolation starts
 

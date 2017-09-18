@@ -891,6 +891,8 @@ void pwm_duty_cycle_controller (void)
   // limit PWM increase/decrease rate --- comment from stancecoke: this part does just nothing? ui8_counter is never increased?!
   static uint8_t ui8_counter;
 
+  static uint8_t ui8_c;
+
   if (ui8_motor_total_current_flag == 0)
   {
     if (ui8_counter++ > PWM_DUTY_CYCLE_CONTROLLER_COUNTER)
@@ -904,13 +906,12 @@ void pwm_duty_cycle_controller (void)
   }
   else
   {
+    debug_pin_set ();
     ui8_motor_total_current_flag = 0;
-//    debug_pin_set ();
-//    if (ui8_duty_cycle > 20)
+
     if (ui8_duty_cycle > 0)
     {
       ui8_duty_cycle--;
-//      ui8_duty_cycle -= 20;
     }
   }
 
@@ -918,7 +919,8 @@ void pwm_duty_cycle_controller (void)
 #if DO_DUTY_CYCLE_RAMP == 1
   pwm_apply_duty_cycle (ui8_duty_cycle);
 #else
-  pwm_apply_duty_cycle (ui8_duty_cycle_target);
+//  pwm_apply_duty_cycle (ui8_duty_cycle_target);
+  pwm_apply_duty_cycle (ui8_duty_cycle);
 #endif
 }
 

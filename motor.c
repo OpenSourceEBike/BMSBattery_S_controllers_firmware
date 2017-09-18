@@ -53,16 +53,19 @@ void TIM1_UPD_OVF_TRG_BRK_IRQHandler(void) __interrupt(TIM1_UPD_OVF_TRG_BRK_IRQH
 {
   uint8_t ui8_temp;
 
-//debug_pin_set ();
-
-  adc_select_channel (ADC1_CHANNEL_MOTOR_TOTAL_CURRENT);
-  ui8_temp = adc_read_channel () >> 2;
-//  if ((ui8_temp > ADC_MOTOR_TOTAL_CURRENT_MAX_POSITIVE) || (ui8_temp < ADC_MOTOR_TOTAL_CURRENT_MIN_NEGATIVE))
-debug_pin_set ();
-  if (ui8_temp > ADC_MOTOR_TOTAL_CURRENT_MAX_POSITIVE)
+  if (ui8_motor_state == MOTOR_STATE_RUNNING_INTERPOLATION_360_DEGREES)
   {
-    TIM1->BKR &= (uint8_t)(~TIM1_BKR_MOE);
-    ui8_motor_total_current_flag = 1;
+    adc_select_channel (ADC1_CHANNEL_MOTOR_TOTAL_CURRENT);
+    ui8_temp = adc_read_channel () >> 2;
+    if (ui8_temp > ADC_MOTOR_TOTAL_CURRENT_MAX_POSITIVE)
+    {
+      TIM1->BKR &= (uint8_t)(~TIM1_BKR_MOE);
+      ui8_motor_total_current_flag = 1;
+    }
+  }
+  else
+  {
+    ui8_motor_total_current_flag = 0;
   }
 
   hall_sensors_read_and_action ();
@@ -113,7 +116,7 @@ void hall_sensors_read_and_action (void)
 
       // update motor state based on motor speed
 #if MOTOR_TYPE == MOTOR_TYPE_Q85
-      if (ui16_motor_speed_erps > 50)
+      if (ui16_motor_speed_erps > 100)
       {
 	ui8_motor_state = MOTOR_STATE_RUNNING_INTERPOLATION_360_DEGREES;
       }
