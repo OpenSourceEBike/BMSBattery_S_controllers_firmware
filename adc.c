@@ -14,6 +14,7 @@
 uint8_t adc_throttle_busy_flag = 0;
 uint8_t ui8_BatteryVoltage = 0;
 uint8_t ui8_BatteryCurrent = 0;
+uint16_t ui16_BatteryCurrent_accumulated = 0;
 
 void adc_init (void)
 {
@@ -70,7 +71,9 @@ uint8_t adc_read_throttle (void)
 
   ADC1->CR1 |= ADC1_CR1_ADON;
   while (!(ADC1->CSR & ADC1_FLAG_EOC)) ;
-  ui8_BatteryCurrent = ADC1->DRH;
+  ui16_BatteryCurrent_accumulated -= ui16_BatteryCurrent_accumulated>>4; //filtering Battery Current Value, as Signal has much scatter
+  ui16_BatteryCurrent_accumulated += ADC1->DRH;
+  ui8_BatteryCurrent = ui16_BatteryCurrent_accumulated>>4;
 
  //Read in battery voltage value (just upper 8bits for performance issues)
     ADC1_Init(ADC1_CONVERSIONMODE_SINGLE,

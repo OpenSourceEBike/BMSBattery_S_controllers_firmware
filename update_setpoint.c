@@ -25,6 +25,7 @@
 static uint32_t ui32_setpoint;
 static uint32_t ui32_SPEED_km_h;
 static int16_t i16_delta;
+static int16_t i16_decaAmps;
 int8_t uint_PWM_Enable=0;
 
 uint16_t update_setpoint (uint16_t speed, uint16_t PAS, uint16_t sumtorque, uint16_t setpoint_old)
@@ -83,8 +84,8 @@ uint16_t update_setpoint (uint16_t speed, uint16_t PAS, uint16_t sumtorque, uint
 #ifdef THROTTLE_AND_PAS
   ui32_setpoint=sumtorque;
 #endif
-
-  printf("Current %d, Voltage %d, sumtor %d, setpoint %lu, km/h %lu\n", ui8_BatteryCurrent, ui8_BatteryVoltage, sumtorque, ui32_setpoint, ui32_SPEED_km_h);
+  i16_decaAmps= (current_cal_a*(int16_t)ui8_BatteryCurrent)/10 + current_cal_b;
+  printf("Current %d, Voltage %d, sumtor %d, setpoint %lu, km/h %lu\n", i16_decaAmps, ui8_BatteryVoltage, sumtorque, ui32_setpoint, ui32_SPEED_km_h);
   }
   return ui32_setpoint;
 }

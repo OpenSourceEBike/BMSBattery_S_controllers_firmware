@@ -156,7 +156,7 @@ printf("Torquearray initialized\n");
       ui16_PAS_Counter=0;			//reset PAS Counter
 
       ui8_PAS_Flag =0; 			//reset interrupt flag
-      if(!ui8_logging_active){
+
       ui8_adc_read_throttle_busy = 1;
       ui8_temp = adc_read_throttle (); //read in recent torque value
       ui8_adc_read_throttle_busy = 0;
@@ -167,7 +167,7 @@ printf("Torquearray initialized\n");
 	   }
       ui8_torque_index++;
       if (ui8_torque_index>NUMBER_OF_PAS_MAGS-1){ui8_torque_index=0;} //reset index counter
-      }
+
 
     }
 
