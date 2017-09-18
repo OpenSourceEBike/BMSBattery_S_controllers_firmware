@@ -15,6 +15,7 @@
 #include "motor.h"
 #include "pwm.h"
 #include "config.h"
+#include "adc.h"
 
 uint8_t ui8_counter = 0;
 
@@ -46,16 +47,34 @@ uint16_t ui16_ADC_iq_current_accumulated = 0;
 uint16_t ui16_ADC_iq_current_filtered = 0;
 uint16_t ui16_iq_current_ma = 0;
 
+uint8_t ui8_motor_total_current_flag = 0;
+
 void TIM1_UPD_OVF_TRG_BRK_IRQHandler(void) __interrupt(TIM1_UPD_OVF_TRG_BRK_IRQHANDLER)
 {
+  uint8_t ui8_temp;
+
 //debug_pin_set ();
+
+  adc_select_channel (ADC1_CHANNEL_MOTOR_TOTAL_CURRENT);
+  ui8_temp = adc_read_channel () >> 2;
+//  if ((ui8_temp > ADC_MOTOR_TOTAL_CURRENT_MAX_POSITIVE) || (ui8_temp < ADC_MOTOR_TOTAL_CURRENT_MIN_NEGATIVE))
+debug_pin_set ();
+  if (ui8_temp > ADC_MOTOR_TOTAL_CURRENT_MAX_POSITIVE)
+  {
+    TIM1->BKR &= (uint8_t)(~TIM1_BKR_MOE);
+    ui8_motor_total_current_flag = 1;
+  }
+
   hall_sensors_read_and_action ();
 
   motor_fast_loop ();
 
-  // clear the interrupt pending bit for TIM1
+  // read here ADC1_CHANNEL_THROTTLE to avoid PWM signal interferences
+  adc_select_channel (ADC1_CHANNEL_THROTTLE);
+  ui8_ADC_throttle = adc_read_channel () >> 2;
+
   TIM1_ClearITPendingBit(TIM1_IT_UPDATE);
-//debug_pin_reset ();
+debug_pin_reset ();
 }
 
 void hall_sensor_init (void)
@@ -79,15 +98,13 @@ void hall_sensors_read_and_action (void)
     switch (hall_sensors)
     {
       case 3:
+//debug_pin_set ();
       // read here the phase B current
-      if (ui8_adc_read_throttle_busy == 0)
-      {
-debug_pin_set ();
-	ui16_ADC_iq_current = ADC1_GetConversionValue ();
-	ui16_ADC_iq_current_accumulated -= ui16_ADC_iq_current_accumulated >> 2;
-	ui16_ADC_iq_current_accumulated += ui16_ADC_iq_current;
-	ui16_ADC_iq_current_filtered = ui16_ADC_iq_current_accumulated >> 2;
-      }
+      adc_select_channel (ADC1_CHANNEL_PHASE_CURRENT_B);
+      ui16_ADC_iq_current = adc_read_channel ();
+      ui16_ADC_iq_current_accumulated -= ui16_ADC_iq_current_accumulated >> 2;
+      ui16_ADC_iq_current_accumulated += ui16_ADC_iq_current;
+      ui16_ADC_iq_current_filtered = ui16_ADC_iq_current_accumulated >> 2;
 
       ui16_PWM_cycles_counter_total = ui16_PWM_cycles_counter;
       ui16_PWM_cycles_counter = 0;
@@ -137,7 +154,7 @@ debug_pin_set ();
       break;
 
       case 4:
-debug_pin_reset ();
+//debug_pin_reset ();
       if (ui8_motor_state != MOTOR_STATE_RUNNING_INTERPOLATION_360_DEGREES)
       {
 	ui8_motor_rotor_absolute_position = ANGLE_1 + MOTOR_ROTOR_DELTA_PHASE_ANGLE_RIGHT;

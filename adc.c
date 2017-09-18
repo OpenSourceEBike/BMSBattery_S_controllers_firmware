@@ -10,8 +10,9 @@
 #include "stm8s.h"
 #include "gpio.h"
 #include "stm8s_adc1.h"
+#include "adc.h"
 
-uint8_t adc_throttle_busy_flag = 0;
+uint8_t ui8_ADC_throttle = 0;
 uint8_t ui8_BatteryVoltage = 0;
 uint8_t ui8_BatteryCurrent = 0;
 
@@ -26,36 +27,7 @@ void adc_init (void)
   ADC1_DeInit();
 
   //init ADC1 peripheral
-  ADC1_Init(ADC1_CONVERSIONMODE_CONTINUOUS,
-	    ADC1_CHANNEL_5,
-	    ADC1_PRESSEL_FCPU_D2,
-            ADC1_EXTTRIG_TIM,
-	    DISABLE,
-	    ADC1_ALIGN_LEFT,
-	    (ADC1_SCHMITTTRIG_CHANNEL4 || ADC1_SCHMITTTRIG_CHANNEL5 || ADC1_SCHMITTTRIG_CHANNEL6),
-            DISABLE);
-}
-
-uint8_t adc_read_throttle (void)
-{
-  uint8_t ui8_temp;
-
-  adc_throttle_busy_flag = 1;
-
   ADC1_Init(ADC1_CONVERSIONMODE_SINGLE,
-	    ADC1_CHANNEL_4,
-	    ADC1_PRESSEL_FCPU_D2,
-            ADC1_EXTTRIG_TIM,
-	    DISABLE,
-	    ADC1_ALIGN_LEFT,
-	    (ADC1_SCHMITTTRIG_CHANNEL4 || ADC1_SCHMITTTRIG_CHANNEL5 || ADC1_SCHMITTTRIG_CHANNEL6),
-            DISABLE);
-
-  ADC1->CR1 |= ADC1_CR1_ADON;
-  while (!(ADC1->CSR & ADC1_FLAG_EOC)) ;
-  ui8_temp = ADC1->DRH;
-
-  ADC1_Init(ADC1_CONVERSIONMODE_CONTINUOUS,
 	    ADC1_CHANNEL_5,
 	    ADC1_PRESSEL_FCPU_D2,
             ADC1_EXTTRIG_TIM,
@@ -64,9 +36,54 @@ uint8_t adc_read_throttle (void)
 	    (ADC1_SCHMITTTRIG_CHANNEL4 || ADC1_SCHMITTTRIG_CHANNEL5 || ADC1_SCHMITTTRIG_CHANNEL6),
             DISABLE);
 
-  ADC1->CR1 |= ADC1_CR1_ADON;
-
-  adc_throttle_busy_flag = 0;
-
-  return ui8_temp;
+  ADC1_Cmd (ENABLE);
 }
+
+void adc_select_channel (uint8_t ADC1_channel)
+{
+  /* Clear the ADC1 channels */
+  ADC1->CSR &= (uint8_t)(~ADC1_CSR_CH);
+  /* Select the ADC1 channel */
+  ADC1->CSR |= (uint8_t)(ADC1_channel);
+
+  ADC1->CR1 |= ADC1_CR1_ADON; // enable ADC
+}
+
+void delay(uint8_t t)
+{
+  while(t--);
+}
+
+uint16_t adc_read_channel (void)
+{
+  uint16_t temph = 0;
+  uint8_t templ = 0;
+  uint8_t delay_counter;
+
+  ADC1->CR1 |= (1<<0); // ADC Start Conversion
+  delay_counter = 4;
+  while (delay_counter--) ; // minimum delay time needed for correct ADC conversion
+  while (!(ADC1->CSR & ADC1_FLAG_EOC)) ; // wait to finnish conversion (about 2us)
+  templ = ADC1->DRL;
+  temph = ADC1->DRH;
+  temph = (uint16_t)(templ | (uint16_t)(temph << (uint8_t)8));
+
+  return ((uint16_t)temph);
+}
+
+//uint16_t adc_read_channel(uint16_t channel)
+//{
+//     unsigned int val=0;
+//     //using ADC in single conversion mode
+//     ADC1->CSR |= ((0x0F)&channel); // select channel
+//     ADC1->CR2 |= (1<<3); // Right Aligned Data
+////     ADC1->CR1 |= (1<<0); // ADC ON
+//     ADC1->CR1 |= (1<<0); // ADC Start Conversion
+//     while(((ADC1->CSR)&(1<<7))== 0); // Wait till EOC
+//     val |= (unsigned int)ADC1->DRL;
+//     val |= (unsigned int)ADC1->DRH<<8;
+////     ADC1->CR1 &= ~(1<<0); // ADC Stop Conversion
+//     val &= 0x03ff;
+//     return (val);
+//}
+

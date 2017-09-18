@@ -878,7 +878,7 @@ void pwm_init (void)
 		  16, // DTG = 0; dead time in 62.5 ns steps; 1us/62.5ns = 16
 		  TIM1_BREAK_DISABLE,
 		  TIM1_BREAKPOLARITY_LOW,
-		  TIM1_AUTOMATICOUTPUT_DISABLE);
+		  TIM1_AUTOMATICOUTPUT_ENABLE);
 
   TIM1_ITConfig(TIM1_IT_UPDATE, ENABLE);
 
@@ -890,13 +890,28 @@ void pwm_duty_cycle_controller (void)
 {
   // limit PWM increase/decrease rate --- comment from stancecoke: this part does just nothing? ui8_counter is never increased?!
   static uint8_t ui8_counter;
-  if (ui8_counter++ > PWM_DUTY_CYCLE_CONTROLLER_COUNTER)
-  {
-    ui8_counter = 0;
 
-    // increment or decrement duty_cycle
-    if (ui8_duty_cycle_target > ui8_duty_cycle) { ui8_duty_cycle++; }
-    else if (ui8_duty_cycle_target < ui8_duty_cycle) { ui8_duty_cycle--; }
+  if (ui8_motor_total_current_flag == 0)
+  {
+    if (ui8_counter++ > PWM_DUTY_CYCLE_CONTROLLER_COUNTER)
+    {
+      ui8_counter = 0;
+
+      // increment or decrement duty_cycle
+      if (ui8_duty_cycle_target > ui8_duty_cycle) { ui8_duty_cycle++; }
+      else if (ui8_duty_cycle_target < ui8_duty_cycle) { ui8_duty_cycle--; }
+    }
+  }
+  else
+  {
+    ui8_motor_total_current_flag = 0;
+//    debug_pin_set ();
+//    if (ui8_duty_cycle > 20)
+    if (ui8_duty_cycle > 0)
+    {
+      ui8_duty_cycle--;
+//      ui8_duty_cycle -= 20;
+    }
   }
 
 //#define DO_DUTY_CYCLE_RAMP 1

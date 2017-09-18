@@ -128,10 +128,8 @@ int main (void)
       ui16_throttle_counter = ui16_temp_delay;
 
       /****************************************************************************/
-      // read throttle and execute cruise control
-      //
-      ui16_adc_value = (uint16_t) adc_read_throttle ();
-      ui8_temp = (uint8_t) map (ui16_adc_value, ADC_THROTTLE_MIN_VALUE, ADC_THROTTLE_MAX_VALUE, 0, 255);
+      // execute cruise control
+      ui8_temp = (uint8_t) map (ui8_ADC_throttle, ADC_THROTTLE_MIN_VALUE, ADC_THROTTLE_MAX_VALUE, 0, 255);
 
 //#define DO_CRUISE_CONTROL 1
 #if DO_CRUISE_CONTROL == 1
@@ -142,10 +140,8 @@ int main (void)
 
       getchar1 ();
 
-
       i16_temp = (((int16_t) ui16_ADC_iq_current_filtered) - 511) * ADC_PHASE_B_CURRENT_FACTOR_MA;
       printf("%d, %d, %d\n", ui16_motor_speed_erps, i16_temp, ui8_position_correction_value);
-//      printf("%d, %d, %d\n", ui8_motor_state, ui16_motor_speed_erps, ui8_position_correction_value);
 
 #if (MOTOR_TYPE == MOTOR_TYPE_EUC2)
       if (ui16_motor_speed_erps > 7)

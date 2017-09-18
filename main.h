@@ -22,10 +22,12 @@
 
 #define NUMBER_OF_PAS_MAGS 16 //16 for sensor from BMSBattery, 32 for Sempu-Sensor
 
+// each 80mv on motor total current = 1A
+// at 8 bits ADC, 1A = 16
 #define ADC_MOTOR_TOTAL_CURRENT_ZERO_AMPS 81 // 1.59V; 325 (10bits) = 81 (8bits)
-#define ADC_MOTOR_TOTAL_CURRENT_MAX 20 // 20 (8bits) ~ 2 Amps
-#define ADC_MOTOR_TOTAL_CURRENT_MAX_POSITIVE 90 // +2A
-#define ADC_MOTOR_TOTAL_CURRENT_MAX_NEGATIVE 70 // +2A
+#define ADC_MOTOR_TOTAL_CURRENT_MAX 32 // 32 (8bits) ~ 2 Amps
+#define ADC_MOTOR_TOTAL_CURRENT_MAX_POSITIVE 86//86 // +2A
+#define ADC_MOTOR_TOTAL_CURRENT_MIN_NEGATIVE 76//76 // -2A
 
 // Phase current: max of +-15.5 amps
 // 512 --> 15.5 amps
