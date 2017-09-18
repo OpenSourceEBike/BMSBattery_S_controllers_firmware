@@ -905,6 +905,7 @@ void pwm_duty_cycle_controller (void)
   else
   {
     ui8_motor_total_current_flag = 0;
+
 //    debug_pin_set ();
 //    if (ui8_duty_cycle > 20)
     if (ui8_duty_cycle > 0)
@@ -918,7 +919,8 @@ void pwm_duty_cycle_controller (void)
 #if DO_DUTY_CYCLE_RAMP == 1
   pwm_apply_duty_cycle (ui8_duty_cycle);
 #else
-  pwm_apply_duty_cycle (ui8_duty_cycle_target);
+//  pwm_apply_duty_cycle (ui8_duty_cycle_target);
+  pwm_apply_duty_cycle (ui8_duty_cycle);
 #endif
 }
 

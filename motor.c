@@ -15,6 +15,7 @@
 #include "motor.h"
 #include "pwm.h"
 #include "config.h"
+#include "stm8s_adc1.h"
 #include "adc.h"
 
 uint8_t ui8_counter = 0;
@@ -52,29 +53,20 @@ uint8_t ui8_motor_total_current_flag = 0;
 void TIM1_UPD_OVF_TRG_BRK_IRQHandler(void) __interrupt(TIM1_UPD_OVF_TRG_BRK_IRQHANDLER)
 {
   uint8_t ui8_temp;
-
-//debug_pin_set ();
-
-  adc_select_channel (ADC1_CHANNEL_MOTOR_TOTAL_CURRENT);
-  ui8_temp = adc_read_channel () >> 2;
-//  if ((ui8_temp > ADC_MOTOR_TOTAL_CURRENT_MAX_POSITIVE) || (ui8_temp < ADC_MOTOR_TOTAL_CURRENT_MIN_NEGATIVE))
-debug_pin_set ();
-  if (ui8_temp > ADC_MOTOR_TOTAL_CURRENT_MAX_POSITIVE)
-  {
-    TIM1->BKR &= (uint8_t)(~TIM1_BKR_MOE);
-    ui8_motor_total_current_flag = 1;
-  }
-
+debug_pin_reset ();
   hall_sensors_read_and_action ();
 
+//  ADC1_AWDChannelConfig (ADC1_CHANNEL_MOTOR_TOTAL_CURRENT, ENABLE);
+
   motor_fast_loop ();
+
+//  ADC1_AWDChannelConfig (ADC1_CHANNEL_MOTOR_TOTAL_CURRENT, DISABLE);
 
   // read here ADC1_CHANNEL_THROTTLE to avoid PWM signal interferences
   adc_select_channel (ADC1_CHANNEL_THROTTLE);
   ui8_ADC_throttle = adc_read_channel () >> 2;
 
   TIM1_ClearITPendingBit(TIM1_IT_UPDATE);
-debug_pin_reset ();
 }
 
 void hall_sensor_init (void)
@@ -234,4 +226,18 @@ void motor_fast_loop (void)
   }
 
   pwm_duty_cycle_controller ();
+}
+
+// Brake signal
+void ADC1_IRQHandler(void) __interrupt(ADC1_IRQHANDLER)
+{
+static uint8_t ui8_t;
+
+ui8_t = ADC1->CSR;
+
+  debug_pin_set ();
+//  TIM1->BKR &= (uint8_t)(~TIM1_BKR_MOE);
+  ui8_motor_total_current_flag = 1;
+
+  ADC1_ClearITPendingBit (ADC1_IT_AWD);
 }

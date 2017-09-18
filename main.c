@@ -77,6 +77,8 @@ void EXTI_PORTC_IRQHandler(void) __interrupt(EXTI_PORTC_IRQHANDLER);
 // PAS signal interrupt
 void EXTI_PORTD_IRQHandler(void) __interrupt(EXTI_PORTD_IRQHANDLER);
 
+void ADC1_IRQHandler(void) __interrupt(ADC1_IRQHANDLER);
+
 // Timer1/PWM period interrupt
 void TIM1_UPD_OVF_TRG_BRK_IRQHandler(void) __interrupt(TIM1_UPD_OVF_TRG_BRK_IRQHANDLER);
 
@@ -104,6 +106,9 @@ int main (void)
   pwm_init ();
   hall_sensor_init ();
   adc_init ();
+
+  ITC_SetSoftwarePriority (ITC_IRQ_TIM1_OVF, ITC_PRIORITYLEVEL_3);
+  ITC_SetSoftwarePriority (ITC_IRQ_ADC1, ITC_PRIORITYLEVEL_1);
 
   enableInterrupts();
 
