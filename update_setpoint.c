@@ -37,7 +37,7 @@ uint16_t update_setpoint (uint16_t speed, uint16_t PAS, uint16_t sumtorque, uint
       TIM1_CtrlPWMOutputs(DISABLE);
             uint_PWM_Enable=0;
             ui32_setpoint=0; 	// highest priority: Stop motor for undervoltage protection
-      printf("Neu Low voltage! %d\n",ui8_BatteryVoltage);
+      printf("Low voltage! %d\n",ui8_BatteryVoltage);
 
 #ifndef THROTTLE
   }else if (ui16_PAS_Counter>timeout){
@@ -47,13 +47,13 @@ uint16_t update_setpoint (uint16_t speed, uint16_t PAS, uint16_t sumtorque, uint
       printf("you are not pedaling!");
 #endif
       ui32_SPEED_km_h=(wheel_circumference*PWM_CYCLES_SECOND*36L)/(100000L*(uint32_t)speed);			//calculate speed in km/h conversion fr	om sec to hour --> *3600, conversion from mm to km --> /1000000, tic frequency 15625 Hz
-  }else if(ui8_BatteryCurrent>BATTERY_CURRENT_MAX_VALUE){
-      ui32_setpoint=setpoint_old--;  //next priority: reduce (old) setpoint if battery current is too high
-      printf("Battery Current too high!");
+  }else if(ui16_BatteryCurrent>BATTERY_CURRENT_MAX_VALUE){
+      if (ui32_setpoint>ADC_THROTTLE_MIN_VALUE){ui32_setpoint=setpoint_old--;}  //next priority: reduce (old) setpoint if battery current is too high
+      printf("Battery Current too high! %d\n",ui16_BatteryCurrent);
 
   }else if (ui32_SPEED_km_h>limit && setpoint_old>(ui32_SPEED_km_h-limit)){
       ui32_setpoint=(uint32_t)setpoint_old-(ui32_SPEED_km_h-limit); 	//next priority: reduce (old) setpoint, if you are riding too fast
-      printf("Speed too high!");
+      printf("Speed too high!\n");
 
   }else {								//if none of the overruling boundaries are concerned, calculate new setpoint
 #ifdef TORQUESENSOR
@@ -70,12 +70,12 @@ uint16_t update_setpoint (uint16_t speed, uint16_t PAS, uint16_t sumtorque, uint
   if (sumtorque>10 && setpoint_old-10>sumtorque){
       TIM1_CtrlPWMOutputs(DISABLE);
       uint_PWM_Enable=0;
-      printf("Floating!");
+      printf("Floating!\n");
   }
   else if (!uint_PWM_Enable && sumtorque>setpoint_old){
       TIM1_CtrlPWMOutputs(ENABLE);
       uint_PWM_Enable=1;
-      printf("PWM enabled!");
+      printf("PWM enabled!\n");
   }
 
   ui32_setpoint=sumtorque;
@@ -84,7 +84,7 @@ uint16_t update_setpoint (uint16_t speed, uint16_t PAS, uint16_t sumtorque, uint
 #ifdef THROTTLE_AND_PAS
   ui32_setpoint=sumtorque;
 #endif
-  i16_deziAmps= (current_cal_a*(int16_t)ui8_BatteryCurrent)/10 + current_cal_b;
+  i16_deziAmps= (current_cal_a*ui16_BatteryCurrent)/10 + current_cal_b;
   printf("Current %d, Voltage %d, sumtor %d, setpoint %lu, km/h %lu\n", i16_deziAmps, ui8_BatteryVoltage, sumtorque, ui32_setpoint, ui32_SPEED_km_h);
   }
   return ui32_setpoint;

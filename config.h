@@ -15,10 +15,10 @@
 #define ADC_THROTTLE_MIN_VALUE 43
 #define ADC_THROTTLE_MAX_VALUE 182
 #define BATTERY_VOLTAGE_MIN_VALUE 80
-#define BATTERY_CURRENT_MAX_VALUE 254
+#define BATTERY_CURRENT_MAX_VALUE 1023
 #define MOTOR_ROTOR_DELTA_PHASE_ANGLE_RIGHT 214
-#define current_cal_a 38
-#define current_cal_b -295
+#define current_cal_a 10
+#define current_cal_b -312
 #define THROTTLE
 
 #endif /* CONFIG_H_ */

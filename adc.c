@@ -13,7 +13,7 @@
 
 uint8_t adc_throttle_busy_flag = 0;
 uint8_t ui8_BatteryVoltage = 0;
-uint8_t ui8_BatteryCurrent = 0;
+uint16_t ui16_BatteryCurrent = 0;
 uint16_t ui16_BatteryCurrent_accumulated = 0;
 uint8_t delay_counter;
 
@@ -44,6 +44,8 @@ void adc_init (void)
 uint8_t adc_read_throttle (void)
 {
   uint8_t ui8_temp;
+  uint16_t temph = 0;
+  uint8_t templ = 0;
 
   adc_throttle_busy_flag = 1;
 //Read in throttle value (just upper 8bits for performance issues)
@@ -66,15 +68,24 @@ uint8_t adc_read_throttle (void)
 	    ADC1_PRESSEL_FCPU_D2,
             ADC1_EXTTRIG_TIM,
 	    DISABLE,
-	    ADC1_ALIGN_LEFT,
+	    ADC1_ALIGN_RIGHT,
 	    (ADC1_SCHMITTTRIG_CHANNEL4 || ADC1_SCHMITTTRIG_CHANNEL5 || ADC1_SCHMITTTRIG_CHANNEL8 || ADC1_SCHMITTTRIG_CHANNEL9),
             DISABLE);
 
   ADC1->CR1 |= ADC1_CR1_ADON;
   while (!(ADC1->CSR & ADC1_FLAG_EOC)) ;
   ui16_BatteryCurrent_accumulated -= ui16_BatteryCurrent_accumulated>>3; //filtering Battery Current Value, as Signal has much scatter
-  ui16_BatteryCurrent_accumulated += ADC1->DRH;
-  ui8_BatteryCurrent = ui16_BatteryCurrent_accumulated>>3;
+
+  /* Read LSB first */
+      templ = ADC1->DRL;
+      /* Then read MSB */
+      temph = ADC1->DRH;
+
+      ui16_BatteryCurrent = (uint16_t)(templ | (uint16_t)(temph << (uint8_t)8));
+
+      ui16_BatteryCurrent_accumulated += ui16_BatteryCurrent;
+      ui16_BatteryCurrent = ui16_BatteryCurrent_accumulated>>3;
+
 
  //Read in battery voltage value (just upper 8bits for performance issues)
     ADC1_Init(ADC1_CONVERSIONMODE_SINGLE,
