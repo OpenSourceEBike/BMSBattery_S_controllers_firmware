@@ -107,9 +107,9 @@ int main (void)
 
   enableInterrupts();
 
-  TIM1_SetCompare1(126 << 1);
-  TIM1_SetCompare2(126 << 1);
-  TIM1_SetCompare3(126 << 1);
+  TIM1_SetCompare1(255);
+  TIM1_SetCompare2(255);
+  TIM1_SetCompare3(255);
 
   hall_sensors_read_and_action (); // needed to start the motor
 
@@ -118,6 +118,7 @@ int main (void)
     static uint32_t ui32_counter = 0;
     uint16_t ui16_temp = 0;
     int16_t i16_temp = 0;
+    int16_t i16_temp1 = 0;
     uint16_t ui32_temp = 0;
     static float f_temp = 0;
 
@@ -131,7 +132,7 @@ int main (void)
       // execute cruise control
       ui8_temp = (uint8_t) map (ui8_ADC_throttle, ADC_THROTTLE_MIN_VALUE, ADC_THROTTLE_MAX_VALUE, 0, 255);
 
-#define DO_CRUISE_CONTROL 1
+//#define DO_CRUISE_CONTROL 1
 #if DO_CRUISE_CONTROL == 1
       ui8_temp = cruise_control (ui8_temp);
 #endif
@@ -141,18 +142,19 @@ int main (void)
       getchar1 ();
 
       i16_temp = (((int16_t) ui16_ADC_iq_current_filtered) - 511) * ADC_PHASE_B_CURRENT_FACTOR_MA;
-      printf("%d, %d, %d, %d\n", ui8_motor_state, ui16_motor_speed_erps, i16_temp, ui8_position_correction_value);
+      i16_temp1 = (((int16_t) ui16_ADC_id_current_filtered) - 511) * ADC_PHASE_B_CURRENT_FACTOR_MA;
+      printf("%d, %d, %d\n", ui16_motor_speed_erps, i16_temp, i16_temp1);
 
 #if (MOTOR_TYPE == MOTOR_TYPE_EUC2)
       if (ui16_motor_speed_erps > 7)
       {
 	if (ui16_ADC_iq_current_filtered > 512)
 	{
-	  ui8_position_correction_value++;
+	  ui8_position_correction_value--;
 	}
 	else if (ui16_ADC_iq_current_filtered < 504)
 	{
-	  ui8_position_correction_value--;
+	  ui8_position_correction_value++;
 	}
       }
 #elif (MOTOR_TYPE == MOTOR_TYPE_Q85)
