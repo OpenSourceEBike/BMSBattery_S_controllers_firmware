@@ -13,31 +13,33 @@
  * Motor PHASE_C: blue wire
  *
  *
- * PIN				  | IN/OUT| Works?|Function
+ * PIN		      | IN/OUT|Function
  * ----------------------------------------------------------
- * PB5  (ADC_AIN5)    | in  | ??  | current_phase_B
- * PB6  (ADC_AIN6)    | in  | ??  | total_current
+ * PB5  (ADC_AIN5)    | in  | phase_B_current
+ * PB6  (ADC_AIN6)    | in  | motor_total_current
+ * PE7  (ADC_AIN8)    | in  | motor_total_current_filtered
+ * PD7                | in  | motor_total_over_current
  *
- * PE6  (ADC_AIN9)     | in  | ??  | battery_voltage
+ * PE6  (ADC_AIN9)    | in  | battery_voltage
  *
- * PE0                | in  | ??  | Hall_sensor_A
- * PE1                | in  | ??  | Hall_sensor_B
- * PE2                | in  | ??  | Hall_sensor_C
+ * PE0                | in  | Hall_sensor_A
+ * PE1                | in  | Hall_sensor_B
+ * PE2                | in  | Hall_sensor_C
  *
- * PB2  (TIM1_CH3N)   | out | ??  | PWM_phase_A_low
- * PB1  (TIM1_CH2N)   | out | ??  | PWM_phase_B_low
- * PB0  (TIM1_CH1N)   | out | ??  | PWM_phase_C_low
- * PC3  (TIM1_CH3)    | out | ??  | PWM_phase_A_high
- * PC2  (TIM1_CH2)    | out | ??  | PWM_phase_B_high
- * PC1  (TIM1_CH1)    | out | ??  | PWM_phase_C_high
+ * PB2  (TIM1_CH3N)   | out | PWM_phase_A_low
+ * PB1  (TIM1_CH2N)   | out | PWM_phase_B_low
+ * PB0  (TIM1_CH1N)   | out | PWM_phase_C_low
+ * PC3  (TIM1_CH3)    | out | PWM_phase_A_high
+ * PC2  (TIM1_CH2)    | out | PWM_phase_B_high
+ * PC1  (TIM1_CH1)    | out | PWM_phase_C_high
  *
- * PD5  (UART2_TX)    | out | ??  | usart_tx
- * PD6  (UART2_RX)    | out | ??  | usart_rx
+ * PD5  (UART2_TX)    | out | usart_tx
+ * PD6  (UART2_RX)    | out | usart_rx
  *
- * PA4                | in  | ??  | brake
- * PB4  (ADC_AIN4)    | in  | ??  | throttle
- * PD0                | in  | ??  | PAS
- * PC5                | in  | ??  | SPEED
+ * PA4                | in  | brake
+ * PB4  (ADC_AIN4)    | in  | throttle
+ * PD0                | in  | PAS
+ * PC5                | in  | SPEED
  *
  *
  */
@@ -50,8 +52,12 @@
 
 #define CURRENT_PHASE_B__PIN      GPIO_PIN_5
 #define CURRENT_PHASE_B__PORT     GPIOB
-#define CURRENT_TOTAL__PIN        GPIO_PIN_6
-#define CURRENT_TOTAL__PORT       GPIOB
+#define CURRENT_MOTOR_TOTAL__PIN  GPIO_PIN_6
+#define CURRENT_MOTOR_TOTAL__PORT GPIOB
+#define CURRENT_MOTOR_TOTAL_FILTERED__PIN GPIO_PIN_7
+#define CURRENT_MOTOR_TOTAL_FILTRED__PORT GPIOE
+#define CURRENT_MOTOR_TOTAL_OVER__PIN  GPIO_PIN_7
+#define CURRENT_MOTOR_TOTAL_OVER__PORT GPIOD
 
 #define BATTERY_VOLTAGE__PIN      GPIO_PIN_6
 #define BATTERY_VOLTAGE__PORT     GPIOE

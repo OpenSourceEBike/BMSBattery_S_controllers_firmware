@@ -20,7 +20,11 @@ void adc_init (void)
 {
   //init GPIO for the used ADC pins
   GPIO_Init(GPIOB,
-	    (THROTTLE__PIN || CURRENT_PHASE_B__PIN || CURRENT_TOTAL__PIN),
+	    (THROTTLE__PIN || CURRENT_PHASE_B__PIN || CURRENT_MOTOR_TOTAL__PIN),
+	    GPIO_MODE_IN_FL_NO_IT);
+
+  GPIO_Init(GPIOE,
+	    (CURRENT_MOTOR_TOTAL_FILTERED__PIN),
 	    GPIO_MODE_IN_FL_NO_IT);
 
   //de-Init ADC peripheral
@@ -33,7 +37,7 @@ void adc_init (void)
             ADC1_EXTTRIG_TIM,
 	    DISABLE,
 	    ADC1_ALIGN_RIGHT,
-	    (ADC1_SCHMITTTRIG_CHANNEL4 || ADC1_SCHMITTTRIG_CHANNEL5 || ADC1_SCHMITTTRIG_CHANNEL6),
+	    (ADC1_SCHMITTTRIG_CHANNEL4 || ADC1_SCHMITTTRIG_CHANNEL5 || ADC1_SCHMITTTRIG_CHANNEL6 || ADC1_SCHMITTTRIG_CHANNEL8),
             DISABLE);
 
   ADC1_Cmd (ENABLE);
@@ -70,20 +74,4 @@ uint16_t adc_read_channel (void)
 
   return ((uint16_t)temph);
 }
-
-//uint16_t adc_read_channel(uint16_t channel)
-//{
-//     unsigned int val=0;
-//     //using ADC in single conversion mode
-//     ADC1->CSR |= ((0x0F)&channel); // select channel
-//     ADC1->CR2 |= (1<<3); // Right Aligned Data
-////     ADC1->CR1 |= (1<<0); // ADC ON
-//     ADC1->CR1 |= (1<<0); // ADC Start Conversion
-//     while(((ADC1->CSR)&(1<<7))== 0); // Wait till EOC
-//     val |= (unsigned int)ADC1->DRL;
-//     val |= (unsigned int)ADC1->DRH<<8;
-////     ADC1->CR1 &= ~(1<<0); // ADC Stop Conversion
-//     val &= 0x03ff;
-//     return (val);
-//}
 

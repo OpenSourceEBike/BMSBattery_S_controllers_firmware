@@ -131,7 +131,7 @@ int main (void)
       // execute cruise control
       ui8_temp = (uint8_t) map (ui8_ADC_throttle, ADC_THROTTLE_MIN_VALUE, ADC_THROTTLE_MAX_VALUE, 0, 255);
 
-//#define DO_CRUISE_CONTROL 1
+#define DO_CRUISE_CONTROL 1
 #if DO_CRUISE_CONTROL == 1
       ui8_temp = cruise_control (ui8_temp);
 #endif

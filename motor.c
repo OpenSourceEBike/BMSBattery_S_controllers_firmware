@@ -55,11 +55,11 @@ void TIM1_UPD_OVF_TRG_BRK_IRQHandler(void) __interrupt(TIM1_UPD_OVF_TRG_BRK_IRQH
 
   if (ui8_motor_state == MOTOR_STATE_RUNNING_INTERPOLATION_360_DEGREES)
   {
-    adc_select_channel (ADC1_CHANNEL_MOTOR_TOTAL_CURRENT);
+    adc_select_channel (ADC1_CHANNEL_MOTOR_TOTAL_CURRENT_FILTERED);
     ui8_temp = adc_read_channel () >> 2;
     if (ui8_temp > ADC_MOTOR_TOTAL_CURRENT_MAX_POSITIVE)
     {
-      TIM1->BKR &= (uint8_t)(~TIM1_BKR_MOE);
+//      TIM1->BKR &= (uint8_t)(~TIM1_BKR_MOE);
       ui8_motor_total_current_flag = 1;
     }
   }
