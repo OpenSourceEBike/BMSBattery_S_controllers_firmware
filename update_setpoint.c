@@ -46,10 +46,13 @@ uint16_t update_setpoint (uint16_t speed, uint16_t PAS, uint16_t sumtorque, uint
       ui32_setpoint=0;			// next priority: Stop motor if not pedaling
       printf("you are not pedaling!");
 #endif
-      ui32_SPEED_km_h=(wheel_circumference*PWM_CYCLES_SECOND*36L)/(100000L*(uint32_t)speed);			//calculate speed in km/h conversion fr	om sec to hour --> *3600, conversion from mm to km --> /1000000, tic frequency 15625 Hz
+
   }else if(ui16_BatteryCurrent>BATTERY_CURRENT_MAX_VALUE){
-      if (ui32_setpoint>ADC_THROTTLE_MIN_VALUE){ui32_setpoint=setpoint_old--;}  //next priority: reduce (old) setpoint if battery current is too high
-      printf("Battery Current too high! %d\n",ui16_BatteryCurrent);
+      if (ui32_setpoint>ADC_THROTTLE_MIN_VALUE){
+	  ui32_setpoint=(uint32_t)(setpoint_old-1);
+	  printf("Battery Current too high!, setpoint %lu, setpoint_old %d\n",ui32_setpoint, setpoint_old);
+      }  //next priority: reduce (old) setpoint if battery current is too high
+
 
   }else if (ui32_SPEED_km_h>limit && setpoint_old>(ui32_SPEED_km_h-limit)){
       ui32_setpoint=(uint32_t)setpoint_old-(ui32_SPEED_km_h-limit); 	//next priority: reduce (old) setpoint, if you are riding too fast
@@ -84,8 +87,8 @@ uint16_t update_setpoint (uint16_t speed, uint16_t PAS, uint16_t sumtorque, uint
 #ifdef THROTTLE_AND_PAS
   ui32_setpoint=sumtorque;
 #endif
+  }
   i16_deziAmps= (current_cal_a*ui16_BatteryCurrent)/10 + current_cal_b;
   printf("Current %d, Voltage %d, sumtor %d, setpoint %lu, km/h %lu\n", i16_deziAmps, ui8_BatteryVoltage, sumtorque, ui32_setpoint, ui32_SPEED_km_h);
-  }
   return ui32_setpoint;
 }
