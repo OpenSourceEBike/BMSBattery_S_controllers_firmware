@@ -16,7 +16,7 @@
  * PIN				  | IN/OUT| Works?|Function
  * ----------------------------------------------------------
  * PB5  (ADC_AIN5)    | in  | ??  | current_phase_B
- * PB6  (ADC_AIN6)    | in  | ??  | total_current
+ * PB6/PE7  (ADC_AIN6/8)    | in  | ??  | total_current ????
  *
  * PE6  (ADC_AIN9)     | in  | ??  | battery_voltage
  *
@@ -50,8 +50,9 @@
 
 #define CURRENT_PHASE_B__PIN      GPIO_PIN_5
 #define CURRENT_PHASE_B__PORT     GPIOB
-#define CURRENT_TOTAL__PIN        GPIO_PIN_6
-#define CURRENT_TOTAL__PORT       GPIOB
+
+#define CURRENT_TOTAL__PIN        GPIO_PIN_7
+#define CURRENT_TOTAL__PORT       GPIOE
 
 #define BATTERY_VOLTAGE__PIN      GPIO_PIN_6
 #define BATTERY_VOLTAGE__PORT     GPIOE

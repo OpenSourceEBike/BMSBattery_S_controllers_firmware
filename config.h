@@ -17,8 +17,8 @@
 #define BATTERY_VOLTAGE_MIN_VALUE 80
 #define BATTERY_CURRENT_MAX_VALUE 254
 #define MOTOR_ROTOR_DELTA_PHASE_ANGLE_RIGHT 214
-#define current_cal_a 10
-#define current_cal_b 0
+#define current_cal_a 38
+#define current_cal_b -295
 #define THROTTLE
 
 #endif /* CONFIG_H_ */
