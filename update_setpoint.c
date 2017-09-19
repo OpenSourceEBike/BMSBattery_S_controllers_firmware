@@ -49,7 +49,7 @@ uint16_t update_setpoint (uint16_t speed, uint16_t PAS, uint16_t sumtorque, uint
 
   }else if(ui16_BatteryCurrent>BATTERY_CURRENT_MAX_VALUE){
       if (ui32_setpoint>ADC_THROTTLE_MIN_VALUE){
-	  ui32_setpoint=(uint32_t)(setpoint_old-1);
+	  ui32_setpoint=(uint32_t)(setpoint_old-(ui16_BatteryCurrent-BATTERY_CURRENT_MAX_VALUE));
 	  printf("Battery Current too high!, setpoint %lu, setpoint_old %d\n",ui32_setpoint, setpoint_old);
       }  //next priority: reduce (old) setpoint if battery current is too high
 
@@ -80,15 +80,24 @@ uint16_t update_setpoint (uint16_t speed, uint16_t PAS, uint16_t sumtorque, uint
       uint_PWM_Enable=1;
       printf("PWM enabled!\n");
   }
-
-  ui32_setpoint=sumtorque;
+  if (sumtorque>setpoint_old){
+  ui32_setpoint=(uint32_t)(setpoint_old+((sumtorque-setpoint_old)>>2));
+  }
+  else if (sumtorque<setpoint_old){
+  ui32_setpoint=(uint32_t)(setpoint_old-((setpoint_old-sumtorque)>>2));
+  }
 #endif
 
 #ifdef THROTTLE_AND_PAS
-  ui32_setpoint=sumtorque;
+  if (sumtorque>setpoint_old){
+    ui32_setpoint=(uint32_t)(setpoint_old+((sumtorque-setpoint_old)>>2));
+    }
+    else if (sumtorque<setpoint_old){
+    ui32_setpoint=(uint32_t)(setpoint_old-((setpoint_old-sumtorque)>>2));
+    }
 #endif
   }
   i16_deziAmps= (current_cal_a*ui16_BatteryCurrent)/10 + current_cal_b;
-  printf("Current %d, Voltage %d, sumtor %d, setpoint %lu, km/h %lu\n", i16_deziAmps, ui8_BatteryVoltage, sumtorque, ui32_setpoint, ui32_SPEED_km_h);
+  printf("Current %d, Voltage %d, sumtor %d, setpoint %lu, setpoint_old %d,km/h %lu\n", i16_deziAmps, ui8_BatteryVoltage, sumtorque, ui32_setpoint, setpoint_old, ui32_SPEED_km_h);
   return ui32_setpoint;
 }
