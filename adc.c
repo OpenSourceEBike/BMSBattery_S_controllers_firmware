@@ -36,7 +36,7 @@ void adc_init (void)
 	    ADC1_PRESSEL_FCPU_D2,
             ADC1_EXTTRIG_TIM,
 	    DISABLE,
-	    ADC1_ALIGN_RIGHT,
+	    ADC1_ALIGN_LEFT,
 	    (ADC1_SCHMITTTRIG_CHANNEL4 || ADC1_SCHMITTTRIG_CHANNEL5 || ADC1_SCHMITTTRIG_CHANNEL6 || ADC1_SCHMITTTRIG_CHANNEL8),
             DISABLE);
 
@@ -58,7 +58,7 @@ void delay(uint8_t t)
   while(t--);
 }
 
-uint16_t adc_read_channel (void)
+uint16_t ui16_adc_read (void)
 {
   uint16_t temph = 0;
   uint8_t templ = 0;
@@ -70,8 +70,19 @@ uint16_t adc_read_channel (void)
   while (!(ADC1->CSR & ADC1_FLAG_EOC)) ; // wait to finnish conversion (about 2us)
   templ = ADC1->DRL;
   temph = ADC1->DRH;
-  temph = (uint16_t)(templ | (uint16_t)(temph << (uint8_t)8));
+  temph = (uint16_t)((uint16_t)((uint16_t)templ << 6) | (uint16_t)((uint16_t)temph << 8));
 
   return ((uint16_t)temph);
 }
 
+uint8_t ui8_adc_read (void)
+{
+  uint8_t delay_counter;
+
+  ADC1->CR1 |= (1<<0); // ADC Start Conversion
+  delay_counter = 4;
+  while (delay_counter--) ; // minimum delay time needed for correct ADC conversion
+  while (!(ADC1->CSR & ADC1_FLAG_EOC)) ; // wait to finnish conversion (about 2us)
+
+  return ADC1->DRH;
+}

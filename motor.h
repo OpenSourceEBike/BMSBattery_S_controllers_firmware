@@ -25,10 +25,10 @@ extern uint16_t ui16_speed_inverse;
 extern uint8_t ui8_motor_state;
 extern uint16_t ui16_PWM_cycles_counter_total;
 extern uint16_t ui16_motor_speed_erps;
-extern uint16_t ui16_ADC_iq_current;
-extern uint16_t ui16_ADC_iq_current_filtered;
-extern uint16_t ui16_ADC_id_current;
-extern uint16_t ui16_ADC_id_current_filtered;
+extern uint8_t ui8_ADC_iq_current;
+extern uint16_t ui8_ADC_iq_current_filtered;
+extern uint8_t ui8_ADC_id_current;
+extern uint8_t ui8_ADC_id_current_filtered;
 extern uint16_t ui16_log;
 extern uint8_t ui8_motor_total_current_flag;
 

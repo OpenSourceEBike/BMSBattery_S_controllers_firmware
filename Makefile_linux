@@ -56,7 +56,7 @@ HEADERS = adc.h  brake.h  cruise_control.h  gpio.h  interrupts.h  main.h  motor.
 RELS = $(EXTRASRCS:.c=.rel)
 
 INCLUDES = -I$(IDIR) -I. 
-CFLAGS   = -m$(PLATFORM) --std-c99 --nolospre
+CFLAGS   = -m$(PLATFORM) -Ddouble=float --std-c99 --nolospre
 ELF_FLAGS = --out-fmt-elf --debug
 LIBS     = 
 

@@ -35,7 +35,7 @@
 // 512 --> 15.5 amps
 // 1 ADC increment --> 0.030A
 // RMS value --> max value * 0.707
-#define ADC_PHASE_B_CURRENT_FACTOR_MA 21 // 0,030273437 * 1000 * 0.707
+#define ADC_PHASE_B_CURRENT_FACTOR 333 // 0.1 / 0.030A * 0.707 = 3.3
 
 #if MOTOR_TYPE == MOTOR_TYPE_Q85
 #define MOTOR_ROTOR_DELTA_PHASE_ANGLE_RIGHT 210// best value found (at max speed, minimum current and power supply voltage keeps the same)

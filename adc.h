@@ -24,7 +24,7 @@ extern uint8_t ui8_ADC_throttle;
 
 void adc_init (void);
 void adc_select_channel (uint8_t ADC1_Channel);
-uint16_t adc_read_channel (void);
-//uint16_t adc_read_channel(uint16_t channel);
+uint16_t ui16_adc_read (void);
+uint8_t ui8_adc_read (void);
 
 #endif /* _ADC_H */

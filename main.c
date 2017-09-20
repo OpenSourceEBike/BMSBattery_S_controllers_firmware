@@ -117,8 +117,8 @@ int main (void)
   {
     static uint32_t ui32_counter = 0;
     uint16_t ui16_temp = 0;
-    int16_t i16_temp = 0;
-    int16_t i16_temp1 = 0;
+    int8_t i8_temp = 0;
+    int8_t i8_temp1 = 0;
     uint16_t ui32_temp = 0;
     static float f_temp = 0;
 
@@ -141,34 +141,36 @@ int main (void)
 
       getchar1 ();
 
-      i16_temp = (((int16_t) ui16_ADC_iq_current_filtered) - 511) * ADC_PHASE_B_CURRENT_FACTOR_MA;
-      i16_temp1 = (((int16_t) ui16_ADC_id_current_filtered) - 511) * ADC_PHASE_B_CURRENT_FACTOR_MA;
-      printf("%d, %d, %d\n", ui16_motor_speed_erps, i16_temp, i16_temp1);
+//      i16_temp = (((int16_t) ui16_ADC_iq_current_filtered) - 511) / ADC_PHASE_B_CURRENT_FACTOR;
+//      i16_temp1 = (((int16_t) ui16_ADC_id_current_filtered) - 511) / ADC_PHASE_B_CURRENT_FACTOR;
+      i8_temp = ui8_ADC_iq_current_filtered - 127;
+      i8_temp1 = ui8_ADC_id_current_filtered - 127;
+      printf("%d, %d, %d\n", ui16_motor_speed_erps, i8_temp, i8_temp1);
 
 #if (MOTOR_TYPE == MOTOR_TYPE_EUC2)
       if (ui16_motor_speed_erps > 7)
       {
-	if (ui16_ADC_iq_current_filtered > 512)
+	if (ui8_ADC_iq_current_filtered > 127)
 	{
 	  ui8_position_correction_value--;
 	}
-	else if (ui16_ADC_iq_current_filtered < 504)
+	else if (ui8_ADC_iq_current_filtered < 125)
 	{
 	  ui8_position_correction_value++;
 	}
       }
 #elif (MOTOR_TYPE == MOTOR_TYPE_Q85)
-      if (ui16_motor_speed_erps > 7)
-      {
-	if (ui16_ADC_iq_current_filtered > 510)
-	{
-	  ui8_position_correction_value++;
-	}
-	else if (ui16_ADC_iq_current_filtered < 508)
-	{
-	  ui8_position_correction_value--;
-	}
-      }
+//      if (ui16_motor_speed_erps > 7)
+//      {
+//	if (ui8_ADC_iq_current_filtered > 127)
+//	{
+//	  ui8_position_correction_value++;
+//	}
+//	else if (ui8_ADC_iq_current_filtered < 125)
+//	{
+//	  ui8_position_correction_value--;
+//	}
+//      }
 #endif
     }
   }
