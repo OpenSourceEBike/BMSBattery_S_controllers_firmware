@@ -31,6 +31,9 @@ extern uint8_t ui8_ADC_id_current;
 extern uint8_t ui8_ADC_id_current_filtered;
 extern uint16_t ui16_log;
 extern uint8_t ui8_motor_total_current_flag;
+extern uint16_t ui16_ADC_id_current;
+
+extern uint16_t ui16_ADC_id_current_accumulated;
 
 void hall_sensor_init (void);
 void hall_sensors_read_and_action (void);

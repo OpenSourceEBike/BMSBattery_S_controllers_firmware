@@ -43,7 +43,6 @@ uint8_t a = 0; 					//loop counter
 static uint16_t ui16_throttle_counter = 0;
 uint16_t ui16_temp_delay = 0;
 
-uint8_t ui8_adc_read_throttle_busy = 0;
 uint16_t ui16_SPEED_Counter = 0; 	//time tics for speed measurement
 uint16_t ui16_SPEED = 32000; 		//speed in timetics
 uint16_t ui16_PAS_Counter = 0; 		//time tics for cadence measurement
@@ -118,9 +117,11 @@ int main (void)
     static uint32_t ui32_counter = 0;
     uint16_t ui16_temp = 0;
     int8_t i8_temp = 0;
-    int8_t i8_temp1 = 0;
+    static int8_t i8_temp1 = 0;
     uint16_t ui32_temp = 0;
     static float f_temp = 0;
+
+    static uint8_t c = 0;
 
     ui16_temp_delay = TIM2_GetCounter ();
 
@@ -130,6 +131,8 @@ int main (void)
 
       /****************************************************************************/
       // execute cruise control
+      // read here ADC1_CHANNEL_THROTTLE to avoid PWM signal interferences
+      ui8_ADC_throttle = ui8_adc_read_throttle ();
       ui8_temp = (uint8_t) map (ui8_ADC_throttle, ADC_THROTTLE_MIN_VALUE, ADC_THROTTLE_MAX_VALUE, 0, 255);
 
 //#define DO_CRUISE_CONTROL 1
@@ -144,8 +147,20 @@ int main (void)
 //      i16_temp = (((int16_t) ui16_ADC_iq_current_filtered) - 511) / ADC_PHASE_B_CURRENT_FACTOR;
 //      i16_temp1 = (((int16_t) ui16_ADC_id_current_filtered) - 511) / ADC_PHASE_B_CURRENT_FACTOR;
       i8_temp = ui8_ADC_iq_current_filtered - 127;
-      i8_temp1 = ui8_ADC_id_current_filtered - 127;
-      printf("%d, %d, %d\n", ui16_motor_speed_erps, i8_temp, i8_temp1);
+      i8_temp1 = ui8_ADC_id_current - 127;
+
+//      if (c++ > 8)
+//      {
+//	i8_temp1 = ui16_ADC_id_current_accumulated / 8;
+//	ui16_ADC_id_current_accumulated = 0;
+//	c = 0;
+//      }
+//      else
+//      {
+//	ui16_ADC_id_current_accumulated += (ui8_ADC_id_current - 127);
+//      }
+
+      printf("%d, %d, %d\n", ui16_motor_speed_erps, i8_temp, (ui16_ADC_id_current - 127));
 
 #if (MOTOR_TYPE == MOTOR_TYPE_EUC2)
       if (ui16_motor_speed_erps > 7)

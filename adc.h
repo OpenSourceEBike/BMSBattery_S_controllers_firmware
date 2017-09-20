@@ -23,8 +23,9 @@ extern uint8_t ui8_BatteryCurrent;
 extern uint8_t ui8_ADC_throttle;
 
 void adc_init (void);
-void adc_select_channel (uint8_t ADC1_Channel);
-uint16_t ui16_adc_read (void);
-uint8_t ui8_adc_read (void);
+uint8_t ui8_adc_read_phase_B_current (void);
+uint16_t ui16_adc_read_phase_B_current (void);
+uint8_t ui8_adc_read_throttle (void);
+uint8_t ui8_adc_read_motor_total_current_filtered (void);
 
 #endif /* _ADC_H */

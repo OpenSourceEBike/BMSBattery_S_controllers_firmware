@@ -32,57 +32,54 @@ void adc_init (void)
 
   //init ADC1 peripheral
   ADC1_Init(ADC1_CONVERSIONMODE_SINGLE,
-	    ADC1_CHANNEL_5,
+	    ADC1_CHANNEL_9,
 	    ADC1_PRESSEL_FCPU_D2,
+//	    ADC1_PRESSEL_FCPU_D4, // may take about 35us to convert all 10 channels, which seems ok for the 64us PWM period
+				  // being slower should improve the noise on ADC measurements
             ADC1_EXTTRIG_TIM,
 	    DISABLE,
 	    ADC1_ALIGN_LEFT,
 	    (ADC1_SCHMITTTRIG_CHANNEL4 || ADC1_SCHMITTTRIG_CHANNEL5 || ADC1_SCHMITTTRIG_CHANNEL6 || ADC1_SCHMITTTRIG_CHANNEL8),
             DISABLE);
 
+  ADC1_ScanModeCmd (ENABLE);
+
   ADC1_Cmd (ENABLE);
 }
 
-void adc_select_channel (uint8_t ADC1_channel)
+uint8_t ui8_adc_read_phase_B_current (void)
 {
-  /* Clear the ADC1 channels */
-  ADC1->CSR &= (uint8_t)(~ADC1_CSR_CH);
-  /* Select the ADC1 channel */
-  ADC1->CSR |= (uint8_t)(ADC1_channel);
-
-  ADC1->CR1 |= ADC1_CR1_ADON; // enable ADC
+//  /* Read LSB first */
+//  templ = *(uint8_t*)(uint16_t)((uint16_t)ADC1_BaseAddress + (uint8_t)(Buffer << 1) + 1);
+//  /* Then read MSB */
+//  temph = *(uint8_t*)(uint16_t)((uint16_t)ADC1_BaseAddress + (uint8_t)(Buffer << 1));
+//#define ADC1_BaseAddress        0x53E0
+//phase_B_current --> ADC_AIN5
+// 0x53E0 + 2*5 = 0x53EA
+  return *(uint8_t*)(0x53EA);
 }
 
-void delay(uint8_t t)
+uint16_t ui16_adc_read_phase_B_current (void)
 {
-  while(t--);
+  uint16_t temph;
+  uint8_t templ;
+
+  templ = *(uint8_t*)(0x53EB);
+  temph = *(uint8_t*)(0x53EA);
+
+  return (uint16_t)((uint16_t)((uint16_t)templ << 6) | (uint16_t)(temph << 8));
 }
 
-uint16_t ui16_adc_read (void)
+uint8_t ui8_adc_read_throttle (void)
 {
-  uint16_t temph = 0;
-  uint8_t templ = 0;
-  uint8_t delay_counter;
-
-  ADC1->CR1 |= (1<<0); // ADC Start Conversion
-  delay_counter = 4;
-  while (delay_counter--) ; // minimum delay time needed for correct ADC conversion
-  while (!(ADC1->CSR & ADC1_FLAG_EOC)) ; // wait to finnish conversion (about 2us)
-  templ = ADC1->DRL;
-  temph = ADC1->DRH;
-  temph = (uint16_t)((uint16_t)((uint16_t)templ << 6) | (uint16_t)((uint16_t)temph << 8));
-
-  return ((uint16_t)temph);
+// 0x53E0 + 2*4 = 0x53E8
+//  return *(uint8_t*)(0x53E8);
+  return *(uint8_t*)(0x53E8);
 }
 
-uint8_t ui8_adc_read (void)
+uint8_t ui8_adc_read_motor_total_current_filtered (void)
 {
-  uint8_t delay_counter;
-
-  ADC1->CR1 |= (1<<0); // ADC Start Conversion
-  delay_counter = 4;
-  while (delay_counter--) ; // minimum delay time needed for correct ADC conversion
-  while (!(ADC1->CSR & ADC1_FLAG_EOC)) ; // wait to finnish conversion (about 2us)
-
-  return ADC1->DRH;
+// 0x53E0 + 2*8 = 0x53F0
+  return *(uint8_t*)(0x53F0);
 }
+

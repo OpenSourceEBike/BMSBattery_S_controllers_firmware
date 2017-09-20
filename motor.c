@@ -46,6 +46,8 @@ uint16_t ui16_ADC_iq_current_accumulated = 0;
 uint16_t ui8_ADC_iq_current_filtered = 0;
 
 uint8_t ui8_ADC_id_current = 0;
+uint16_t ui16_ADC_id_current = 0;
+uint8_t ui8_ADC_id_current_counter = 0;
 uint16_t ui16_ADC_id_current_accumulated = 0;
 uint8_t ui8_ADC_id_current_filtered = 0;
 uint8_t ui8_ADC_id_current_sum = 0;
@@ -57,31 +59,17 @@ void TIM1_UPD_OVF_TRG_BRK_IRQHandler(void) __interrupt(TIM1_UPD_OVF_TRG_BRK_IRQH
 {
   uint8_t ui8_temp;
 debug_pin_set ();
-  if (ui8_motor_state == MOTOR_STATE_RUNNING_INTERPOLATION_360_DEGREES)
-  {
-    adc_select_channel (ADC1_CHANNEL_MOTOR_TOTAL_CURRENT_FILTERED);
-    ui8_temp = ui8_adc_read ();
-    if (ui8_temp > ADC_MOTOR_TOTAL_CURRENT_MAX_POSITIVE)
-    {
-      ui8_motor_total_current_flag = 1;
-    }
-  }
-  else
-  {
-    ui8_motor_total_current_flag = 0;
-  }
+
+  // start ADC all channels, scan conversion (buffered)
+  ADC1->CSR &= 0x09; // clear EOC flag first (selectd also channel 9)
+  ADC1_StartConversion ();
 
   hall_sensors_read_and_action ();
 
   motor_fast_loop ();
 
-  // read here ADC1_CHANNEL_THROTTLE to avoid PWM signal interferences
-  adc_select_channel (ADC1_CHANNEL_THROTTLE);
-  ui8_ADC_throttle = ui8_adc_read ();
-
-debug_pin_reset ();
-
   TIM1_ClearITPendingBit(TIM1_IT_UPDATE);
+debug_pin_reset ();
 }
 
 void hall_sensor_init (void)
@@ -106,8 +94,7 @@ void hall_sensors_read_and_action (void)
     {
       case 3:
       // read here the phase B current: FOC Iq current
-      adc_select_channel (ADC1_CHANNEL_PHASE_CURRENT_B);
-      ui8_ADC_iq_current = ui8_adc_read ();
+      ui8_ADC_iq_current = ui8_adc_read_phase_B_current ();
 
       ui16_PWM_cycles_counter_total = ui16_PWM_cycles_counter;
       ui16_PWM_cycles_counter = 0;
@@ -163,11 +150,6 @@ void hall_sensors_read_and_action (void)
       break;
 
       case 5:
-//      ui16_ADC_id_current_accumulated -= ui16_ADC_id_current_accumulated >> 6;
-//      ui16_ADC_id_current_accumulated += ui8_ADC_id_current;
-//      ui8_ADC_id_current_filtered = ui16_ADC_id_current_accumulated >> 6;
-
-
       if (ui8_motor_state != MOTOR_STATE_RUNNING_INTERPOLATION_360_DEGREES)
       {
 	ui8_motor_rotor_absolute_position = ANGLE_300 + MOTOR_ROTOR_DELTA_PHASE_ANGLE_RIGHT;
@@ -207,7 +189,7 @@ void hall_sensors_read_and_action (void)
 // runs every 64us (PWM frequency)
 void motor_fast_loop (void)
 {
-  uint8_t ui8_temp;
+  uint16_t ui16_temp;
 
   // count number of fast loops / PWM cycles
   if (ui16_PWM_cycles_counter < PWM_CYCLES_COUNTER_MAX)
@@ -227,16 +209,41 @@ void motor_fast_loop (void)
     hall_sensors_read_and_action ();
   }
 
-//  if (ui8_motor_state == MOTOR_STATE_RUNNING_INTERPOLATION_360_DEGREES)
-//  {
-//    adc_select_channel (ADC1_CHANNEL_PHASE_CURRENT_B);
-//    ui8_temp = ui8_adc_read ();
+  if (ui8_motor_state == MOTOR_STATE_RUNNING_INTERPOLATION_360_DEGREES)
+  {
+//    ui8_temp = ui8_adc_read_phase_B_current ();
 //
 //    if (ui8_temp > 127)
 //    {
+//      ui16_ADC_id_current_accumulated += ui8_temp;
+//      ui8_ADC_id_current_counter++;
+//
+//      if (ui8_ADC_id_current_counter > 127)
+//      {
+//	ui8_ADC_id_current_counter = 0;
+//	ui8_ADC_id_current = ui16_ADC_id_current_accumulated >> 7;
+//	ui16_ADC_id_current_accumulated = 0;
+//      }
+
+      ui16_temp = ui8_adc_read_phase_B_current ();
+
+      if (ui16_temp > 127)
+      {
+	      ui16_ADC_id_current = ui16_temp;
+//
+//        ui16_ADC_id_current_accumulated += ui16_temp;
+//        ui8_ADC_id_current_counter++;
+//
+//        if (ui8_ADC_id_current_counter > 63)
+//        {
+//	  ui8_ADC_id_current_counter = 0;
+//	  ui16_ADC_id_current = ui16_ADC_id_current_accumulated >> 6;
+//	  ui16_ADC_id_current_accumulated = 0;
+//        }
+
 //      ui8_ADC_id_current = (ui8_ADC_id_current >> 1) + (ui8_temp >> 1);
-//    }
-//  }
+    }
+  }
 
 #define DO_INTERPOLATION 1 // may be usefull when debugging
 #if DO_INTERPOLATION == 1
@@ -267,4 +274,12 @@ void motor_fast_loop (void)
   }
 
   pwm_duty_cycle_controller ();
+
+  if (ui8_motor_state == MOTOR_STATE_RUNNING_INTERPOLATION_360_DEGREES)
+  {
+    if (ui8_adc_read_motor_total_current_filtered () > ADC_MOTOR_TOTAL_CURRENT_MAX_POSITIVE)
+      ui8_motor_total_current_flag = 1;
+    else
+      ui8_motor_total_current_flag = 0;
+  }
 }
