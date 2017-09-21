@@ -116,8 +116,8 @@ int main (void)
   {
     static uint32_t ui32_counter = 0;
     uint16_t ui16_temp = 0;
-    int8_t i8_temp = 0;
-    static int8_t i8_temp1 = 0;
+    uint8_t ui8_temp = 0;
+    static uint8_t ui8_temp1 = 0;
     uint16_t ui32_temp = 0;
     static float f_temp = 0;
 
@@ -125,7 +125,7 @@ int main (void)
 
     ui16_temp_delay = TIM2_GetCounter ();
 
-    if ((ui16_temp_delay - ui16_throttle_counter) > 100)
+    if ((ui16_temp_delay - ui16_throttle_counter) > 20)
     {
       ui16_throttle_counter = ui16_temp_delay;
 
@@ -146,21 +146,14 @@ int main (void)
 
 //      i16_temp = (((int16_t) ui16_ADC_iq_current_filtered) - 511) / ADC_PHASE_B_CURRENT_FACTOR;
 //      i16_temp1 = (((int16_t) ui16_ADC_id_current_filtered) - 511) / ADC_PHASE_B_CURRENT_FACTOR;
-      i8_temp = ui8_ADC_iq_current_filtered - 127;
-      i8_temp1 = ui8_ADC_id_current - 127;
+      ui8_temp = ui8_ADC_iq_current_filtered - 127;
+      ui8_temp1 = ui8_ADC_id_current_filtered - 127;
 
-//      if (c++ > 8)
-//      {
-//	i8_temp1 = ui16_ADC_id_current_accumulated / 8;
-//	ui16_ADC_id_current_accumulated = 0;
-//	c = 0;
-//      }
-//      else
-//      {
-//	ui16_ADC_id_current_accumulated += (ui8_ADC_id_current - 127);
-//      }
+      ui16_ADC_id_current_accumulated -= ui16_ADC_id_current_accumulated >> 4;
+      ui16_ADC_id_current_accumulated += ui8_temp1;
+      ui8_ADC_id_current_filtered = ui16_ADC_id_current_accumulated >> 4;
 
-      printf("%d, %d, %d\n", ui16_motor_speed_erps, i8_temp, (ui16_ADC_id_current - 127));
+      printf("%d, %d, %d\n", ui16_motor_speed_erps, ui8_temp1, ui8_ADC_id_current_filtered);
 
 #if (MOTOR_TYPE == MOTOR_TYPE_EUC2)
       if (ui16_motor_speed_erps > 7)

@@ -69,6 +69,16 @@ debug_pin_set ();
   motor_fast_loop ();
 
   TIM1_ClearITPendingBit(TIM1_IT_UPDATE);
+
+  if (ui8_motor_state == MOTOR_STATE_RUNNING_INTERPOLATION_360_DEGREES)
+  {
+    ui8_temp = ui8_adc_read_phase_B_current ();
+    if (ui8_temp > 127)
+    {
+      ui8_ADC_id_current = (ui8_ADC_id_current >> 1) + (ui8_temp >> 1);
+    }
+  }
+
 debug_pin_reset ();
 }
 
@@ -105,6 +115,8 @@ void hall_sensors_read_and_action (void)
       if (ui16_motor_speed_erps > 100)
       {
 	ui8_motor_state = MOTOR_STATE_RUNNING_INTERPOLATION_360_DEGREES;
+	ui8_ADC_id_current_filtered = ui8_ADC_id_current;
+	ui8_ADC_id_current = 0;
       }
       else if (ui16_motor_speed_erps > 25)
       {
@@ -189,7 +201,7 @@ void hall_sensors_read_and_action (void)
 // runs every 64us (PWM frequency)
 void motor_fast_loop (void)
 {
-  uint16_t ui16_temp;
+  uint8_t ui8_temp;
 
   // count number of fast loops / PWM cycles
   if (ui16_PWM_cycles_counter < PWM_CYCLES_COUNTER_MAX)
@@ -207,42 +219,6 @@ void motor_fast_loop (void)
     // next code is need for motor startup correctly
     ui8_motor_state = MOTOR_STATE_COAST;
     hall_sensors_read_and_action ();
-  }
-
-  if (ui8_motor_state == MOTOR_STATE_RUNNING_INTERPOLATION_360_DEGREES)
-  {
-//    ui8_temp = ui8_adc_read_phase_B_current ();
-//
-//    if (ui8_temp > 127)
-//    {
-//      ui16_ADC_id_current_accumulated += ui8_temp;
-//      ui8_ADC_id_current_counter++;
-//
-//      if (ui8_ADC_id_current_counter > 127)
-//      {
-//	ui8_ADC_id_current_counter = 0;
-//	ui8_ADC_id_current = ui16_ADC_id_current_accumulated >> 7;
-//	ui16_ADC_id_current_accumulated = 0;
-//      }
-
-      ui16_temp = ui8_adc_read_phase_B_current ();
-
-      if (ui16_temp > 127)
-      {
-	      ui16_ADC_id_current = ui16_temp;
-//
-//        ui16_ADC_id_current_accumulated += ui16_temp;
-//        ui8_ADC_id_current_counter++;
-//
-//        if (ui8_ADC_id_current_counter > 63)
-//        {
-//	  ui8_ADC_id_current_counter = 0;
-//	  ui16_ADC_id_current = ui16_ADC_id_current_accumulated >> 6;
-//	  ui16_ADC_id_current_accumulated = 0;
-//        }
-
-//      ui8_ADC_id_current = (ui8_ADC_id_current >> 1) + (ui8_temp >> 1);
-    }
   }
 
 #define DO_INTERPOLATION 1 // may be usefull when debugging
