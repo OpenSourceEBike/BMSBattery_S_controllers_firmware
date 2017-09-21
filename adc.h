@@ -27,5 +27,6 @@ uint8_t ui8_adc_read_phase_B_current (void);
 uint16_t ui16_adc_read_phase_B_current (void);
 uint8_t ui8_adc_read_throttle (void);
 uint8_t ui8_adc_read_motor_total_current_filtered (void);
+uint8_t ui16_adc_read_motor_total_current_filtered (void);
 
 #endif /* _ADC_H */

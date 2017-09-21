@@ -133,13 +133,15 @@ int main (void)
       // execute cruise control
       // read here ADC1_CHANNEL_THROTTLE to avoid PWM signal interferences
       ui8_ADC_throttle = ui8_adc_read_throttle ();
-      ui8_temp = (uint8_t) map (ui8_ADC_throttle, ADC_THROTTLE_MIN_VALUE, ADC_THROTTLE_MAX_VALUE, 0, 255);
+      ui8_temp = (uint8_t) map (ui8_ADC_throttle, ADC_THROTTLE_MIN_VALUE, ADC_THROTTLE_MAX_VALUE, 77, 89);
 
 //#define DO_CRUISE_CONTROL 1
 #if DO_CRUISE_CONTROL == 1
       ui8_temp = cruise_control (ui8_temp);
 #endif
-      pwm_set_duty_cycle (ui8_temp);
+      pwm_set_duty_cycle (255);
+
+      ui8_motor_current = ui8_temp;
       /****************************************************************************/
 
       getchar1 ();
@@ -148,10 +150,10 @@ int main (void)
 //      i16_temp1 = (((int16_t) ui16_ADC_id_current_filtered) - 511) / ADC_PHASE_B_CURRENT_FACTOR;
       ui8_temp = ui8_ADC_iq_current_filtered - 127;
       ui8_temp1 = ui8_ADC_id_current_filtered - 127;
-
-      ui16_ADC_id_current_accumulated -= ui16_ADC_id_current_accumulated >> 4;
-      ui16_ADC_id_current_accumulated += ui8_temp1;
-      ui8_ADC_id_current_filtered = ui16_ADC_id_current_accumulated >> 4;
+//
+//      ui16_ADC_id_current_accumulated -= ui16_ADC_id_current_accumulated >> 4;
+//      ui16_ADC_id_current_accumulated += ui8_temp1;
+//      ui8_ADC_id_current_filtered = ui16_ADC_id_current_accumulated >> 4;
 
       printf("%d, %d, %d\n", ui16_motor_speed_erps, ui8_temp1, ui8_ADC_id_current_filtered);
 

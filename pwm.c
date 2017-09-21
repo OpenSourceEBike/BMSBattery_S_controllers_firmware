@@ -376,7 +376,7 @@ void pwm_duty_cycle_controller (void)
   }
   else
   {
-//    debug_pin_set ();
+debug_pin_set ();
     ui8_motor_total_current_flag = 0;
 
     if (ui8_duty_cycle > 0)

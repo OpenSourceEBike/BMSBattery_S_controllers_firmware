@@ -83,3 +83,14 @@ uint8_t ui8_adc_read_motor_total_current_filtered (void)
   return *(uint8_t*)(0x53F0);
 }
 
+uint8_t ui16_adc_read_motor_total_current_filtered (void)
+{
+  uint16_t temph;
+  uint8_t templ;
+
+  templ = *(uint8_t*)(0x53F1);
+  temph = *(uint8_t*)(0x53F0);
+
+  return (uint16_t)((uint16_t)((uint16_t)templ << 6) | (uint16_t)(temph << 8));
+}
+
