@@ -22,16 +22,16 @@
 #include "config.h"
 
 
-static uint32_t ui32_setpoint;
-static uint32_t ui32_SPEED_km_h;
-static int16_t i16_delta;
-static int16_t i16_deziAmps;
+static uint32_t ui32_setpoint; // local version of setpoint
+uint32_t ui32_SPEED_km_h; //global variable Speed
+static int16_t i16_delta; // difference between setpoint and actual value
+
 int8_t uint_PWM_Enable=0;
 
 uint16_t update_setpoint (uint16_t speed, uint16_t PAS, uint16_t sumtorque, uint16_t setpoint_old)
 {
    ui32_SPEED_km_h=(wheel_circumference*PWM_CYCLES_SECOND*36L)/(100000L*(uint32_t)speed);			//calculate speed in km/h conversion fr	om sec to hour --> *3600, conversion from mm to km --> /1000000, tic frequency 15625 Hz
-
+  if(ui16_SPEED_Counter>40000){ui32_SPEED_km_h=0;}     //if wheel isn't turning, reset speed
   if(ui8_BatteryVoltage<BATTERY_VOLTAGE_MIN_VALUE){
       ui32_setpoint=0; 	// highest priority: Stop motor for undervoltage protection
       TIM1_CtrlPWMOutputs(DISABLE);
@@ -81,23 +81,22 @@ uint16_t update_setpoint (uint16_t speed, uint16_t PAS, uint16_t sumtorque, uint
       printf("PWM enabled!\n");
   }
   if (sumtorque>setpoint_old){
-  ui32_setpoint=(uint32_t)(setpoint_old+((sumtorque-setpoint_old)>>2));
+  ui32_setpoint=(uint32_t)(setpoint_old+((sumtorque-setpoint_old)>>3));
   }
   else if (sumtorque<setpoint_old){
-  ui32_setpoint=(uint32_t)(setpoint_old-((setpoint_old-sumtorque)>>2));
+  ui32_setpoint=(uint32_t)(setpoint_old-((setpoint_old-sumtorque)>>3));
   }
 #endif
 
 #ifdef THROTTLE_AND_PAS
   if (sumtorque>setpoint_old){
-    ui32_setpoint=(uint32_t)(setpoint_old+((sumtorque-setpoint_old)>>2));
+    ui32_setpoint=(uint32_t)(setpoint_old+((sumtorque-setpoint_old)>>3));
     }
     else if (sumtorque<setpoint_old){
-    ui32_setpoint=(uint32_t)(setpoint_old-((setpoint_old-sumtorque)>>2));
+    ui32_setpoint=(uint32_t)(setpoint_old-((setpoint_old-sumtorque)>>3));
     }
 #endif
   }
-  i16_deziAmps= (current_cal_a*ui16_BatteryCurrent)/10 + current_cal_b;
-  printf("Current %d, Voltage %d, sumtor %d, setpoint %lu, setpoint_old %d,km/h %lu\n", i16_deziAmps, ui8_BatteryVoltage, sumtorque, ui32_setpoint, setpoint_old, ui32_SPEED_km_h);
+
   return ui32_setpoint;
 }

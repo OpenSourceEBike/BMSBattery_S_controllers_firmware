@@ -68,6 +68,7 @@ extern uint16_t ui16_SPEED_Counter; 	//Counter for bike speed
 extern uint16_t ui16_PAS_Counter;	//Counter for cadence
 extern uint8_t ui8_PAS_Flag;		//Flag for PAS Interrupt detected
 extern uint8_t ui8_SPEED_Flag;		//Flag for PAS Interrupt detected
+extern uint8_t ui8_slowloop_flag;	//Flag for slow loop timing
 
 
 #endif

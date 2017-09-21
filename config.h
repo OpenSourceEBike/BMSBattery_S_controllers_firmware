@@ -8,7 +8,7 @@
 #ifndef CONFIG_H_
 #define CONFIG_H_
 
-#define limit 25
+#define limit 20
 #define timeout 3125
 #define wheel_circumference 2000L
 #define fummelfaktor 64L

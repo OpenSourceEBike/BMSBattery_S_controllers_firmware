@@ -12,7 +12,6 @@
 #include "stm8s_tim1.h"
 #include "motor.h"
 #include "gpio.h"
-#include "motor.h"
 #include "pwm.h"
 #include "config.h"
 
@@ -56,6 +55,7 @@ void TIM1_UPD_OVF_TRG_BRK_IRQHandler(void) __interrupt(TIM1_UPD_OVF_TRG_BRK_IRQH
   TIM1_ClearITPendingBit(TIM1_IT_UPDATE);
 }
 
+
 void hall_sensor_init (void)
 {
   GPIO_Init(HALL_SENSORS__PORT,
@@ -76,15 +76,13 @@ void hall_sensors_read_and_action (void)
 
     switch (hall_sensors)
     {
-      case 3:
-      // read here the phase B current
+      case 3://rotor position 180 degree
+      // full electric revolution recognized, reset counters read here the phase B current for FOC,
       if (ui8_adc_read_throttle_busy == 0)
       {
 debug_pin_set ();
-	ui16_ADC_iq_current = ADC1_GetConversionValue ();
-	ui16_ADC_iq_current_accumulated -= ui16_ADC_iq_current_accumulated >> 2;
-	ui16_ADC_iq_current_accumulated += ui16_ADC_iq_current;
-	ui16_ADC_iq_current_filtered = ui16_ADC_iq_current_accumulated >> 2;
+	ui16_ADC_iq_current = ADC1_GetConversionValue (); // this value is regualted to be zero by FOC in this case without averaging
+
       }
 
       ui16_PWM_cycles_counter_total = ui16_PWM_cycles_counter;
@@ -120,21 +118,32 @@ debug_pin_set ();
       ui8_motor_rotor_absolute_position = ANGLE_180 + MOTOR_ROTOR_DELTA_PHASE_ANGLE_RIGHT;
       break;
 
-      case 1:
+      case 1: //rotor position 240 degree, do FOC control
+	if (ui16_motor_speed_erps > 7)
+	      {
+		if (ui16_ADC_iq_current>>2 > 127)// hier prüfen, ob Wandlung von 10 auf 8 bit geht....
+		{
+		  ui8_position_correction_value++;
+		}
+		else if (ui16_ADC_iq_current>>2 < 125)
+		{
+		  ui8_position_correction_value--;
+		}
+	      }
       if (ui8_motor_state != MOTOR_STATE_RUNNING_INTERPOLATION_360_DEGREES)
       {
 	ui8_motor_rotor_absolute_position = ANGLE_240 + MOTOR_ROTOR_DELTA_PHASE_ANGLE_RIGHT;
       }
       break;
 
-      case 5:
+      case 5: //rotor position 300 degree
       if (ui8_motor_state != MOTOR_STATE_RUNNING_INTERPOLATION_360_DEGREES)
       {
 	ui8_motor_rotor_absolute_position = ANGLE_300 + MOTOR_ROTOR_DELTA_PHASE_ANGLE_RIGHT;
       }
       break;
 
-      case 4:
+      case 4: //rotor position 0 degree
 debug_pin_reset ();
       if (ui8_motor_state != MOTOR_STATE_RUNNING_INTERPOLATION_360_DEGREES)
       {
@@ -142,14 +151,14 @@ debug_pin_reset ();
       }
       break;
 
-      case 6:
+      case 6://rotor position 60 degree
       if (ui8_motor_state != MOTOR_STATE_RUNNING_INTERPOLATION_360_DEGREES)
       {
 	ui8_motor_rotor_absolute_position = ANGLE_60 + MOTOR_ROTOR_DELTA_PHASE_ANGLE_RIGHT;
       }
       break;
 
-      case 2:
+      case 2://rotor position 120 degree
       if (ui8_motor_state != MOTOR_STATE_RUNNING_INTERPOLATION_360_DEGREES)
       {
 	ui8_motor_rotor_absolute_position = ANGLE_120 + MOTOR_ROTOR_DELTA_PHASE_ANGLE_RIGHT;

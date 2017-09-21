@@ -32,6 +32,8 @@
 //uint16_t ui16_LPF_angle_adjust_temp = 0;
 
 uint16_t ui16_log1 = 0;
+uint8_t ui8_slowloop_flag = 0;
+uint8_t ui8_veryslowloop_counter = 0;
 uint16_t ui16_log2 = 0;
 uint8_t ui8_log = 0;
 uint8_t ui8_i= 0; 				//counter for ... next loop
@@ -42,6 +44,7 @@ uint8_t a = 0; 					//loop counter
 
 static uint16_t ui16_throttle_counter = 0;
 uint16_t ui16_temp_delay = 0;
+static int16_t i16_deziAmps;
 
 
 
@@ -83,8 +86,12 @@ void EXTI_PORTD_IRQHandler(void) __interrupt(EXTI_PORTD_IRQHANDLER);
 // Timer1/PWM period interrupt
 void TIM1_UPD_OVF_TRG_BRK_IRQHandler(void) __interrupt(TIM1_UPD_OVF_TRG_BRK_IRQHANDLER);
 
+// Timer2/slow control loop
+void TIM2_UPD_OVF_TRG_BRK_IRQHandler(void) __interrupt(TIM2_UPD_OVF_TRG_BRK_IRQHANDLER);
+
 /////////////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////////////
+
 
 int main (void)
 {
@@ -173,28 +180,22 @@ printf("Torquearray initialized\n");
 
 
 #endif
-// scheduled update of setpoint and duty cycle (every 100ms)
-	ui16_temp_delay = TIM2_GetCounter ();
 
-	if ((ui16_temp_delay - ui16_throttle_counter) > 100)
-    {
-	  ui16_throttle_counter = ui16_temp_delay;
-	  //printf("Timetic!");
-#ifndef TORQUESENSOR
+
+// scheduled update of setpoint and duty cycle (slow loop)
+
+	if (ui8_slowloop_flag)
+	  {
+	    //printf("MainSlowLoop\n");
+	    ui8_slowloop_flag=0; //reset flag for slow loop
+	    ui8_veryslowloop_counter++; // increase counter for very slow loop
+#ifndef TORQUESENSOR // read in Throttle value an map it to margins
 	  ui8_adc_read_throttle_busy = 1;
 	      ui8_temp= adc_read_throttle (); //read in recent torque value
 	      ui8_adc_read_throttle_busy = 0;
 	      ui16_sum_torque = (uint8_t) map (ui8_temp , ADC_THROTTLE_MIN_VALUE, ADC_THROTTLE_MAX_VALUE, 0, SETPOINT_MAX_VALUE); //map throttle to limits
 #endif
 	  ui16_setpoint = (uint16_t)update_setpoint (ui16_SPEED,ui16_PAS,ui16_sum_torque,ui16_setpoint); //update setpoint
-/*
-//Read in throttle for debugging to test, if motor runs with additional interrupts from PAS and SPEEDk
-	  ui8_adc_read_throttle_busy = 1;
-	  ui16_setpoint = (uint16_t) adc_read_throttle (); //read in recent torque value
-	  ui8_adc_read_throttle_busy = 0;
-
-*/
-
 
 
 //#define DO_CRUISE_CONTROL 1
@@ -204,26 +205,19 @@ printf("Torquearray initialized\n");
 
       pwm_set_duty_cycle ((uint8_t)ui16_setpoint);
 	  /****************************************************************************/
-
+//very slow loop for communication
+      if (ui8_veryslowloop_counter > 5){
+	  ui8_veryslowloop_counter=0;
       getchar1 ();
-      i16_temp = (((int16_t) ui16_ADC_iq_current_filtered) - 511) * ADC_PHASE_B_CURRENT_FACTOR_MA;
-            printf("%d, %d, %d\n", ui16_motor_speed_erps, i16_temp, ui8_position_correction_value);
+
+       //     printf("%d, %d, %d\n", ui16_motor_speed_erps, i16_temp, ui8_position_correction_value);
       //      printf("%d, %d, %d\n", ui8_motor_state, ui16_motor_speed_erps, ui8_position_correction_value);
 
+      i16_deziAmps= (current_cal_a*ui16_BatteryCurrent)/10 + current_cal_b; //calculate Amps out of 10bit ADC value
+      printf("correction angle %d, Current %d, Voltage %d, sumtorque %d, setpoint %d, km/h %lu\n",ui8_position_correction_value, i16_deziAmps, ui8_BatteryVoltage, ui16_sum_torque, ui16_setpoint, ui32_SPEED_km_h);
+      }//end of very slow loop
 
 
-      if (ui16_motor_speed_erps > 7)
-            {
-      	if (ui16_ADC_iq_current_filtered > 510)
-      	{
-      	  ui8_position_correction_value++;
-      	}
-      	else if (ui16_ADC_iq_current_filtered < 508)
-      	{
-      	  ui8_position_correction_value--;
-      	}
-            }
-
-    }
-  }
+    }// end of slow loop
+  }// end of while(1) loop
 }
