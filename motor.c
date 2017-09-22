@@ -49,6 +49,7 @@ uint8_t ui8_motor_current = ADC_MOTOR_TOTAL_CURRENT_MAX_POSITIVE;
 
 void TIM1_UPD_OVF_TRG_BRK_IRQHandler(void) __interrupt(TIM1_UPD_OVF_TRG_BRK_IRQHANDLER)
 {
+debug_pin_set ();
   // start ADC all channels, scan conversion (buffered)
   ADC1->CSR &= 0x09; // clear EOC flag first (selectd also channel 9)
   ADC1_StartConversion ();
@@ -58,6 +59,7 @@ void TIM1_UPD_OVF_TRG_BRK_IRQHandler(void) __interrupt(TIM1_UPD_OVF_TRG_BRK_IRQH
   motor_fast_loop ();
 
   TIM1_ClearITPendingBit(TIM1_IT_UPDATE);
+debug_pin_reset ();
 }
 
 void hall_sensor_init (void)
@@ -118,16 +120,15 @@ void hall_sensors_read_and_action (void)
 
       case 1:
 #if (MOTOR_TYPE == MOTOR_TYPE_EUC2)
-      if ((ui8_motor_state == MOTOR_STATE_RUNNING_INTERPOLATION_60_DEGREES) ||
-	  (ui8_motor_state == MOTOR_STATE_RUNNING_INTERPOLATION_360_DEGREES))
+      if (ui8_motor_state == MOTOR_STATE_RUNNING_INTERPOLATION_60_DEGREES)
       {
 	if (ui8_ADC_id_current > 127)
 	{
-	  ui8_position_correction_value--;
+	  ui8_position_correction_value++;
 	}
 	else if (ui8_ADC_id_current < 125)
 	{
-	  ui8_position_correction_value++;
+	  ui8_position_correction_value--;
 	}
       }
 #elif (MOTOR_TYPE == MOTOR_TYPE_Q85)

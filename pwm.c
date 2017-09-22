@@ -395,22 +395,19 @@ void pwm_duty_cycle_controller (void)
 
 void pwm_apply_duty_cycle (uint8_t ui8_duty_cycle_value)
 {
-  static uint8_t ui8__duty_cycle;
-  static uint8_t ui8_temp;
-
-  ui8__duty_cycle = ui8_duty_cycle_value;
+  uint8_t ui8_temp;
 
   // scale and apply _duty_cycle
   ui8_temp = ui8_svm_table[ui8_motor_rotor_position];
   if (ui8_temp > MIDDLE_PWM_VALUE_DUTY_CYCLE_MAX)
   {
-    ui16_value = ((uint16_t) (ui8_temp - MIDDLE_PWM_VALUE_DUTY_CYCLE_MAX)) * ui8__duty_cycle;
+    ui16_value = ((uint16_t) (ui8_temp - MIDDLE_PWM_VALUE_DUTY_CYCLE_MAX)) * ui8_duty_cycle_value;
     ui8_temp = (uint8_t) (ui16_value >> 8);
     ui8_value_a = MIDDLE_PWM_VALUE_DUTY_CYCLE_MAX + ui8_temp;
   }
   else
   {
-    ui16_value = ((uint16_t) (MIDDLE_PWM_VALUE_DUTY_CYCLE_MAX - ui8_temp)) * ui8__duty_cycle;
+    ui16_value = ((uint16_t) (MIDDLE_PWM_VALUE_DUTY_CYCLE_MAX - ui8_temp)) * ui8_duty_cycle_value;
     ui8_temp = (uint8_t) (ui16_value >> 8);
     ui8_value_a = MIDDLE_PWM_VALUE_DUTY_CYCLE_MAX - ui8_temp;
   }
@@ -419,13 +416,13 @@ void pwm_apply_duty_cycle (uint8_t ui8_duty_cycle_value)
   ui8_temp = ui8_svm_table[(uint8_t) (ui8_motor_rotor_position + 85 /* 120º */)];
   if (ui8_temp > MIDDLE_PWM_VALUE_DUTY_CYCLE_MAX)
   {
-    ui16_value = ((uint16_t) (ui8_temp - MIDDLE_PWM_VALUE_DUTY_CYCLE_MAX)) * ui8__duty_cycle;
+    ui16_value = ((uint16_t) (ui8_temp - MIDDLE_PWM_VALUE_DUTY_CYCLE_MAX)) * ui8_duty_cycle_value;
     ui8_temp = (uint8_t) (ui16_value >> 8);
     ui8_value_b = MIDDLE_PWM_VALUE_DUTY_CYCLE_MAX + ui8_temp;
   }
   else
   {
-    ui16_value = ((uint16_t) (MIDDLE_PWM_VALUE_DUTY_CYCLE_MAX - ui8_temp)) * ui8__duty_cycle;
+    ui16_value = ((uint16_t) (MIDDLE_PWM_VALUE_DUTY_CYCLE_MAX - ui8_temp)) * ui8_duty_cycle_value;
     ui8_temp = (uint8_t) (ui16_value >> 8);
     ui8_value_b = MIDDLE_PWM_VALUE_DUTY_CYCLE_MAX - ui8_temp;
   }
@@ -434,13 +431,13 @@ void pwm_apply_duty_cycle (uint8_t ui8_duty_cycle_value)
   ui8_temp = ui8_svm_table[(uint8_t) (ui8_motor_rotor_position + 171 /* 240º */)];
   if (ui8_temp > MIDDLE_PWM_VALUE_DUTY_CYCLE_MAX)
   {
-    ui16_value = ((uint16_t) (ui8_temp - MIDDLE_PWM_VALUE_DUTY_CYCLE_MAX)) * ui8__duty_cycle;
+    ui16_value = ((uint16_t) (ui8_temp - MIDDLE_PWM_VALUE_DUTY_CYCLE_MAX)) * ui8_duty_cycle_value;
     ui8_temp = (uint8_t) (ui16_value >> 8);
     ui8_value_c = MIDDLE_PWM_VALUE_DUTY_CYCLE_MAX + ui8_temp;
   }
   else
   {
-    ui16_value = ((uint16_t) (MIDDLE_PWM_VALUE_DUTY_CYCLE_MAX - ui8_temp)) * ui8__duty_cycle;
+    ui16_value = ((uint16_t) (MIDDLE_PWM_VALUE_DUTY_CYCLE_MAX - ui8_temp)) * ui8_duty_cycle_value;
     ui8_temp = (uint8_t) (ui16_value >> 8);
     ui8_value_c = MIDDLE_PWM_VALUE_DUTY_CYCLE_MAX - ui8_temp;
   }
