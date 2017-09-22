@@ -14,6 +14,7 @@
 #include "gpio.h"
 #include "motor.h"
 #include "pwm.h"
+#include "adc.h"
 
 uint8_t ui8_svm_table [SVM_TABLE_LEN] =
 {
@@ -277,6 +278,8 @@ uint8_t ui8_svm_table [SVM_TABLE_LEN] =
 
 uint8_t ui8_duty_cycle = 0;
 uint8_t ui8_duty_cycle_target = 0;
+uint8_t ui8_duty_cycle_ramp_inverse_step = 0;
+uint8_t ui8_counter_duty_cycle_ramp = 0;
 uint8_t ui8_value_a;
 uint8_t ui8_value_b;
 uint8_t ui8_value_c;
@@ -358,40 +361,30 @@ void pwm_init (void)
 
 void pwm_duty_cycle_controller (void)
 {
-  // limit PWM increase/decrease rate --- comment from stancecoke: this part does just nothing? ui8_counter is never increased?!
-  static uint8_t ui8_counter;
+  uint8_t ui8_temp;
 
-  static uint8_t ui8_c;
-
-  if (ui8_motor_total_current_flag == 0)
+  // verify motor max current limit
+  ui8_temp = ui8_adc_read_motor_total_current ();
+  if (ui8_temp > ui8_motor_current)  // motor max current, reduce duty_cycle
   {
-    if (ui8_counter++ > PWM_DUTY_CYCLE_CONTROLLER_COUNTER)
-    {
-      ui8_counter = 0;
-
-      // increment or decrement duty_cycle
-      if (ui8_duty_cycle_target > ui8_duty_cycle) { ui8_duty_cycle++; }
-      else if (ui8_duty_cycle_target < ui8_duty_cycle) { ui8_duty_cycle--; }
-    }
-  }
-  else
-  {
-debug_pin_set ();
-    ui8_motor_total_current_flag = 0;
-
     if (ui8_duty_cycle > 0)
     {
       ui8_duty_cycle--;
     }
   }
+  else // no motor max current, adjust duty_cycle to duty_cycle_target, including ramping
+  {
+    if (ui8_counter_duty_cycle_ramp++ >= ui8_duty_cycle_ramp_inverse_step)
+    {
+	ui8_counter_duty_cycle_ramp = 0;
 
-//#define DO_DUTY_CYCLE_RAMP 1
-#if DO_DUTY_CYCLE_RAMP == 1
+      // implement duty_cycle ramp
+      if (ui8_duty_cycle_target > ui8_duty_cycle) { ui8_duty_cycle++; }
+      else if (ui8_duty_cycle_target < ui8_duty_cycle) { ui8_duty_cycle--; }
+    }
+  }
+
   pwm_apply_duty_cycle (ui8_duty_cycle);
-#else
-//  pwm_apply_duty_cycle (ui8_duty_cycle_target);
-  pwm_apply_duty_cycle (ui8_duty_cycle);
-#endif
 }
 
 void pwm_apply_duty_cycle (uint8_t ui8_duty_cycle_value)
