@@ -106,6 +106,10 @@ int main (void)
 
   enableInterrupts();
 
+  TIM1_SetCompare1(255);
+  TIM1_SetCompare2(255);
+  TIM1_SetCompare3(255);
+
   hall_sensors_read_and_action (); // needed to start the motor
 
   while (1)
