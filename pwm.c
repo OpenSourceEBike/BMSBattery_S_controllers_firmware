@@ -299,7 +299,7 @@ void pwm_init (void)
 		    TIM1_COUNTERMODE_CENTERALIGNED1,
 		    (512 - 1), // clock = 16MHz; counter period = 1024; PWM freq = 16MHz / 1024 = 15.625kHz;
 		    //(BUT PWM center aligned mode needs twice the frequency)
-		    1); // will fire the TIM1_IT_UPDATE at every PWM period cycle
+		    1); // will fire the TIM1_IT_UPDATE at every PWM period cycle, instead of 2 times if this value was 0
 
 //#define DISABLE_PWM_CHANNELS_1_3
 
@@ -376,11 +376,17 @@ void pwm_duty_cycle_controller (void)
   {
     if (ui8_counter_duty_cycle_ramp++ >= ui8_duty_cycle_ramp_inverse_step)
     {
-	ui8_counter_duty_cycle_ramp = 0;
+      ui8_counter_duty_cycle_ramp = 0;
 
       // implement duty_cycle ramp
-      if (ui8_duty_cycle_target > ui8_duty_cycle) { ui8_duty_cycle++; }
-      else if (ui8_duty_cycle_target < ui8_duty_cycle) { ui8_duty_cycle--; }
+      if (ui8_duty_cycle_target > ui8_duty_cycle)
+      {
+	ui8_duty_cycle++;
+      }
+      else if (ui8_duty_cycle_target < ui8_duty_cycle)
+      {
+	ui8_duty_cycle--;
+      }
     }
   }
 
