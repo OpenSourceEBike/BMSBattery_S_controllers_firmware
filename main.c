@@ -104,9 +104,9 @@ int main (void)
   hall_sensor_init ();
   adc_init ();
 
-  motor_init ();
-
   enableInterrupts();
+
+  motor_init ();
 
   TIM1_SetCompare1(255);
   TIM1_SetCompare2(255);
@@ -147,6 +147,9 @@ int main (void)
       ui8_temp = cruise_control (ui8_temp);
 #endif
 
+#if (MOTOR_TYPE == MOTOR_TYPE_EUC2)
+//      // Coast motor while decelerating and so no regen happens.
+//      //
 //      // calc BEMF
 //      ui16_motor_BEMF = ui16_motor_speed_erps * MOTOR_KVOLTS_PER_ERPS;
 //
@@ -164,21 +167,22 @@ int main (void)
 //      {
 //	if (ui8_duty_cycle_target > ui16_duty_cycle_min)
 //	{
-////	  pwm_set_duty_cycle (0);
-//	    pwm_set_duty_cycle (ui8_duty_cycle_target);
-//	    motor_set_mode_run ();
+//	  pwm_set_duty_cycle (ui8_duty_cycle_target);
+//	  motor_set_mode_run ();
 //	}
 //      }
 //      ui8_duty_cycle_target_old = ui8_duty_cycle_target;
+pwm_set_duty_cycle (ui8_duty_cycle_target);
 
-
+#elif (MOTOR_TYPE == MOTOR_TYPE_Q85)
       pwm_set_duty_cycle (ui8_duty_cycle_target);
+#endif
 
       /****************************************************************************/
 
       getchar1 ();
 
-      printf("%d, %d\n", ui16_motor_speed_erps, ui8_motor_interpolation_state);
+      printf("%d, %d, %d, %d\n", ui16_motor_speed_erps, ui8_duty_cycle_target, ui8_duty_cycle, ui8_position_correction_value);
     }
   }
 }

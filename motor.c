@@ -40,7 +40,7 @@ uint16_t ui16_adc_current_phase_B_filtered = 0;
 uint8_t ui8_motor_interpolation_state = NO_INTERPOLATION_60_DEGREES;
 uint8_t ui8_motor_state = MOTOR_STATE_COAST;
 
-int8_t hall_sensors;
+int8_t hall_sensors = 0;
 int8_t hall_sensors_last = 0;
 
 uint8_t ui8_ADC_id_current = 0;
@@ -48,7 +48,9 @@ uint8_t ui8_ADC_id_current_sign = 0;
 
 uint8_t ui8_motor_total_current_flag = 0;
 
-uint8_t ui8_motor_current = ADC_MOTOR_TOTAL_CURRENT_MAX_POSITIVE;
+uint8_t ui8_ADC_motor_current_max_positive = ADC_MOTOR_TOTAL_CURRENT_MAX_POSITIVE;
+uint8_t ui8_ADC_motor_current_max_negative = ADC_MOTOR_TOTAL_CURRENT_MIN_NEGATIVE;
+uint8_t ui8_ADC_motor_current_zero_value;
 
 void TIM1_UPD_OVF_TRG_BRK_IRQHandler(void) __interrupt(TIM1_UPD_OVF_TRG_BRK_IRQHANDLER)
 {
@@ -81,28 +83,34 @@ debug_pin_set ();
       ui8_ADC_id_current = ui8_adc_read_phase_B_current ();
 
 #if (MOTOR_TYPE == MOTOR_TYPE_EUC2)
-      if (ui8_motor_interpolation_state == INTERPOLATION_60_DEGREES)
+      if (ui8_motor_state == MOTOR_STATE_RUNNING)
       {
-	if (ui8_ADC_id_current > 127)
+	if (ui8_motor_interpolation_state == INTERPOLATION_60_DEGREES)
 	{
-	  ui8_position_correction_value++;
-	}
-	else if (ui8_ADC_id_current < 125)
-	{
-	  ui8_position_correction_value--;
+	  if (ui8_ADC_id_current > 127)
+	  {
+	    ui8_position_correction_value++;
+	  }
+	  else if (ui8_ADC_id_current < 125)
+	  {
+	    ui8_position_correction_value--;
+	  }
 	}
       }
 #elif (MOTOR_TYPE == MOTOR_TYPE_Q85)
-      if ((ui8_motor_interpolation_state == INTERPOLATION_60_DEGREES) ||
-	  (ui8_motor_interpolation_state == INTERPOLATION_360_DEGREES))
+      if (ui8_motor_state == MOTOR_STATE_RUNNING)
       {
-	if (ui8_ADC_id_current > 127)
+	if ((ui8_motor_interpolation_state == INTERPOLATION_60_DEGREES) ||
+	    (ui8_motor_interpolation_state == INTERPOLATION_360_DEGREES))
 	{
-	  ui8_position_correction_value++;
-	}
-	else if (ui8_ADC_id_current < 125)
-	{
-	  ui8_position_correction_value--;
+	  if (ui8_ADC_id_current > 127)
+	  {
+	    ui8_position_correction_value++;
+	  }
+	  else if (ui8_ADC_id_current < 125)
+	  {
+	    ui8_position_correction_value--;
+	  }
 	}
       }
 #endif
@@ -115,7 +123,6 @@ debug_pin_set ();
 
       case 1:
       ui16_PWM_cycles_counter_total = ui16_PWM_cycles_counter;
-      ui16_PWM_cycles_counter_div_4 = ui16_PWM_cycles_counter_total >> 2;
       ui16_PWM_cycles_counter = 0;
       ui16_motor_speed_erps = PWM_CYCLES_SECOND / ui16_PWM_cycles_counter_total; // this division takes ~4.2us
 
@@ -132,6 +139,7 @@ debug_pin_set ();
       else
       {
 	ui8_motor_interpolation_state = NO_INTERPOLATION_60_DEGREES;
+	ui8_motor_state = MOTOR_STATE_RUNNING;
       }
 #elif MOTOR_TYPE == MOTOR_TYPE_EUC2
       if (ui16_motor_speed_erps > 10)
@@ -141,6 +149,7 @@ debug_pin_set ();
       else
       {
 	ui8_motor_interpolation_state = NO_INTERPOLATION_60_DEGREES;
+	ui8_motor_state = MOTOR_STATE_RUNNING;
       }
 #endif
 
@@ -204,13 +213,8 @@ void motor_fast_loop (void)
     ui16_PWM_cycles_counter_total = 0;
     ui8_position_correction_value = 127;
     ui8_motor_interpolation_state = NO_INTERPOLATION_60_DEGREES;
+    ui8_motor_state = MOTOR_STATE_STOP;
   }
-
-//  if (ui16_PWM_cycles_counter == ui16_PWM_cycles_counter_div_4)
-//  {
-//    if (ui8_adc_read_phase_B_current () > 129) { ui8_ADC_id_current_sign = 1; }
-//    else { ui8_ADC_id_current_sign = 0; }
-//  }
 
 #define DO_INTERPOLATION 1 // may be usefull when debugging
 #if DO_INTERPOLATION == 1
@@ -246,15 +250,12 @@ void motor_fast_loop (void)
 void motor_set_mode_coast (void)
 {
   TIM1_CtrlPWMOutputs(DISABLE);
-  ui8_duty_cycle = 0;
   ui8_motor_state = MOTOR_STATE_COAST;
 }
 
 void motor_set_mode_run (void)
 {
-//  ui8_motor_state = MOTOR_STATE_RUNNING_NO_INTERPOLATION_60_DEGREES;
   TIM1_CtrlPWMOutputs(ENABLE);
-  ui8_motor_state = MOTOR_STATE_RUNNING;
 }
 
 void hall_sensor_init (void)
@@ -266,5 +267,14 @@ void hall_sensor_init (void)
 
 void motor_init (void)
 {
-  hall_sensors = (GPIO_ReadInputData (HALL_SENSORS__PORT) & (HALL_SENSORS_MASK));
+  uint8_t ui8_counter = 0;
+  uint16_t ui16_temp = 0;
+
+  // reading some samples of ADC motor total current and average, to get the real zero value
+  while (ui8_counter < 32)
+  {
+    ui16_temp += ui8_adc_read_motor_total_current ();
+    ui8_counter++;
+  }
+  ui8_ADC_motor_current_zero_value = ui16_temp >> 5; // ui16_temp / 32
 }

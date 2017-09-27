@@ -278,7 +278,7 @@ uint8_t ui8_svm_table [SVM_TABLE_LEN] =
 
 uint8_t ui8_duty_cycle = 0;
 uint8_t ui8_duty_cycle_target = 0;
-uint8_t ui8_duty_cycle_ramp_inverse_step = 0;
+uint8_t ui8_duty_cycle_ramp_inverse_step = 20;
 uint8_t ui8_counter_duty_cycle_ramp = 0;
 uint8_t ui8_value_a;
 uint8_t ui8_value_b;
@@ -365,14 +365,22 @@ void pwm_duty_cycle_controller (void)
 
   // verify motor max current limit
   ui8_temp = ui8_adc_read_motor_total_current ();
-  if (ui8_temp > ui8_motor_current)  // motor max current, reduce duty_cycle
+  if (ui8_temp > (ui8_ADC_motor_current_zero_value + ui8_ADC_motor_current_max_positive))  // motor max current, reduce duty_cycle
   {
     if (ui8_duty_cycle > 0)
     {
       ui8_duty_cycle--;
     }
   }
-  else // no motor max current, adjust duty_cycle to duty_cycle_target, including ramping
+  // verify motor max regen current limit
+  else if (ui8_temp < (ui8_ADC_motor_current_zero_value - ui8_ADC_motor_current_max_negative))  // motor max current, increase duty_cycle
+  {
+    if (ui8_duty_cycle < 255)
+    {
+      ui8_duty_cycle++;
+    }
+  }
+  else // no motor current limits, adjust duty_cycle to duty_cycle_target, including ramping
   {
     if (ui8_counter_duty_cycle_ramp++ >= ui8_duty_cycle_ramp_inverse_step)
     {

@@ -30,8 +30,10 @@ extern uint16_t ui16_PWM_cycles_counter_total;
 extern uint16_t ui16_motor_speed_erps;
 extern uint8_t ui8_ADC_id_current;
 extern uint8_t ui8_motor_total_current_flag;
-extern uint8_t ui8_motor_current;
-extern uint16_t ui16_motor_current;
+extern uint8_t ui8_ADC_id_current_sign;
+extern uint8_t ui8_ADC_motor_current_max_positive;
+extern uint8_t ui8_ADC_motor_current_max_negative;
+extern uint8_t ui8_ADC_motor_current_zero_value;
 extern uint8_t ui8_ADC_id_current_sign;
 
 extern uint16_t ui16_ADC_id_current_accumulated;
