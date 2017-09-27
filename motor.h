@@ -35,6 +35,9 @@ extern uint8_t ui8_ADC_motor_current_max_positive;
 extern uint8_t ui8_ADC_motor_current_max_negative;
 extern uint8_t ui8_ADC_motor_current_zero_value;
 extern uint8_t ui8_ADC_id_current_sign;
+extern uint8_t ui8_hall_sensors;
+extern uint8_t ui8_motor_rotor_absolute_position;
+extern uint8_t ui8_motor_state;
 
 extern uint16_t ui16_ADC_id_current_accumulated;
 

@@ -182,7 +182,7 @@ pwm_set_duty_cycle (ui8_duty_cycle_target);
 
       getchar1 ();
 
-      printf("%d, %d, %d, %d\n", ui16_motor_speed_erps, ui8_duty_cycle_target, ui8_duty_cycle, ui8_position_correction_value);
+      printf("%d, %d, %d, %d\n", ui16_motor_speed_erps, ui8_motor_state, ui8_motor_interpolation_state, ui8_position_correction_value);
     }
   }
 }

@@ -50,6 +50,7 @@
 #if MOTOR_TYPE == MOTOR_TYPE_Q85
 #define MOTOR_ROTOR_DELTA_PHASE_ANGLE_RIGHT 210// best value found (at max speed, minimum current and power supply voltage keeps the same)
 #elif MOTOR_TYPE == MOTOR_TYPE_EUC2
+//#define MOTOR_ROTOR_DELTA_PHASE_ANGLE_RIGHT 235 // best value found
 #define MOTOR_ROTOR_DELTA_PHASE_ANGLE_RIGHT 235 // best value found
 #endif
 
