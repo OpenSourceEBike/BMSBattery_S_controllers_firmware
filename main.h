@@ -12,11 +12,17 @@
 #define MOTOR_TYPE_Q85 1
 #define MOTOR_TYPE_EUC2 2
 
-#define MOTOR_TYPE MOTOR_TYPE_EUC2
+#define MOTOR_TYPE MOTOR_TYPE_Q85
+
+
+// MOTOR_TYPE_EUC2
+// 28V --> 66 ERPs
+// 0.424 for each ERPs
+//#define MOTOR_KVOLTS_PER_ERPS 107 //0.424 << 8 EUC2 motor
+#define MOTOR_KVOLTS_PER_ERPS 73 //Q85 motor
 
 #define SVM_TABLE_LEN 256
 #define SVM_TABLE_LEN_x1024 262144 //(256 * 1024)
-
 
 #define SETPOINT_MAX_VALUE 237		//maximum value for setpoint, taken from map function
 
@@ -31,6 +37,12 @@
 //#define ADC_MOTOR_TOTAL_CURRENT_MAX_POSITIVE 83 // 2.5A
 #define ADC_MOTOR_TOTAL_CURRENT_MAX_POSITIVE 100 // 10A ??
 #define ADC_MOTOR_TOTAL_CURRENT_MIN_NEGATIVE 76//76 // -2A
+
+// ADC Battery voltage
+// 29.8V --> 110 (8bits ADC)
+// 22.1V --> 81 (8bits ADC)
+// 1 ADC step 8 bits --> 0.272 volts
+#define ADC_BATTERY_VOLTAGE_K 70 // 0.272 << 8
 
 // Phase current: max of +-15.5 amps
 // 512 --> 15.5 amps

@@ -28,7 +28,8 @@ void EXTI_PORTA_IRQHandler(void) __interrupt(EXTI_PORTA_IRQHANDLER)
   else
   {
     brake_coast_disable ();
-    pwm_set_duty_cycle (0);
+//    pwm_set_duty_cycle (0);
+    ui8_duty_cycle = 0;
     stop_cruise_control ();
   }
 }

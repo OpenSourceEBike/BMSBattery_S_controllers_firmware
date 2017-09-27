@@ -351,7 +351,7 @@ void pwm_init (void)
 		  16, // DTG = 0; dead time in 62.5 ns steps; 1us/62.5ns = 16
 		  TIM1_BREAK_DISABLE,
 		  TIM1_BREAKPOLARITY_LOW,
-		  TIM1_AUTOMATICOUTPUT_ENABLE);
+		  TIM1_AUTOMATICOUTPUT_DISABLE);
 
   TIM1_ITConfig(TIM1_IT_UPDATE, ENABLE);
 

@@ -23,10 +23,12 @@ extern uint8_t ui8_BatteryCurrent;
 extern uint8_t ui8_ADC_throttle;
 
 void adc_init (void);
+inline void adc_trigger (void);
 uint8_t ui8_adc_read_phase_B_current (void);
 uint16_t ui16_adc_read_phase_B_current (void);
 uint8_t ui8_adc_read_throttle (void);
 uint8_t ui8_adc_read_motor_total_current (void);
 uint8_t ui16_adc_read_motor_total_current (void);
+uint8_t ui8_adc_read_battery_voltage (void);
 
 #endif /* _ADC_H */

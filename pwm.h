@@ -16,6 +16,7 @@
 
 extern uint8_t ui8_svm_table [SVM_TABLE_LEN];
 extern uint8_t ui8_duty_cycle_target;
+extern uint8_t ui8_duty_cycle;
 
 void pwm_init (void);
 void pwm_duty_cycle_controller (void);

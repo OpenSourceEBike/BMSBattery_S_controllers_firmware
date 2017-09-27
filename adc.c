@@ -47,6 +47,13 @@ void adc_init (void)
   ADC1_Cmd (ENABLE);
 }
 
+inline void adc_trigger (void)
+{
+  // start ADC all channels, scan conversion (buffered)
+  ADC1->CSR &= 0x09; // clear EOC flag first (selectd also channel 9)
+  ADC1_StartConversion ();
+}
+
 uint8_t ui8_adc_read_phase_B_current (void)
 {
 //  /* Read LSB first */
@@ -94,3 +101,8 @@ uint8_t ui16_adc_read_motor_total_current (void)
   return (uint16_t)((uint16_t)((uint16_t)templ << 6) | (uint16_t)(temph << 8));
 }
 
+uint8_t ui8_adc_read_battery_voltage (void)
+{
+  // 0x53E0 + 2*9 = 0x53F2
+  return *(uint8_t*)(0x53F2);
+}

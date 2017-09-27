@@ -104,6 +104,8 @@ int main (void)
   hall_sensor_init ();
   adc_init ();
 
+  motor_init ();
+
   enableInterrupts();
 
   TIM1_SetCompare1(255);
@@ -117,9 +119,15 @@ int main (void)
     static uint32_t ui32_counter = 0;
     uint16_t ui16_temp = 0;
     uint8_t ui8_temp = 0;
+    static uint8_t ui8_temp_last = 0;
     static uint8_t ui8_temp1 = 0;
     uint16_t ui32_temp = 0;
     static float f_temp = 0;
+
+    uint8_t ui8_duty_cycle_target = 0;
+    static uint8_t ui8_duty_cycle_target_old = 0;
+    uint16_t ui16_motor_BEMF = 0;
+    uint16_t ui16_duty_cycle_min = 0;
 
     static uint8_t c = 0;
 
@@ -131,20 +139,46 @@ int main (void)
 
       /****************************************************************************/
       // execute cruise control
-      // read here ADC1_CHANNEL_THROTTLE to avoid PWM signal interferences
       ui8_ADC_throttle = ui8_adc_read_throttle ();
-      ui8_temp = (uint8_t) map (ui8_ADC_throttle, ADC_THROTTLE_MIN_VALUE, ADC_THROTTLE_MAX_VALUE, 0, 255);
+      ui8_duty_cycle_target = (uint8_t) map (ui8_ADC_throttle, ADC_THROTTLE_MIN_VALUE, ADC_THROTTLE_MAX_VALUE, 0, 255);
 
 //#define DO_CRUISE_CONTROL 1
 #if DO_CRUISE_CONTROL == 1
       ui8_temp = cruise_control (ui8_temp);
 #endif
-      pwm_set_duty_cycle (ui8_temp);
+
+//      // calc BEMF
+//      ui16_motor_BEMF = ui16_motor_speed_erps * MOTOR_KVOLTS_PER_ERPS;
+//
+//      // CALC MIN DUTY_CYCLE
+//      // min duty_cycle = (BEMF * max duty_cycle) / Vbat
+//      // since BEMF is already multiplied by 255 (max duty_cycle), duty = BEMF / Vbat
+//      ui16_duty_cycle_min = ui16_motor_BEMF / ((ui8_adc_read_battery_voltage () * ADC_BATTERY_VOLTAGE_K) >> 8);
+//      if (ui16_duty_cycle_min > 255) { ui16_duty_cycle_min = 255; }
+//
+//      if (ui8_duty_cycle_target < ui8_duty_cycle_target_old)
+//      {
+//	motor_set_mode_coast ();
+//      }
+//      else
+//      {
+//	if (ui8_duty_cycle_target > ui16_duty_cycle_min)
+//	{
+////	  pwm_set_duty_cycle (0);
+//	    pwm_set_duty_cycle (ui8_duty_cycle_target);
+//	    motor_set_mode_run ();
+//	}
+//      }
+//      ui8_duty_cycle_target_old = ui8_duty_cycle_target;
+
+
+      pwm_set_duty_cycle (ui8_duty_cycle_target);
+
       /****************************************************************************/
 
       getchar1 ();
 
-      printf("%d\n", ui16_motor_speed_erps);
+      printf("%d, %d\n", ui16_motor_speed_erps, ui8_motor_interpolation_state);
     }
   }
 }
