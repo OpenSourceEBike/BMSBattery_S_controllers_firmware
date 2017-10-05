@@ -155,6 +155,7 @@ printf("Torquearray initialized\n");
 	ui16_SPEED=ui16_SPEED_Counter; 	//save recent speed
 	ui16_SPEED_Counter=0;		//reset speed counter
 	ui8_SPEED_Flag =0; 			//reset interrupt flag
+	KM_main.Tx.Wheeltime_ms=ui16_SPEED_Counter>>4; // is not exactly correct, factor should be 15.625, not 16
 	//printf("SPEEDtic\n");
     }
 
@@ -224,7 +225,7 @@ printf("Torquearray initialized\n");
        //     printf("%d, %d, %d\n", ui16_motor_speed_erps, i16_temp, ui8_position_correction_value);
       //      printf("%d, %d, %d\n", ui8_motor_state, ui16_motor_speed_erps, ui8_position_correction_value);
 
-      i16_deziAmps= (current_cal_a*ui16_BatteryCurrent)/10 + current_cal_b; //calculate Amps out of 10bit ADC value
+	KM_main.Tx.Current_x10= (current_cal_a*ui16_BatteryCurrent)/10 + current_cal_b; //calculate Amps out of 10bit ADC value
       //printf("correction angle %d, Current %d, Voltage %d, sumtorque %d, setpoint %d, km/h %lu\n",ui8_position_correction_value, i16_deziAmps, ui8_BatteryVoltage, ui16_sum_torque, ui16_setpoint, ui32_SPEED_km_h);
       }//end of very slow loop
 
