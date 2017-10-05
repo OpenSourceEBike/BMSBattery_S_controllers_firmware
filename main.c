@@ -27,6 +27,7 @@
 #include "update_setpoint.h"
 #include "config.h"
 #include "display.h"
+#include "display_kingmeter.h"
 
 
 //uint16_t ui16_LPF_angle_adjust = 0;
@@ -94,7 +95,7 @@ void TIM2_UPD_OVF_TRG_BRK_IRQHandler(void) __interrupt(TIM2_UPD_OVF_TRG_BRK_IRQH
 
 /////////////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////////////
-
+KINGMETER_t KM_main;
 
 int main (void)
 {
@@ -209,7 +210,7 @@ printf("Torquearray initialized\n");
 
      // pwm_set_duty_cycle ((uint8_t)ui16_setpoint);
 
-      pwm_set_duty_cycle (ui8_assistlevel_global*50); //for test of display communication
+      pwm_set_duty_cycle (KM_main.Rx.AssistLevel*50); //for test of display communication
 	  /****************************************************************************/
 //very slow loop for communication
       if (ui8_veryslowloop_counter > 5){

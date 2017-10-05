@@ -32,8 +32,6 @@ display_view_type display_view;
 
 display_mode_type display_mode; //currently display mode
 uint8_t display_force_text;         //only valid for Nokia displays
-uint16_t poti_stat;
-uint16_t throttle_stat;
 uint8_t battery_percent_fromvoltage;
 uint8_t battery_percent_fromcapacity;
 uint32_t wheel_time;
@@ -138,15 +136,15 @@ void kingmeter_update(void)
     if(KM.Rx.PushAssist == KM_PUSHASSIST_ON)
     {
         #if (DISPLAY_TYPE == DISPLAY_TYPE_KINGMETER_901U)
-        throttle_stat = map(KM.Rx.AssistLevel, 0, 255, 0,1023);
+        //do anything
         #else
-        throttle_stat = 200;
+        //do something else
         #endif
     }
     else
     {
-        throttle_stat = 0;
-        poti_stat     = map(KM.Rx.AssistLevel, 0, 255, 0,1023);
+
+        //do something completly else
     }
 
 

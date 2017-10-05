@@ -183,6 +183,7 @@ typedef struct
     TX_PARAM_t      Tx;
 
 }KINGMETER_t;
+
 void KingMeter_Init (KINGMETER_t* KM_ctx);
 
 

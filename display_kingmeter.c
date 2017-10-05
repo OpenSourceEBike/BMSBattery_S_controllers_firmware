@@ -287,7 +287,7 @@ static void KM_618U_Service(KINGMETER_t* KM_ctx)
 //      KM_ctx->Rx.CUR_Limit_x10;
 
     }
-    ui8_assistlevel_global=KM_ctx->Rx.AssistLevel;
+
 }
 #endif
 
