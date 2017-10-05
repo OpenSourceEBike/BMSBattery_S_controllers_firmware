@@ -26,6 +26,7 @@
 #include "SPEED.h"
 #include "update_setpoint.h"
 #include "config.h"
+#include "display.h"
 
 
 //uint16_t ui16_LPF_angle_adjust = 0;
@@ -56,6 +57,8 @@ uint16_t ui16_PAS_Counter = 0; 		//time tics for cadence measurement
 uint16_t ui16_PAS = 32000;		//cadence in timetics
 uint8_t ui8_PAS_Flag = 0; 		//flag for PAS interrupt
 uint8_t ui8_SPEED_Flag = 0; 		//flag for SPEED interrupt
+
+uint8_t ui8_assistlevel_global = 0;
 
 /////////////////////////////////////////////////////////////////////////////////////////////
 //// Functions prototypes
@@ -116,6 +119,7 @@ int main (void)
   adc_init ();
   PAS_init();
   SPEED_init();
+  display_init();
 
 //  ITC_SetSoftwarePriority (ITC_IRQ_TIM1_OVF, ITC_PRIORITYLEVEL_2);
 
@@ -203,18 +207,24 @@ printf("Torquearray initialized\n");
 	  ui16_setpoint = cruise_control (ui16_setpoint);
 #endif
 
-      pwm_set_duty_cycle ((uint8_t)ui16_setpoint);
+     // pwm_set_duty_cycle ((uint8_t)ui16_setpoint);
+
+      pwm_set_duty_cycle (ui8_assistlevel_global*50); //for test of display communication
 	  /****************************************************************************/
 //very slow loop for communication
       if (ui8_veryslowloop_counter > 5){
 	  ui8_veryslowloop_counter=0;
-      getchar1 ();
+      //getchar1 ();
+
+
+
+	  display_update(); //Display aktualisieren aus Code vom Forumscontroller
 
        //     printf("%d, %d, %d\n", ui16_motor_speed_erps, i16_temp, ui8_position_correction_value);
       //      printf("%d, %d, %d\n", ui8_motor_state, ui16_motor_speed_erps, ui8_position_correction_value);
 
       i16_deziAmps= (current_cal_a*ui16_BatteryCurrent)/10 + current_cal_b; //calculate Amps out of 10bit ADC value
-      printf("correction angle %d, Current %d, Voltage %d, sumtorque %d, setpoint %d, km/h %lu\n",ui8_position_correction_value, i16_deziAmps, ui8_BatteryVoltage, ui16_sum_torque, ui16_setpoint, ui32_SPEED_km_h);
+      //printf("correction angle %d, Current %d, Voltage %d, sumtorque %d, setpoint %d, km/h %lu\n",ui8_position_correction_value, i16_deziAmps, ui8_BatteryVoltage, ui16_sum_torque, ui16_setpoint, ui32_SPEED_km_h);
       }//end of very slow loop
 
 

@@ -18,7 +18,7 @@ uint8_t ui8_array_flag=0;
 void uart_init (void)
 {
   UART2_DeInit();
-  UART2_Init((uint32_t)115200,
+  UART2_Init((uint32_t)9600,
 	     UART2_WORDLENGTH_8D,
 	     UART2_STOPBITS_1,
 	     UART2_PARITY_NO,
@@ -28,6 +28,15 @@ void uart_init (void)
 
 #if __SDCC_REVISION < 9624
 void putchar(char c)
+{
+  //Write a character to the UART2
+  UART2_SendData8(c);
+
+  //Loop until the end of transmission
+  while (UART2_GetFlagStatus(UART2_FLAG_TXE) == RESET);
+}
+
+void putbyte(uint8_t c)
 {
   //Write a character to the UART2
   UART2_SendData8(c);

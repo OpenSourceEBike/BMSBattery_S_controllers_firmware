@@ -14,6 +14,7 @@
 extern uint8_t ui8_array_flag;
 
 void uart_init (void);
+void putbyte(uint8_t c);
 char getchar1(void);
 
 #endif /* _UART_H */

@@ -21,4 +21,9 @@
 #define current_cal_b -312
 #define THROTTLE
 
+#define DISPLAY_TYPE_KINGMETER_618U (1<<4)                  // King-Meter 618U protocol (KM5s, EBS-LCD2, J-LCD, SW-LCD)
+#define DISPLAY_TYPE_KINGMETER      (DISPLAY_TYPE_KINGMETER_618U|DISPLAY_TYPE_KINGMETER_901U)
+
+#define DISPLAY_TYPE DISPLAY_TYPE_KINGMETER                // Set your display type here. CHANGES ONLY HERE!
+
 #endif /* CONFIG_H_ */
