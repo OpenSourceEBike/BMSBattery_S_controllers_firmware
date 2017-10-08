@@ -1,8 +1,10 @@
 Please read the project documentation here: https://opensourceebikefirmware.bitbucket.io/
 
-This branch adds support for bottom bracket torque sensors to make motor power dependent on human power and functions for legal use in germany.
+This branch adds support for a Kingmeter J-LCD Display. 
 
-Parameters for legality are defined in config.h.
+Many thanks to the team of the Forumscontroller, I took the main functions from there!
+
+https://github.com/jenkie/Arduino-Pedelec-Controller
 
 You have to edit the path to your STVP installation in the .bat files, if not installed directly in C:\, to use the Java-tool.
 
