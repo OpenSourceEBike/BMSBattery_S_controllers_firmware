@@ -70,6 +70,7 @@ extern uint8_t ui8_PAS_Flag;		//Flag for PAS Interrupt detected
 extern uint8_t ui8_SPEED_Flag;		//Flag for PAS Interrupt detected
 extern uint8_t ui8_slowloop_flag;	//Flag for slow loop timing
 extern uint8_t ui8_assistlevel_global;
+extern uint8_t ui8_msg_received;
 
 
 #endif

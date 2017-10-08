@@ -10,5 +10,6 @@
 #define _TIMERS_H_
 
 void timer2_init (void);
+void delay_halfms(uint16_t ms) ;
 
 #endif /* _TIMERS_H_ */

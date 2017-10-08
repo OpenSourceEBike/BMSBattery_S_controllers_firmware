@@ -42,3 +42,20 @@ void TIM2_UPD_OVF_TRG_BRK_IRQHandler(void) __interrupt(TIM2_UPD_OVF_TRG_BRK_IRQH
   // clear the interrupt pending bit for TIM2
   TIM2_ClearITPendingBit(TIM2_IT_UPDATE);
 }
+
+
+#define CLOCKFREQ   (16000000L)
+/* Instructions per millisecond. */
+#define INSNS_PER_MS    (CLOCKFREQ / 4000L)
+/* Delay loop is about 10 cycles per iteration. */
+#define LOOPS_PER_MS    (INSNS_PER_MS/20L)
+void delay_halfms(uint16_t ms) {
+    uint16_t u;
+    while (ms--) {
+        /* Inner loop takes about 10 cycles per iteration + 4 cycles setup. */
+        for (u = 0; u < LOOPS_PER_MS; u++) {
+            /* Prevent this loop from being optimized away. */
+            __asm nop __endasm;
+        }
+    }
+}

@@ -108,6 +108,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #define KM_ERROR_NONE           0x00
 #define KM_ERROR_COMM           0x30
 
+extern uint8_t ui8_UART_tic;
+
 #if (DISPLAY_TYPE == DISPLAY_TYPE_KINGMETER_618U)
 /*
 uint16_t KM_WHEELSIZE [8] =

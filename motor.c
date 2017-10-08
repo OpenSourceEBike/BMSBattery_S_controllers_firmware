@@ -14,6 +14,7 @@
 #include "gpio.h"
 #include "pwm.h"
 #include "config.h"
+#include "display_kingmeter.h"
 
 uint8_t ui8_counter = 0;
 
@@ -179,6 +180,7 @@ void motor_fast_loop (void)
 {
   if(ui16_SPEED_Counter < 65530) {ui16_SPEED_Counter++;} 	//increase SPEED Counter but avoid overflow
   if(ui16_PAS_Counter < 65530) {ui16_PAS_Counter++;}		//increase PAS Counter but avoid overflow
+
 
   // count number of fast loops / PWM cycles
   if (ui16_PWM_cycles_counter < PWM_CYCLES_COUNTER_MAX)

@@ -37,7 +37,7 @@ uint16_t update_setpoint (uint16_t speed, uint16_t PAS, uint16_t sumtorque, uint
       TIM1_CtrlPWMOutputs(DISABLE);
             uint_PWM_Enable=0;
             ui32_setpoint=0; 	// highest priority: Stop motor for undervoltage protection
-      printf("Low voltage! %d\n",ui8_BatteryVoltage);
+     // printf("Low voltage! %d\n",ui8_BatteryVoltage);
 
 #ifndef THROTTLE
   }else if (ui16_PAS_Counter>timeout){
@@ -50,13 +50,13 @@ uint16_t update_setpoint (uint16_t speed, uint16_t PAS, uint16_t sumtorque, uint
   }else if(ui16_BatteryCurrent>BATTERY_CURRENT_MAX_VALUE){
       if (ui32_setpoint>ADC_THROTTLE_MIN_VALUE){
 	  ui32_setpoint=(uint32_t)(setpoint_old-(ui16_BatteryCurrent-BATTERY_CURRENT_MAX_VALUE));
-	  printf("Battery Current too high!, setpoint %lu, setpoint_old %d\n",ui32_setpoint, setpoint_old);
+	  //printf("Battery Current too high!, setpoint %lu, setpoint_old %d\n",ui32_setpoint, setpoint_old);
       }  //next priority: reduce (old) setpoint if battery current is too high
 
 
   }else if (ui32_SPEED_km_h>limit && setpoint_old>(ui32_SPEED_km_h-limit)){
       ui32_setpoint=(uint32_t)setpoint_old-(ui32_SPEED_km_h-limit); 	//next priority: reduce (old) setpoint, if you are riding too fast
-      printf("Speed too high!\n");
+      //printf("Speed too high!\n");
 
   }else {								//if none of the overruling boundaries are concerned, calculate new setpoint
 #ifdef TORQUESENSOR
@@ -73,12 +73,12 @@ uint16_t update_setpoint (uint16_t speed, uint16_t PAS, uint16_t sumtorque, uint
   if (sumtorque>10 && setpoint_old-10>sumtorque){
       TIM1_CtrlPWMOutputs(DISABLE);
       uint_PWM_Enable=0;
-      printf("Floating!\n");
+      //printf("Floating!\n");
   }
   else if (!uint_PWM_Enable && sumtorque>setpoint_old){
       TIM1_CtrlPWMOutputs(ENABLE);
       uint_PWM_Enable=1;
-      printf("PWM enabled!\n");
+      //printf("PWM enabled!\n");
   }
   if (sumtorque>setpoint_old){
   ui32_setpoint=(uint32_t)(setpoint_old+((sumtorque-setpoint_old)>>3));

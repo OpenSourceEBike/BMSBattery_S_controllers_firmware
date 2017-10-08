@@ -27,15 +27,15 @@ Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301  USA
 #include "stm8s_itc.h"
 #include "uart.h"
 #include "utils.h"
+#include "adc.h"
 
 display_view_type display_view;
 
 display_mode_type display_mode; //currently display mode
-uint8_t display_force_text;         //only valid for Nokia displays
-uint8_t battery_percent_fromvoltage;
-uint8_t battery_percent_fromcapacity;
-uint32_t wheel_time;
+
+
 float current_display;
+uint8_t battery_percent_fromcapacity=11; //hier nur als Konstante um Batterie normal zu senden....
 
 
 #if (DISPLAY_TYPE & DISPLAY_TYPE_KINGMETER)
@@ -101,10 +101,10 @@ void kingmeter_update(void)
         KM.Tx.Battery = KM_BATTERY_LOW;
     }
 
-    if(wheel_time < KM_MAX_WHEELTIME)
+    if(ui16_SPEED_Counter < KM_MAX_WHEELTIME)
     {
         // Adapt wheeltime to match displayed speedo value according config.h setting      
-        KM.Tx.Wheeltime_ms = (uint16_t) (((float) wheel_time) * (((float) KM.Settings.WheelSize_mm) / (wheel_circumference * 1000)));
+        KM.Tx.Wheeltime_ms = ui16_SPEED_Counter>>4;	// is not exactly correct, factor should be 15.625, not 16
     }
     else
     {
@@ -113,8 +113,8 @@ void kingmeter_update(void)
 
     KM.Tx.Error = KM_ERROR_NONE;
 
-    KM.Tx.Current_x10 = (uint16_t) (current_display * 10);
 
+    KM.Tx.Current_x10= (current_cal_a*ui16_BatteryCurrent)/10 + current_cal_b; //calculate Amps out of 10bit ADC value
 
     /* Receive Rx parameters/settings and send Tx parameters */
     KingMeter_Service(&KM);
@@ -138,14 +138,13 @@ void kingmeter_update(void)
         #if (DISPLAY_TYPE == DISPLAY_TYPE_KINGMETER_901U)
         //do anything
         #else
-        //do something else
+	//do something else
         #endif
     }
     else
     {
-
-        //do something completly else
-    }
+	ui8_assistlevel_global=KM.Rx.AssistLevel;
+     }
 
 
     /* Shutdown in case we received no message in the last 3s

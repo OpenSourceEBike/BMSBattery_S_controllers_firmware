@@ -59,7 +59,7 @@ uint16_t ui16_PAS = 32000;		//cadence in timetics
 uint8_t ui8_PAS_Flag = 0; 		//flag for PAS interrupt
 uint8_t ui8_SPEED_Flag = 0; 		//flag for SPEED interrupt
 
-uint8_t ui8_assistlevel_global = 0;
+uint8_t ui8_assistlevel_global = 1;// for debugging of display communication
 
 /////////////////////////////////////////////////////////////////////////////////////////////
 //// Functions prototypes
@@ -93,9 +93,12 @@ void TIM1_UPD_OVF_TRG_BRK_IRQHandler(void) __interrupt(TIM1_UPD_OVF_TRG_BRK_IRQH
 // Timer2/slow control loop
 void TIM2_UPD_OVF_TRG_BRK_IRQHandler(void) __interrupt(TIM2_UPD_OVF_TRG_BRK_IRQHANDLER);
 
+// UART2 receivce handler
+void UART2_IRQHandler(void) __interrupt(UART2_IRQHANDLER);
+
 /////////////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////////////
-KINGMETER_t KM_main;
+
 
 int main (void)
 {
@@ -136,18 +139,30 @@ int main (void)
 #endif
 
   hall_sensors_read_and_action (); // needed to start the motor
-printf("Back in Main.c\n");
+//printf("Back in Main.c\n");
 
   for(a = 0; a < NUMBER_OF_PAS_MAGS;a++) {// array init
    ui16_torque[a]=0;
   }
-printf("Torquearray initialized\n");
+//printf("Torquearray initialized\n");
   while (1)
   {
     static uint32_t ui32_counter = 0;
     uint16_t ui16_temp = 0;
+
     uint16_t ui32_temp = 0;
+    uint8_t j = 0;//Schleifenzähler
     static float f_temp = 0;
+
+    // Update display after message received occurrence
+    if (ui8_msg_received)
+        {
+	ui8_msg_received=0;
+	display_update(); //Display aktualisieren aus Code vom Forumscontroller
+
+
+        }
+
 
     // Update speed after speed interrupt occurrence
     if (ui8_SPEED_Flag == 1)
@@ -155,7 +170,7 @@ printf("Torquearray initialized\n");
 	ui16_SPEED=ui16_SPEED_Counter; 	//save recent speed
 	ui16_SPEED_Counter=0;		//reset speed counter
 	ui8_SPEED_Flag =0; 			//reset interrupt flag
-	KM_main.Tx.Wheeltime_ms=ui16_SPEED_Counter>>4; // is not exactly correct, factor should be 15.625, not 16
+
 	//printf("SPEEDtic\n");
     }
 
@@ -201,7 +216,8 @@ printf("Torquearray initialized\n");
 	      ui8_adc_read_throttle_busy = 0;
 	      ui16_sum_torque = (uint8_t) map (ui8_temp , ADC_THROTTLE_MIN_VALUE, ADC_THROTTLE_MAX_VALUE, 0, SETPOINT_MAX_VALUE); //map throttle to limits
 #endif
-	  ui16_setpoint = (uint16_t)update_setpoint (ui16_SPEED,ui16_PAS,ui16_sum_torque,ui16_setpoint); //update setpoint
+
+	      ui16_setpoint = (uint16_t)update_setpoint (ui16_SPEED,ui16_PAS,ui16_sum_torque,ui16_setpoint); //update setpoint
 
 
 //#define DO_CRUISE_CONTROL 1
@@ -211,7 +227,9 @@ printf("Torquearray initialized\n");
 
      // pwm_set_duty_cycle ((uint8_t)ui16_setpoint);
 
-      pwm_set_duty_cycle (KM_main.Rx.AssistLevel*50); //for test of display communication
+      pwm_set_duty_cycle ((ui8_assistlevel_global-1)*60); //for test of display communication
+
+
 	  /****************************************************************************/
 //very slow loop for communication
       if (ui8_veryslowloop_counter > 5){
@@ -220,12 +238,11 @@ printf("Torquearray initialized\n");
 
 
 
-	  display_update(); //Display aktualisieren aus Code vom Forumscontroller
 
        //     printf("%d, %d, %d\n", ui16_motor_speed_erps, i16_temp, ui8_position_correction_value);
       //      printf("%d, %d, %d\n", ui8_motor_state, ui16_motor_speed_erps, ui8_position_correction_value);
 
-	KM_main.Tx.Current_x10= (current_cal_a*ui16_BatteryCurrent)/10 + current_cal_b; //calculate Amps out of 10bit ADC value
+
       //printf("correction angle %d, Current %d, Voltage %d, sumtorque %d, setpoint %d, km/h %lu\n",ui8_position_correction_value, i16_deziAmps, ui8_BatteryVoltage, ui16_sum_torque, ui16_setpoint, ui32_SPEED_km_h);
       }//end of very slow loop
 

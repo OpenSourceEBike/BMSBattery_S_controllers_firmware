@@ -27,6 +27,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "stm8s_itc.h"
 #include "uart.h"
 #include "utils.h"
+#include "timers.h"
+#include "interrupts.h"
+
 
 #if (DISPLAY_TYPE & DISPLAY_TYPE_KINGMETER)
 
@@ -40,6 +43,12 @@ int pas_tolerance;
 int wheel_magnets;
 int vcutoff;
 int spd_max1;
+
+uint8_t ui8_UARTCounter = 0;
+uint8_t ui8_rx[6];
+uint8_t ui8_msg_received=0;
+
+uint16_t  k; //for debugging, number of calls of service
 uint16_t KM_WHEELSIZE [8] =
     {
 	KM_WHEELSIZE_16,
@@ -51,6 +60,8 @@ uint16_t KM_WHEELSIZE [8] =
 	KM_WHEELSIZE_700,
 	KM_WHEELSIZE_28
     };
+
+uint8_t ui8_UART_flag = 0;
 
 
 // Hashtable used for handshaking in 901U protocol
@@ -86,7 +97,7 @@ static void KM_901U_Service(KINGMETER_t* KM_ctx);
 void KingMeter_Init (KINGMETER_t* KM_ctx)
 
 {
-    uint8_t i;
+    uint16_t i;
 
 
 //    KM_ctx->SerialPort                      = DisplaySerial;            // Store serial port to use
@@ -113,7 +124,7 @@ void KingMeter_Init (KINGMETER_t* KM_ctx)
     KM_ctx->Settings.WheelSize_mm           = (uint16_t) (wheel_circumference * 1000);
 
     // Parameters received from display in operation mode:
-    KM_ctx->Rx.AssistLevel                  = 0;
+    KM_ctx->Rx.AssistLevel                  = 1;
     KM_ctx->Rx.Headlight                    = KM_HEADLIGHT_OFF;
     KM_ctx->Rx.Battery                      = KM_BATTERY_NORMAL;
     KM_ctx->Rx.PushAssist                   = KM_PUSHASSIST_OFF;
@@ -135,6 +146,44 @@ void KingMeter_Init (KINGMETER_t* KM_ctx)
 }
 
 
+
+
+/****************************************************************************************************
+ * UART2 receive interrupt handler - receive data from and to the display
+ *
+ ***************************************************************************************************/
+void UART2_IRQHandler(void) __interrupt(UART2_IRQHANDLER)
+    {
+	if(UART2_GetFlagStatus(UART2_FLAG_RXNE) == SET){
+
+	ui8_rx[ui8_UARTCounter] = UART2_ReceiveData8();
+	ui8_UARTCounter++;
+
+	  if(ui8_rx[ui8_UARTCounter-1]==0x0D)                                      // Check for reception of complete message
+	    {
+	      ui8_UARTCounter=0;
+	      ui8_msg_received=1;
+
+	    }
+	  if(ui8_UARTCounter>6)                                      // if 0x0D is not received properly avoid buffer overflow
+	  	    {
+	  	      ui8_UARTCounter=0;
+
+	  	    }
+
+	}
+	else //catch errors
+	  {
+	    if(UART2_GetFlagStatus(UART2_FLAG_OR_LHE) == SET)
+	    {
+	      UART2_ReceiveData8();  // -> clear!
+	    }
+	    if(UART2_GetFlagStatus(UART2_FLAG_FE) == SET)
+	    {
+	      UART2_ReceiveData8();  // -> clear!
+	    }
+	  } //end else
+    }
 
 /****************************************************************************************************
  * KingMeter_Service() - Communicates data from and to the display
@@ -163,37 +212,40 @@ void KingMeter_Service(KINGMETER_t* KM_ctx)
  ***************************************************************************************************/
 static void KM_618U_Service(KINGMETER_t* KM_ctx)
 {
-    uint8_t  i;
+    uint16_t  i;
+    uint16_t  j;
+
     uint8_t TxBuff[KM_MAX_TXBUFF];
+
+
 
 
     // Search for Start Code
     if(KM_ctx->RxState == RXSTATE_STARTCODE)
     {
-        //if(KM_ctx->SerialPort->available())
-	if(UART2_GetFlagStatus(UART2_FLAG_RXNE) == RESET)
-        {
-            //KM_ctx->LastRx = millis();
 
-            //if(KM_ctx->SerialPort->read() == 0x46)
-            if(UART2_ReceiveData8() == 0x46)
 
-            {
-                KM_ctx->RxBuff[0] = 0x46;
-                KM_ctx->RxCnt = 1;
-                KM_ctx->RxState = RXSTATE_SENDTXMSG;
-            }
-            else
-            {
-                return;                                                 // No need to continue
-            }
-        }
+	if (ui8_rx[0]==0x46 && ui8_rx[5]==0x0D) //Check, if Message is valid
+	  {
+	   for(j =0; j<6; j++)
+        	{
+        	  KM_ctx->RxBuff[j] = ui8_rx[j];
+        	  //putbyte(ui8_rx[j]);
+        	}
+	   KM_ctx->RxState = RXSTATE_SENDTXMSG;
+	  }
+
+
     }
+
+
+
 
 
     if(KM_ctx->RxState == RXSTATE_SENDTXMSG)
     {
-        KM_ctx->RxState = RXSTATE_MSGBODY;
+        KM_ctx->RxState = RXSTATE_DONE;
+
 
         // Prepare Tx message
         TxBuff[0] = 0X46;                                               // StartCode
@@ -204,13 +256,14 @@ static void KM_618U_Service(KINGMETER_t* KM_ctx)
         }
         else
         {
-            TxBuff[1] = 0x01;
+            TxBuff[1] = 0x03;						//Original firmware of Lishui sends "3" at this Byte
         }
 
-        TxBuff[2] = (uint8_t) ((KM_ctx->Tx.Current_x10 * 3) / 10);      // Current unit: 1/3A
-        TxBuff[3] = KM_ctx->Tx.Wheeltime_ms>>8;
-        TxBuff[4] = KM_ctx->Tx.Wheeltime_ms & 0xFF;
-        TxBuff[5] = 0x7A;                                               // Reply with WheelSize 26" / Maxspeed 25km/h (no influence on display)
+        //TxBuff[2] = (uint8_t) ((KM_ctx->Tx.Current_x10 * 3) / 10);      // Current unit: 1/3A is not needed for J-LCD and gives error at first loop rund
+        TxBuff[2] = 0x00;
+        TxBuff[3] = KM_ctx->Tx.Wheeltime_ms>>8;				// richtige Funktion der Bitmanipulation noch nicht bestätigt
+        TxBuff[4] = KM_ctx->Tx.Wheeltime_ms & 0xFF;			// richtige Funktion der Bitmanipulation noch nicht bestätigt
+        TxBuff[5] = 0xA7;                                               // Reply with WheelSize 26" / Maxspeed 25km/h (no influence on display)
         TxBuff[6] = KM_ctx->Tx.Error;
 
         
@@ -222,48 +275,22 @@ static void KM_618U_Service(KINGMETER_t* KM_ctx)
         for(i=1; i<7; i++)
         {
             putbyte(TxBuff[i]);                       // Send TxBuff[1..6]
-            TxBuff[7] = TxBuff[7] ^ TxBuff[i];                          // Calculate XOR CheckSum
+            TxBuff[7] ^= TxBuff[i];                   // Calculate XOR CheckSum
         }
 
-        putbyte(TxBuff[7]);                           // Send XOR CheckSum
+        putbyte(TxBuff[7]);                          // Send XOR CheckSum
     }
 
 
-    // Receive Message body
-    if(KM_ctx->RxState == RXSTATE_MSGBODY)
-    {
 
-	while (UART2_GetFlagStatus(UART2_FLAG_RXNE) == SET)
-
-	 // c = UART2_ReceiveData8();
-        //while(KM_ctx->SerialPort->available())
-        {
-            KM_ctx->RxBuff[KM_ctx->RxCnt] = UART2_ReceiveData8();
-            KM_ctx->RxCnt++;
-
-            if(KM_ctx->RxCnt >= 6)                                      // Check for reception of complete message
-            {
-                // Verify XOR CheckSum
-                if(KM_ctx->RxBuff[4] == (KM_ctx->RxBuff[1] ^ KM_ctx->RxBuff[2] ^ KM_ctx->RxBuff[3]))
-                {
-                    KM_ctx->RxState = RXSTATE_DONE;
-                }
-                else
-                {
-                    KM_ctx->RxState = RXSTATE_STARTCODE;
-                }
-                break;
-            }
-        }
-    }
 
     // Message received completely
     if(KM_ctx->RxState == RXSTATE_DONE)
     {
         KM_ctx->RxState = RXSTATE_STARTCODE;
 
-        // Decode PAS level - Display sets PAS-level to 0 when overspeed detected!
-        KM_ctx->Rx.AssistLevel = map(KM_ctx->RxBuff[1] & 0x07, 0, 5, 0, 255);
+         // Decode PAS level - Display sets PAS-level to 0 when overspeed detected!
+        KM_ctx->Rx.AssistLevel = KM_ctx->RxBuff[1] & 0x07; //Mapping entfernt, da nur der Faktor genutzt werden soll.
 
         // Decode Headlight status
         KM_ctx->Rx.Headlight = (KM_ctx->RxBuff[1] & 0x80) >> 7;         // KM_HEADLIGHT_OFF / KM_HEADLIGHT_ON
