@@ -47,7 +47,7 @@ EXTRASRCS = \
 	pwm.c \
 	motor.c \
 
-HEADERS = adc.h  brake.h  cruise_control.h  gpio.h  interrupts.h  main.h  motor.h  pwm.h  timers.h  uart.h  utils.h  PAS.h  SPEED.h  update_setpoint.h
+HEADERS = adc.h  brake.h  cruise_control.h  gpio.h  interrupts.h  main.h  motor.h  pwm.h  timers.h  uart.h  utils.h
 
 # The list of .rel files can be derived from the list of their source files
 RELS = $(EXTRASRCS:.c=.rel)
