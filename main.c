@@ -98,8 +98,8 @@ int main (void)
   hall_sensors_read_and_action (); // needed to start the motor
 
 
-  motor_set_current_max (10); // 1 --> 0.5A
-  motor_set_regen_current_max (10); // 1 --> 0.5A
+  motor_set_current_max (8); // 1 --> 0.5A
+  motor_set_regen_current_max (8); // 1 --> 0.5A
   motor_set_pwm_duty_cycle_ramp_inverse_step (2); // each step = 64us
 
   while (1)
@@ -127,8 +127,8 @@ int main (void)
 
 //      getchar1 ();
 
-//      printf("%d, %d, %d, %d\n", ui16_motor_speed_erps, ui8_motor_state, ui8_motor_interpolation_state, ui8_position_correction_value);
-      printf("%d, %d\n", motor_get_motor_speed_erps (), ui8_duty_cycle_target);
+      printf("%d, %d, %d, %d\n",  motor_get_motor_speed_erps (), ui8_motor_state, ui8_motor_interpolation_state, ui8_position_correction_value);
+//      printf("%d, %d\n", motor_get_motor_speed_erps (), ui8_duty_cycle_target);
     }
   }
 }

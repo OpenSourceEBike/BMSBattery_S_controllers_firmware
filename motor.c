@@ -58,7 +58,8 @@ void hall_sensors_read_and_action (void)
 {
   // read hall sensors signal pins and mask other pins
   ui8_hall_sensors = (GPIO_ReadInputData (HALL_SENSORS__PORT) & (HALL_SENSORS_MASK));
-  if (ui8_hall_sensors != ui8_hall_sensors_last)
+  if ((ui8_hall_sensors != ui8_hall_sensors_last) ||
+      (ui8_motor_state == MOTOR_STATE_STOP))
   {
     ui8_hall_sensors_last = ui8_hall_sensors;
 
@@ -86,8 +87,7 @@ void hall_sensors_read_and_action (void)
 #elif (MOTOR_TYPE == MOTOR_TYPE_Q85)
       if (ui8_motor_state == MOTOR_STATE_RUNNING)
       {
-	if ((ui8_motor_interpolation_state == INTERPOLATION_60_DEGREES) ||
-	    (ui8_motor_interpolation_state == INTERPOLATION_360_DEGREES))
+	if (ui8_motor_interpolation_state == INTERPOLATION_360_DEGREES)
 	{
 	  if (ui8_ADC_id_current > 127)
 	  {
@@ -97,6 +97,10 @@ void hall_sensors_read_and_action (void)
 	  {
 	    ui8_position_correction_value--;
 	  }
+	}
+	else
+	{
+	  ui8_position_correction_value = 127; // keep using the reset value
 	}
       }
 #endif
