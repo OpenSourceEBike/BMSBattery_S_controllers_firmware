@@ -83,7 +83,7 @@ int main (void)
   debug_pin_init ();
   timer2_init ();
   uart_init ();
-  pwm_init ();
+  pwm_init_6_steps ();
   hall_sensor_init ();
   adc_init ();
 

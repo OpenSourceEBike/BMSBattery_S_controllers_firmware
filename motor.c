@@ -107,7 +107,9 @@ void hall_sensors_read_and_action (void)
 
       if (ui8_motor_interpolation_state != INTERPOLATION_360_DEGREES)
       {
-	ui8_motor_rotor_absolute_position = ANGLE_180 + MOTOR_ROTOR_DELTA_PHASE_ANGLE_RIGHT;
+	pwm_phase_a_enable_low (ui8_duty_cycle);
+	pwm_phase_b_disable (ui8_duty_cycle);
+	pwm_phase_c_enable_pwm (ui8_duty_cycle);
       }
       break;
 
@@ -124,17 +126,19 @@ void hall_sensors_read_and_action (void)
 #if MOTOR_TYPE == MOTOR_TYPE_Q85
       if (ui16_motor_speed_erps > 100)
       {
-	ui8_motor_interpolation_state = INTERPOLATION_360_DEGREES;
-	ui8_motor_state = MOTOR_STATE_RUNNING;
+//	ui8_motor_interpolation_state = INTERPOLATION_360_DEGREES;
+//	ui8_motor_state = MOTOR_STATE_RUNNING;
+//	pwm_init_bipolar_4q ();
       }
       else if (ui16_motor_speed_erps > 25)
       {
-	ui8_motor_interpolation_state = INTERPOLATION_60_DEGREES;
-	ui8_motor_state = MOTOR_STATE_RUNNING;
+//	ui8_motor_interpolation_state = INTERPOLATION_60_DEGREES;
+//	ui8_motor_state = MOTOR_STATE_RUNNING;
       }
       else
       {
 	ui8_motor_interpolation_state = NO_INTERPOLATION_60_DEGREES;
+        pwm_init_6_steps ();
       }
 #elif MOTOR_TYPE == MOTOR_TYPE_EUC2
       if (ui16_motor_speed_erps > 3)
@@ -148,20 +152,33 @@ void hall_sensors_read_and_action (void)
       }
 #endif
 
-      ui8_motor_rotor_absolute_position = ANGLE_240 + MOTOR_ROTOR_DELTA_PHASE_ANGLE_RIGHT;
+      if (ui8_motor_interpolation_state != INTERPOLATION_360_DEGREES)
+      {
+	pwm_phase_a_enable_low (ui8_duty_cycle);
+	pwm_phase_b_enable_pwm (ui8_duty_cycle);
+	pwm_phase_c_disable (ui8_duty_cycle);
+      }
+      else
+      {
+	ui8_motor_rotor_absolute_position = ANGLE_240 + MOTOR_ROTOR_DELTA_PHASE_ANGLE_RIGHT;
+      }
       break;
 
       case 5:
       if (ui8_motor_interpolation_state != INTERPOLATION_360_DEGREES)
       {
-	ui8_motor_rotor_absolute_position = ANGLE_300 + MOTOR_ROTOR_DELTA_PHASE_ANGLE_RIGHT;
+	pwm_phase_a_disable (ui8_duty_cycle);
+	pwm_phase_b_enable_pwm (ui8_duty_cycle);
+	pwm_phase_c_enable_low (ui8_duty_cycle);
       }
       break;
 
       case 4:
       if (ui8_motor_interpolation_state != INTERPOLATION_360_DEGREES)
       {
-	ui8_motor_rotor_absolute_position = ANGLE_1 + MOTOR_ROTOR_DELTA_PHASE_ANGLE_RIGHT;
+	pwm_phase_a_enable_pwm (ui8_duty_cycle);
+	pwm_phase_b_disable (ui8_duty_cycle);
+	pwm_phase_c_enable_low (ui8_duty_cycle);
       }
       break;
 
@@ -170,14 +187,18 @@ void hall_sensors_read_and_action (void)
 
       if (ui8_motor_interpolation_state != INTERPOLATION_360_DEGREES)
       {
-	ui8_motor_rotor_absolute_position = ANGLE_60 + MOTOR_ROTOR_DELTA_PHASE_ANGLE_RIGHT;
+	pwm_phase_a_enable_pwm (ui8_duty_cycle);
+	pwm_phase_b_enable_low (ui8_duty_cycle);
+	pwm_phase_c_disable (ui8_duty_cycle);
       }
       break;
 
       case 2:
       if (ui8_motor_interpolation_state != INTERPOLATION_360_DEGREES)
       {
-	ui8_motor_rotor_absolute_position = ANGLE_120 + MOTOR_ROTOR_DELTA_PHASE_ANGLE_RIGHT;
+	pwm_phase_a_enable_pwm (ui8_duty_cycle);
+	pwm_phase_b_enable_low (ui8_duty_cycle);
+	pwm_phase_c_disable (ui8_duty_cycle);
       }
       break;
 
@@ -264,16 +285,16 @@ void motor_init (void)
   uint8_t ui8_counter = 0;
   uint16_t ui16_temp = 0;
 
-  /***************************************************************************************/
-  // motor overcurrent pin as external input pin interrupt
-  GPIO_Init(CURRENT_MOTOR_TOTAL_OVER__PORT,
-	    CURRENT_MOTOR_TOTAL_OVER__PIN,
-	    GPIO_MODE_IN_FL_IT); // with external interrupt
-
-  //initialize the Interrupt sensitivity
-  EXTI_SetExtIntSensitivity(EXTI_PORT_GPIOD,
-			    EXTI_SENSITIVITY_FALL_LOW);
-  /***************************************************************************************/
+//  /***************************************************************************************/
+//  // motor overcurrent pin as external input pin interrupt
+//  GPIO_Init(CURRENT_MOTOR_TOTAL_OVER__PORT,
+//	    CURRENT_MOTOR_TOTAL_OVER__PIN,
+//	    GPIO_MODE_IN_FL_IT); // with external interrupt
+//
+//  //initialize the Interrupt sensitivity
+//  EXTI_SetExtIntSensitivity(EXTI_PORT_GPIOD,
+//			    EXTI_SENSITIVITY_FALL_LOW);
+//  /***************************************************************************************/
 
   /***************************************************************************************/
   // reading some samples of ADC motor total current and average, to get the real zero value

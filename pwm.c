@@ -290,14 +290,16 @@ void pwm_set_duty_cycle_target (uint8_t value)
   ui8_duty_cycle_target = value;
 }
 
-void pwm_init (void)
+void pwm_init_bipolar_4q (void)
 {
-  TIM1_DeInit();
+  TIM1_CtrlPWMOutputs(DISABLE);
+
   TIM1_TimeBaseInit(0, // TIM1_Prescaler = 0
 		    TIM1_COUNTERMODE_CENTERALIGNED1,
 		    (512 - 1), // clock = 16MHz; counter period = 1024; PWM freq = 16MHz / 1024 = 15.625kHz;
 		    //(BUT PWM center aligned mode needs twice the frequency)
-		    1); // will fire the TIM1_IT_UPDATE at every PWM period cycle, instead of 2 times if this value was 0
+		    1); // will fire the TIM1_IT_UPDATE at every PWM period cycle
+
 
 //#define DISABLE_PWM_CHANNELS_1_3
 
@@ -309,20 +311,20 @@ void pwm_init (void)
 	       TIM1_OUTPUTSTATE_ENABLE,
 	       TIM1_OUTPUTNSTATE_ENABLE,
 #endif
-	       0, // initial duty_cycle value
+	       255, // initial duty_cycle value
 	       TIM1_OCPOLARITY_HIGH,
 	       TIM1_OCNPOLARITY_LOW,
 	       TIM1_OCIDLESTATE_RESET,
 	       TIM1_OCNIDLESTATE_SET);
 
   TIM1_OC2Init(TIM1_OCMODE_PWM1,
-	       TIM1_OUTPUTSTATE_ENABLE,
-	       TIM1_OUTPUTNSTATE_ENABLE,
-	       0, // initial duty_cycle value
+	       TIM1_OUTPUTSTATE_DISABLE,
+	       TIM1_OUTPUTNSTATE_DISABLE,
+	       255, // initial duty_cycle value
 	       TIM1_OCPOLARITY_HIGH,
 	       TIM1_OCNPOLARITY_LOW,
-	       TIM1_OCIDLESTATE_RESET,
-	       TIM1_OCNIDLESTATE_SET);
+	       TIM1_OCIDLESTATE_SET,
+	       TIM1_OCIDLESTATE_SET);
 
   TIM1_OC3Init(TIM1_OCMODE_PWM1,
 #ifdef DISABLE_PWM_CHANNELS_1_3
@@ -332,15 +334,52 @@ void pwm_init (void)
 	       TIM1_OUTPUTSTATE_ENABLE,
 	       TIM1_OUTPUTNSTATE_ENABLE,
 #endif
+	       255, // initial duty_cycle value
+	       TIM1_OCPOLARITY_HIGH,
+	       TIM1_OCNPOLARITY_LOW,
+	       TIM1_OCIDLESTATE_RESET,
+	       TIM1_OCNIDLESTATE_SET);
+
+  TIM1_ITConfig(TIM1_IT_UPDATE, ENABLE);
+  TIM1_Cmd(ENABLE); // TIM1 counter enable
+}
+
+void pwm_init_6_steps (void)
+{
+// TIM1 Peripheral Configuration
+  TIM1_DeInit();
+
+  TIM1_TimeBaseInit(0, // TIM1_Prescaler = 0
+		     TIM1_COUNTERMODE_UP,
+		     (1024 - 1), // clock = 16MHz; counter period = 1024; PWM freq = 16MHz / 1024 = 15.625kHz
+		     0); // TIM1_RepetitionCounter = 0
+
+  TIM1_OC1Init(TIM1_OCMODE_PWM1,
+	       TIM1_OUTPUTSTATE_ENABLE,
+	       TIM1_OUTPUTNSTATE_DISABLE,
 	       0, // initial duty_cycle value
 	       TIM1_OCPOLARITY_HIGH,
 	       TIM1_OCNPOLARITY_LOW,
 	       TIM1_OCIDLESTATE_RESET,
 	       TIM1_OCNIDLESTATE_SET);
 
-  TIM1_OC1PreloadConfig (ENABLE);
-  TIM1_OC2PreloadConfig (ENABLE);
-  TIM1_OC3PreloadConfig (ENABLE);
+  TIM1_OC2Init(TIM1_OCMODE_PWM1,
+	       TIM1_OUTPUTSTATE_ENABLE,
+	       TIM1_OUTPUTNSTATE_DISABLE,
+	       0, // initial duty_cycle value
+	       TIM1_OCPOLARITY_HIGH,
+	       TIM1_OCNPOLARITY_LOW,
+	       TIM1_OCIDLESTATE_RESET,
+	       TIM1_OCNIDLESTATE_SET);
+
+  TIM1_OC3Init(TIM1_OCMODE_PWM1,
+	       TIM1_OUTPUTSTATE_ENABLE,
+	       TIM1_OUTPUTNSTATE_DISABLE,
+	       0, // initial duty_cycle value
+	       TIM1_OCPOLARITY_HIGH,
+	       TIM1_OCNPOLARITY_LOW,
+	       TIM1_OCIDLESTATE_RESET,
+	       TIM1_OCNIDLESTATE_SET);
 
   // break, dead time and lock configuration
   TIM1_BDTRConfig(TIM1_OSSISTATE_ENABLE,
@@ -352,33 +391,31 @@ void pwm_init (void)
 		  TIM1_AUTOMATICOUTPUT_DISABLE);
 
   TIM1_ITConfig(TIM1_IT_UPDATE, ENABLE);
-
   TIM1_Cmd(ENABLE); // TIM1 counter enable
-  TIM1_CtrlPWMOutputs(ENABLE); // main Output Enable
 }
 
 void pwm_duty_cycle_controller (void)
 {
   uint8_t ui8_temp;
 
-  // verify motor max current limit
-  ui8_temp = ui8_adc_read_motor_total_current ();
-  if (ui8_temp > (ui8_ADC_motor_current_zero_value + ui8_ADC_motor_current_max))  // motor max current, reduce duty_cycle
-  {
-    if (ui8_duty_cycle > 0)
-    {
-      ui8_duty_cycle--;
-    }
-  }
-  // verify motor max regen current limit
-  else if (ui8_temp < (ui8_ADC_motor_current_zero_value - ui8_ADC_motor_regen_current_max))  // motor max current, increase duty_cycle
-  {
-    if (ui8_duty_cycle < 255)
-    {
-      ui8_duty_cycle++;
-    }
-  }
-  else // no motor current limits, adjust duty_cycle to duty_cycle_target, including ramping
+//  // verify motor max current limit
+//  ui8_temp = ui8_adc_read_motor_total_current ();
+//  if (ui8_temp > (ui8_ADC_motor_current_zero_value + ui8_ADC_motor_current_max))  // motor max current, reduce duty_cycle
+//  {
+//    if (ui8_duty_cycle > 0)
+//    {
+//      ui8_duty_cycle--;
+//    }
+//  }
+//  // verify motor max regen current limit
+//  else if (ui8_temp < (ui8_ADC_motor_current_zero_value - ui8_ADC_motor_regen_current_max))  // motor max current, increase duty_cycle
+//  {
+//    if (ui8_duty_cycle < 255)
+//    {
+//      ui8_duty_cycle++;
+//    }
+//  }
+//  else // no motor current limits, adjust duty_cycle to duty_cycle_target, including ramping
   {
     if (ui8_counter_duty_cycle_ramp++ >= ui8_duty_cycle_ramp_inverse_step)
     {
@@ -403,54 +440,249 @@ void pwm_apply_duty_cycle (uint8_t ui8_duty_cycle_value)
 {
   uint8_t ui8_temp;
 
-  // scale and apply _duty_cycle
-  ui8_temp = ui8_svm_table[ui8_motor_rotor_position];
-  if (ui8_temp > MIDDLE_PWM_VALUE_DUTY_CYCLE_MAX)
+  if (ui8_motor_interpolation_state != INTERPOLATION_360_DEGREES)
   {
-    ui16_value = ((uint16_t) (ui8_temp - MIDDLE_PWM_VALUE_DUTY_CYCLE_MAX)) * ui8_duty_cycle_value;
-    ui8_temp = (uint8_t) (ui16_value >> 8);
-    ui8_value_a = MIDDLE_PWM_VALUE_DUTY_CYCLE_MAX + ui8_temp;
+    TIM1_SetCompare1((uint16_t) (ui8_duty_cycle_value << 2));
+    TIM1_SetCompare2((uint16_t) (ui8_duty_cycle_value << 2));
+    TIM1_SetCompare3((uint16_t) (ui8_duty_cycle_value << 2));
+
+    TIM1_CtrlPWMOutputs(ENABLE); // main Output Enable
   }
   else
   {
-    ui16_value = ((uint16_t) (MIDDLE_PWM_VALUE_DUTY_CYCLE_MAX - ui8_temp)) * ui8_duty_cycle_value;
-    ui8_temp = (uint8_t) (ui16_value >> 8);
-    ui8_value_a = MIDDLE_PWM_VALUE_DUTY_CYCLE_MAX - ui8_temp;
-  }
+    // scale and apply _duty_cycle
+    ui8_temp = ui8_svm_table[ui8_motor_rotor_position];
+    if (ui8_temp > MIDDLE_PWM_VALUE_DUTY_CYCLE_MAX)
+    {
+      ui16_value = ((uint16_t) (ui8_temp - MIDDLE_PWM_VALUE_DUTY_CYCLE_MAX)) * ui8_duty_cycle_value;
+      ui8_temp = (uint8_t) (ui16_value >> 8);
+      ui8_value_a = MIDDLE_PWM_VALUE_DUTY_CYCLE_MAX + ui8_temp;
+    }
+    else
+    {
+      ui16_value = ((uint16_t) (MIDDLE_PWM_VALUE_DUTY_CYCLE_MAX - ui8_temp)) * ui8_duty_cycle_value;
+      ui8_temp = (uint8_t) (ui16_value >> 8);
+      ui8_value_a = MIDDLE_PWM_VALUE_DUTY_CYCLE_MAX - ui8_temp;
+    }
 
-  // add 120 degrees and limit
-  ui8_temp = ui8_svm_table[(uint8_t) (ui8_motor_rotor_position + 85 /* 120º */)];
-  if (ui8_temp > MIDDLE_PWM_VALUE_DUTY_CYCLE_MAX)
-  {
-    ui16_value = ((uint16_t) (ui8_temp - MIDDLE_PWM_VALUE_DUTY_CYCLE_MAX)) * ui8_duty_cycle_value;
-    ui8_temp = (uint8_t) (ui16_value >> 8);
-    ui8_value_b = MIDDLE_PWM_VALUE_DUTY_CYCLE_MAX + ui8_temp;
-  }
-  else
-  {
-    ui16_value = ((uint16_t) (MIDDLE_PWM_VALUE_DUTY_CYCLE_MAX - ui8_temp)) * ui8_duty_cycle_value;
-    ui8_temp = (uint8_t) (ui16_value >> 8);
-    ui8_value_b = MIDDLE_PWM_VALUE_DUTY_CYCLE_MAX - ui8_temp;
-  }
+    // add 120 degrees and limit
+    ui8_temp = ui8_svm_table[(uint8_t) (ui8_motor_rotor_position + 85 /* 120º */)];
+    if (ui8_temp > MIDDLE_PWM_VALUE_DUTY_CYCLE_MAX)
+    {
+      ui16_value = ((uint16_t) (ui8_temp - MIDDLE_PWM_VALUE_DUTY_CYCLE_MAX)) * ui8_duty_cycle_value;
+      ui8_temp = (uint8_t) (ui16_value >> 8);
+      ui8_value_b = MIDDLE_PWM_VALUE_DUTY_CYCLE_MAX + ui8_temp;
+    }
+    else
+    {
+      ui16_value = ((uint16_t) (MIDDLE_PWM_VALUE_DUTY_CYCLE_MAX - ui8_temp)) * ui8_duty_cycle_value;
+      ui8_temp = (uint8_t) (ui16_value >> 8);
+      ui8_value_b = MIDDLE_PWM_VALUE_DUTY_CYCLE_MAX - ui8_temp;
+    }
 
-  // subtract 120 degrees and limit
-  ui8_temp = ui8_svm_table[(uint8_t) (ui8_motor_rotor_position + 171 /* 240º */)];
-  if (ui8_temp > MIDDLE_PWM_VALUE_DUTY_CYCLE_MAX)
-  {
-    ui16_value = ((uint16_t) (ui8_temp - MIDDLE_PWM_VALUE_DUTY_CYCLE_MAX)) * ui8_duty_cycle_value;
-    ui8_temp = (uint8_t) (ui16_value >> 8);
-    ui8_value_c = MIDDLE_PWM_VALUE_DUTY_CYCLE_MAX + ui8_temp;
-  }
-  else
-  {
-    ui16_value = ((uint16_t) (MIDDLE_PWM_VALUE_DUTY_CYCLE_MAX - ui8_temp)) * ui8_duty_cycle_value;
-    ui8_temp = (uint8_t) (ui16_value >> 8);
-    ui8_value_c = MIDDLE_PWM_VALUE_DUTY_CYCLE_MAX - ui8_temp;
-  }
+    // subtract 120 degrees and limit
+    ui8_temp = ui8_svm_table[(uint8_t) (ui8_motor_rotor_position + 171 /* 240º */)];
+    if (ui8_temp > MIDDLE_PWM_VALUE_DUTY_CYCLE_MAX)
+    {
+      ui16_value = ((uint16_t) (ui8_temp - MIDDLE_PWM_VALUE_DUTY_CYCLE_MAX)) * ui8_duty_cycle_value;
+      ui8_temp = (uint8_t) (ui16_value >> 8);
+      ui8_value_c = MIDDLE_PWM_VALUE_DUTY_CYCLE_MAX + ui8_temp;
+    }
+    else
+    {
+      ui16_value = ((uint16_t) (MIDDLE_PWM_VALUE_DUTY_CYCLE_MAX - ui8_temp)) * ui8_duty_cycle_value;
+      ui8_temp = (uint8_t) (ui16_value >> 8);
+      ui8_value_c = MIDDLE_PWM_VALUE_DUTY_CYCLE_MAX - ui8_temp;
+    }
 
-  // set final duty_cycle value
-  TIM1_SetCompare1((uint16_t) (ui8_value_a << 1));
-  TIM1_SetCompare2((uint16_t) (ui8_value_c << 1));
-  TIM1_SetCompare3((uint16_t) (ui8_value_b << 1));
+    // set final duty_cycle value
+    TIM1_SetCompare1((uint16_t) (ui8_value_a << 1));
+    TIM1_SetCompare2((uint16_t) (ui8_value_c << 1));
+    TIM1_SetCompare3((uint16_t) (ui8_value_b << 1));
+
+    TIM1_CtrlPWMOutputs(ENABLE); // main Output Enable
+  }
 }
 
+void pwm_phase_a_disable (uint8_t _duty_cycle_value)
+{
+  TIM1_OC3Init(TIM1_OCMODE_PWM1,
+	       TIM1_OUTPUTNSTATE_DISABLE,
+  	       TIM1_OUTPUTNSTATE_DISABLE,
+	       _duty_cycle_value,
+  	       TIM1_OCPOLARITY_HIGH,
+  	       TIM1_OCNPOLARITY_LOW,
+  	       TIM1_OCIDLESTATE_RESET,
+  	       TIM1_OCNIDLESTATE_SET);
+
+  // disable pin
+  GPIO_Init(PMW_PHASE_A_HIGH__PORT,
+	    PMW_PHASE_A_HIGH__PIN,
+	    GPIO_MODE_OUT_PP_LOW_FAST);
+
+  // disable pin
+  GPIO_Init(PMW_PHASE_A_LOW__PORT,
+	    PMW_PHASE_A_LOW__PIN,
+	    GPIO_MODE_OUT_PP_HIGH_FAST);
+}
+
+void pwm_phase_a_enable_pwm (uint8_t _duty_cycle_value)
+{
+  TIM1_OC3Init(TIM1_OCMODE_PWM1,
+	       TIM1_OUTPUTSTATE_ENABLE,
+	       TIM1_OUTPUTNSTATE_DISABLE,
+	       _duty_cycle_value,
+	       TIM1_OCPOLARITY_HIGH,
+	       TIM1_OCNPOLARITY_LOW,
+	       TIM1_OCIDLESTATE_RESET,
+	       TIM1_OCNIDLESTATE_SET);
+
+  // disable pin
+  GPIO_Init(PMW_PHASE_A_LOW__PORT,
+	    PMW_PHASE_A_LOW__PIN,
+	    GPIO_MODE_OUT_PP_HIGH_FAST);
+}
+
+void pwm_phase_a_enable_low (uint8_t _duty_cycle_value)
+{
+  TIM1_OC3Init(TIM1_OCMODE_PWM1,
+	       TIM1_OUTPUTNSTATE_DISABLE,
+  	       TIM1_OUTPUTNSTATE_DISABLE,
+	       _duty_cycle_value,
+	       TIM1_OCPOLARITY_HIGH,
+	       TIM1_OCNPOLARITY_LOW,
+	       TIM1_OCIDLESTATE_RESET,
+	       TIM1_OCNIDLESTATE_SET);
+
+  // disable pin
+  GPIO_Init(PMW_PHASE_A_HIGH__PORT,
+	    PMW_PHASE_A_HIGH__PIN,
+	    GPIO_MODE_OUT_PP_LOW_FAST);
+
+  // enable pin
+  GPIO_Init(PMW_PHASE_A_LOW__PORT,
+	    PMW_PHASE_A_LOW__PIN,
+	    GPIO_MODE_OUT_PP_LOW_FAST);
+}
+
+void pwm_phase_b_disable (uint8_t _duty_cycle_value)
+{
+  TIM1_OC2Init(TIM1_OCMODE_PWM1,
+	       TIM1_OUTPUTNSTATE_DISABLE,
+  	       TIM1_OUTPUTNSTATE_DISABLE,
+	       _duty_cycle_value,
+  	       TIM1_OCPOLARITY_HIGH,
+  	       TIM1_OCNPOLARITY_LOW,
+  	       TIM1_OCIDLESTATE_RESET,
+  	       TIM1_OCNIDLESTATE_SET);
+
+  // disable pin
+  GPIO_Init(PMW_PHASE_B_HIGH__PORT,
+	    PMW_PHASE_B_HIGH__PIN,
+	    GPIO_MODE_OUT_PP_LOW_FAST);
+
+  // disable pin
+  GPIO_Init(PMW_PHASE_B_LOW__PORT,
+	    PMW_PHASE_B_LOW__PIN,
+	    GPIO_MODE_OUT_PP_HIGH_FAST);
+}
+
+void pwm_phase_b_enable_pwm (uint8_t _duty_cycle_value)
+{
+  TIM1_OC2Init(TIM1_OCMODE_PWM1,
+	       TIM1_OUTPUTSTATE_ENABLE,
+	       TIM1_OUTPUTNSTATE_DISABLE,
+	       _duty_cycle_value,
+	       TIM1_OCPOLARITY_HIGH,
+	       TIM1_OCNPOLARITY_LOW,
+	       TIM1_OCIDLESTATE_RESET,
+	       TIM1_OCNIDLESTATE_SET);
+
+  // disable pin
+  GPIO_Init(PMW_PHASE_B_LOW__PORT,
+	    PMW_PHASE_B_LOW__PIN,
+	    GPIO_MODE_OUT_PP_HIGH_FAST);
+}
+
+void pwm_phase_b_enable_low (uint8_t _duty_cycle_value)
+{
+  TIM1_OC2Init(TIM1_OCMODE_PWM1,
+	       TIM1_OUTPUTNSTATE_DISABLE,
+  	       TIM1_OUTPUTNSTATE_DISABLE,
+	       _duty_cycle_value,
+	       TIM1_OCPOLARITY_HIGH,
+	       TIM1_OCNPOLARITY_LOW,
+	       TIM1_OCIDLESTATE_RESET,
+	       TIM1_OCNIDLESTATE_SET);
+
+  // disable pin
+  GPIO_Init(PMW_PHASE_B_HIGH__PORT,
+	    PMW_PHASE_B_HIGH__PIN,
+	    GPIO_MODE_OUT_PP_LOW_FAST);
+
+  // enable pin
+  GPIO_Init(PMW_PHASE_B_LOW__PORT,
+	    PMW_PHASE_B_LOW__PIN,
+	    GPIO_MODE_OUT_PP_LOW_FAST);
+}
+
+void pwm_phase_c_disable (uint8_t _duty_cycle_value)
+{
+  TIM1_OC1Init(TIM1_OCMODE_PWM1,
+	       TIM1_OUTPUTNSTATE_DISABLE,
+  	       TIM1_OUTPUTNSTATE_DISABLE,
+	       _duty_cycle_value,
+  	       TIM1_OCPOLARITY_HIGH,
+  	       TIM1_OCNPOLARITY_LOW,
+  	       TIM1_OCIDLESTATE_RESET,
+  	       TIM1_OCNIDLESTATE_SET);
+
+  // disable pin
+  GPIO_Init(PMW_PHASE_C_HIGH__PORT,
+	    PMW_PHASE_C_HIGH__PIN,
+	    GPIO_MODE_OUT_PP_LOW_FAST);
+
+  // disable pin
+  GPIO_Init(PMW_PHASE_C_LOW__PORT,
+	    PMW_PHASE_C_LOW__PIN,
+	    GPIO_MODE_OUT_PP_HIGH_FAST);
+}
+
+void pwm_phase_c_enable_pwm (uint8_t _duty_cycle_value)
+{
+  TIM1_OC1Init(TIM1_OCMODE_PWM1,
+	       TIM1_OUTPUTSTATE_ENABLE,
+	       TIM1_OUTPUTNSTATE_DISABLE,
+	       _duty_cycle_value,
+	       TIM1_OCPOLARITY_HIGH,
+	       TIM1_OCNPOLARITY_LOW,
+	       TIM1_OCIDLESTATE_RESET,
+	       TIM1_OCNIDLESTATE_SET);
+
+  // disable pin
+  GPIO_Init(PMW_PHASE_C_LOW__PORT,
+	    PMW_PHASE_C_LOW__PIN,
+	    GPIO_MODE_OUT_PP_HIGH_FAST);
+}
+
+void pwm_phase_c_enable_low (uint8_t _duty_cycle_value)
+{
+  TIM1_OC1Init(TIM1_OCMODE_PWM1,
+	       TIM1_OUTPUTNSTATE_DISABLE,
+  	       TIM1_OUTPUTNSTATE_DISABLE,
+	       _duty_cycle_value,
+	       TIM1_OCPOLARITY_HIGH,
+	       TIM1_OCNPOLARITY_LOW,
+	       TIM1_OCIDLESTATE_RESET,
+	       TIM1_OCNIDLESTATE_SET);
+
+  // disable pin
+  GPIO_Init(PMW_PHASE_C_HIGH__PORT,
+	    PMW_PHASE_C_HIGH__PIN,
+	    GPIO_MODE_OUT_PP_LOW_FAST);
+
+  // enable pin
+  GPIO_Init(PMW_PHASE_C_LOW__PORT,
+	    PMW_PHASE_C_LOW__PIN,
+	    GPIO_MODE_OUT_PP_LOW_FAST);
+}
