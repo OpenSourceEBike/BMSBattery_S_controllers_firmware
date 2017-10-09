@@ -17,10 +17,11 @@
 extern uint8_t ui8_svm_table [SVM_TABLE_LEN];
 extern uint8_t ui8_duty_cycle_target;
 extern uint8_t ui8_duty_cycle;
+extern uint8_t ui8_duty_cycle_ramp_inverse_step;
 
 void pwm_init (void);
 void pwm_duty_cycle_controller (void);
-void pwm_set_duty_cycle (uint8_t value);
+void pwm_set_duty_cycle_target (uint8_t value);
 void pwm_apply_duty_cycle (uint8_t ui8_duty_cycle_value);
 
 #endif /* _PWM_H_ */

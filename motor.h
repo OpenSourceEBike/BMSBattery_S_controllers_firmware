@@ -23,29 +23,32 @@
 
 extern uint8_t ui8_motor_rotor_position;
 extern uint8_t ui8_position_correction_value;
-extern uint8_t ui8_position_correction_value1;
-extern uint16_t ui16_speed_inverse;
 extern uint8_t ui8_motor_interpolation_state;
 extern uint16_t ui16_PWM_cycles_counter_total;
-extern uint16_t ui16_motor_speed_erps;
 extern uint8_t ui8_ADC_id_current;
 extern uint8_t ui8_motor_total_current_flag;
-extern uint8_t ui8_ADC_id_current_sign;
-extern uint8_t ui8_ADC_motor_current_max_positive;
-extern uint8_t ui8_ADC_motor_current_max_negative;
+extern uint8_t ui8_ADC_motor_current_max;
+extern uint8_t ui8_ADC_motor_regen_current_max;
 extern uint8_t ui8_ADC_motor_current_zero_value;
-extern uint8_t ui8_ADC_id_current_sign;
 extern uint8_t ui8_hall_sensors;
 extern uint8_t ui8_motor_rotor_absolute_position;
 extern uint8_t ui8_motor_state;
 
-extern uint16_t ui16_ADC_id_current_accumulated;
+/***************************************************************************************/
+// Motor interface
+void hall_sensor_init (void); // must be called before using the motor
+void motor_init (void); // must be called before using the motor
+void motor_set_mode_coast (void); // disable PWM output
+void motor_set_mode_run (void); // enable PWM output
+void motor_set_pwm_duty_cycle_target (uint8_t value);
+void motor_set_current_max (uint8_t value); // steps of 0.5A each step
+void motor_set_regen_current_max (uint8_t value); // steps of 0.5A each step
+void motor_set_pwm_duty_cycle_ramp_inverse_step (uint8_t value);
+uint16_t motor_get_motor_speed_erps (void);
+/***************************************************************************************/
 
-void hall_sensor_init (void);
+
 void hall_sensors_read_and_action (void);
-void motor_init (void);
 void motor_fast_loop (void);
-void motor_set_mode_coast (void);
-void motor_set_mode_run (void);
 
 #endif /* _MOTOR_H_ */

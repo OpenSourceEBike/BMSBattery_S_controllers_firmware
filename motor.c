@@ -17,10 +17,7 @@
 #include "config.h"
 #include "adc.h"
 
-uint8_t ui8_counter = 0;
-
 uint16_t ui16_PWM_cycles_counter = 0;
-uint16_t ui16_PWM_cycles_counter_div_4 = 0;
 uint16_t ui16_PWM_cycles_counter_6 = 0;
 uint16_t ui16_PWM_cycles_counter_total = 0;
 
@@ -28,12 +25,7 @@ uint16_t ui16_motor_speed_erps = 0;
 uint8_t ui8_motor_rotor_position = 0; // in 360/256 degrees
 uint8_t ui8_motor_rotor_absolute_position = 0; // in 360/256 degrees
 uint8_t ui8_position_correction_value = 127; // in 360/256 degrees
-
 uint8_t ui8_interpolation_angle = 0;
-
-uint16_t ui16_adc_current_phase_B = 0;
-uint16_t ui16_adc_current_phase_B_accumulated = 0;
-uint16_t ui16_adc_current_phase_B_filtered = 0;
 
 uint8_t ui8_motor_interpolation_state = NO_INTERPOLATION_60_DEGREES;
 uint8_t ui8_motor_state = MOTOR_STATE_COAST;
@@ -42,12 +34,9 @@ uint8_t ui8_hall_sensors = 0;
 uint8_t ui8_hall_sensors_last = 0;
 
 uint8_t ui8_ADC_id_current = 0;
-uint8_t ui8_ADC_id_current_sign = 0;
 
-uint8_t ui8_motor_total_current_flag = 0;
-
-uint8_t ui8_ADC_motor_current_max_positive = ADC_MOTOR_TOTAL_CURRENT_MAX_POSITIVE;
-uint8_t ui8_ADC_motor_current_max_negative = ADC_MOTOR_TOTAL_CURRENT_MIN_NEGATIVE;
+uint8_t ui8_ADC_motor_current_max;
+uint8_t ui8_ADC_motor_regen_current_max;
 uint8_t ui8_ADC_motor_current_zero_value;
 
 uint8_t ui8_half_e_rotation_flag = 0;
@@ -76,8 +65,7 @@ void hall_sensors_read_and_action (void)
     switch (ui8_hall_sensors)
     {
       case 3:
-debug_pin_set ();
-      // read here the phase B current: FOC Iq current
+      // read here the phase B current: FOC Id current
       ui8_ADC_id_current = ui8_adc_read_phase_B_current ();
 
 #if (MOTOR_TYPE == MOTOR_TYPE_EUC2)
@@ -145,7 +133,7 @@ debug_pin_set ();
 	ui8_motor_interpolation_state = NO_INTERPOLATION_60_DEGREES;
       }
 #elif MOTOR_TYPE == MOTOR_TYPE_EUC2
-      if (ui16_motor_speed_erps > 10)
+      if (ui16_motor_speed_erps > 3)
       {
 	ui8_motor_interpolation_state = INTERPOLATION_60_DEGREES;
 	ui8_motor_state = MOTOR_STATE_RUNNING;
@@ -167,7 +155,6 @@ debug_pin_set ();
       break;
 
       case 4:
-debug_pin_reset ();
       if (ui8_motor_interpolation_state != INTERPOLATION_360_DEGREES)
       {
 	ui8_motor_rotor_absolute_position = ANGLE_1 + MOTOR_ROTOR_DELTA_PHASE_ANGLE_RIGHT;
@@ -202,8 +189,6 @@ debug_pin_reset ();
 // runs every 64us (PWM frequency)
 void motor_fast_loop (void)
 {
-  uint8_t ui8_temp;
-
   // count number of fast loops / PWM cycles
   if (ui16_PWM_cycles_counter < PWM_CYCLES_COUNTER_MAX)
   {
@@ -221,10 +206,10 @@ void motor_fast_loop (void)
     ui8_motor_state = MOTOR_STATE_STOP;
   }
 
-#define DO_INTERPOLATION 1 // may be usefull when debugging
+#define DO_INTERPOLATION 1 // may be usefull to disable interpolation when debugging
 #if DO_INTERPOLATION == 1
-//  // calculate the interpolation angle
-//  // interpolation seems a problem when motor starts, so avoid to do it at very low speed
+  // calculate the interpolation angle
+  // interpolation seems a problem when motor starts, so avoid to do it at very low speed
   if (ui8_motor_interpolation_state == INTERPOLATION_60_DEGREES)
   {
     ui8_interpolation_angle = (ui16_PWM_cycles_counter_6 << 8) / ui16_PWM_cycles_counter_total;
@@ -275,6 +260,7 @@ void motor_init (void)
   uint8_t ui8_counter = 0;
   uint16_t ui16_temp = 0;
 
+  /***************************************************************************************/
   // reading some samples of ADC motor total current and average, to get the real zero value
   while (ui8_counter < 32)
   {
@@ -282,4 +268,35 @@ void motor_init (void)
     ui8_counter++;
   }
   ui8_ADC_motor_current_zero_value = ui16_temp >> 5; // ui16_temp / 32
+  /***************************************************************************************/
+
+  motor_set_current_max (ADC_MOTOR_CURRENT_MAX);
+  motor_set_regen_current_max (ADC_MOTOR_REGEN_CURRENT_MAX);
+  motor_set_pwm_duty_cycle_ramp_inverse_step (PWM_DUTY_CYCLE_RAMP_INVERSE_STEP);
 }
+
+void motor_set_pwm_duty_cycle_target (uint8_t value)
+{
+  pwm_set_duty_cycle_target (value);
+}
+
+void motor_set_current_max (uint8_t value)
+{
+  ui8_ADC_motor_current_max = value;
+}
+
+void motor_set_regen_current_max (uint8_t value)
+{
+  ui8_ADC_motor_regen_current_max = value;
+}
+
+void motor_set_pwm_duty_cycle_ramp_inverse_step (uint8_t value)
+{
+  ui8_duty_cycle_ramp_inverse_step = value;
+}
+
+uint16_t motor_get_motor_speed_erps (void)
+{
+  return ui16_motor_speed_erps;
+}
+

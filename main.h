@@ -14,26 +14,20 @@
 
 #define MOTOR_TYPE MOTOR_TYPE_EUC2
 
-
 // MOTOR_TYPE_EUC2
 // 28V --> 66 ERPs
 // 0.424 for each ERPs
+#if MOTOR_TYPE == MOTOR_TYPE_Q85
+#define MOTOR_KVOLTS_PER_ERPS 73 //Q85 motor
+#elif MOTOR_TYPE == MOTOR_TYPE_EUC2
 #define MOTOR_KVOLTS_PER_ERPS 107 //0.424 << 8 EUC2 motor
-//#define MOTOR_KVOLTS_PER_ERPS 73 //Q85 motor
+#endif
 
 #define SVM_TABLE_LEN 256
 #define SVM_TABLE_LEN_x1024 262144 //(256 * 1024)
 
-#define SETPOINT_MAX_VALUE 237		//maximum value for setpoint, taken from map function
-
-#define NUMBER_OF_PAS_MAGS 16 //16 for sensor from BMSBattery, 32 for Sempu-Sensor
-
-// each 80mv on motor total current = 1A
-// at 8 bits ADC, 1A = 16
-#define ADC_MOTOR_TOTAL_CURRENT_ZERO_AMPS 81 // 1.59V; 325 (10bits) = 81 (8bits)
-#define ADC_MOTOR_TOTAL_CURRENT_MAX 32 // 32 (8bits) ~ 2 Amps
-#define ADC_MOTOR_TOTAL_CURRENT_MAX_POSITIVE 5 // 1 --> 0.5A
-#define ADC_MOTOR_TOTAL_CURRENT_MIN_NEGATIVE 1//76 // -2A
+#define ADC_MOTOR_CURRENT_MAX 4 	// 1 --> 0.5A
+#define ADC_MOTOR_REGEN_CURRENT_MAX 4 	//1 --> 0.5A
 
 // ADC Battery voltage
 // 29.8V --> 110 (8bits ADC)
@@ -50,16 +44,13 @@
 #if MOTOR_TYPE == MOTOR_TYPE_Q85
 #define MOTOR_ROTOR_DELTA_PHASE_ANGLE_RIGHT 210// best value found (at max speed, minimum current and power supply voltage keeps the same)
 #elif MOTOR_TYPE == MOTOR_TYPE_EUC2
-//#define MOTOR_ROTOR_DELTA_PHASE_ANGLE_RIGHT 235 // best value found
 #define MOTOR_ROTOR_DELTA_PHASE_ANGLE_RIGHT 235 // best value found
 #endif
 
 #define PWM_CYCLES_COUNTER_MAX 4000 // bei h�heren Werten wird angenommen, der Motor steht.
 #define PWM_CYCLES_SECOND 15625L // 1 / 64us(PWM period)
 
-// 2 seconds to get up to max PWM duty cycle value of 255 (127 * 255 * 64us ~= 2 seconds)
-//#define PWM_DUTY_CYCLE_CONTROLLER_COUNTER 127
-#define PWM_DUTY_CYCLE_CONTROLLER_COUNTER 2
+#define PWM_DUTY_CYCLE_RAMP_INVERSE_STEP 127
 
 #define SPEED_INVERSE_INTERPOLATION 625 // experimental value; min speed aftwer which interpolation starts
 
@@ -74,14 +65,6 @@
 #define ANGLE_300 212
 #define ANGLE_360 255
 
-extern uint16_t ui16_log1;
-extern uint16_t ui16_log2;
-extern uint8_t ui8_log;
 extern uint8_t ui8_adc_read_throttle_busy;
-extern uint16_t ui16_SPEED_Counter; 	//Counter for bike speed
-extern uint16_t ui16_PAS_Counter;	//Counter for cadence
-extern uint8_t ui8_PAS_Flag;		//Flag for PAS Interrupt detected
-extern uint8_t ui8_SPEED_Flag;		//Flag for PAS Interrupt detected
-
 
 #endif

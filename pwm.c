@@ -277,24 +277,22 @@ uint8_t ui8_svm_table [SVM_TABLE_LEN] =
 };
 
 uint8_t ui8_duty_cycle = 0;
-uint8_t ui8_duty_cycle_target = 0;
-uint8_t ui8_duty_cycle_ramp_inverse_step = 20;
+uint8_t ui8_duty_cycle_target;
+uint8_t ui8_duty_cycle_ramp_inverse_step;
 uint8_t ui8_counter_duty_cycle_ramp = 0;
 uint8_t ui8_value_a;
 uint8_t ui8_value_b;
 uint8_t ui8_value_c;
 uint16_t ui16_value;
 
-void pwm_set_duty_cycle (uint8_t value)
+void pwm_set_duty_cycle_target (uint8_t value)
 {
   ui8_duty_cycle_target = value;
 }
 
 void pwm_init (void)
 {
-// TIM1 Peripheral Configuration
   TIM1_DeInit();
-
   TIM1_TimeBaseInit(0, // TIM1_Prescaler = 0
 		    TIM1_COUNTERMODE_CENTERALIGNED1,
 		    (512 - 1), // clock = 16MHz; counter period = 1024; PWM freq = 16MHz / 1024 = 15.625kHz;
@@ -365,7 +363,7 @@ void pwm_duty_cycle_controller (void)
 
   // verify motor max current limit
   ui8_temp = ui8_adc_read_motor_total_current ();
-  if (ui8_temp > (ui8_ADC_motor_current_zero_value + ui8_ADC_motor_current_max_positive))  // motor max current, reduce duty_cycle
+  if (ui8_temp > (ui8_ADC_motor_current_zero_value + ui8_ADC_motor_current_max))  // motor max current, reduce duty_cycle
   {
     if (ui8_duty_cycle > 0)
     {
@@ -373,7 +371,7 @@ void pwm_duty_cycle_controller (void)
     }
   }
   // verify motor max regen current limit
-  else if (ui8_temp < (ui8_ADC_motor_current_zero_value - ui8_ADC_motor_current_max_negative))  // motor max current, increase duty_cycle
+  else if (ui8_temp < (ui8_ADC_motor_current_zero_value - ui8_ADC_motor_regen_current_max))  // motor max current, increase duty_cycle
   {
     if (ui8_duty_cycle < 255)
     {

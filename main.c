@@ -22,23 +22,7 @@
 #include "cruise_control.h"
 #include "timers.h"
 #include "pwm.h"
-#include "PAS.h"
-#include "SPEED.h"
-#include "update_setpoint.h"
 #include "config.h"
-
-
-//uint16_t ui16_LPF_angle_adjust = 0;
-//uint16_t ui16_LPF_angle_adjust_temp = 0;
-
-uint16_t ui16_log1 = 0;
-uint16_t ui16_log2 = 0;
-uint8_t ui8_log = 0;
-uint8_t ui8_i= 0; 				//counter for ... next loop
-uint16_t ui16_torque[NUMBER_OF_PAS_MAGS]; 	//array for torque values of one crank revolution
-uint16_t ui16_sum_torque = 0; 			//sum of array elements
-uint8_t ui8_torque_index=0 ; 			//counter for torque array
-uint8_t a = 0; 					//loop counter
 
 static uint16_t ui16_throttle_counter = 0;
 uint16_t ui16_temp_delay = 0;
@@ -71,10 +55,6 @@ int main (void);
 
 // Brake signal interrupt
 void EXTI_PORTA_IRQHandler(void) __interrupt(EXTI_PORTA_IRQHANDLER);
-// Speed signal interrupt
-void EXTI_PORTC_IRQHandler(void) __interrupt(EXTI_PORTC_IRQHANDLER);
-// PAS signal interrupt
-void EXTI_PORTD_IRQHandler(void) __interrupt(EXTI_PORTD_IRQHANDLER);
 
 // Timer1/PWM period interrupt
 void TIM1_UPD_OVF_TRG_BRK_IRQHandler(void) __interrupt(TIM1_UPD_OVF_TRG_BRK_IRQHANDLER);
@@ -114,22 +94,14 @@ int main (void)
 
   hall_sensors_read_and_action (); // needed to start the motor
 
+
+  motor_set_current_max (2); // 1 --> 0.5A
+  motor_set_regen_current_max (1); // 1 --> 0.5A
+  motor_set_pwm_duty_cycle_ramp_inverse_step (2);
+
   while (1)
   {
-    static uint32_t ui32_counter = 0;
-    uint16_t ui16_temp = 0;
-    uint8_t ui8_temp = 0;
-    static uint8_t ui8_temp_last = 0;
-    static uint8_t ui8_temp1 = 0;
-    uint16_t ui32_temp = 0;
-    static float f_temp = 0;
-
-    uint8_t ui8_duty_cycle_target = 0;
-    static uint8_t ui8_duty_cycle_target_old = 0;
-    uint16_t ui16_motor_BEMF = 0;
-    uint16_t ui16_duty_cycle_min = 0;
-
-    static uint8_t c = 0;
+    uint8_t ui8_duty_cycle_target;
 
     ui16_temp_delay = TIM2_GetCounter ();
 
@@ -144,45 +116,16 @@ int main (void)
 
 //#define DO_CRUISE_CONTROL 1
 #if DO_CRUISE_CONTROL == 1
-      ui8_temp = cruise_control (ui8_temp);
+      ui8_duty_cycle_target = cruise_control (ui8_duty_cycle_target);
 #endif
 
-#if (MOTOR_TYPE == MOTOR_TYPE_EUC2)
-//      // Coast motor while decelerating and so no regen happens.
-//      //
-//      // calc BEMF
-//      ui16_motor_BEMF = ui16_motor_speed_erps * MOTOR_KVOLTS_PER_ERPS;
-//
-//      // CALC MIN DUTY_CYCLE
-//      // min duty_cycle = (BEMF * max duty_cycle) / Vbat
-//      // since BEMF is already multiplied by 255 (max duty_cycle), duty = BEMF / Vbat
-//      ui16_duty_cycle_min = ui16_motor_BEMF / ((ui8_adc_read_battery_voltage () * ADC_BATTERY_VOLTAGE_K) >> 8);
-//      if (ui16_duty_cycle_min > 255) { ui16_duty_cycle_min = 255; }
-//
-//      if (ui8_duty_cycle_target < ui8_duty_cycle_target_old)
-//      {
-//	motor_set_mode_coast ();
-//      }
-//      else
-//      {
-//	if (ui8_duty_cycle_target > ui16_duty_cycle_min)
-//	{
-//	  pwm_set_duty_cycle (ui8_duty_cycle_target);
-//	  motor_set_mode_run ();
-//	}
-//      }
-//      ui8_duty_cycle_target_old = ui8_duty_cycle_target;
-pwm_set_duty_cycle (ui8_duty_cycle_target);
-
-#elif (MOTOR_TYPE == MOTOR_TYPE_Q85)
-      pwm_set_duty_cycle (ui8_duty_cycle_target);
-#endif
-
+      motor_set_pwm_duty_cycle_target (ui8_duty_cycle_target);
       /****************************************************************************/
 
       getchar1 ();
 
-      printf("%d, %d, %d, %d\n", ui16_motor_speed_erps, ui8_motor_state, ui8_motor_interpolation_state, ui8_position_correction_value);
+//      printf("%d, %d, %d, %d\n", ui16_motor_speed_erps, ui8_motor_state, ui8_motor_interpolation_state, ui8_position_correction_value);
+      printf("%d, %d\n", motor_get_motor_speed_erps (), ui8_duty_cycle_target);
     }
   }
 }
