@@ -261,6 +261,17 @@ void motor_init (void)
   uint16_t ui16_temp = 0;
 
   /***************************************************************************************/
+  // motor overcurrent pin as external input pin interrupt
+  GPIO_Init(CURRENT_MOTOR_TOTAL_OVER__PORT,
+	    CURRENT_MOTOR_TOTAL_OVER__PIN,
+	    GPIO_MODE_IN_FL_IT); // with external interrupt
+
+  //initialize the Interrupt sensitivity
+  EXTI_SetExtIntSensitivity(EXTI_PORT_GPIOD,
+			    EXTI_SENSITIVITY_FALL_LOW);
+  /***************************************************************************************/
+
+  /***************************************************************************************/
   // reading some samples of ADC motor total current and average, to get the real zero value
   while (ui8_counter < 32)
   {
@@ -298,5 +309,12 @@ void motor_set_pwm_duty_cycle_ramp_inverse_step (uint8_t value)
 uint16_t motor_get_motor_speed_erps (void)
 {
   return ui16_motor_speed_erps;
+}
+
+// motor overcurrent interrupt
+void EXTI_PORTD_IRQHandler(void) __interrupt(EXTI_PORTD_IRQHANDLER)
+{
+    motor_set_mode_coast ();
+    while (1) ; // infinite loop, user will need to reset the system
 }
 

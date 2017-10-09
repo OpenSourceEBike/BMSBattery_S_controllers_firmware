@@ -22,12 +22,12 @@ void EXTI_PORTA_IRQHandler(void) __interrupt(EXTI_PORTA_IRQHANDLER)
 {
   if (brake_is_set())
   {
-    brake_coast_enable ();
+    motor_set_mode_coast ();
     stop_cruise_control ();
   }
   else
   {
-    brake_coast_disable ();
+    motor_set_mode_run ();
 //    pwm_set_duty_cycle (0);
     ui8_duty_cycle = 0;
     stop_cruise_control ();
@@ -36,7 +36,7 @@ void EXTI_PORTA_IRQHandler(void) __interrupt(EXTI_PORTA_IRQHANDLER)
 
 void brake_init (void)
 {
-  //hall sensors pins as external input pin interrupt
+  //brake pin as external input pin interrupt
   GPIO_Init(BRAKE__PORT,
 	    BRAKE__PIN,
 	    GPIO_MODE_IN_FL_IT); // with external interrupt
