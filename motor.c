@@ -105,7 +105,7 @@ void hall_sensors_read_and_action (void)
       }
 #endif
 
-      if (ui8_motor_interpolation_state != INTERPOLATION_360_DEGREES)
+      if (ui8_motor_interpolation_state == NO_INTERPOLATION_60_DEGREES)
       {
 	pwm_phase_a_enable_pwm (ui8_duty_cycle);
 	pwm_phase_b_disable (ui8_duty_cycle);
@@ -160,7 +160,7 @@ void hall_sensors_read_and_action (void)
       }
 #endif
 
-      if (ui8_motor_interpolation_state != INTERPOLATION_360_DEGREES)
+      if (ui8_motor_interpolation_state == NO_INTERPOLATION_60_DEGREES)
       {
 	pwm_phase_a_enable_pwm (ui8_duty_cycle);
 	pwm_phase_b_enable_low (ui8_duty_cycle);
@@ -173,7 +173,7 @@ void hall_sensors_read_and_action (void)
       break;
 
       case 5:
-      if (ui8_motor_interpolation_state != INTERPOLATION_360_DEGREES)
+      if (ui8_motor_interpolation_state == NO_INTERPOLATION_60_DEGREES)
       {
 	pwm_phase_a_disable (ui8_duty_cycle);
 	pwm_phase_b_enable_low (ui8_duty_cycle);
@@ -182,7 +182,7 @@ void hall_sensors_read_and_action (void)
       break;
 
       case 4:
-      if (ui8_motor_interpolation_state != INTERPOLATION_360_DEGREES)
+      if (ui8_motor_interpolation_state == NO_INTERPOLATION_60_DEGREES)
       {
 	pwm_phase_a_enable_low (ui8_duty_cycle);
 	pwm_phase_b_disable (ui8_duty_cycle);
@@ -193,7 +193,7 @@ void hall_sensors_read_and_action (void)
       case 6:
       ui8_half_e_rotation_flag = 1;
 
-      if (ui8_motor_interpolation_state != INTERPOLATION_360_DEGREES)
+      if (ui8_motor_interpolation_state == NO_INTERPOLATION_60_DEGREES)
       {
 	pwm_phase_a_enable_low (ui8_duty_cycle);
 	pwm_phase_b_enable_pwm (ui8_duty_cycle);
@@ -202,7 +202,7 @@ void hall_sensors_read_and_action (void)
       break;
 
       case 2:
-      if (ui8_motor_interpolation_state != INTERPOLATION_360_DEGREES)
+      if (ui8_motor_interpolation_state == NO_INTERPOLATION_60_DEGREES)
       {
 	pwm_phase_a_disable (ui8_duty_cycle);
 	pwm_phase_b_enable_pwm (ui8_duty_cycle);

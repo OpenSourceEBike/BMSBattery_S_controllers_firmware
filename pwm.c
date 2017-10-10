@@ -339,6 +339,18 @@ void pwm_init_bipolar_4q (void)
 	       TIM1_OCNPOLARITY_LOW,
 	       TIM1_OCIDLESTATE_RESET,
 	       TIM1_OCNIDLESTATE_SET);
+
+  // break, dead time and lock configuration
+  TIM1_BDTRConfig(TIM1_OSSISTATE_ENABLE,
+		  TIM1_LOCKLEVEL_OFF,
+		  // hardware nees a dead time of 1us
+		  16, // DTG = 0; dead time in 62.5 ns steps; 1us/62.5ns = 16
+		  TIM1_BREAK_DISABLE,
+		  TIM1_BREAKPOLARITY_LOW,
+		  TIM1_AUTOMATICOUTPUT_DISABLE);
+
+  TIM1_ITConfig(TIM1_IT_UPDATE, ENABLE);
+  TIM1_Cmd(ENABLE); // TIM1 counter enable
 }
 
 void pwm_init_6_steps (void)
