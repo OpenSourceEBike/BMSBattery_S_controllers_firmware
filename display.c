@@ -19,7 +19,7 @@ along with this program; if not, write to the Free Software Foundation,
 Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301  USA
 */
 
-
+#include <stdio.h>
 #include "stm8s.h"
 #include "display.h"
 #include "main.h"
@@ -101,10 +101,12 @@ void kingmeter_update(void)
         KM.Tx.Battery = KM_BATTERY_LOW;
     }
 
-    if(ui16_SPEED_Counter < KM_MAX_WHEELTIME)
+    if((ui16_SPEED>>4) < KM_MAX_WHEELTIME && ui16_SPEED!=0)
     {
         // Adapt wheeltime to match displayed speedo value according config.h setting      
-        KM.Tx.Wheeltime_ms = ui16_SPEED_Counter>>4;	// is not exactly correct, factor should be 15.625, not 16
+        KM.Tx.Wheeltime_ms = ui16_SPEED>>4;	// is not exactly correct, factor should be 15.625, not 16
+
+
     }
     else
     {
@@ -113,8 +115,10 @@ void kingmeter_update(void)
 
     KM.Tx.Error = KM_ERROR_NONE;
 
-
+    if (((current_cal_a*ui16_BatteryCurrent)/10 + current_cal_b) != 0x99)
+    {
     KM.Tx.Current_x10= (current_cal_a*ui16_BatteryCurrent)/10 + current_cal_b; //calculate Amps out of 10bit ADC value
+    }
 
     /* Receive Rx parameters/settings and send Tx parameters */
     KingMeter_Service(&KM);

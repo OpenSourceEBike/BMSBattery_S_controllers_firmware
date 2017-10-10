@@ -259,10 +259,10 @@ static void KM_618U_Service(KINGMETER_t* KM_ctx)
             TxBuff[1] = 0x03;						//Original firmware of Lishui sends "3" at this Byte
         }
 
-        //TxBuff[2] = (uint8_t) ((KM_ctx->Tx.Current_x10 * 3) / 10);      // Current unit: 1/3A is not needed for J-LCD and gives error at first loop rund
-        TxBuff[2] = 0x00;
-        TxBuff[3] = KM_ctx->Tx.Wheeltime_ms>>8;				// richtige Funktion der Bitmanipulation noch nicht bestätigt
-        TxBuff[4] = KM_ctx->Tx.Wheeltime_ms & 0xFF;			// richtige Funktion der Bitmanipulation noch nicht bestätigt
+        TxBuff[2] = (uint8_t) ((KM_ctx->Tx.Current_x10 * 3) / 10);      // Current unit: 1/3A, gives still error at first loop run?
+        //TxBuff[2] = 0x00;
+        TxBuff[3] = (uint8_t) (KM_ctx->Tx.Wheeltime_ms>>8);				// richtige Funktion der Bitmanipulation noch nicht bestätigt
+        TxBuff[4] = (uint8_t) (KM_ctx->Tx.Wheeltime_ms & 0xFF);			// richtige Funktion der Bitmanipulation noch nicht bestätigt
         TxBuff[5] = 0xA7;                                               // Reply with WheelSize 26" / Maxspeed 25km/h (no influence on display)
         TxBuff[6] = KM_ctx->Tx.Error;
 
@@ -279,6 +279,7 @@ static void KM_618U_Service(KINGMETER_t* KM_ctx)
         }
 
         putbyte(TxBuff[7]);                          // Send XOR CheckSum
+
     }
 
 

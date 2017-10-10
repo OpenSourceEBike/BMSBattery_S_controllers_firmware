@@ -158,6 +158,7 @@ int main (void)
     if (ui8_msg_received)
         {
 	ui8_msg_received=0;
+	printf("%d\n", ui16_SPEED);
 	display_update(); //Display aktualisieren aus Code vom Forumscontroller
 
 
