@@ -14,7 +14,7 @@ Windows:
 
 1. Just double click on "Start_Compiling.bat" 
 2. or hit "Run" Button on Eclipse 
-3. or hit "Write Configuartion" Button on the OSEC Parameter Configurator
+3. or hit "Write Configuration" Button on the OSEC Parameter Configurator
 
 Linux:
 1. clean the previous built files: $ make -f Makefile_linux clean

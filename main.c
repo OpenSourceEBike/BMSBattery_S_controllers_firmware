@@ -53,7 +53,7 @@ static int16_t i16_deziAmps;
 
 uint8_t ui8_adc_read_throttle_busy = 0;
 uint16_t ui16_SPEED_Counter = 0; 	//time tics for speed measurement
-uint16_t ui16_SPEED = 32000; 		//speed in timetics
+uint16_t ui16_SPEED = 56001; 		//speed in timetics
 uint16_t ui16_PAS_Counter = 0; 		//time tics for cadence measurement
 uint16_t ui16_PAS = 32000;		//cadence in timetics
 uint8_t ui8_PAS_Flag = 0; 		//flag for PAS interrupt
@@ -158,7 +158,7 @@ int main (void)
     if (ui8_msg_received)
         {
 	ui8_msg_received=0;
-	printf("%d\n", ui16_SPEED);
+	//printf("%d\n", ui16_SPEED);
 	display_update(); //Display aktualisieren aus Code vom Forumscontroller
 
 
@@ -174,6 +174,11 @@ int main (void)
 
 	//printf("SPEEDtic\n");
     }
+    if (ui16_SPEED_Counter>56000L)
+        {
+    	ui16_SPEED=56000L; 	//Set Display to 0 km/h
+
+        }
 
 
 #ifdef TORQUESENSOR
