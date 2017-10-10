@@ -66,6 +66,45 @@ void hall_sensors_read_and_action (void)
     switch (ui8_hall_sensors)
     {
       case 3:
+      // read here the phase B current: FOC Id current
+      ui8_ADC_id_current = ui8_adc_read_phase_B_current ();
+
+#if (MOTOR_TYPE == MOTOR_TYPE_EUC2)
+      if (ui8_motor_state == MOTOR_STATE_RUNNING)
+      {
+	if (ui8_motor_interpolation_state == INTERPOLATION_60_DEGREES)
+	{
+	  if (ui8_ADC_id_current > 127)
+	  {
+	    ui8_position_correction_value++;
+	  }
+	  else if (ui8_ADC_id_current < 125)
+	  {
+	    ui8_position_correction_value--;
+	  }
+	}
+      }
+#elif (MOTOR_TYPE == MOTOR_TYPE_Q85)
+      if (ui8_motor_state == MOTOR_STATE_RUNNING)
+      {
+	if (ui8_motor_interpolation_state == INTERPOLATION_360_DEGREES)
+	{
+	  if (ui8_ADC_id_current > 127)
+	  {
+	    ui8_position_correction_value++;
+	  }
+	  else if (ui8_ADC_id_current < 125)
+	  {
+	    ui8_position_correction_value--;
+	  }
+	}
+	else
+	{
+	  ui8_position_correction_value = 127; // keep using the reset value
+	}
+      }
+#endif
+
       if (ui8_motor_interpolation_state != INTERPOLATION_360_DEGREES)
       {
 	pwm_phase_a_enable_pwm (ui8_duty_cycle);
@@ -84,17 +123,42 @@ void hall_sensors_read_and_action (void)
       }
 
       // update motor state based on motor speed
-      if (ui16_motor_speed_erps > 100)
+#if MOTOR_TYPE == MOTOR_TYPE_Q85
+      if (ui16_motor_speed_erps > 400/*100*/)
       {
-//	ui8_motor_interpolation_state = INTERPOLATION_360_DEGREES;
-//	ui8_motor_state = MOTOR_STATE_RUNNING;
-//	pwm_init_bipolar_4q ();
+	ui8_motor_interpolation_state = INTERPOLATION_360_DEGREES;
+	ui8_motor_state = MOTOR_STATE_RUNNING;
+      }
+      else if (ui16_motor_speed_erps > 200/*25*/)
+      {
+	if (ui8_motor_interpolation_state == NO_INTERPOLATION_60_DEGREES)
+	{
+	  pwm_init_bipolar_4q ();
+	}
+
+	ui8_motor_interpolation_state = INTERPOLATION_60_DEGREES;
+	ui8_motor_state = MOTOR_STATE_RUNNING;
+      }
+      else
+      {
+	if (ui8_motor_interpolation_state != NO_INTERPOLATION_60_DEGREES)
+        {
+	  pwm_init_6_steps ();
+        }
+
+	ui8_motor_interpolation_state = NO_INTERPOLATION_60_DEGREES;
+      }
+#elif MOTOR_TYPE == MOTOR_TYPE_EUC2
+      if (ui16_motor_speed_erps > 3)
+      {
+	ui8_motor_interpolation_state = INTERPOLATION_60_DEGREES;
+	ui8_motor_state = MOTOR_STATE_RUNNING;
       }
       else
       {
 	ui8_motor_interpolation_state = NO_INTERPOLATION_60_DEGREES;
-//        pwm_init_6_steps ();
       }
+#endif
 
       if (ui8_motor_interpolation_state != INTERPOLATION_360_DEGREES)
       {
@@ -111,9 +175,9 @@ void hall_sensors_read_and_action (void)
       case 5:
       if (ui8_motor_interpolation_state != INTERPOLATION_360_DEGREES)
       {
-	pwm_phase_a_enable_pwm (ui8_duty_cycle);
+	pwm_phase_a_disable (ui8_duty_cycle);
 	pwm_phase_b_enable_low (ui8_duty_cycle);
-	pwm_phase_c_disable (ui8_duty_cycle);
+	pwm_phase_c_enable_pwm (ui8_duty_cycle);
       }
       break;
 
@@ -286,4 +350,3 @@ void EXTI_PORTD_IRQHandler(void) __interrupt(EXTI_PORTD_IRQHANDLER)
     motor_set_mode_coast ();
     while (1) ; // infinite loop, user will need to reset the system
 }
-

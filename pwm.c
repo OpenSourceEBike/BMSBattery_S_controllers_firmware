@@ -339,9 +339,6 @@ void pwm_init_bipolar_4q (void)
 	       TIM1_OCNPOLARITY_LOW,
 	       TIM1_OCIDLESTATE_RESET,
 	       TIM1_OCNIDLESTATE_SET);
-
-  TIM1_ITConfig(TIM1_IT_UPDATE, ENABLE);
-  TIM1_Cmd(ENABLE); // TIM1 counter enable
 }
 
 void pwm_init_6_steps (void)
@@ -440,7 +437,7 @@ void pwm_apply_duty_cycle (uint8_t ui8_duty_cycle_value)
 {
   uint8_t ui8_temp;
 
-  if (ui8_motor_interpolation_state != INTERPOLATION_360_DEGREES)
+  if (ui8_motor_interpolation_state == NO_INTERPOLATION_60_DEGREES)
   {
     TIM1_SetCompare1((uint16_t) (ui8_duty_cycle_value << 2));
     TIM1_SetCompare2((uint16_t) (ui8_duty_cycle_value << 2));
