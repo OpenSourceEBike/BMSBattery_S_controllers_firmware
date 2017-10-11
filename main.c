@@ -180,6 +180,17 @@ int main (void)
 
         }
 
+#ifdef THROTTLEANDPAS
+	      if (ui8_PAS_Flag == 1)
+	      	              {
+	      	                ui16_PAS=ui16_PAS_Counter; 		//save recent cadence
+	      	                //printf("PAStic %d\n", ui16_PAS_Counter);
+	      	                ui16_PAS_Counter=0;			//reset PAS Counter
+
+	      	                ui8_PAS_Flag =0; 			//reset interrupt flag
+	      	          }
+#endif
+
 
 #ifdef TORQUESENSOR
     //	Update cadence and torque after PAS interrupt occurrence
@@ -221,7 +232,10 @@ int main (void)
 	      ui8_temp= adc_read_throttle (); //read in recent torque value
 	      ui8_adc_read_throttle_busy = 0;
 	      ui16_sum_torque = (uint8_t) map (ui8_temp , ADC_THROTTLE_MIN_VALUE, ADC_THROTTLE_MAX_VALUE, 0, SETPOINT_MAX_VALUE); //map throttle to limits
+
+
 #endif
+
 
 	      ui16_setpoint = (uint16_t)update_setpoint (ui16_SPEED,ui16_PAS,ui16_sum_torque,ui16_setpoint); //update setpoint
 
