@@ -111,6 +111,10 @@ void hall_sensors_read_and_action (void)
 	pwm_phase_b_disable (ui8_duty_cycle);
 	pwm_phase_c_enable_low (ui8_duty_cycle);
       }
+      else if (ui8_motor_interpolation_state == INTERPOLATION_60_DEGREES)
+      {
+	ui8_motor_rotor_absolute_position = ANGLE_180 + MOTOR_ROTOR_DELTA_PHASE_ANGLE_RIGHT;
+      }
       break;
 
       case 1:
@@ -124,16 +128,16 @@ void hall_sensors_read_and_action (void)
 
       // update motor state based on motor speed
 #if MOTOR_TYPE == MOTOR_TYPE_Q85
-      if (ui16_motor_speed_erps > 400/*100*/)
+      if (ui16_motor_speed_erps > 250)
       {
 	ui8_motor_interpolation_state = INTERPOLATION_360_DEGREES;
 	ui8_motor_state = MOTOR_STATE_RUNNING;
       }
-      else if (ui16_motor_speed_erps > 200/*25*/)
+      else if (ui16_motor_speed_erps > 150)
       {
 	if (ui8_motor_interpolation_state == NO_INTERPOLATION_60_DEGREES)
 	{
-	  pwm_init_bipolar_4q ();
+	    pwm_init_bipolar_4q ();
 	}
 
 	ui8_motor_interpolation_state = INTERPOLATION_60_DEGREES;
@@ -142,9 +146,9 @@ void hall_sensors_read_and_action (void)
       else
       {
 	if (ui8_motor_interpolation_state != NO_INTERPOLATION_60_DEGREES)
-        {
+	{
 	  pwm_init_6_steps ();
-        }
+	}
 
 	ui8_motor_interpolation_state = NO_INTERPOLATION_60_DEGREES;
       }
@@ -179,6 +183,10 @@ void hall_sensors_read_and_action (void)
 	pwm_phase_b_enable_low (ui8_duty_cycle);
 	pwm_phase_c_enable_pwm (ui8_duty_cycle);
       }
+      else if (ui8_motor_interpolation_state == INTERPOLATION_60_DEGREES)
+      {
+	ui8_motor_rotor_absolute_position = ANGLE_300 + MOTOR_ROTOR_DELTA_PHASE_ANGLE_RIGHT;
+      }
       break;
 
       case 4:
@@ -187,6 +195,10 @@ void hall_sensors_read_and_action (void)
 	pwm_phase_a_enable_low (ui8_duty_cycle);
 	pwm_phase_b_disable (ui8_duty_cycle);
 	pwm_phase_c_enable_pwm (ui8_duty_cycle);
+      }
+      else if (ui8_motor_interpolation_state == INTERPOLATION_60_DEGREES)
+      {
+	ui8_motor_rotor_absolute_position = ANGLE_1 + MOTOR_ROTOR_DELTA_PHASE_ANGLE_RIGHT;
       }
       break;
 
@@ -199,6 +211,10 @@ void hall_sensors_read_and_action (void)
 	pwm_phase_b_enable_pwm (ui8_duty_cycle);
 	pwm_phase_c_disable (ui8_duty_cycle);
       }
+      else if (ui8_motor_interpolation_state == INTERPOLATION_60_DEGREES)
+      {
+	ui8_motor_rotor_absolute_position = ANGLE_60 + MOTOR_ROTOR_DELTA_PHASE_ANGLE_RIGHT;
+      }
       break;
 
       case 2:
@@ -207,6 +223,10 @@ void hall_sensors_read_and_action (void)
 	pwm_phase_a_disable (ui8_duty_cycle);
 	pwm_phase_b_enable_pwm (ui8_duty_cycle);
 	pwm_phase_c_enable_low (ui8_duty_cycle);
+      }
+      else if (ui8_motor_interpolation_state == INTERPOLATION_60_DEGREES)
+      {
+	ui8_motor_rotor_absolute_position = ANGLE_120 + MOTOR_ROTOR_DELTA_PHASE_ANGLE_RIGHT;
       }
       break;
 
