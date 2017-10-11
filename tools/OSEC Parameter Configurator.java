@@ -49,6 +49,11 @@ public class ErsterVersuch extends JFrame {
 	private JTextField txtMaxbatterycurrent;
 	private JTextField txtUndervoltage;
 	private final ButtonGroup Ridingmode = new ButtonGroup();
+	private JTextField txtMotor_specific_angle;
+	private JTextField txtBatteryCurcala;
+	private JTextField txtBatteryCurcalb;
+	private JLabel lblDiplayType;
+	private final ButtonGroup buttonGroup = new ButtonGroup();
 	
 	
 
@@ -86,22 +91,22 @@ public class ErsterVersuch extends JFrame {
 		contentPane.add(lblTollesProgramm);
 		
 		JLabel lblPasTimeout = new JLabel("PAS Timeout");
-		lblPasTimeout.setBounds(5, 167, 101, 14);
+		lblPasTimeout.setBounds(5, 146, 101, 14);
 		contentPane.add(lblPasTimeout);
 		
 		txtPasTimeout = new JTextField();
 		txtPasTimeout.setText("3125");
-		txtPasTimeout.setBounds(150, 165, 86, 20);
+		txtPasTimeout.setBounds(150, 144, 86, 20);
 		contentPane.add(txtPasTimeout);
 		txtPasTimeout.setColumns(10);
 		
 		JLabel lblWheelCircumference = new JLabel("Wheel circumference");
-		lblWheelCircumference.setBounds(5, 130, 131, 14);
+		lblWheelCircumference.setBounds(5, 119, 131, 14);
 		contentPane.add(lblWheelCircumference);
 		
 		txtWheelCircumference = new JTextField();
 		txtWheelCircumference.setText("2000");
-		txtWheelCircumference.setBounds(150, 128, 86, 20);
+		txtWheelCircumference.setBounds(150, 117, 86, 20);
 		contentPane.add(txtWheelCircumference);
 		txtWheelCircumference.setColumns(10);
 		
@@ -116,44 +121,74 @@ public class ErsterVersuch extends JFrame {
 		txtNumberOfPas.setColumns(10);
 		
 		lblSpeedLimit = new JLabel("Speed Limit (km/h)");
-		lblSpeedLimit.setBounds(5, 209, 135, 14);
+		lblSpeedLimit.setBounds(5, 173, 135, 14);
 		contentPane.add(lblSpeedLimit);
 		
 		txtSpeedlimit = new JTextField();
 		txtSpeedlimit.setText("25");
-		txtSpeedlimit.setBounds(150, 207, 86, 20);
+		txtSpeedlimit.setBounds(150, 171, 86, 20);
 		contentPane.add(txtSpeedlimit);
 		txtSpeedlimit.setColumns(10);
 		
 		lblSupportFactor = new JLabel("Assist factor");
-		lblSupportFactor.setBounds(5, 248, 101, 14);
+		lblSupportFactor.setBounds(5, 201, 101, 14);
 		contentPane.add(lblSupportFactor);
 		
 		txtSupportfactor = new JTextField();
 		txtSupportfactor.setText("64");
-		txtSupportfactor.setBounds(150, 245, 86, 20);
+		txtSupportfactor.setBounds(150, 198, 86, 20);
 		contentPane.add(txtSupportfactor);
 		txtSupportfactor.setColumns(10);
 		
 		lblThrottleMin = new JLabel("Throttle min");
-		lblThrottleMin.setBounds(5, 291, 78, 14);
+		lblThrottleMin.setBounds(5, 229, 78, 14);
 		contentPane.add(lblThrottleMin);
 		
 		txtThrottlemin = new JTextField();
 		txtThrottlemin.setText("43");
-		txtThrottlemin.setBounds(150, 288, 86, 20);
+		txtThrottlemin.setBounds(150, 226, 86, 20);
 		contentPane.add(txtThrottlemin);
 		txtThrottlemin.setColumns(10);
 		
 		lblThrottleMax = new JLabel("Throttle max");
-		lblThrottleMax.setBounds(5, 335, 78, 14);
+		lblThrottleMax.setBounds(5, 260, 78, 14);
 		contentPane.add(lblThrottleMax);
 		
 		txtThrottlemax = new JTextField();
 		txtThrottlemax.setText("182");
-		txtThrottlemax.setBounds(150, 332, 86, 20);
+		txtThrottlemax.setBounds(150, 257, 86, 20);
 		contentPane.add(txtThrottlemax);
 		txtThrottlemax.setColumns(10);
+		
+		txtMotor_specific_angle = new JTextField();
+		txtMotor_specific_angle.setText("214");
+		txtMotor_specific_angle.setBounds(150, 350, 86, 20);
+		contentPane.add(txtMotor_specific_angle);
+		txtMotor_specific_angle.setColumns(10);
+		
+		JLabel lblMotorSpecificAngle = new JLabel("Motor specific angle");
+		lblMotorSpecificAngle.setBounds(5, 353, 121, 14);
+		contentPane.add(lblMotorSpecificAngle);
+		
+		txtBatteryCurcala = new JTextField();
+		txtBatteryCurcala.setText("10");
+		txtBatteryCurcala.setBounds(150, 381, 86, 20);
+		contentPane.add(txtBatteryCurcala);
+		txtBatteryCurcala.setColumns(10);
+		
+		JLabel lblBatteryCurrentCal = new JLabel("Battery Current cal a");
+		lblBatteryCurrentCal.setBounds(5, 384, 121, 14);
+		contentPane.add(lblBatteryCurrentCal);
+		
+		txtBatteryCurcalb = new JTextField();
+		txtBatteryCurcalb.setText("-312");
+		txtBatteryCurcalb.setBounds(150, 412, 86, 20);
+		contentPane.add(txtBatteryCurcalb);
+		txtBatteryCurcalb.setColumns(10);
+		
+		JLabel lblBatteryCurrentCal_1 = new JLabel("Battery Current cal b");
+		lblBatteryCurrentCal_1.setBounds(5, 415, 131, 14);
+		contentPane.add(lblBatteryCurrentCal_1);
 		
 		lblHttpsopensourceebikefirmwarebitbucketio = new JButton("https://opensourceebikefirmware.bitbucket.io/");
 		lblHttpsopensourceebikefirmwarebitbucketio.addActionListener(new ActionListener() {
@@ -182,23 +217,23 @@ public class ErsterVersuch extends JFrame {
 		contentPane.add(lblOpenSourceFirmware);
 		
 		txtMaxbatterycurrent = new JTextField();
-		txtMaxbatterycurrent.setText("254");
-		txtMaxbatterycurrent.setBounds(150, 371, 86, 20);
+		txtMaxbatterycurrent.setText("462");
+		txtMaxbatterycurrent.setBounds(150, 288, 86, 20);
 		contentPane.add(txtMaxbatterycurrent);
 		txtMaxbatterycurrent.setColumns(10);
 		
 		JLabel lblBatteryCurrentMax = new JLabel("Battery Current max");
-		lblBatteryCurrentMax.setBounds(5, 374, 131, 14);
+		lblBatteryCurrentMax.setBounds(5, 291, 131, 14);
 		contentPane.add(lblBatteryCurrentMax);
 		
 		txtUndervoltage = new JTextField();
 		txtUndervoltage.setText("127");
-		txtUndervoltage.setBounds(150, 404, 86, 20);
+		txtUndervoltage.setBounds(150, 319, 86, 20);
 		contentPane.add(txtUndervoltage);
 		txtUndervoltage.setColumns(10);
 		
 		JLabel lblUndervoltageLimit = new JLabel("Undervoltage limit");
-		lblUndervoltageLimit.setBounds(5, 407, 121, 14);
+		lblUndervoltageLimit.setBounds(5, 322, 121, 14);
 		contentPane.add(lblUndervoltageLimit);
 		
 		JRadioButton rdbtnThrottle = new JRadioButton("Throttle");
@@ -216,6 +251,26 @@ public class ErsterVersuch extends JFrame {
 		Ridingmode.add(rdbtnTorqueSensor);
 		rdbtnTorqueSensor.setBounds(259, 270, 144, 23);
 		contentPane.add(rdbtnTorqueSensor);
+		
+		JLabel lblRideMode = new JLabel("Ride Mode");
+		lblRideMode.setFont(new Font("Tahoma", Font.BOLD, 12));
+		lblRideMode.setBounds(259, 201, 86, 14);
+		contentPane.add(lblRideMode);
+		
+		lblDiplayType = new JLabel("Display Type");
+		lblDiplayType.setFont(new Font("Tahoma", Font.BOLD, 12));
+		lblDiplayType.setBounds(259, 321, 86, 14);
+		contentPane.add(lblDiplayType);
+		
+		JRadioButton rdbtnNone = new JRadioButton("None");
+		buttonGroup.add(rdbtnNone);
+		rdbtnNone.setBounds(259, 342, 109, 23);
+		contentPane.add(rdbtnNone);
+		
+		JRadioButton rdbtnKingmeterJlcd = new JRadioButton("Kingmeter J-LCD");
+		buttonGroup.add(rdbtnKingmeterJlcd);
+		rdbtnKingmeterJlcd.setBounds(259, 368, 149, 23);
+		contentPane.add(rdbtnKingmeterJlcd);
 		
 		JButton btnWriteoptionsbyte = new JButton("Write Option Bytes");
 		btnWriteoptionsbyte.setFont(new Font("Tahoma", Font.BOLD, 12));
@@ -283,6 +338,13 @@ public class ErsterVersuch extends JFrame {
 		            pWriter.println(text_to_save); 
 		            text_to_save = "#define BATTERY_CURRENT_MAX_VALUE " + txtMaxbatterycurrent.getText();
 		            pWriter.println(text_to_save); 
+		            text_to_save = "#define MOTOR_ROTOR_DELTA_PHASE_ANGLE_RIGHT " + txtMotor_specific_angle.getText();
+		            pWriter.println(text_to_save); 
+		            text_to_save = "#define current_cal_a " + txtBatteryCurcala.getText();
+		            pWriter.println(text_to_save); 
+		            text_to_save = "#define current_cal_b " + txtBatteryCurcalb.getText();
+		            pWriter.println(text_to_save); 
+
 		    		if (rdbtnTorqueSensor.isSelected()){ 
 			            text_to_save = "#define TORQUESENSOR";
 			            pWriter.println(text_to_save); 		                
@@ -294,6 +356,14 @@ public class ErsterVersuch extends JFrame {
 		    		if (rdbtnThrottle.isSelected()){ 
 			            text_to_save = "#define THROTTLE";
 			            pWriter.println(text_to_save); 		                
+		    		}
+		    		if (rdbtnKingmeterJlcd.isSelected()){ 
+			            text_to_save = "#define DISPLAY_TYPE_KINGMETER_618U (1<<4) // King-Meter 618U protocol (KM5s, EBS-LCD2, J-LCD, SW-LCD)";
+			            pWriter.println(text_to_save); 		
+			            text_to_save = "#define DISPLAY_TYPE_KINGMETER  // (DISPLAY_TYPE_KINGMETER_618U|DISPLAY_TYPE_KINGMETER_901U)";
+			            pWriter.println(text_to_save);
+			            text_to_save = "##define DISPLAY_TYPE DISPLAY_TYPE_KINGMETER  // Set your display type here. CHANGES ONLY HERE!";
+			            pWriter.println(text_to_save);
 		    		}
 		            pWriter.println("\r\n#endif /* CONFIG_H_ */"); 
 		            
@@ -318,6 +388,10 @@ public class ErsterVersuch extends JFrame {
 		btnWriteConfiguration.setForeground(Color.BLUE);
 		btnWriteConfiguration.setBounds(259, 25, 167, 58);
 		contentPane.add(btnWriteConfiguration);
+		
+		
+		
+
 		
 
 		
