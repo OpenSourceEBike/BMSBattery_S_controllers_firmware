@@ -90,24 +90,17 @@ int main (void)
   enableInterrupts();
 
   motor_init ();
-
-  TIM1_SetCompare1(255);
-  TIM1_SetCompare2(255);
-  TIM1_SetCompare3(255);
+  motor_set_current_max (6); // 1 --> 0.5A
+  motor_set_regen_current_max (2); // 1 --> 0.5A
+  motor_set_pwm_duty_cycle_ramp_inverse_step (2); // each step = 64us
 
   hall_sensors_read_and_action (); // needed to start the motor
-
-
-  motor_set_current_max (8); // 1 --> 0.5A
-  motor_set_regen_current_max (8); // 1 --> 0.5A
-  motor_set_pwm_duty_cycle_ramp_inverse_step (2); // each step = 64us
 
   while (1)
   {
     uint8_t ui8_duty_cycle_target;
 
     ui16_temp_delay = TIM2_GetCounter ();
-
     if ((ui16_temp_delay - ui16_throttle_counter) > 20)
     {
       ui16_throttle_counter = ui16_temp_delay;
@@ -127,7 +120,7 @@ int main (void)
 
 //      getchar1 ();
 
-      printf("%d, %d, %d, %d\n",  motor_get_motor_speed_erps (), ui8_motor_state, ui8_motor_interpolation_state, ui8_position_correction_value);
+      printf("%d, %d, %d, %d\n",  motor_get_motor_speed_erps (), ui8_motor_state, ui8_motor_interpolation_state, ui8_adc_read_battery_voltage());
 //      printf("%d, %d\n", motor_get_motor_speed_erps (), ui8_duty_cycle_target);
     }
   }

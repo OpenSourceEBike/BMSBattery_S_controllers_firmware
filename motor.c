@@ -37,7 +37,6 @@ uint8_t ui8_ADC_id_current = 0;
 
 uint8_t ui8_ADC_motor_current_max;
 uint8_t ui8_ADC_motor_regen_current_max;
-uint8_t ui8_ADC_motor_current_zero_value;
 
 uint8_t ui8_half_e_rotation_flag = 0;
 
@@ -310,28 +309,15 @@ void hall_sensor_init (void)
 
 void motor_init (void)
 {
-  uint8_t ui8_counter = 0;
-  uint16_t ui16_temp = 0;
-
-//  /***************************************************************************************/
-//  // motor overcurrent pin as external input pin interrupt
-//  GPIO_Init(CURRENT_MOTOR_TOTAL_OVER__PORT,
-//	    CURRENT_MOTOR_TOTAL_OVER__PIN,
-//	    GPIO_MODE_IN_FL_IT); // with external interrupt
-//
-//  //initialize the Interrupt sensitivity
-//  EXTI_SetExtIntSensitivity(EXTI_PORT_GPIOD,
-//			    EXTI_SENSITIVITY_FALL_LOW);
-//  /***************************************************************************************/
-
   /***************************************************************************************/
-  // reading some samples of ADC motor total current and average, to get the real zero value
-  while (ui8_counter < 32)
-  {
-    ui16_temp += ui8_adc_read_motor_total_current ();
-    ui8_counter++;
-  }
-  ui8_ADC_motor_current_zero_value = ui16_temp >> 5; // ui16_temp / 32
+  // motor overcurrent pin as external input pin interrupt
+  GPIO_Init(CURRENT_MOTOR_TOTAL_OVER__PORT,
+	    CURRENT_MOTOR_TOTAL_OVER__PIN,
+	    GPIO_MODE_IN_FL_IT); // with external interrupt
+
+  //initialize the Interrupt sensitivity
+  EXTI_SetExtIntSensitivity(EXTI_PORT_GPIOD,
+			    EXTI_SENSITIVITY_FALL_LOW);
   /***************************************************************************************/
 
   motor_set_current_max (ADC_MOTOR_CURRENT_MAX);

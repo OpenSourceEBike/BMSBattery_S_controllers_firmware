@@ -407,24 +407,24 @@ void pwm_duty_cycle_controller (void)
 {
   uint8_t ui8_temp;
 
-//  // verify motor max current limit
-//  ui8_temp = ui8_adc_read_motor_total_current ();
-//  if (ui8_temp > (ui8_ADC_motor_current_zero_value + ui8_ADC_motor_current_max))  // motor max current, reduce duty_cycle
-//  {
-//    if (ui8_duty_cycle > 0)
-//    {
-//      ui8_duty_cycle--;
-//    }
-//  }
-//  // verify motor max regen current limit
-//  else if (ui8_temp < (ui8_ADC_motor_current_zero_value - ui8_ADC_motor_regen_current_max))  // motor max current, increase duty_cycle
-//  {
-//    if (ui8_duty_cycle < 255)
-//    {
-//      ui8_duty_cycle++;
-//    }
-//  }
-//  else // no motor current limits, adjust duty_cycle to duty_cycle_target, including ramping
+  // verify motor max current limit
+  ui8_temp = ui8_adc_read_motor_total_current ();
+  if (ui8_temp > (ADC_MOTOR_CURRENT_MAX_ZERO_VALUE + ui8_ADC_motor_current_max))  // motor max current, reduce duty_cycle
+  {
+    if (ui8_duty_cycle > 0)
+    {
+      ui8_duty_cycle--;
+    }
+  }
+  // verify motor max regen current limit
+  else if (ui8_temp < (ADC_MOTOR_CURRENT_MAX_ZERO_VALUE - ui8_ADC_motor_regen_current_max))  // motor max current, increase duty_cycle
+  {
+    if (ui8_duty_cycle < 255)
+    {
+      ui8_duty_cycle++;
+    }
+  }
+  else // no motor current limits, adjust duty_cycle to duty_cycle_target, including ramping
   {
     if (ui8_counter_duty_cycle_ramp++ >= ui8_duty_cycle_ramp_inverse_step)
     {

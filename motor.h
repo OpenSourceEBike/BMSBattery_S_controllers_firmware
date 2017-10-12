@@ -29,7 +29,6 @@ extern uint8_t ui8_ADC_id_current;
 extern uint8_t ui8_motor_total_current_flag;
 extern uint8_t ui8_ADC_motor_current_max;
 extern uint8_t ui8_ADC_motor_regen_current_max;
-extern uint8_t ui8_ADC_motor_current_zero_value;
 extern uint8_t ui8_hall_sensors;
 extern uint8_t ui8_motor_rotor_absolute_position;
 extern uint8_t ui8_motor_state;
