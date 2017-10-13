@@ -34,6 +34,17 @@ uint16_t ui16_PAS = 32000;		//cadence in timetics
 uint8_t ui8_PAS_Flag = 0; 		//flag for PAS interrupt
 uint8_t ui8_SPEED_Flag = 0; 		//flag for SPEED interrupt
 
+
+uint16_t ui16_setpoint = ADC_THROTTLE_MIN_VALUE;
+uint8_t ui8_temp = 0;
+uint16_t ui16_adc_value;
+
+uint16_t ui16_throttle_timer_counter = 0;
+uint16_t ui16_motor_speed_controller_timer_counter = 0;
+uint16_t ui16_motor_speed = 0;
+
+uint8_t ui8_duty_cycle_target_temp;
+
 /////////////////////////////////////////////////////////////////////////////////////////////
 //// Functions prototypes
 
@@ -52,6 +63,7 @@ int main (void);
 // Local VS global variables
 // Sometimes I got the following error when compiling the firmware: motor.asm:750: Error: <r> relocation error
 // and the solution was to avoid using local variables and define them as global instead
+// Other times, I got code that did not work until I put the variables global.
 
 // Brake signal interrupt
 void EXTI_PORTA_IRQHandler(void) __interrupt(EXTI_PORTA_IRQHANDLER);
@@ -69,13 +81,7 @@ int main (void)
 {
 //  static uint32_t ui32_cruise_counter = 0;
 //  static uint8_t ui8_cruise_duty_cycle = 0;
-  static uint16_t ui16_setpoint = ADC_THROTTLE_MIN_VALUE;
-  static uint8_t ui8_temp = 0;
-  static uint16_t ui16_adc_value;
 
-  static uint16_t ui16_throttle_timer_counter = 0;
-  static uint16_t ui16_motor_speed_controller_timer_counter = 0;
-  static uint16_t ui16_motor_speed = 0;
 
 
   //set clock at the max 16MHz
@@ -94,7 +100,7 @@ int main (void)
   enableInterrupts();
 
   motor_init ();
-  motor_set_current_max (6); // 1 --> 0.5A
+  motor_set_current_max (12); // 1 --> 0.5A
   motor_set_regen_current_max (2); // 1 --> 0.5A
   motor_set_pwm_duty_cycle_ramp_inverse_step (2); // each step = 64us
   motor_speed_controller_set_erps (0);
@@ -103,8 +109,6 @@ int main (void)
 
   while (1)
   {
-    uint8_t ui8_duty_cycle_target;
-
     ui16_temp_delay = TIM2_GetCounter ();
     if ((ui16_temp_delay - ui16_motor_speed_controller_timer_counter) > 100) // every 100ms
     {
@@ -123,17 +127,19 @@ int main (void)
       /****************************************************************************/
       // execute cruise control
       ui8_ADC_throttle = ui8_adc_read_throttle ();
-//      ui8_duty_cycle_target = (uint8_t) map (ui8_ADC_throttle, ADC_THROTTLE_MIN_VALUE, ADC_THROTTLE_MAX_VALUE, 0, 255);
+//      ui8_duty_cycle_target_temp = (uint8_t) map (ui8_ADC_throttle, ADC_THROTTLE_MIN_VALUE, ADC_THROTTLE_MAX_VALUE, 0, 255);
 
-      ui16_motor_speed = (uint8_t) map (ui8_ADC_throttle, ADC_THROTTLE_MIN_VALUE, ADC_THROTTLE_MAX_VALUE, 0, 200);
+      ui16_motor_speed = map (ui8_ADC_throttle, ADC_THROTTLE_MIN_VALUE, ADC_THROTTLE_MAX_VALUE, 0, 550);
       motor_speed_controller_set_erps (ui16_motor_speed);
+
+//motor_speed_controller_set_erps (300);
 
 //#define DO_CRUISE_CONTROL 1
 #if DO_CRUISE_CONTROL == 1
-      ui8_duty_cycle_target = cruise_control (ui8_duty_cycle_target);
+      ui8_duty_cycle_target = cruise_control (ui8_duty_cycle_target_temp);
 #endif
 
-//      motor_set_pwm_duty_cycle_target (ui8_duty_cycle_target);
+//      motor_set_pwm_duty_cycle_target (ui8_duty_cycle_target_temp);
       /****************************************************************************/
 
 //      printf("%d, %d, %d, %d\n",  motor_get_motor_speed_erps (), ui8_motor_state, ui8_motor_interpolation_state, ui8_adc_read_battery_voltage());

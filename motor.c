@@ -127,29 +127,34 @@ void hall_sensors_read_and_action (void)
 
       // update motor state based on motor speed
 #if MOTOR_TYPE == MOTOR_TYPE_Q85
-      if (ui16_motor_speed_erps > 250)
+      if ((ui16_motor_speed_erps > 300) &&
+	  (ui8_motor_interpolation_state == INTERPOLATION_60_DEGREES))
       {
 	ui8_motor_interpolation_state = INTERPOLATION_360_DEGREES;
 	ui8_motor_state = MOTOR_STATE_RUNNING;
       }
-      else if (ui16_motor_speed_erps > 150)
+      if ((ui16_motor_speed_erps < 250) &&
+	  (ui8_motor_interpolation_state == INTERPOLATION_360_DEGREES))
       {
-	if (ui8_motor_interpolation_state == NO_INTERPOLATION_60_DEGREES)
-	{
-	    pwm_init_bipolar_4q ();
-	}
-
 	ui8_motor_interpolation_state = INTERPOLATION_60_DEGREES;
 	ui8_motor_state = MOTOR_STATE_RUNNING;
       }
-      else
-      {
-	if (ui8_motor_interpolation_state != NO_INTERPOLATION_60_DEGREES)
-	{
-	  pwm_init_6_steps ();
-	}
 
+      if ((ui16_motor_speed_erps > 200) &&
+	  (ui8_motor_interpolation_state == NO_INTERPOLATION_60_DEGREES))
+      {
+	ui8_motor_interpolation_state = INTERPOLATION_60_DEGREES;
+	ui8_motor_state = MOTOR_STATE_RUNNING;
+
+	pwm_init_bipolar_4q ();
+      }
+      if ((ui16_motor_speed_erps < 100) &&
+	  (ui8_motor_interpolation_state == INTERPOLATION_60_DEGREES))
+      {
 	ui8_motor_interpolation_state = NO_INTERPOLATION_60_DEGREES;
+	ui8_motor_state = MOTOR_STATE_RUNNING;
+
+	pwm_init_6_steps ();
       }
 #elif MOTOR_TYPE == MOTOR_TYPE_EUC2
       if (ui16_motor_speed_erps > 3)
