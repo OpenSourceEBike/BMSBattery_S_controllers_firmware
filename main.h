@@ -66,6 +66,10 @@
 #define ANGLE_300 212
 #define ANGLE_360 255
 
+#define MOTOR_SPEED_CONTROLLER_KP 16 // x << 4
+#define MOTOR_SPEED_CONTROLLER_KI 1 // x << 4
+#define MOTOR_SPEED_CONTROLLER_OUTPUT_MAX 4000 // PWM max duty_cycle << 4
+
 extern uint8_t ui8_adc_read_throttle_busy;
 
 #endif
