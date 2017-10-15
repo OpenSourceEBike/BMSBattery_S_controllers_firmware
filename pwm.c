@@ -455,7 +455,7 @@ void pwm_apply_duty_cycle (uint8_t ui8_duty_cycle_value)
     TIM1_SetCompare2((uint16_t) (ui8_duty_cycle_value << 2));
     TIM1_SetCompare3((uint16_t) (ui8_duty_cycle_value << 2));
 
-    TIM1_CtrlPWMOutputs(ENABLE); // main Output Enable
+//    TIM1_CtrlPWMOutputs(ENABLE); // main Output Enable
   }
   else
   {
@@ -509,7 +509,7 @@ void pwm_apply_duty_cycle (uint8_t ui8_duty_cycle_value)
     TIM1_SetCompare2((uint16_t) (ui8_value_c << 1));
     TIM1_SetCompare3((uint16_t) (ui8_value_b << 1));
 
-    TIM1_CtrlPWMOutputs(ENABLE); // main Output Enable
+//    TIM1_CtrlPWMOutputs(ENABLE); // main Output Enable
   }
 }
 

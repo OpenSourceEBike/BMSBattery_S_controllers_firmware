@@ -138,7 +138,8 @@ int main (void)
 //      motor_set_pwm_duty_cycle_target (ui8_duty_cycle_target_temp);
       /****************************************************************************/
 
-//      printf("%d, %d, %d, %d\n",  motor_get_motor_speed_erps (), ui8_motor_state, ui8_motor_interpolation_state, ui8_adc_read_battery_voltage());
+      printf("%d, %d, %d, %d\n",  ui8_adc_read_phase_B_current (), ui8_adc_read_throttle (), ui8_adc_read_motor_total_current (), ui8_adc_read_battery_voltage ());
+
       continue;
     }
   }
