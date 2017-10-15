@@ -66,6 +66,7 @@
 #define ANGLE_300 212
 #define ANGLE_360 255
 
+#define MOTOR_OVER_SPEED_ERPS 390 // motor max speed, protection max value | 40 points for the sinewave at max speed
 #define MOTOR_SPEED_CONTROLLER_KP 5 // x << 5
 #define MOTOR_SPEED_CONTROLLER_KI 2 // x << 5
 #define MOTOR_SPEED_CONTROLLER_OUTPUT_MAX 8000 // PWM max duty_cycle << 5

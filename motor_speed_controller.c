@@ -12,11 +12,6 @@
 
 uint16_t target_erps = 0;
 
-int16_t i16_error;
-int16_t i16_p_term;
-int16_t i16_i_term;
-int16_t i16_output;
-
 void motor_speed_controller_set_erps (uint16_t erps)
 {
   target_erps = erps;
@@ -25,7 +20,24 @@ void motor_speed_controller_set_erps (uint16_t erps)
 // call every 100ms
 void motor_speed_controller (void)
 {
-  i16_error = target_erps - ((int16_t) motor_get_motor_speed_erps ());
+  int16_t i16_error;
+  int16_t i16_p_term;
+  static int16_t i16_i_term;
+  int16_t i16_output;
+  int16_t i16_motor_speed_erps;
+
+  i16_motor_speed_erps = (int16_t) motor_get_motor_speed_erps ();
+
+  // if MOTOR_OVER_SPEED_ERPS, then limit for this value and not user defined target_erps
+  if (target_erps > MOTOR_OVER_SPEED_ERPS)
+  {
+    i16_error = MOTOR_OVER_SPEED_ERPS - i16_motor_speed_erps;
+  }
+  else
+  {
+    i16_error = target_erps - i16_motor_speed_erps;
+  }
+
   i16_p_term = i16_error * MOTOR_SPEED_CONTROLLER_KP;
   i16_i_term += i16_error * MOTOR_SPEED_CONTROLLER_KI;
   // windup control
@@ -40,6 +52,4 @@ void motor_speed_controller (void)
   i16_output >>= 5; // divide to 32, as MOTOR_SPEED_CONTROLLER_KP and MOTOR_SPEED_CONTROLLER_KI are 32x; avoid using floats
 
   motor_set_pwm_duty_cycle_target ((uint8_t) i16_output);
-
-  printf("%d, %d\n", i16_error, (uint8_t) i16_output);
 }

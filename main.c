@@ -113,10 +113,8 @@ int main (void)
     if ((ui16_temp_delay - ui16_motor_speed_controller_timer_counter) > 100) // every 100ms
     {
       ui16_motor_speed_controller_timer_counter = ui16_temp_delay;
-
       motor_speed_controller ();
-
-//      break;
+      continue;
     }
 
     ui16_temp_delay = TIM2_GetCounter ();
@@ -129,10 +127,8 @@ int main (void)
       ui8_ADC_throttle = ui8_adc_read_throttle ();
 //      ui8_duty_cycle_target_temp = (uint8_t) map (ui8_ADC_throttle, ADC_THROTTLE_MIN_VALUE, ADC_THROTTLE_MAX_VALUE, 0, 255);
 
-      ui16_motor_speed = map (ui8_ADC_throttle, ADC_THROTTLE_MIN_VALUE, ADC_THROTTLE_MAX_VALUE, 0, 550);
+      ui16_motor_speed = map (ui8_ADC_throttle, ADC_THROTTLE_MIN_VALUE, ADC_THROTTLE_MAX_VALUE, 0, 600);
       motor_speed_controller_set_erps (ui16_motor_speed);
-
-//motor_speed_controller_set_erps (300);
 
 //#define DO_CRUISE_CONTROL 1
 #if DO_CRUISE_CONTROL == 1
@@ -143,8 +139,7 @@ int main (void)
       /****************************************************************************/
 
 //      printf("%d, %d, %d, %d\n",  motor_get_motor_speed_erps (), ui8_motor_state, ui8_motor_interpolation_state, ui8_adc_read_battery_voltage());
-
-//      break;
+      continue;
     }
   }
 
