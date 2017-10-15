@@ -302,7 +302,7 @@ void motor_set_mode_coast (void)
 
 void motor_set_mode_run (void)
 {
-//  TIM1_CtrlPWMOutputs(ENABLE);
+  TIM1_CtrlPWMOutputs(ENABLE);
 }
 
 void hall_sensor_init (void)
