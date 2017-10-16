@@ -404,11 +404,9 @@ void pwm_init_6_steps (void)
 
 void pwm_duty_cycle_controller (void)
 {
-  uint8_t ui8_temp;
-
   // verify motor max current limit
-  ui8_temp = ui8_adc_read_motor_total_current ();
-  if (ui8_temp > (ADC_MOTOR_CURRENT_MAX_ZERO_VALUE + ui8_ADC_motor_current_max))  // motor max current, reduce duty_cycle
+  ui8_adc_motor_total_current = ui8_adc_read_motor_total_current ();
+  if (ui8_adc_motor_total_current > (ADC_MOTOR_CURRENT_MAX_ZERO_VALUE + ui8_ADC_motor_current_max))  // motor max current, reduce duty_cycle
   {
     if (ui8_duty_cycle > 0)
     {
@@ -416,7 +414,7 @@ void pwm_duty_cycle_controller (void)
     }
   }
   // verify motor max regen current limit
-  else if (ui8_temp < (ADC_MOTOR_CURRENT_MAX_ZERO_VALUE - ui8_ADC_motor_regen_current_max))  // motor max current, increase duty_cycle
+  else if (ui8_adc_motor_total_current < (ADC_MOTOR_CURRENT_MAX_ZERO_VALUE - ui8_ADC_motor_regen_current_max))  // motor max current, increase duty_cycle
   {
     if (ui8_duty_cycle < 255)
     {

@@ -37,6 +37,8 @@ uint8_t ui8_ADC_id_current = 0;
 uint8_t ui8_ADC_motor_current_max;
 uint8_t ui8_ADC_motor_regen_current_max;
 
+uint8_t ui8_adc_motor_total_current = 0;
+
 uint8_t ui8_half_e_rotation_flag = 0;
 
 void TIM1_UPD_OVF_TRG_BRK_IRQHandler(void) __interrupt(TIM1_UPD_OVF_TRG_BRK_IRQHANDLER)
@@ -337,6 +339,11 @@ void motor_set_pwm_duty_cycle_target (uint8_t value)
 void motor_set_current_max (uint8_t value)
 {
   ui8_ADC_motor_current_max = value;
+}
+
+uint8_t motor_get_current_max (void)
+{
+  return ui8_adc_motor_total_current;
 }
 
 void motor_set_regen_current_max (uint8_t value)

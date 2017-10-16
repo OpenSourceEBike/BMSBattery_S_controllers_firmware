@@ -24,10 +24,12 @@
 #include "motor_controller_low_level.h"
 #include "motor_controller_high_level.h"
 #include "throttle_pas_torque_sensor_controller.h"
+#include "communications_controller.h"
 
 uint16_t ui16_TIM2_counter = 0;
 uint16_t ui16_motor_controller_counter = 0;
 uint16_t ui16_throttle_pas_torque_sensor_controller_counter = 0;
+uint16_t ui16_communications_controller_counter = 0;
 
 /////////////////////////////////////////////////////////////////////////////////////////////
 //// Functions prototypes
@@ -93,6 +95,14 @@ int main (void)
     {
       ui16_motor_controller_counter = ui16_TIM2_counter;
       motor_controller_high_level ();
+      continue;
+    }
+
+    ui16_TIM2_counter = TIM2_GetCounter ();
+    if ((ui16_TIM2_counter - ui16_communications_controller_counter) > 150) // every 100ms
+    {
+      ui16_communications_controller_counter = ui16_TIM2_counter;
+      communications_controller ();
       continue;
     }
 
