@@ -14,37 +14,20 @@
 #include "stm8s_gpio.h"
 #include "interrupts.h"
 #include "stm8s_tim2.h"
-#include "motor_controller_low_level.h"
-#include "motor_controller_high_level.h"
 #include "uart.h"
 #include "adc.h"
 #include "brake.h"
 #include "utils.h"
-#include "cruise_control.h"
 #include "timers.h"
 #include "pwm.h"
 #include "config.h"
+#include "motor_controller_low_level.h"
+#include "motor_controller_high_level.h"
+#include "throttle_pas_torque_sensor_controller.h"
 
-
-uint16_t ui16_temp_delay = 0;
-
-uint16_t ui16_SPEED_Counter = 0; 	//time tics for speed measurement
-uint16_t ui16_SPEED = 32000; 		//speed in timetics
-uint16_t ui16_PAS_Counter = 0; 		//time tics for cadence measurement
-uint16_t ui16_PAS = 32000;		//cadence in timetics
-uint8_t ui8_PAS_Flag = 0; 		//flag for PAS interrupt
-uint8_t ui8_SPEED_Flag = 0; 		//flag for SPEED interrupt
-
-
-uint16_t ui16_setpoint = ADC_THROTTLE_MIN_VALUE;
-uint8_t ui8_temp = 0;
-uint16_t ui16_adc_value;
-
-uint16_t ui16_throttle_timer_counter = 0;
-uint16_t ui16_motor_speed_controller_timer_counter = 0;
-uint16_t ui16_motor_speed = 0;
-
-uint8_t ui8_duty_cycle_target_temp;
+uint16_t ui16_TIM2_counter = 0;
+uint16_t ui16_motor_controller_counter = 0;
+uint16_t ui16_throttle_pas_torque_sensor_controller_counter = 0;
 
 /////////////////////////////////////////////////////////////////////////////////////////////
 //// Functions prototypes
@@ -80,11 +63,6 @@ void TIM1_UPD_OVF_TRG_BRK_IRQHandler(void) __interrupt(TIM1_UPD_OVF_TRG_BRK_IRQH
 
 int main (void)
 {
-//  static uint32_t ui32_cruise_counter = 0;
-//  static uint8_t ui8_cruise_duty_cycle = 0;
-
-
-
   //set clock at the max 16MHz
   CLK_HSIPrescalerConfig(CLK_PRESCALER_HSIDIV1);
 
@@ -110,36 +88,19 @@ int main (void)
 
   while (1)
   {
-    ui16_temp_delay = TIM2_GetCounter ();
-    if ((ui16_temp_delay - ui16_motor_speed_controller_timer_counter) > 100) // every 100ms
+    ui16_TIM2_counter = TIM2_GetCounter ();
+    if ((ui16_TIM2_counter - ui16_motor_controller_counter) > 100) // every 100ms
     {
-      ui16_motor_speed_controller_timer_counter = ui16_temp_delay;
+      ui16_motor_controller_counter = ui16_TIM2_counter;
       motor_controller_high_level ();
       continue;
     }
 
-    ui16_temp_delay = TIM2_GetCounter ();
-    if ((ui16_temp_delay - ui16_throttle_timer_counter) > 20) // 20ms
+    ui16_TIM2_counter = TIM2_GetCounter ();
+    if ((ui16_TIM2_counter - ui16_throttle_pas_torque_sensor_controller_counter) > 20) // every 20ms
     {
-      ui16_throttle_timer_counter = ui16_temp_delay;
-
-      /****************************************************************************/
-      // execute cruise control
-      ui8_ADC_throttle = ui8_adc_read_throttle ();
-//      ui8_duty_cycle_target_temp = (uint8_t) map (ui8_ADC_throttle, ADC_THROTTLE_MIN_VALUE, ADC_THROTTLE_MAX_VALUE, 0, 255);
-
-      ui16_motor_speed = map (ui8_ADC_throttle, ADC_THROTTLE_MIN_VALUE, ADC_THROTTLE_MAX_VALUE, 0, 600);
-      motor_speed_controller_set_erps (ui16_motor_speed);
-
-//#define DO_CRUISE_CONTROL 1
-#if DO_CRUISE_CONTROL == 1
-      ui8_duty_cycle_target = cruise_control (ui8_duty_cycle_target_temp);
-#endif
-
-//      motor_set_pwm_duty_cycle_target (ui8_duty_cycle_target_temp);
-      /****************************************************************************/
-
-//      printf("%d, %d, %d, %d\n",  motor_get_motor_speed_erps (), ui8_motor_state, ui8_motor_interpolation_state, ui8_adc_read_battery_voltage());
+      ui16_throttle_pas_torque_sensor_controller_counter = ui16_TIM2_counter;
+      throttle_pas_torque_sensor_controller ();
       continue;
     }
   }

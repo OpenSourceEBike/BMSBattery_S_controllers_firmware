@@ -39,7 +39,6 @@ EXTRASRCS = \
 	$(SDIR)/stm8s_adc1.c \
 	gpio.c \
 	utils.c \
-	cruise_control.c \
 	uart.c \
 	adc.c \
 	brake.c \
@@ -47,8 +46,10 @@ EXTRASRCS = \
 	pwm.c \
 	motor_controller_high_level.c \
 	motor_controller_low_level.c \
+	throttle_pas_torque_sensor_controller.c
 
-HEADERS = adc.h brake.h cruise_control.h gpio.h interrupts.h main.h pwm.h timers.h uart.h utils.h motor_controller_low_level.h motor_controller_high_level.h
+HEADERS = adc.h brake.h gpio.h interrupts.h main.h pwm.h timers.h uart.h utils.h motor_controller_low_level.h motor_controller_high_level.h \
+	throttle_pas_torque_sensor_controller.h
 
 # The list of .rel files can be derived from the list of their source files
 RELS = $(EXTRASRCS:.c=.rel)

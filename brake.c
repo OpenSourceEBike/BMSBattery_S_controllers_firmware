@@ -13,9 +13,9 @@
 #include "main.h"
 #include "interrupts.h"
 #include "brake.h"
-#include "cruise_control.h"
 #include "motor_controller_low_level.h"
 #include "pwm.h"
+#include "throttle_pas_torque_sensor_controller.h"
 
 // Brake signal
 void EXTI_PORTA_IRQHandler(void) __interrupt(EXTI_PORTA_IRQHANDLER)

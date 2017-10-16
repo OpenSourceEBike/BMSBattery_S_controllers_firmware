@@ -77,6 +77,4 @@
 #define ADC_THROTTLE_MIN_VALUE 43
 #define ADC_THROTTLE_MAX_VALUE 182
 
-extern uint8_t ui8_adc_read_throttle_busy;
-
 #endif
