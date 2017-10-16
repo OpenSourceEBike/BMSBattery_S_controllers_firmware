@@ -14,7 +14,7 @@
 #include "interrupts.h"
 #include "brake.h"
 #include "cruise_control.h"
-#include "motor.h"
+#include "motor_controller_low_level.h"
 #include "pwm.h"
 
 // Brake signal

@@ -8,9 +8,21 @@
 
 #include <stdint.h>
 #include <stdio.h>
-#include "motor.h"
+#include "main.h"
+#include "adc.h"
+#include "motor_controller_low_level.h"
+#include "motor_controller_high_level.h"
 
 uint16_t target_erps = 0;
+
+uint16_t ui16_ADC_battery_voltage_accumulated = BATTERY_VOLTAGE_MED_VALUE;
+uint16_t ui16_ADC_battery_voltage_filtered;
+
+void motor_controller_high_level (void)
+{
+  motor_speed_controller ();
+  motor_battery_voltage_protection ();
+}
 
 void motor_speed_controller_set_erps (uint16_t erps)
 {
@@ -52,4 +64,31 @@ void motor_speed_controller (void)
   i16_output >>= 5; // divide to 32, as MOTOR_SPEED_CONTROLLER_KP and MOTOR_SPEED_CONTROLLER_KI are 32x; avoid using floats
 
   motor_set_pwm_duty_cycle_target ((uint8_t) i16_output);
+}
+
+void motor_battery_voltage_protection (void)
+{
+  // low pass filter the voltage readed value, to avoid possible fast spikes/noise
+  ui16_ADC_battery_voltage_accumulated -= ui16_ADC_battery_voltage_accumulated >> 4;
+  ui16_ADC_battery_voltage_accumulated += ui8_adc_read_battery_voltage ();
+  ui16_ADC_battery_voltage_filtered = ui16_ADC_battery_voltage_accumulated >> 4;
+
+  if (ui16_ADC_battery_voltage_filtered > BATTERY_VOLTAGE_MAX_VALUE)
+  {
+    // TODO: disable motor regen
+
+motor_set_mode_coast ();
+while (1) ; // infinite loop, user will need to reset the system
+  }
+  else if (ui16_ADC_battery_voltage_filtered < BATTERY_VOLTAGE_MIN_VALUE)
+  {
+    // TODO: disable motor for 20 seconds and signal error
+
+motor_set_mode_coast ();
+while (1) ; // infinite loop, user will need to reset the system
+  }
+  else
+  {
+    // TODO: enable motor regen
+  }
 }

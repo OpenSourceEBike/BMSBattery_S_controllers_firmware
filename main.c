@@ -14,8 +14,8 @@
 #include "stm8s_gpio.h"
 #include "interrupts.h"
 #include "stm8s_tim2.h"
-#include "motor.h"
-#include "motor_speed_controller.h"
+#include "motor_controller_low_level.h"
+#include "motor_controller_high_level.h"
 #include "uart.h"
 #include "adc.h"
 #include "brake.h"
@@ -24,6 +24,7 @@
 #include "timers.h"
 #include "pwm.h"
 #include "config.h"
+
 
 uint16_t ui16_temp_delay = 0;
 
@@ -113,7 +114,7 @@ int main (void)
     if ((ui16_temp_delay - ui16_motor_speed_controller_timer_counter) > 100) // every 100ms
     {
       ui16_motor_speed_controller_timer_counter = ui16_temp_delay;
-      motor_speed_controller ();
+      motor_controller_high_level ();
       continue;
     }
 

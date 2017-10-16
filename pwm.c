@@ -10,9 +10,8 @@
 #include <stdio.h>
 #include "stm8s_gpio.h"
 #include "stm8s_tim1.h"
-#include "motor.h"
+#include "motor_controller_low_level.h"
 #include "gpio.h"
-#include "motor.h"
 #include "pwm.h"
 #include "adc.h"
 

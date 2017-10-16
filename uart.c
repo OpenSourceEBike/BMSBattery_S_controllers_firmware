@@ -11,7 +11,7 @@
 
 #include "stm8s.h"
 #include "stm8s_uart2.h"
-#include "motor.h"
+#include "motor_controller_low_level.h"
 #include "pwm.h"
 
 void uart_init (void)

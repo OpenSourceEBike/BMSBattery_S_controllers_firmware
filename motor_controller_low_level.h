@@ -6,8 +6,8 @@
  * Released under the GPL License, Version 3
  */
 
-#ifndef _MOTOR_H
-#define _MOTOR_H
+#ifndef _MOTOR_CONTROLLER_LOW_LEVEL_H_
+#define _MOTOR_CONTROLLER_LOW_LEVEL_H_
 
 #include "main.h"
 #include "interrupts.h"
@@ -50,4 +50,4 @@ uint16_t motor_get_motor_speed_erps (void);
 void hall_sensors_read_and_action (void);
 void motor_fast_loop (void);
 
-#endif /* _MOTOR_H_ */
+#endif /* _MOTOR_CONTROLLER_LOW_LEVEL_H_ */

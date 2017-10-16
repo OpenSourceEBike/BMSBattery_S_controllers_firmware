@@ -35,6 +35,9 @@
 // 22.1V --> 81 (8bits ADC)
 // 1 ADC step 8 bits --> 0.272 volts
 #define ADC_BATTERY_VOLTAGE_K 70 // 0.272 << 8
+#define BATTERY_VOLTAGE_MAX_VALUE 108 // 29.4V (7S * 4.2V)
+#define BATTERY_VOLTAGE_MED_VALUE 1408 // 24V: 88 << 4
+#define BATTERY_VOLTAGE_MIN_VALUE 77 // 29.4V (7S * 3.0V)
 
 // Phase current: max of +-15.5 amps
 // 512 --> 15.5 amps
@@ -70,6 +73,9 @@
 #define MOTOR_SPEED_CONTROLLER_KP 5 // x << 5
 #define MOTOR_SPEED_CONTROLLER_KI 2 // x << 5
 #define MOTOR_SPEED_CONTROLLER_OUTPUT_MAX 8000 // PWM max duty_cycle << 5
+
+#define ADC_THROTTLE_MIN_VALUE 43
+#define ADC_THROTTLE_MAX_VALUE 182
 
 extern uint8_t ui8_adc_read_throttle_busy;
 
