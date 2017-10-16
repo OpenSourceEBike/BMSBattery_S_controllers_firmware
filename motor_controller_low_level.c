@@ -258,7 +258,7 @@ void motor_fast_loop (void)
     ui16_PWM_cycles_counter = 0;
     ui16_PWM_cycles_counter_6 = 0;
     ui16_motor_speed_erps = 0;
-    ui16_PWM_cycles_counter_total = 0;
+    ui16_PWM_cycles_counter_total = 0xffff;
     ui8_position_correction_value = 127;
     ui8_motor_interpolation_state = NO_INTERPOLATION_60_DEGREES;
     ui8_motor_state = MOTOR_STATE_STOP;

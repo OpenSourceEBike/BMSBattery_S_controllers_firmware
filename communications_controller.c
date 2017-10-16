@@ -12,15 +12,15 @@
 #include "uart.h"
 #include "motor_controller_low_level.h"
 #include "communications_controller.h"
+#include "delay.h"
 
 void communications_controller (void)
 {
   static uint8_t tx_buffer[12];
-  static uint8_t ui8_i = 0;
+  uint8_t ui8_i = 0;
   uint8_t ui8_crc = 0;
-  uint16_t ui16_speed = motor_get_motor_speed_erps () * 100;
+  uint16_t ui16_speed = 6 * ui16_PWM_cycles_counter_total; // * 6 works for my Q85 motor; 16 magnets; Reduction ratio: 12.6
 
-  // setup the tx package 65 16 48 0 139 0 164 2 13 0 0 0
   // B0: start package??
   tx_buffer [0] = 65;
   // B1: battery level: 0: empty box
@@ -28,8 +28,8 @@ void communications_controller (void)
   // B2: 24V controller
   tx_buffer [2] = 24;
   // B3: speed, wheel rotation period, ms; period(ms)=B3*256+B4;
-  tx_buffer [3] = (ui16_speed >> 8) & 0x0f;
-  tx_buffer [4] = ui16_speed & 0x0f;
+  tx_buffer [3] = (ui16_speed >> 8) & 0xff;
+  tx_buffer [4] = ui16_speed & 0xff;
   // B5: error info display
   tx_buffer [5] = 0;
   // B6: CRC: xor B1,B2,B3,B4,B5,B7,B8,B9,B10,B11
@@ -58,4 +58,3 @@ void communications_controller (void)
     putchar (tx_buffer [ui8_i]);
   }
 }
-
