@@ -17,7 +17,7 @@
 uint16_t target_erps = 0;
 
 uint16_t ui16_ADC_battery_voltage_accumulated = BATTERY_VOLTAGE_MED_VALUE;
-uint16_t ui16_ADC_battery_voltage_filtered;
+uint8_t ui8_ADC_battery_voltage_filtered;
 
 void motor_controller_high_level (void)
 {
@@ -76,11 +76,11 @@ void motor_speed_controller (void)
 void motor_battery_voltage_protection (void)
 {
   // low pass filter the voltage readed value, to avoid possible fast spikes/noise
-  ui16_ADC_battery_voltage_accumulated -= ui16_ADC_battery_voltage_accumulated >> 6;
+  ui16_ADC_battery_voltage_accumulated -= ui16_ADC_battery_voltage_accumulated >> 4;
   ui16_ADC_battery_voltage_accumulated += ui8_adc_read_battery_voltage ();
-  ui16_ADC_battery_voltage_filtered = ui16_ADC_battery_voltage_accumulated >> 6;
+  ui8_ADC_battery_voltage_filtered = ui16_ADC_battery_voltage_accumulated >> 4;
 
-  if (ui16_ADC_battery_voltage_filtered > BATTERY_VOLTAGE_MAX_VALUE)
+  if (ui8_ADC_battery_voltage_filtered > BATTERY_VOLTAGE_MAX_VALUE)
   {
     // TODO: disable motor regen
 
@@ -88,7 +88,7 @@ motor_set_mode_coast ();
 disableInterrupts();
 while (1) ; // infinite loop, user will need to reset the system
   }
-  else if (ui16_ADC_battery_voltage_filtered < BATTERY_VOLTAGE_MIN_VALUE)
+  else if (ui8_ADC_battery_voltage_filtered < BATTERY_VOLTAGE_MIN_VALUE)
   {
     // TODO: disable motor for 20 seconds and signal error
 
@@ -101,3 +101,12 @@ while (1) ; // infinite loop, user will need to reset the system
     // TODO: enable motor regen
   }
 }
+
+uint8_t motor_get_ADC_battery_voltage_filtered (void)
+{
+  return ui8_ADC_battery_voltage_filtered;
+}
+
+
+
+

@@ -13,6 +13,7 @@
 
 void motor_controller_high_level (void);
 void motor_battery_voltage_protection (void);
+uint8_t motor_get_ADC_battery_voltage_filtered (void);
 void motor_speed_controller_set_erps (uint16_t erps);
 // call every 100ms
 void motor_speed_controller (void);

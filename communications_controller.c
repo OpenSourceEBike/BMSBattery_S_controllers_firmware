@@ -11,6 +11,7 @@
 #include "main.h"
 #include "uart.h"
 #include "motor_controller_low_level.h"
+#include "motor_controller_high_level.h"
 #include "communications_controller.h"
 
 void communications_controller (void)
@@ -19,14 +20,25 @@ void communications_controller (void)
   uint8_t ui8_i = 0;
   uint8_t ui8_crc = 0;
   uint16_t ui16_wheel_period_ms;
+  static uint16_t ui16_battery_volts;
+  static uint16_t ui16_battery_soc;
 
-  // calc whell period in ms
+  // calc wheel period in ms
   ui16_wheel_period_ms = (motor_get_er_PWM_ticks () * (MOTOR_NUMBER_MAGNETS >> 1) * MOTOR_REDUCTION_RATIO) / MOTOR_PWM_TICKS_PER_MS;
 
-  // B0: start package??
+  // calc battery pack state of charge (SOC)
+  ui16_battery_volts = motor_get_ADC_battery_voltage_filtered () * ADC_BATTERY_VOLTAGE_K;
+  if (ui16_battery_volts > BATTERY_PACK_VOLTS_100) { ui16_battery_soc = 16; } // 4 bars | full
+  else if (ui16_battery_volts > BATTERY_PACK_VOLTS_80) { ui16_battery_soc = 12; } // 3 bars
+  else if (ui16_battery_volts > BATTERY_PACK_VOLTS_40) { ui16_battery_soc = 8; } // 2 bars
+  else if (ui16_battery_volts > BATTERY_PACK_VOLTS_20) { ui16_battery_soc = 4; } // 1 bar
+  else { ui16_battery_soc = 1; } // empty flashing
+
+  // preparing the package
+  // B0: start package (?)
   tx_buffer [0] = 65;
-  // B1: battery level: 0: empty box
-  tx_buffer [1] = 4;
+  // B1: battery level
+  tx_buffer [1] = ui16_battery_soc;
   // B2: 24V controller
   tx_buffer [2] = 24;
   // B3: speed, wheel rotation period, ms; period(ms)=B3*256+B4;
