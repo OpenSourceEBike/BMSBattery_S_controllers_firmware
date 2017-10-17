@@ -343,7 +343,7 @@ void motor_set_current_max (uint8_t value)
 
 uint8_t motor_get_current_max (void)
 {
-  return ui8_adc_motor_total_current;
+  return ui8_adc_motor_total_current - ADC_MOTOR_CURRENT_MAX_ZERO_VALUE;
 }
 
 void motor_set_regen_current_max (uint8_t value)

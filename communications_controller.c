@@ -12,7 +12,6 @@
 #include "uart.h"
 #include "motor_controller_low_level.h"
 #include "communications_controller.h"
-#include "delay.h"
 
 void communications_controller (void)
 {
@@ -38,7 +37,7 @@ void communications_controller (void)
   // B7: moving mode indication, bit
   tx_buffer [7] = 2;
   // B8: 4x controller current
-  tx_buffer [8] = (motor_get_current_max () - ADC_MOTOR_CURRENT_MAX_ZERO_VALUE) << 1;
+  tx_buffer [8] = motor_get_current_max () << 1;
   // B9: motor temperature
   tx_buffer [9] = 0;
   // B10 and B11: 0

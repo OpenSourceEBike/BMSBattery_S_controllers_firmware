@@ -38,6 +38,13 @@ void motor_speed_controller (void)
   int16_t i16_output;
   int16_t i16_motor_speed_erps;
 
+  if (target_erps < 5)
+  {
+    i16_i_term = 0; // avoid I term errors when target_erps = 0
+    motor_set_pwm_duty_cycle_target (0);
+    return;
+  }
+
   i16_motor_speed_erps = (int16_t) motor_get_motor_speed_erps ();
 
   // if MOTOR_OVER_SPEED_ERPS, then limit for this value and not user defined target_erps
@@ -55,7 +62,6 @@ void motor_speed_controller (void)
   // windup control
   if (i16_i_term > MOTOR_SPEED_CONTROLLER_OUTPUT_MAX) i16_i_term = MOTOR_SPEED_CONTROLLER_OUTPUT_MAX;
   else if (i16_i_term < 1) i16_i_term = 0;
-  if (target_erps < 3) i16_i_term = 0; // avoid I term errors when target_erps = 0
 
   i16_output = i16_p_term + i16_i_term;
   // limit max output value

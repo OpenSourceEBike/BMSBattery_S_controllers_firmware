@@ -50,7 +50,7 @@ EXTRASRCS = \
 	communications_controller.c
 
 HEADERS = adc.h brake.h gpio.h interrupts.h main.h pwm.h timers.h uart.h utils.h motor_controller_low_level.h motor_controller_high_level.h \
-	throttle_pas_torque_sensor_controller.h communications_controller.h delay.h
+	throttle_pas_torque_sensor_controller.h communications_controller.h
 
 # The list of .rel files can be derived from the list of their source files
 RELS = $(EXTRASRCS:.c=.rel)
