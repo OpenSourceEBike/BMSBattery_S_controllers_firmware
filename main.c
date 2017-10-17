@@ -100,7 +100,7 @@ int main (void)
   enableInterrupts();
 
   motor_init ();
-  motor_set_current_max (12); // 1 --> 0.5A
+  motor_set_current_max (25); // 1 --> 0.5A
   motor_set_regen_current_max (2); // 1 --> 0.5A
   motor_set_pwm_duty_cycle_ramp_inverse_step (2); // each step = 64us
   motor_speed_controller_set_erps (0);
@@ -138,7 +138,8 @@ int main (void)
 //      motor_set_pwm_duty_cycle_target (ui8_duty_cycle_target_temp);
       /****************************************************************************/
 
-      printf("%d, %d, %d, %d\n",  ui8_adc_read_phase_B_current (), ui8_adc_read_throttle (), ui8_adc_read_motor_total_current (), ui8_adc_read_battery_voltage ());
+//      printf("%d, %d, %d, %d\n",  ui8_adc_read_phase_B_current (), ui8_adc_read_throttle (), ui8_adc_read_motor_total_current (), ui8_adc_read_battery_voltage ());
+      printf("%d, %d\n",  motor_get_motor_speed_erps (), ui8_position_correction_value);
 
       continue;
     }
