@@ -361,6 +361,11 @@ uint16_t motor_get_motor_speed_erps (void)
   return ui16_motor_speed_erps;
 }
 
+uint16_t motor_get_er_PWM_ticks (void)
+{
+  return ui16_PWM_cycles_counter_total;
+}
+
 // motor overcurrent interrupt
 void EXTI_PORTD_IRQHandler(void) __interrupt(EXTI_PORTD_IRQHANDLER)
 {
