@@ -1,3 +1,8 @@
+.settings/
+
+.cproject
+.project
+
 *.asm
 *.bin
 *.elf
@@ -10,4 +15,5 @@
 *.rel
 *.rst
 *.sym
+
 Debug
