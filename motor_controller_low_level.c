@@ -28,6 +28,7 @@ uint8_t ui8_interpolation_angle = 0;
 
 uint8_t ui8_motor_interpolation_state = NO_INTERPOLATION_60_DEGREES;
 uint8_t ui8_motor_state = MOTOR_STATE_COAST;
+uint8_t ui8_motor_controller_state = MOTOR_CONTROLLER_STATE_OK;
 
 uint8_t ui8_hall_sensors = 0;
 uint8_t ui8_hall_sensors_last = 0;
@@ -295,15 +296,34 @@ void motor_fast_loop (void)
   pwm_duty_cycle_controller ();
 }
 
-void motor_set_mode_coast (void)
+void motor_disable_PWM (void)
 {
   TIM1_CtrlPWMOutputs(DISABLE);
-  ui8_motor_state = MOTOR_STATE_COAST;
 }
 
-void motor_set_mode_run (void)
+void motor_enable_PWM (void)
 {
   TIM1_CtrlPWMOutputs(ENABLE);
+}
+
+void motor_controller_set_state (uint8_t state)
+{
+  ui8_motor_controller_state |= state;
+}
+
+void motor_controller_reset_state (uint8_t state)
+{
+  ui8_motor_controller_state &= ~state;
+}
+
+uint8_t motor_controller_get_state (void)
+{
+  return ui8_motor_controller_state;
+}
+
+uint8_t motor_controller_state_is_set (uint8_t state)
+{
+  return ui8_motor_controller_state & state;
 }
 
 void hall_sensor_init (void)
@@ -369,6 +389,7 @@ uint16_t motor_get_er_PWM_ticks (void)
 // motor overcurrent interrupt
 void EXTI_PORTD_IRQHandler(void) __interrupt(EXTI_PORTD_IRQHANDLER)
 {
-    motor_set_mode_coast ();
-    while (1) ; // infinite loop, user will need to reset the system
+  disableInterrupts ();
+  motor_disable_PWM ();
+  while (1) ; // infinite loop, user will need to reset the system
 }

@@ -66,7 +66,7 @@ void TIM1_UPD_OVF_TRG_BRK_IRQHandler(void) __interrupt(TIM1_UPD_OVF_TRG_BRK_IRQH
 int main (void)
 {
   //set clock at the max 16MHz
-  CLK_HSIPrescalerConfig(CLK_PRESCALER_HSIDIV1);
+  CLK_HSIPrescalerConfig (CLK_PRESCALER_HSIDIV1);
 
   gpio_init ();
   brake_init ();
@@ -78,10 +78,10 @@ int main (void)
   hall_sensor_init ();
   adc_init ();
 
-  enableInterrupts();
+  enableInterrupts ();
 
   motor_init ();
-  motor_set_current_max (12); // 1 --> 0.5A
+  motor_set_current_max (ADC_MOTOR_CURRENT_MAX); // 1 --> 0.5A
   motor_set_regen_current_max (2); // 1 --> 0.5A
   motor_set_pwm_duty_cycle_ramp_inverse_step (2); // each step = 64us
   motor_speed_controller_set_erps (0);

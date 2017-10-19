@@ -13,6 +13,7 @@
 #include "main.h"
 #include "interrupts.h"
 #include "brake.h"
+#include "motor_controller_high_level.h"
 #include "motor_controller_low_level.h"
 #include "pwm.h"
 #include "throttle_pas_torque_sensor_controller.h"
@@ -22,15 +23,15 @@ void EXTI_PORTA_IRQHandler(void) __interrupt(EXTI_PORTA_IRQHANDLER)
 {
   if (brake_is_set())
   {
-    motor_set_mode_coast ();
+    motor_controller_set_state (MOTOR_CONTROLLER_STATE_BRAKE);
+    motor_disable_PWM ();
     stop_cruise_control ();
   }
   else
   {
-    motor_set_mode_run ();
-//    pwm_set_duty_cycle (0);
+    motor_controller_reset_state (MOTOR_CONTROLLER_STATE_BRAKE);
+    motor_enable_PWM ();
     ui8_duty_cycle = 0;
-    stop_cruise_control ();
   }
 }
 

@@ -27,7 +27,7 @@
 #define SVM_TABLE_LEN_x1024 262144 //(256 * 1024)
 
 #define ADC_MOTOR_CURRENT_MAX_ZERO_VALUE 79
-#define ADC_MOTOR_CURRENT_MAX 4 	// 1 --> 0.5A
+#define ADC_MOTOR_CURRENT_MAX 30 	// 30 = 15A; 1 --> 0.5A
 #define ADC_MOTOR_REGEN_CURRENT_MAX 2 	//1 --> 0.5A
 
 // ADC Battery voltage
@@ -36,7 +36,7 @@
 // 1 ADC step 8 bits --> 0.287 volts
 #define ADC_BATTERY_VOLTAGE_K 73 // 0.272 << 8
 #define BATTERY_VOLTAGE_MAX_VALUE 108 // 29.4V (7S * 4.2V)
-#define BATTERY_VOLTAGE_MED_VALUE 1408 // 24V: 88 << 4
+#define BATTERY_VOLTAGE_MED_VALUE 5632 // 24V: 88 << 6
 #define BATTERY_VOLTAGE_MIN_VALUE 77 // 29.4V (7S * 3.0V)
 
 // Phase current: max of +-15.5 amps

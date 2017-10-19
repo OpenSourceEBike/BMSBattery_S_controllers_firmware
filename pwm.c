@@ -452,7 +452,10 @@ void pwm_apply_duty_cycle (uint8_t ui8_duty_cycle_value)
     TIM1_SetCompare2((uint16_t) (ui8_duty_cycle_value << 2));
     TIM1_SetCompare3((uint16_t) (ui8_duty_cycle_value << 2));
 
-    TIM1_CtrlPWMOutputs(ENABLE); // main Output Enable
+    if (!motor_controller_state_is_set (MOTOR_CONTROLLER_STATE_BRAKE))
+    {
+      motor_enable_PWM ();
+    }
   }
   else
   {
@@ -506,7 +509,10 @@ void pwm_apply_duty_cycle (uint8_t ui8_duty_cycle_value)
     TIM1_SetCompare2((uint16_t) (ui8_value_c << 1));
     TIM1_SetCompare3((uint16_t) (ui8_value_b << 1));
 
-    TIM1_CtrlPWMOutputs(ENABLE); // main Output Enable
+    if (!motor_controller_state_is_set (MOTOR_CONTROLLER_STATE_BRAKE))
+    {
+      motor_enable_PWM ();
+    }
   }
 }
 

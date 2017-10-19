@@ -13,29 +13,35 @@
 #include "adc.h"
 #include "utils.h"
 #include "motor_controller_high_level.h"
+#include "motor_controller_low_level.h"
 
 uint8_t ui8_cruise_state = 0;
 uint8_t ui8_cruise_value = 0;
 uint8_t ui8_cruise_output = 0;
 uint32_t ui32_cruise_counter = 0;
 
+uint8_t cruise_control (uint8_t ui8_value);
+
 void throttle_pas_torque_sensor_controller (void)
 {
-  uint16_t ui16_motor_speed;
+  uint16_t ui16_temp;
 
   // only throttle implemented for now
   ui8_ADC_throttle = ui8_adc_read_throttle ();
-//  ui8_duty_cycle_target_temp = (uint8_t) map (ui8_ADC_throttle, ADC_THROTTLE_MIN_VALUE, ADC_THROTTLE_MAX_VALUE, 0, 255);
 
-  ui16_motor_speed = map (ui8_ADC_throttle, ADC_THROTTLE_MIN_VALUE, ADC_THROTTLE_MAX_VALUE, 0, 600);
-  motor_speed_controller_set_erps (ui16_motor_speed);
+// NOTE: for some reason, cruise control is not working anymore
+//#define DO_CRUISE_CONTROL 1
+#if DO_CRUISE_CONTROL == 1
+  ui8_ADC_throttle = cruise_control (ui8_ADC_throttle);
+#endif
 
-  //#define DO_CRUISE_CONTROL 1
-  #if DO_CRUISE_CONTROL == 1
-  ui8_duty_cycle_target = cruise_control (ui8_duty_cycle_target_temp);
-  #endif
+  // throttle will setup motor current from 5A to 15A
+  ui16_temp = (uint16_t) (map ((int32_t) ui8_ADC_throttle, ADC_THROTTLE_MIN_VALUE, ADC_THROTTLE_MAX_VALUE, 10, ADC_MOTOR_CURRENT_MAX));
+  motor_set_current_max (ui16_temp);
 
-//  motor_set_pwm_duty_cycle_target (ui8_duty_cycle_target_temp);
+  // throttle will setup motor speed from 0 to 29km/h (in 26 inch wheel, Q85 328RPM)
+  ui16_temp = map (ui8_ADC_throttle, ADC_THROTTLE_MIN_VALUE, ADC_THROTTLE_MAX_VALUE, 0, MOTOR_OVER_SPEED_ERPS);
+  motor_speed_controller_set_erps (ui16_temp);
 }
 
 uint8_t cruise_control (uint8_t ui8_value)
