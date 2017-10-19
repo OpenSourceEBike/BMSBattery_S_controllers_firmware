@@ -13,29 +13,31 @@
 #include "main.h"
 #include "interrupts.h"
 #include "brake.h"
-#include "cruise_control.h"
-#include "motor.h"
+#include "motor_controller_high_level.h"
+#include "motor_controller_low_level.h"
 #include "pwm.h"
+#include "throttle_pas_torque_sensor_controller.h"
 
 // Brake signal
 void EXTI_PORTA_IRQHandler(void) __interrupt(EXTI_PORTA_IRQHANDLER)
 {
   if (brake_is_set())
   {
-    brake_coast_enable ();
+    motor_controller_set_state (MOTOR_CONTROLLER_STATE_BRAKE);
+    motor_disable_PWM ();
     stop_cruise_control ();
   }
   else
   {
-    brake_coast_disable ();
-    pwm_set_duty_cycle (0);
-    stop_cruise_control ();
+    motor_controller_reset_state (MOTOR_CONTROLLER_STATE_BRAKE);
+    motor_enable_PWM ();
+    ui8_duty_cycle = 0;
   }
 }
 
 void brake_init (void)
 {
-  //hall sensors pins as external input pin interrupt
+  //brake pin as external input pin interrupt
   GPIO_Init(BRAKE__PORT,
 	    BRAKE__PIN,
 	    GPIO_MODE_IN_FL_IT); // with external interrupt

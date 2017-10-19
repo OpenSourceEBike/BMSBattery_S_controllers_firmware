@@ -6,14 +6,14 @@
  * Released under the GPL License, Version 3
  */
 
-#ifndef _CRUISE_CONTROL_H
-#define _CRUISE_CONTROL_H
+#ifndef _THROTTLE_PAS_TORQUE_SENSOR_CONTROLLER_H_
+#define _THROTTLE_PAS_TORQUE_SENSOR_CONTROLLER_H_
 
+#include <stdint.h>
 #include "main.h"
 
-//uint8_t cruise_control (uint8_t ui8_value);
-uint8_t cruise_control (uint8_t ui8_value);
+void throttle_pas_torque_sensor_controller (void);
 void set_cruise_control_state (uint8_t value);
 void stop_cruise_control (void);
 
-#endif /* _CRUISE_CONTROL_H */
+#endif /* _THROTTLE_PAS_TORQUE_SENSOR_CONTROLLER_H_ */

@@ -14,45 +14,22 @@
 #include "stm8s_gpio.h"
 #include "interrupts.h"
 #include "stm8s_tim2.h"
-#include "motor.h"
 #include "uart.h"
 #include "adc.h"
 #include "brake.h"
 #include "utils.h"
-#include "cruise_control.h"
 #include "timers.h"
 #include "pwm.h"
-#include "PAS.h"
-#include "SPEED.h"
-#include "update_setpoint.h"
 #include "config.h"
+#include "motor_controller_low_level.h"
+#include "motor_controller_high_level.h"
+#include "throttle_pas_torque_sensor_controller.h"
+#include "communications_controller.h"
 
-
-//uint16_t ui16_LPF_angle_adjust = 0;
-//uint16_t ui16_LPF_angle_adjust_temp = 0;
-
-uint16_t ui16_log1 = 0;
-uint16_t ui16_log2 = 0;
-uint8_t ui8_log = 0;
-uint8_t ui8_i= 0; 				//counter for ... next loop
-uint16_t ui16_torque[NUMBER_OF_PAS_MAGS]; 	//array for torque values of one crank revolution
-uint16_t ui16_sum_torque = 0; 			//sum of array elements
-uint8_t ui8_torque_index=0 ; 			//counter for torque array
-uint8_t a = 0; 					//loop counter
-
-static uint16_t ui16_throttle_counter = 0;
-uint16_t ui16_temp_delay = 0;
-
-
-
-
-uint8_t ui8_adc_read_throttle_busy = 0;
-uint16_t ui16_SPEED_Counter = 0; 	//time tics for speed measurement
-uint16_t ui16_SPEED = 32000; 		//speed in timetics
-uint16_t ui16_PAS_Counter = 0; 		//time tics for cadence measurement
-uint16_t ui16_PAS = 32000;		//cadence in timetics
-uint8_t ui8_PAS_Flag = 0; 		//flag for PAS interrupt
-uint8_t ui8_SPEED_Flag = 0; 		//flag for SPEED interrupt
+uint16_t ui16_TIM2_counter = 0;
+uint16_t ui16_motor_controller_counter = 0;
+uint16_t ui16_throttle_pas_torque_sensor_controller_counter = 0;
+uint16_t ui16_communications_controller_counter = 0;
 
 /////////////////////////////////////////////////////////////////////////////////////////////
 //// Functions prototypes
@@ -72,12 +49,12 @@ int main (void);
 // Local VS global variables
 // Sometimes I got the following error when compiling the firmware: motor.asm:750: Error: <r> relocation error
 // and the solution was to avoid using local variables and define them as global instead
+// Other times, I got code that did not work until I put the variables global.
 
 // Brake signal interrupt
 void EXTI_PORTA_IRQHandler(void) __interrupt(EXTI_PORTA_IRQHANDLER);
-// Speed signal interrupt
-void EXTI_PORTC_IRQHandler(void) __interrupt(EXTI_PORTC_IRQHANDLER);
-// PAS signal interrupt
+
+// motor overcurrent interrupt
 void EXTI_PORTD_IRQHandler(void) __interrupt(EXTI_PORTD_IRQHANDLER);
 
 // Timer1/PWM period interrupt
@@ -88,14 +65,8 @@ void TIM1_UPD_OVF_TRG_BRK_IRQHandler(void) __interrupt(TIM1_UPD_OVF_TRG_BRK_IRQH
 
 int main (void)
 {
-//  static uint32_t ui32_cruise_counter = 0;
-//  static uint8_t ui8_cruise_duty_cycle = 0;
-  static uint16_t ui16_setpoint = ADC_THROTTLE_MIN_VALUE;
-  static uint8_t ui8_temp = 0;
-
-
   //set clock at the max 16MHz
-  CLK_HSIPrescalerConfig(CLK_PRESCALER_HSIDIV1);
+  CLK_HSIPrescalerConfig (CLK_PRESCALER_HSIDIV1);
 
   gpio_init ();
   brake_init ();
@@ -103,114 +74,46 @@ int main (void)
   debug_pin_init ();
   timer2_init ();
   uart_init ();
-  pwm_init ();
+  pwm_init_6_steps ();
   hall_sensor_init ();
   adc_init ();
-  PAS_init();
-  SPEED_init();
 
-//  ITC_SetSoftwarePriority (ITC_IRQ_TIM1_OVF, ITC_PRIORITYLEVEL_2);
+  enableInterrupts ();
 
-  enableInterrupts();
-#if (SVM_TABLE == SVM)
-  TIM1_SetCompare1(126 << 1);
-  TIM1_SetCompare2(126 << 1);
-  TIM1_SetCompare3(126 << 1);
-#elif (SVM_TABLE == SINE) || (SVM_TABLE == SINE_SVM)
-  TIM1_SetCompare1(126 << 2);
-  TIM1_SetCompare2(126 << 2);
-  TIM1_SetCompare3(126 << 2);
-#endif
+  motor_init ();
+  motor_set_current_max (ADC_MOTOR_CURRENT_MAX); // 1 --> 0.5A
+  motor_set_regen_current_max (2); // 1 --> 0.5A
+  motor_set_pwm_duty_cycle_ramp_inverse_step (2); // each step = 64us
+  motor_speed_controller_set_erps (0);
 
   hall_sensors_read_and_action (); // needed to start the motor
-printf("Back in Main.c\n");
 
-  for(a = 0; a < NUMBER_OF_PAS_MAGS;a++) {// array init
-   ui16_torque[a]=0;
-  }
-printf("Torquearray initialized\n");
   while (1)
   {
-    static uint32_t ui32_counter = 0;
-    uint16_t ui16_temp = 0;
-    uint16_t ui32_temp = 0;
-    static float f_temp = 0;
-
-    // Update speed after speed interrupt occurrence
-    if (ui8_SPEED_Flag == 1)
+    ui16_TIM2_counter = TIM2_GetCounter ();
+    if ((ui16_TIM2_counter - ui16_motor_controller_counter) > 100) // every 100ms
     {
-	ui16_SPEED=ui16_SPEED_Counter; 	//save recent speed
-	ui16_SPEED_Counter=0;		//reset speed counter
-	ui8_SPEED_Flag =0; 			//reset interrupt flag
-	//printf("SPEEDtic\n");
+      ui16_motor_controller_counter = ui16_TIM2_counter;
+      motor_controller_high_level ();
+      continue;
     }
 
-
-#ifdef TORQUESENSOR
-    //	Update cadence and torque after PAS interrupt occurrence
-    if (ui8_PAS_Flag == 1)
+    ui16_TIM2_counter = TIM2_GetCounter ();
+    if ((ui16_TIM2_counter - ui16_communications_controller_counter) > 150) // every 100ms
     {
-      ui16_PAS=ui16_PAS_Counter; 		//save recent cadence
-      //printf("PAStic %d\n", ui16_PAS_Counter);
-      ui16_PAS_Counter=0;			//reset PAS Counter
-
-      ui8_PAS_Flag =0; 			//reset interrupt flag
-
-      ui8_adc_read_throttle_busy = 1;
-      ui8_temp = adc_read_throttle (); //read in recent torque value
-      ui8_adc_read_throttle_busy = 0;
-      ui16_torque[ui8_torque_index]= (uint8_t) map (ui8_temp , ADC_THROTTLE_MIN_VALUE, ADC_THROTTLE_MAX_VALUE, 0, SETPOINT_MAX_VALUE); //map throttle to limits
-      ui16_sum_torque = 0;
-      for(a = 0; a < NUMBER_OF_PAS_MAGS; a++) {			// sum up array content
-	   ui16_sum_torque+= ui16_torque[a];
-	   }
-      ui8_torque_index++;
-      if (ui8_torque_index>NUMBER_OF_PAS_MAGS-1){ui8_torque_index=0;} //reset index counter
-
+      ui16_communications_controller_counter = ui16_TIM2_counter;
+      communications_controller ();
+      continue;
     }
 
-#else // just read in throttle value
-    ui8_adc_read_throttle_busy = 1;
-    ui8_temp= adc_read_throttle (); //read in recent torque value
-    ui16_sum_torque = (uint8_t) map (ui8_temp , ADC_THROTTLE_MIN_VALUE, ADC_THROTTLE_MAX_VALUE, 0, SETPOINT_MAX_VALUE); //map throttle to limits
-    ui8_adc_read_throttle_busy = 0;
-
-#endif
-// scheduled update of setpoint and duty cycle (every 100ms)
-    ui16_temp_delay = TIM2_GetCounter ();
-
-    if ((ui16_temp_delay - ui16_throttle_counter) > 100)
+    ui16_TIM2_counter = TIM2_GetCounter ();
+    if ((ui16_TIM2_counter - ui16_throttle_pas_torque_sensor_controller_counter) > 20) // every 20ms
     {
-      ui16_throttle_counter = ui16_temp_delay;
-      //printf("Timetic!");
-
-//#define DO_CRUISE_CONTROL 1
-#if DO_CRUISE_CONTROL == 1
-	  ui16_setpoint = (uint16_t)update_setpoint (ui16_SPEED,ui16_PAS,ui16_sum_torque,ui16_setpoint); //update setpoint
-/*
-//Read in throttle for debugging to test, if motor runs with additional interrupts from PAS and SPEEDk
-	  ui8_adc_read_throttle_busy = 1;
-	  ui16_setpoint = (uint16_t) adc_read_throttle (); //read in recent torque value
-	  ui8_adc_read_throttle_busy = 0;
-
-*/
-	  ui16_setpoint = cruise_control (ui16_setpoint);
-#endif
-
-#if TORQUESENSOR
-      pwm_set_duty_cycle ((uint8_t)ui16_setpoint);
-#else if THROTTLE
-      pwm_set_duty_cycle ((uint8_t)ui16_sum_torque);
-#endif
-
-      getchar1 ();
-
-      // printf("Main: spd %d, pas %d, sumtor %d, setpoint %d\n", ui16_SPEED, ui16_PAS, ui16_sum_torque, ui16_setpoint);
-      if(ui16_speed_inverse < 60 ) { ui8_position_correction_value = 152-((ui16_speed_inverse*44)/100);}
-      else {ui8_position_correction_value=127;}
-
-//      printf("%d, %d\n", ui16_speed_inverse, ui8_position_correction_value);
-      printf("%d, %d\n", ui8_motor_state, ui16_PWM_cycles_counter_total);
+      ui16_throttle_pas_torque_sensor_controller_counter = ui16_TIM2_counter;
+      throttle_pas_torque_sensor_controller ();
+      continue;
     }
   }
+
+  return 0;
 }

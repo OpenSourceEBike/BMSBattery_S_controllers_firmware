@@ -11,12 +11,13 @@
 
 #include "stm8s.h"
 #include "stm8s_uart2.h"
-#include "motor.h"
+#include "motor_controller_low_level.h"
+#include "pwm.h"
 
 void uart_init (void)
 {
   UART2_DeInit();
-  UART2_Init((uint32_t)115200,
+  UART2_Init((uint32_t)9600,
 	     UART2_WORDLENGTH_8D,
 	     UART2_STOPBITS_1,
 	     UART2_PARITY_NO,
@@ -79,9 +80,19 @@ char getchar1(void)
   }
 
   if (c == '1')
-	  {
-	    ui8_position_correction_value++;
-	  }
+  {
+    ui8_position_correction_value++;
+  }
+
+  if (c == '2')
+  {
+    ui8_duty_cycle_target--;
+  }
+
+  if (c == '3')
+  {
+    ui8_duty_cycle_target++;
+  }
 
   return (c);
 }

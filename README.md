@@ -6,11 +6,7 @@ You have to edit the path to your STVP installation,in the .bat files, if not in
 
 HOW TO BUILD
 
-Windows:
-
-1. Just double click on "Start_Compiling.bat" 
-2. or hit "Run" Button on Eclipse 
-3. or hit "Write Configuartion" Button on the OSEC Parameter Configurator
+Windows: ???
 
 Linux:
 1. clean the previous built files: $ make -f Makefile_linux clean

@@ -10,8 +10,9 @@
 #include "stm8s.h"
 #include "gpio.h"
 #include "stm8s_adc1.h"
+#include "adc.h"
 
-uint8_t adc_throttle_busy_flag = 0;
+uint8_t ui8_ADC_throttle = 0;
 uint8_t ui8_BatteryVoltage = 0;
 uint8_t ui8_BatteryCurrent = 0;
 
@@ -19,86 +20,89 @@ void adc_init (void)
 {
   //init GPIO for the used ADC pins
   GPIO_Init(GPIOB,
-	    (THROTTLE__PIN || CURRENT_PHASE_B__PIN || CURRENT_TOTAL__PIN),
+	    (THROTTLE__PIN || CURRENT_PHASE_B__PIN || CURRENT_MOTOR_TOTAL__PIN),
 	    GPIO_MODE_IN_FL_NO_IT);
+
   GPIO_Init(GPIOE,
-	    (BATTERY_VOLTAGE__PIN),
+	    (CURRENT_MOTOR_TOTAL_FILTERED__PIN),
 	    GPIO_MODE_IN_FL_NO_IT);
 
   //de-Init ADC peripheral
   ADC1_DeInit();
 
   //init ADC1 peripheral
-  ADC1_Init(ADC1_CONVERSIONMODE_CONTINUOUS,
-	    ADC1_CHANNEL_5,
+  ADC1_Init(ADC1_CONVERSIONMODE_SINGLE,
+	    ADC1_CHANNEL_9,
 	    ADC1_PRESSEL_FCPU_D2,
+//	    ADC1_PRESSEL_FCPU_D4, // may take about 35us to convert all 10 channels, which seems ok for the 64us PWM period
+				  // being slower should improve the noise on ADC measurements
             ADC1_EXTTRIG_TIM,
 	    DISABLE,
 	    ADC1_ALIGN_LEFT,
-	    (ADC1_SCHMITTTRIG_CHANNEL4 || ADC1_SCHMITTTRIG_CHANNEL5 || ADC1_SCHMITTTRIG_CHANNEL6 || ADC1_SCHMITTTRIG_CHANNEL9),
+	    (ADC1_SCHMITTTRIG_CHANNEL4 || ADC1_SCHMITTTRIG_CHANNEL5 || ADC1_SCHMITTTRIG_CHANNEL6 || ADC1_SCHMITTTRIG_CHANNEL8),
             DISABLE);
+
+  ADC1_ScanModeCmd (ENABLE);
+
+  ADC1_Cmd (ENABLE);
 }
 
-uint8_t adc_read_throttle (void)
+inline void adc_trigger (void)
 {
-  uint8_t ui8_temp;
+  // start ADC all channels, scan conversion (buffered)
+  ADC1->CSR &= 0x09; // clear EOC flag first (selectd also channel 9)
+  ADC1_StartConversion ();
+}
 
-  adc_throttle_busy_flag = 1;
-//Read in throttle value (just upper 8bits for performance issues)
-  ADC1_Init(ADC1_CONVERSIONMODE_SINGLE,
-	    ADC1_CHANNEL_4,
-	    ADC1_PRESSEL_FCPU_D2,
-            ADC1_EXTTRIG_TIM,
-	    DISABLE,
-	    ADC1_ALIGN_LEFT,
-	    (ADC1_SCHMITTTRIG_CHANNEL4 || ADC1_SCHMITTTRIG_CHANNEL5 || ADC1_SCHMITTTRIG_CHANNEL6 || ADC1_SCHMITTTRIG_CHANNEL9),
-            DISABLE);
+uint8_t ui8_adc_read_phase_B_current (void)
+{
+//  /* Read LSB first */
+//  templ = *(uint8_t*)(uint16_t)((uint16_t)ADC1_BaseAddress + (uint8_t)(Buffer << 1) + 1);
+//  /* Then read MSB */
+//  temph = *(uint8_t*)(uint16_t)((uint16_t)ADC1_BaseAddress + (uint8_t)(Buffer << 1));
+//#define ADC1_BaseAddress        0x53E0
+//phase_B_current --> ADC_AIN5
+// 0x53E0 + 2*5 = 0x53EA
+  return *(uint8_t*)(0x53EA);
+}
 
-  ADC1->CR1 |= ADC1_CR1_ADON;
-  while (!(ADC1->CSR & ADC1_FLAG_EOC)) ;
-  ui8_temp = ADC1->DRH;
+uint16_t ui16_adc_read_phase_B_current (void)
+{
+  uint16_t temph;
+  uint8_t templ;
 
-//Read in battery current value (just upper 8bits for performance issues)
-  ADC1_Init(ADC1_CONVERSIONMODE_SINGLE,
-	    ADC1_CHANNEL_6,
-	    ADC1_PRESSEL_FCPU_D2,
-            ADC1_EXTTRIG_TIM,
-	    DISABLE,
-	    ADC1_ALIGN_LEFT,
-	    (ADC1_SCHMITTTRIG_CHANNEL4 || ADC1_SCHMITTTRIG_CHANNEL5 || ADC1_SCHMITTTRIG_CHANNEL6 || ADC1_SCHMITTTRIG_CHANNEL9),
-            DISABLE);
+  templ = *(uint8_t*)(0x53EB);
+  temph = *(uint8_t*)(0x53EA);
 
-  ADC1->CR1 |= ADC1_CR1_ADON;
-  while (!(ADC1->CSR & ADC1_FLAG_EOC)) ;
-  ui8_BatteryCurrent = ADC1->DRH;
+  return (uint16_t)((uint16_t)((uint16_t)templ << 6) | (uint16_t)(temph << 8));
+}
 
- //Read in battery voltage value (just upper 8bits for performance issues)
-    ADC1_Init(ADC1_CONVERSIONMODE_SINGLE,
-  	    ADC1_CHANNEL_9,
-  	    ADC1_PRESSEL_FCPU_D2,
-              ADC1_EXTTRIG_TIM,
-  	    DISABLE,
-  	    ADC1_ALIGN_LEFT,
-  	    (ADC1_SCHMITTTRIG_CHANNEL4 || ADC1_SCHMITTTRIG_CHANNEL5 || ADC1_SCHMITTTRIG_CHANNEL6 || ADC1_SCHMITTTRIG_CHANNEL9),
-              DISABLE);
+uint8_t ui8_adc_read_throttle (void)
+{
+// 0x53E0 + 2*4 = 0x53E8
+//  return *(uint8_t*)(0x53E8);
+  return *(uint8_t*)(0x53E8);
+}
 
-    ADC1->CR1 |= ADC1_CR1_ADON;
-    while (!(ADC1->CSR & ADC1_FLAG_EOC)) ;
-    ui8_BatteryVoltage = ADC1->DRH;
+uint8_t ui8_adc_read_motor_total_current (void)
+{
+// 0x53E0 + 2*8 = 0x53F0
+  return *(uint8_t*)(0x53F0);
+}
 
-// Restart continous reading of phaseB current
-  ADC1_Init(ADC1_CONVERSIONMODE_CONTINUOUS,
-	    ADC1_CHANNEL_5,
-	    ADC1_PRESSEL_FCPU_D2,
-            ADC1_EXTTRIG_TIM,
-	    DISABLE,
-	    ADC1_ALIGN_RIGHT,
-	    (ADC1_SCHMITTTRIG_CHANNEL4 || ADC1_SCHMITTTRIG_CHANNEL5 || ADC1_SCHMITTTRIG_CHANNEL6 || ADC1_SCHMITTTRIG_CHANNEL9),
-            DISABLE);
+uint8_t ui16_adc_read_motor_total_current (void)
+{
+  uint16_t temph;
+  uint8_t templ;
 
-  ADC1->CR1 |= ADC1_CR1_ADON;
+  templ = *(uint8_t*)(0x53F1);
+  temph = *(uint8_t*)(0x53F0);
 
-  adc_throttle_busy_flag = 0;
+  return (uint16_t)((uint16_t)((uint16_t)templ << 6) | (uint16_t)(temph << 8));
+}
 
-  return ui8_temp;
+uint8_t ui8_adc_read_battery_voltage (void)
+{
+  // 0x53E0 + 2*9 = 0x53F2
+  return *(uint8_t*)(0x53F2);
 }
