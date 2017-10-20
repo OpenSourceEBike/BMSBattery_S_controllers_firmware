@@ -12,10 +12,6 @@
 #include "stm8s_adc1.h"
 #include "adc.h"
 
-uint8_t ui8_ADC_throttle = 0;
-uint8_t ui8_BatteryVoltage = 0;
-uint8_t ui8_BatteryCurrent = 0;
-
 void adc_init (void)
 {
   //init GPIO for the used ADC pins

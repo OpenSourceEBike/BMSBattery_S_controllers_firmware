@@ -15,15 +15,17 @@
 #include "motor_controller_high_level.h"
 #include "motor_controller_low_level.h"
 
+// if this variables are no global, SDCC will throw the error: xxx.asm:612: Error: <r> relocation error
 uint8_t ui8_cruise_state = 0;
 uint8_t ui8_cruise_value = 0;
 uint8_t ui8_cruise_output = 0;
-uint32_t ui32_cruise_counter = 0;
+uint8_t ui8_cruise_counter = 0;
 
 uint8_t cruise_control (uint8_t ui8_value);
 
 void throttle_pas_torque_sensor_controller (void)
 {
+  uint8_t ui8_ADC_throttle;
   uint16_t ui16_temp;
 
   // only throttle implemented for now
@@ -39,8 +41,7 @@ void throttle_pas_torque_sensor_controller (void)
     motor_controller_set_error (MOTOR_CONTROLLER_ERROR_01_THROTTLE);
   }
 
-// NOTE: for some reason, cruise control is not working anymore
-//#define DO_CRUISE_CONTROL 1
+#define DO_CRUISE_CONTROL 1
 #if DO_CRUISE_CONTROL == 1
   ui8_ADC_throttle = cruise_control (ui8_ADC_throttle);
 #endif
@@ -59,34 +60,34 @@ uint8_t cruise_control (uint8_t ui8_value)
   // Cruise control
   if (ui8_cruise_state == 0)
   {
-    if ((ui8_value > 25) &&
-	((ui8_value > (ui8_cruise_value - 25)) || (ui8_value < (ui8_cruise_value + 15))))
+    if ((ui8_value > CRUISE_CONTROL_MIN_VALUE) &&
+	((ui8_value > (ui8_cruise_value - CRUISE_CONTROL_MIN_VALUE)) || (ui8_value < (ui8_cruise_value + CRUISE_CONTROL_MIN_VALUE))))
     {
-      ui32_cruise_counter++;
+      ui8_cruise_counter++;
       ui8_cruise_output = ui8_value;
 
-      if (ui32_cruise_counter > 100) // 100 time control: time to lock cruise control
+      if (ui8_cruise_counter > 80) // 80 * 100ms = 8 seconds: time to lock cruise control
       {
 	ui8_cruise_state = 1;
 	ui8_cruise_output = ui8_value;
-	ui32_cruise_counter = 0;
+	ui8_cruise_counter = 0;
 	ui8_cruise_value = 0;
       }
     }
     else
     {
-      ui32_cruise_counter = 0;
+      ui8_cruise_counter = 0;
       ui8_cruise_value = ui8_value;
       ui8_cruise_output = ui8_cruise_value;
     }
   }
   else if (ui8_cruise_state == 1)
   {
-    if (ui8_value < 25) { ui8_cruise_state = 2; }
+    if (ui8_value < CRUISE_CONTROL_MIN_VALUE) { ui8_cruise_state = 2; }
   }
   else if (ui8_cruise_state == 2)
   {
-    if (ui8_value > 25)
+    if (ui8_value > CRUISE_CONTROL_MIN_VALUE)
     {
       ui8_cruise_state = 0;
       ui8_cruise_output = ui8_value;

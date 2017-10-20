@@ -90,6 +90,8 @@ int main (void)
 
   while (1)
   {
+    // because of continue; at the end of each if code block that will stop the while (1) loop there,
+    // the first if block code will have the higher priority over the others
     ui16_TIM2_counter = TIM2_GetCounter ();
     if ((ui16_TIM2_counter - ui16_motor_controller_counter) > 100) // every 100ms
     {
@@ -107,7 +109,7 @@ int main (void)
     }
 
     ui16_TIM2_counter = TIM2_GetCounter ();
-    if ((ui16_TIM2_counter - ui16_throttle_pas_torque_sensor_controller_counter) > 20) // every 20ms
+    if ((ui16_TIM2_counter - ui16_throttle_pas_torque_sensor_controller_counter) > 100) // every 100ms
     {
       ui16_throttle_pas_torque_sensor_controller_counter = ui16_TIM2_counter;
       throttle_pas_torque_sensor_controller ();
