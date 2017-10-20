@@ -22,6 +22,7 @@ void communications_controller (void)
   uint16_t ui16_wheel_period_ms;
   static uint16_t ui16_battery_volts;
   static uint16_t ui16_battery_soc;
+  static uint8_t ui16_error;
 
   // calc wheel period in ms
   ui16_wheel_period_ms = (motor_get_er_PWM_ticks () * (MOTOR_NUMBER_MAGNETS >> 1) * MOTOR_REDUCTION_RATIO) / MOTOR_PWM_TICKS_PER_MS;
@@ -32,7 +33,16 @@ void communications_controller (void)
   else if (ui16_battery_volts > BATTERY_PACK_VOLTS_80) { ui16_battery_soc = 12; } // 3 bars
   else if (ui16_battery_volts > BATTERY_PACK_VOLTS_40) { ui16_battery_soc = 8; } // 2 bars
   else if (ui16_battery_volts > BATTERY_PACK_VOLTS_20) { ui16_battery_soc = 4; } // 1 bar
-  else { ui16_battery_soc = 1; } // empty flashing
+  else { ui16_battery_soc = 3; } // empty
+
+  // prepare error
+  ui16_error = motor_controller_get_error (); // get the error value
+  // if battery under voltage, signal instead on LCD battery symbol
+  if (ui16_error == MOTOR_CONTROLLER_ERROR_91_BATTERY_UNDER_VOLTAGE)
+  {
+    ui16_battery_soc = 1; // empty flashing
+    ui16_error = 0;
+  }
 
   // preparing the package
   // B0: start package (?)
@@ -40,12 +50,12 @@ void communications_controller (void)
   // B1: battery level
   tx_buffer [1] = ui16_battery_soc;
   // B2: 24V controller
-  tx_buffer [2] = 24;
+  tx_buffer [2] = COMMUNICATIONS_BATTERY_VOLTAGE;
   // B3: speed, wheel rotation period, ms; period(ms)=B3*256+B4;
   tx_buffer [3] = (ui16_wheel_period_ms >> 8) & 0xff;
   tx_buffer [4] = ui16_wheel_period_ms & 0xff;
   // B5: error info display
-  tx_buffer [5] = 0;
+  tx_buffer [5] = ui16_error;
   // B6: CRC: xor B1,B2,B3,B4,B5,B7,B8,B9,B10,B11
   // 0 value so no effect on xor operation for now
   tx_buffer [6] = 0;
@@ -73,3 +83,4 @@ void communications_controller (void)
     putchar (tx_buffer [ui8_i]);
   }
 }
+

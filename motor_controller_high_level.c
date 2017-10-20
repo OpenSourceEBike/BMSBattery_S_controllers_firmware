@@ -19,6 +19,8 @@ uint16_t target_erps = 0;
 uint16_t ui16_ADC_battery_voltage_accumulated = BATTERY_VOLTAGE_MED_VALUE;
 uint8_t ui8_ADC_battery_voltage_filtered;
 
+uint8_t ui8_motor_controller_error = MOTOR_CONTROLLER_ERROR_EMPTY;
+
 void motor_controller_high_level (void)
 {
   motor_speed_controller ();
@@ -90,21 +92,31 @@ while (1) ; // infinite loop, user will need to reset the system
   }
   else if (ui8_ADC_battery_voltage_filtered < BATTERY_VOLTAGE_MIN_VALUE)
   {
-    // TODO: disable motor for 20 seconds and signal error
-
-disableInterrupts();
-motor_disable_PWM ();
-while (1) ; // infinite loop, user will need to reset the system
-  }
-  else
-  {
-    // TODO: enable motor regen
+    // motor will stop and battery symbol on LCD will be empty and flashing
+    motor_controller_set_state (MOTOR_CONTROLLER_STATE_UNDER_VOLTAGE);
+    motor_disable_PWM ();
+    motor_controller_set_error (MOTOR_CONTROLLER_ERROR_91_BATTERY_UNDER_VOLTAGE);
   }
 }
 
 uint8_t motor_get_ADC_battery_voltage_filtered (void)
 {
   return ui8_ADC_battery_voltage_filtered;
+}
+
+void motor_controller_set_error (uint8_t error)
+{
+  ui8_motor_controller_error = error;
+}
+
+void motor_controller_clear_error (uint8_t error)
+{
+  ui8_motor_controller_error = 0;
+}
+
+uint8_t motor_controller_get_error (void)
+{
+  return ui8_motor_controller_error;
 }
 
 

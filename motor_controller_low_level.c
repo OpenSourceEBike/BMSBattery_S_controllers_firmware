@@ -10,11 +10,13 @@
 #include <stdio.h>
 #include "stm8s_gpio.h"
 #include "stm8s_tim1.h"
-#include "motor_controller_low_level.h"
 #include "gpio.h"
 #include "pwm.h"
 #include "config.h"
 #include "adc.h"
+#include "motor_controller_low_level.h"
+#include "motor_controller_high_level.h"
+#include "communications_controller.h"
 
 uint16_t ui16_PWM_cycles_counter = 0;
 uint16_t ui16_PWM_cycles_counter_6 = 0;
@@ -389,7 +391,8 @@ uint16_t motor_get_er_PWM_ticks (void)
 // motor overcurrent interrupt
 void EXTI_PORTD_IRQHandler(void) __interrupt(EXTI_PORTD_IRQHANDLER)
 {
-  disableInterrupts ();
+  // motor will stop and error symbol on LCD will be shown
+  motor_controller_set_state (MOTOR_CONTROLLER_STATE_OVER_CURRENT);
   motor_disable_PWM ();
-  while (1) ; // infinite loop, user will need to reset the system
+  motor_controller_set_error (MOTOR_CONTROLLER_ERROR_06_SHORT_CIRCUIT);
 }

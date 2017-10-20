@@ -29,6 +29,16 @@ void throttle_pas_torque_sensor_controller (void)
   // only throttle implemented for now
   ui8_ADC_throttle = ui8_adc_read_throttle ();
 
+  // verify if throttle is connect or if there is any error
+  // if error: error symbol on LCD will be shown
+  if ((ui8_ADC_throttle < ADC_THROTTLE_MIN_VALUE_ERROR) ||
+      (ui8_ADC_throttle > ADC_THROTTLE_MAX_VALUE_ERROR))
+  {
+    motor_controller_set_state (MOTOR_CONTROLLER_STATE_THROTTLE_ERROR);
+    motor_disable_PWM ();
+    motor_controller_set_error (MOTOR_CONTROLLER_ERROR_01_THROTTLE);
+  }
+
 // NOTE: for some reason, cruise control is not working anymore
 //#define DO_CRUISE_CONTROL 1
 #if DO_CRUISE_CONTROL == 1
