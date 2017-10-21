@@ -127,11 +127,11 @@ debug_pin_set ();
 	      }
 	if (ui16_motor_speed_erps > 7)
 	      {
-		if (ui16_current_array[4]>>2 > 127)// hier prüfen, ob Wandlung von 10 auf 8 bit geht....
+		if (ui16_current_array[4]>>2 > 127+MOTOR_ROTOR_DELTA_PHASE_ANGLE_RIGHT)// hier prüfen, ob Wandlung von 10 auf 8 bit geht....
 		{
 		  i8_position_correction_value++;
 		}
-		else if (ui16_current_array[4]>>2 < 125)
+		else if (ui16_current_array[4]>>2 < 125+MOTOR_ROTOR_DELTA_PHASE_ANGLE_RIGHT)
 		{
 		  i8_position_correction_value--;
 		}
