@@ -247,7 +247,7 @@ int main (void)
 
      // pwm_set_duty_cycle ((uint8_t)ui16_setpoint);
 
-      pwm_set_duty_cycle ((ui8_assistlevel_global-1)*60); //for test of display communication
+      pwm_set_duty_cycle ((uint8_t)ui16_sum_torque); //for test of display communication
 
 
 	  /****************************************************************************/
@@ -259,7 +259,7 @@ int main (void)
 
 
 
-       //     printf("%d, %d, %d\n", ui16_motor_speed_erps, i16_temp, ui8_position_correction_value);
+            printf("%d, %d, %d\n", ui16_motor_speed_erps, i16_temp, ui8_position_correction_value);
       //      printf("%d, %d, %d\n", ui8_motor_state, ui16_motor_speed_erps, ui8_position_correction_value);
 
 
