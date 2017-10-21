@@ -52,13 +52,13 @@
 #define PWM_VALUE_DUTY_CYCLE_MAX (256 - 1)
 #define MIDDLE_PWM_VALUE_DUTY_CYCLE_MAX (PWM_VALUE_DUTY_CYCLE_MAX/2)
 
-#define ANGLE_1 0 //(360/256) / 300
-#define ANGLE_60 42
-#define ANGLE_120 85
-#define ANGLE_180 127
-#define ANGLE_240 170
-#define ANGLE_300 212
-#define ANGLE_360 255
+#define ANGLE_1 0 //0 //(360/256) / 300 the first value in the SVM-Table refers to 30° rotor position, if zero crossing with rising edge of Phase A is defined as 0°
+#define ANGLE_60 42 //42
+#define ANGLE_120 85//85
+#define ANGLE_180 127	//127
+#define ANGLE_240 170//170
+#define ANGLE_300 212//212
+//#define ANGLE_360 255 234
 
 extern uint16_t ui16_log1;
 extern uint16_t ui16_log2;

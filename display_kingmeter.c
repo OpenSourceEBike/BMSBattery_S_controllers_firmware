@@ -29,6 +29,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "utils.h"
 #include "timers.h"
 #include "interrupts.h"
+#include "motor.h"
 
 
 #if (DISPLAY_TYPE & DISPLAY_TYPE_KINGMETER)
@@ -155,9 +156,6 @@ void KingMeter_Init (KINGMETER_t* KM_ctx)
 void UART2_IRQHandler(void) __interrupt(UART2_IRQHANDLER)
     {
 	if(UART2_GetFlagStatus(UART2_FLAG_RXNE) == SET){
-
-	ui8_rx[ui8_UARTCounter] = UART2_ReceiveData8();
-	ui8_UARTCounter++;
 
 	  if(ui8_rx[ui8_UARTCounter-1]==0x0D)                                      // Check for reception of complete message
 	    {

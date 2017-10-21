@@ -90,13 +90,13 @@ char getchar1(void)
 
   if (c == '0')
   {
-    ui8_position_correction_value--;
+    i8_position_correction_value-= 21;
   }
 
 
   if (c == '1')
   	  {
-  	    ui8_position_correction_value++;
+  	    i8_position_correction_value+=21;
   	  }
 
 

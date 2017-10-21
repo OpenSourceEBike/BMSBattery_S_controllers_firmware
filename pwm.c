@@ -960,7 +960,7 @@ void pwm_apply_duty_cycle (uint8_t ui8_duty_cycle_value)
     ui8_value_c = MIDDLE_PWM_VALUE_DUTY_CYCLE_MAX - ui8_temp;
   }
 
-  // set final duty_cycle value
+  // set final duty_cycle value  Phases changend due to have a plausible rotation angle
   TIM1_SetCompare1((uint16_t) (ui8_value_a << 1));
   TIM1_SetCompare2((uint16_t) (ui8_value_c << 1));
   TIM1_SetCompare3((uint16_t) (ui8_value_b << 1));
