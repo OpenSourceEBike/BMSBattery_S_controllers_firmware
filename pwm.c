@@ -317,8 +317,8 @@ void pwm_init_bipolar_4q (void)
 	       TIM1_OCNIDLESTATE_SET);
 
   TIM1_OC2Init(TIM1_OCMODE_PWM1,
-	       TIM1_OUTPUTSTATE_DISABLE,
-	       TIM1_OUTPUTNSTATE_DISABLE,
+	       TIM1_OUTPUTSTATE_ENABLE,
+	       TIM1_OUTPUTNSTATE_ENABLE,
 	       255, // initial duty_cycle value
 	       TIM1_OCPOLARITY_HIGH,
 	       TIM1_OCNPOLARITY_LOW,

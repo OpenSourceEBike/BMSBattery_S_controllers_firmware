@@ -61,53 +61,14 @@ void hall_sensors_read_and_action (void)
 {
   // read hall sensors signal pins and mask other pins
   ui8_hall_sensors = (GPIO_ReadInputData (HALL_SENSORS__PORT) & (HALL_SENSORS_MASK));
-  if ((ui8_hall_sensors != ui8_hall_sensors_last) ||
-      (ui8_motor_state == MOTOR_STATE_STOP))
+  if (ui8_hall_sensors != ui8_hall_sensors_last)
   {
     ui8_hall_sensors_last = ui8_hall_sensors;
 
     switch (ui8_hall_sensors)
     {
       case 3:
-      // read here the phase B current: FOC Id current
-      ui8_ADC_id_current = ui8_adc_read_phase_B_current ();
-
-#if (MOTOR_TYPE == MOTOR_TYPE_EUC2)
-      if (ui8_motor_state == MOTOR_STATE_RUNNING)
-      {
-	if (ui8_motor_interpolation_state == INTERPOLATION_60_DEGREES)
-	{
-	  if (ui8_ADC_id_current > 127)
-	  {
-	    ui8_position_correction_value++;
-	  }
-	  else if (ui8_ADC_id_current < 125)
-	  {
-	    ui8_position_correction_value--;
-	  }
-	}
-      }
-#elif (MOTOR_TYPE == MOTOR_TYPE_Q85)
-      if (ui8_motor_state == MOTOR_STATE_RUNNING)
-      {
-	if (ui8_motor_interpolation_state == INTERPOLATION_360_DEGREES)
-	{
-	  if (ui8_ADC_id_current > 127)
-	  {
-	    ui8_position_correction_value++;
-	  }
-	  else if (ui8_ADC_id_current < 125)
-	  {
-	    ui8_position_correction_value--;
-	  }
-	}
-	else
-	{
-	  ui8_position_correction_value = 127; // keep using the reset value
-	}
-      }
-#endif
-
+debug_pin_reset ();
       if (ui8_motor_interpolation_state == NO_INTERPOLATION_60_DEGREES)
       {
 	pwm_phase_a_enable_pwm (ui8_duty_cycle);
@@ -131,20 +92,20 @@ void hall_sensors_read_and_action (void)
 
       // update motor state based on motor speed
 #if MOTOR_TYPE == MOTOR_TYPE_Q85
-      if ((ui16_motor_speed_erps > 300) &&
+      if ((ui16_motor_speed_erps > 80) &&
 	  (ui8_motor_interpolation_state == INTERPOLATION_60_DEGREES))
       {
 	ui8_motor_interpolation_state = INTERPOLATION_360_DEGREES;
 	ui8_motor_state = MOTOR_STATE_RUNNING;
       }
-      if ((ui16_motor_speed_erps < 250) &&
+      if ((ui16_motor_speed_erps < 60) &&
 	  (ui8_motor_interpolation_state == INTERPOLATION_360_DEGREES))
       {
 	ui8_motor_interpolation_state = INTERPOLATION_60_DEGREES;
 	ui8_motor_state = MOTOR_STATE_RUNNING;
       }
 
-      if ((ui16_motor_speed_erps > 200) &&
+      if ((ui16_motor_speed_erps > 40) &&
 	  (ui8_motor_interpolation_state == NO_INTERPOLATION_60_DEGREES))
       {
 	ui8_motor_interpolation_state = INTERPOLATION_60_DEGREES;
@@ -152,7 +113,7 @@ void hall_sensors_read_and_action (void)
 
 	pwm_init_bipolar_4q ();
       }
-      if ((ui16_motor_speed_erps < 100) &&
+      if ((ui16_motor_speed_erps < 20) &&
 	  (ui8_motor_interpolation_state == INTERPOLATION_60_DEGREES))
       {
 	ui8_motor_interpolation_state = NO_INTERPOLATION_60_DEGREES;
@@ -198,6 +159,47 @@ void hall_sensors_read_and_action (void)
       break;
 
       case 4:
+debug_pin_set ();
+      // read here the phase B current: FOC Id current
+      ui8_ADC_id_current = ui8_adc_read_phase_B_current ();
+
+#if (MOTOR_TYPE == MOTOR_TYPE_EUC2)
+      if (ui8_motor_state == MOTOR_STATE_RUNNING)
+      {
+	if (ui8_motor_interpolation_state == INTERPOLATION_60_DEGREES)
+	{
+	  if (ui8_ADC_id_current > 127)
+	  {
+	    ui8_position_correction_value++;
+	  }
+	  else if (ui8_ADC_id_current < 125)
+	  {
+	    ui8_position_correction_value--;
+	  }
+	}
+      }
+#elif (MOTOR_TYPE == MOTOR_TYPE_Q85)
+      if (ui8_motor_state == MOTOR_STATE_RUNNING)
+      {
+	if ((ui8_motor_interpolation_state == INTERPOLATION_60_DEGREES) ||
+	   (ui8_motor_interpolation_state == INTERPOLATION_360_DEGREES))
+	{
+	  if (ui8_ADC_id_current > 127)
+	  {
+	    ui8_position_correction_value--;
+	  }
+	  else if (ui8_ADC_id_current < 125)
+	  {
+	    ui8_position_correction_value++;
+	  }
+	}
+	else
+	{
+	  ui8_position_correction_value = 127; // keep using the reset value
+	}
+      }
+#endif
+
       if (ui8_motor_interpolation_state == NO_INTERPOLATION_60_DEGREES)
       {
 	pwm_phase_a_enable_low (ui8_duty_cycle);
@@ -265,6 +267,7 @@ void motor_fast_loop (void)
     ui8_position_correction_value = 127;
     ui8_motor_interpolation_state = NO_INTERPOLATION_60_DEGREES;
     ui8_motor_state = MOTOR_STATE_STOP;
+    ui8_hall_sensors = 0;
   }
 
 #define DO_INTERPOLATION 1 // may be usefull to disable interpolation when debugging

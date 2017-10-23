@@ -80,7 +80,9 @@ void communications_controller (void)
   // send the package over UART
   for (ui8_i = 0; ui8_i <= 11; ui8_i++)
   {
+#ifndef DEBUG_UART
     putchar (tx_buffer [ui8_i]);
+#endif
   }
 }
 

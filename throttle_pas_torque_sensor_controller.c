@@ -41,7 +41,7 @@ void throttle_pas_torque_sensor_controller (void)
     motor_controller_set_error (MOTOR_CONTROLLER_ERROR_01_THROTTLE);
   }
 
-#define DO_CRUISE_CONTROL 1
+//#define DO_CRUISE_CONTROL 1
 #if DO_CRUISE_CONTROL == 1
   ui8_ADC_throttle = cruise_control (ui8_ADC_throttle);
 #endif
