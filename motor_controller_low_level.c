@@ -267,7 +267,7 @@ void motor_fast_loop (void)
     ui8_position_correction_value = 127;
     ui8_motor_interpolation_state = NO_INTERPOLATION_60_DEGREES;
     ui8_motor_state = MOTOR_STATE_STOP;
-    ui8_hall_sensors = 0;
+    ui8_hall_sensors_last = 0; // this way we force execution of hall sensors code
   }
 
 #define DO_INTERPOLATION 1 // may be usefull to disable interpolation when debugging

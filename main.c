@@ -81,7 +81,7 @@ int main (void)
   motor_init ();
   motor_set_current_max (ADC_MOTOR_CURRENT_MAX); // 1 --> 0.5A
   motor_set_regen_current_max (2); // 1 --> 0.5A
-  motor_set_pwm_duty_cycle_ramp_inverse_step (100); // each step = 64us
+  motor_set_pwm_duty_cycle_ramp_inverse_step (50); // each step = 64us
   motor_speed_controller_set_erps (0);
 
   enableInterrupts ();
