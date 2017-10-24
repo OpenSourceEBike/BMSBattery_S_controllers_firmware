@@ -29,7 +29,7 @@
 #define SVM_TABLE_LEN_x1024 262144 //(256 * 1024)
 
 #define ADC_MOTOR_CURRENT_MAX_ZERO_VALUE 79
-#define ADC_MOTOR_CURRENT_MAX 30 	// 30 = 15A; 1 --> 0.5A
+#define ADC_MOTOR_CURRENT_MAX 30 // 30 = 15A; 1 --> 0.5A
 #define ADC_MOTOR_REGEN_CURRENT_MAX 2 	//1 --> 0.5A
 
 // ADC Battery voltage

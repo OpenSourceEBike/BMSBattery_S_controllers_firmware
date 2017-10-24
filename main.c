@@ -81,8 +81,7 @@ int main (void)
   motor_init ();
   motor_set_current_max (ADC_MOTOR_CURRENT_MAX); // 1 --> 0.5A
   motor_set_regen_current_max (4); // 1 --> 0.5A
-//  motor_set_pwm_duty_cycle_ramp_inverse_step (50); // each step = 64us | value of 50 makes that duty_cycle never goes down, maybe because of bad motor current limit read, REGN or MAX current: ADC_MOTOR_CURRENT_MAX_ZERO_VALUE
-  motor_set_pwm_duty_cycle_ramp_inverse_step (2); // each step = 64us
+  motor_set_pwm_duty_cycle_ramp_inverse_step (50); // each step = 64us
   motor_speed_controller_set_erps (0);
 
   enableInterrupts ();
