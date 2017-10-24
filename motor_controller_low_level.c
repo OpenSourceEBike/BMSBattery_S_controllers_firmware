@@ -92,20 +92,20 @@ debug_pin_reset ();
 
       // update motor state based on motor speed
 #if MOTOR_TYPE == MOTOR_TYPE_Q85
-      if ((ui16_motor_speed_erps > 80) &&
+      if ((ui16_motor_speed_erps > 125) &&
 	  (ui8_motor_interpolation_state == INTERPOLATION_60_DEGREES))
       {
 	ui8_motor_interpolation_state = INTERPOLATION_360_DEGREES;
 	ui8_motor_state = MOTOR_STATE_RUNNING;
       }
-      if ((ui16_motor_speed_erps < 60) &&
+      if ((ui16_motor_speed_erps < 100) &&
 	  (ui8_motor_interpolation_state == INTERPOLATION_360_DEGREES))
       {
 	ui8_motor_interpolation_state = INTERPOLATION_60_DEGREES;
 	ui8_motor_state = MOTOR_STATE_RUNNING;
       }
 
-      if ((ui16_motor_speed_erps > 40) &&
+      if ((ui16_motor_speed_erps > 75) &&
 	  (ui8_motor_interpolation_state == NO_INTERPOLATION_60_DEGREES))
       {
 	ui8_motor_interpolation_state = INTERPOLATION_60_DEGREES;
@@ -113,7 +113,7 @@ debug_pin_reset ();
 
 	pwm_init_bipolar_4q ();
       }
-      if ((ui16_motor_speed_erps < 20) &&
+      if ((ui16_motor_speed_erps < 50) &&
 	  (ui8_motor_interpolation_state == INTERPOLATION_60_DEGREES))
       {
 	ui8_motor_interpolation_state = NO_INTERPOLATION_60_DEGREES;

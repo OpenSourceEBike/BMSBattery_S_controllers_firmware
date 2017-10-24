@@ -23,9 +23,11 @@ uint8_t ui8_cruise_counter = 0;
 
 uint8_t cruise_control (uint8_t ui8_value);
 
+uint8_t ui8_ADC_throttle;
+
 void throttle_pas_torque_sensor_controller (void)
 {
-  uint8_t ui8_ADC_throttle;
+//  uint8_t ui8_ADC_throttle;
   uint16_t ui16_temp;
 
   // only throttle implemented for now
