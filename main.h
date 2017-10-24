@@ -9,7 +9,7 @@
 #ifndef _MAIN_H_
 #define _MAIN_H_
 
-#define DEBUG_UART
+//#define DEBUG_UART
 
 #define MOTOR_TYPE_Q85 1
 #define MOTOR_TYPE_EUC2 2
