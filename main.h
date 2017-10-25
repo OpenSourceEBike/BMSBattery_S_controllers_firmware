@@ -9,7 +9,7 @@
 #ifndef _MAIN_H_
 #define _MAIN_H_
 
-//#define DEBUG_UART
+#define DEBUG_UART
 
 #define MOTOR_TYPE_Q85 1
 #define MOTOR_TYPE_EUC2 2
@@ -29,7 +29,7 @@
 #define SVM_TABLE_LEN_x1024 262144 //(256 * 1024)
 
 #define ADC_MOTOR_CURRENT_MAX_ZERO_VALUE 79
-#define ADC_MOTOR_CURRENT_MAX 30 // 30 = 15A; 1 --> 0.5A
+#define ADC_MOTOR_CURRENT_MAX 20//30 // 30 = 15A; 1 --> 0.5A
 #define ADC_MOTOR_REGEN_CURRENT_MAX 2 	//1 --> 0.5A
 
 // ADC Battery voltage
@@ -73,9 +73,8 @@
 #define ANGLE_360 255
 
 #define MOTOR_OVER_SPEED_ERPS 390 // motor max speed, protection max value | 40 points for the sinewave at max speed
-#define MOTOR_SPEED_CONTROLLER_KP 5 // x << 5
-#define MOTOR_SPEED_CONTROLLER_KI 2 // x << 5
-#define MOTOR_SPEED_CONTROLLER_OUTPUT_MAX 8000 // PWM max duty_cycle << 5
+#define MOTOR_SPEED_CONTROLLER_KP 2 // x << 5
+#define MOTOR_SPEED_CONTROLLER_OUTPUT_MAX 8160 // PWM max duty_cycle << 5
 
 #define MOTOR_PWM_TICKS_PER_MS 16
 #define MOTOR_NUMBER_MAGNETS 16

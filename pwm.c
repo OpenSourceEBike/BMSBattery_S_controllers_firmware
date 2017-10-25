@@ -698,3 +698,8 @@ void pwm_phase_c_enable_low (uint8_t _duty_cycle_value)
 	    PMW_PHASE_C_LOW__PIN,
 	    GPIO_MODE_OUT_PP_LOW_FAST);
 }
+
+uint8_t pwm_get_duty_cycle (void)
+{
+  return ui8_duty_cycle;
+}

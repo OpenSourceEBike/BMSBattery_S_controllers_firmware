@@ -49,7 +49,7 @@ void throttle_pas_torque_sensor_controller (void)
 #endif
 
   // throttle will setup motor current from 5A to 15A
-//  ui16_temp = (uint16_t) (map ((int32_t) ui8_ADC_throttle, ADC_THROTTLE_MIN_VALUE, ADC_THROTTLE_MAX_VALUE, 10, ADC_MOTOR_CURRENT_MAX));
+//  ui16_temp = (uint16_t) (map ((int32_t) ui8_ADC_throttle, ADC_THROTTLE_MIN_VALUE, ADC_THROTTLE_MAX_VALUE, 5, 10));
 //  motor_set_current_max (ui16_temp);
 
   // throttle will setup motor speed from 0 to 29km/h (in 26 inch wheel, Q85 328RPM)

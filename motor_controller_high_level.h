@@ -20,14 +20,13 @@
 #define MOTOR_CONTROLLER_ERROR_06_SHORT_CIRCUIT 0x21
 #define MOTOR_CONTROLLER_ERROR_91_BATTERY_UNDER_VOLTAGE 0x91
 
+extern uint8_t ui16_ADC_iq_current_filtered;
+
 void motor_controller_high_level (void);
-void motor_battery_voltage_protection (void);
 uint8_t motor_get_ADC_battery_voltage_filtered (void);
 void motor_speed_controller_set_erps (uint16_t erps);
 void motor_controller_set_error (uint8_t error);
-void motor_controller_clear_error (uint8_t error);
+void motor_controller_clear_error (void);
 uint8_t motor_controller_get_error (void);
-// call every 100ms
-void motor_speed_controller (void);
 
 #endif /* _MOTOR_CONTROLLER_HIGH_LEVEL_H_ */

@@ -29,8 +29,8 @@ void adc_init (void)
   //init ADC1 peripheral
   ADC1_Init(ADC1_CONVERSIONMODE_SINGLE,
 	    ADC1_CHANNEL_9,
-	    ADC1_PRESSEL_FCPU_D2,
-//	    ADC1_PRESSEL_FCPU_D4, // may take about 35us to convert all 10 channels, which seems ok for the 64us PWM period
+//	    ADC1_PRESSEL_FCPU_D2,
+	    ADC1_PRESSEL_FCPU_D4, // may take about 35us to convert all 10 channels, which seems ok for the 64us PWM period
 				  // being slower should improve the noise on ADC measurements
             ADC1_EXTTRIG_TIM,
 	    DISABLE,

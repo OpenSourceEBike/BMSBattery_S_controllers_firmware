@@ -34,5 +34,6 @@ void pwm_init_bipolar_4q (void);
 void pwm_duty_cycle_controller (void);
 void pwm_set_duty_cycle_target (uint8_t value);
 void pwm_apply_duty_cycle (uint8_t ui8_duty_cycle_value);
+uint8_t pwm_get_duty_cycle (void);
 
 #endif /* _PWM_H_ */
