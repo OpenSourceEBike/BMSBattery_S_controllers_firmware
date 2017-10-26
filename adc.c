@@ -46,7 +46,7 @@ void adc_init (void)
 inline void adc_trigger (void)
 {
   // start ADC all channels, scan conversion (buffered)
-  ADC1->CSR &= 0x09; // clear EOC flag first (selectd also channel 9)
+  ADC1->CSR &= 0x09; // clear EOC flag first (selected also channel 9)
   ADC1_StartConversion ();
 }
 
@@ -70,7 +70,7 @@ uint16_t ui16_adc_read_phase_B_current (void)
   templ = *(uint8_t*)(0x53EB);
   temph = *(uint8_t*)(0x53EA);
 
-  return (uint16_t)((uint16_t)((uint16_t)templ << 6) | (uint16_t)(temph << 8));
+  return ((uint16_t) temph) << 2 | ((uint16_t) templ);
 }
 
 uint8_t ui8_adc_read_throttle (void)
@@ -86,7 +86,7 @@ uint8_t ui8_adc_read_motor_total_current (void)
   return *(uint8_t*)(0x53F0);
 }
 
-uint8_t ui16_adc_read_motor_total_current (void)
+uint16_t ui16_adc_read_motor_total_current (void)
 {
   uint16_t temph;
   uint8_t templ;
@@ -94,7 +94,7 @@ uint8_t ui16_adc_read_motor_total_current (void)
   templ = *(uint8_t*)(0x53F1);
   temph = *(uint8_t*)(0x53F0);
 
-  return (uint16_t)((uint16_t)((uint16_t)templ << 6) | (uint16_t)(temph << 8));
+  return ((uint16_t) temph) << 2 | ((uint16_t) templ);
 }
 
 uint8_t ui8_adc_read_battery_voltage (void)

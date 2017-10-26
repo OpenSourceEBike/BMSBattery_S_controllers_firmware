@@ -82,7 +82,7 @@ int main (void)
   motor_set_current_max (ADC_MOTOR_CURRENT_MAX); // 1 --> 0.5A
   motor_set_regen_current_max (4); // 1 --> 0.5A
   motor_set_pwm_duty_cycle_ramp_inverse_step (50); // each step = 64us
-  motor_speed_controller_set_erps (0);
+  motor_controller_set_speed_erps (0);
 
   enableInterrupts ();
 
@@ -91,9 +91,10 @@ int main (void)
   while (1)
   {
 #ifdef DEBUG_UART
-    printf ("%d, %d, %d\n", ui8_duty_cycle, motor_get_motor_speed_erps (), ui8_position_correction_value);
-
+//      printf ("%d, %d, %d\n", ui8_duty_cycle, motor_get_motor_speed_erps (), ui16_adc_read_motor_total_current ());
 //    printf ("%d, %d, %d\n", ui8_duty_cycle, motor_get_motor_speed_erps (), (ui16_ADC_iq_current_filtered - 127));
+
+      printf ("%d, %d, %d, %d\n", ui8_duty_cycle, ui16_target_current, motor_get_motor_speed_erps (), ui16_ADC_motor_current_filtered);
 #endif
 
     // because of continue; at the end of each if code block that will stop the while (1) loop there,

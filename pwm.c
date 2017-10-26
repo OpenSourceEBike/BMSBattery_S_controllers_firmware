@@ -275,7 +275,7 @@ uint8_t ui8_svm_table [SVM_TABLE_LEN] =
     122
 };
 
-uint8_t ui8_duty_cycle = 0;
+volatile uint8_t ui8_duty_cycle = 0;
 uint8_t ui8_duty_cycle_target;
 uint8_t ui8_duty_cycle_ramp_inverse_step;
 uint8_t ui8_counter_duty_cycle_ramp = 0;
