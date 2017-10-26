@@ -89,7 +89,7 @@ void hall_sensors_read_and_action (void)
       {
 	ui8_half_e_rotation_flag = 0;
 	ui16_PWM_cycles_counter_total = ui16_PWM_cycles_counter;
-//	ui16_PWM_cycles_counter_total_div4 = ui16_PWM_cycles_counter >> 2;
+	ui16_PWM_cycles_counter_total_div4 = ui16_PWM_cycles_counter >> 2;
 	ui16_PWM_cycles_counter = 0;
 	ui16_motor_speed_erps = PWM_CYCLES_SECOND / ui16_PWM_cycles_counter_total; // this division takes ~4.2us
       }
@@ -164,7 +164,7 @@ void hall_sensors_read_and_action (void)
 
       case 4:
 //debug_pin_set ();
-//      ui16_PWM_cycles_counter_temp = 0;
+      ui16_PWM_cycles_counter_temp = 0;
 
       // read here the phase B current: FOC Id current
       ui8_ADC_id_current = ui8_adc_read_phase_B_current ();
@@ -263,13 +263,13 @@ void motor_fast_loop (void)
   {
     ui16_PWM_cycles_counter++;
     ui16_PWM_cycles_counter_6++;
-//    ui16_PWM_cycles_counter_temp++;
+    ui16_PWM_cycles_counter_temp++;
   }
   else
   {
     ui16_PWM_cycles_counter = 0;
     ui16_PWM_cycles_counter_6 = 0;
-//    ui16_PWM_cycles_counter_temp = 0;
+    ui16_PWM_cycles_counter_temp = 0;
     ui16_motor_speed_erps = 0;
     ui16_PWM_cycles_counter_total = 0xffff;
     ui8_position_correction_value = 127;
@@ -278,13 +278,13 @@ void motor_fast_loop (void)
     ui8_hall_sensors_last = 0; // this way we force execution of hall sensors code
   }
 
-//  if (ui16_PWM_cycles_counter_temp == ui16_PWM_cycles_counter_total_div4)
-//  {
-//debug_pin_set ();
-//    // read here the phase B current: FOC Iq current
-//    ui8_ADC_iq_current = ui8_adc_read_phase_B_current ();
-//debug_pin_reset ();
-//  }
+  if (ui16_PWM_cycles_counter_temp == ui16_PWM_cycles_counter_total_div4)
+  {
+debug_pin_set ();
+    // read here the phase B current: FOC Iq current
+    ui8_ADC_iq_current = ui8_adc_read_phase_B_current ();
+debug_pin_reset ();
+  }
 
 #define DO_INTERPOLATION 1 // may be usefull to disable interpolation when debugging
 #if DO_INTERPOLATION == 1

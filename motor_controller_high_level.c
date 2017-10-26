@@ -92,10 +92,12 @@ void motor_current_controller (void)
 
   // low pass filter the current readed value, to avoid possible fast spikes/noise
   ui16_ADC_motor_current_accumulated -= ui16_ADC_motor_current_accumulated >> 4;
-  ui16_ADC_motor_current_accumulated += ui16_adc_read_motor_total_current ();
+//  ui16_ADC_motor_current_accumulated += ui16_adc_read_motor_total_current ();
+  ui16_ADC_motor_current_accumulated +=   ui8_ADC_iq_current;
   ui16_ADC_motor_current_filtered = ui16_ADC_motor_current_accumulated >> 4;
 
-  i16_motor_current = ui16_ADC_motor_current_filtered - ADC_MOTOR_CURRENT_MAX_ZERO_VALUE_10B;
+//  i16_motor_current = ui16_ADC_motor_current_filtered - ADC_MOTOR_CURRENT_MAX_ZERO_VALUE_10B;
+  i16_motor_current = ui16_ADC_motor_current_filtered - 129;
   // make sure current is not negative, we are not here to control negative/regen current
   if (i16_motor_current < 0)
   {
