@@ -27,7 +27,6 @@ uint8_t ui8_ADC_throttle;
 
 void throttle_pas_torque_sensor_controller (void)
 {
-//  uint8_t ui8_ADC_throttle;
   uint16_t ui16_temp;
 
   // only throttle implemented for now
@@ -48,17 +47,13 @@ void throttle_pas_torque_sensor_controller (void)
   ui8_ADC_throttle = cruise_control (ui8_ADC_throttle);
 #endif
 
-//  uint8_t ui8_current_motor_duty_cycle;
-//
-//  ui8_current_motor_duty_cycle = pwm_get_duty_cycle ();
-
-  // throttle will setup motor current from 5A to 15A
-  ui16_temp = (uint16_t) (map ((int32_t) ui8_ADC_throttle, ADC_THROTTLE_MIN_VALUE, ADC_THROTTLE_MAX_VALUE, 0, 24));
+  // throttle will setup motor current from 5A to 12A
+  ui16_temp = (uint16_t) (map ((int32_t) ui8_ADC_throttle, ADC_THROTTLE_MIN_VALUE, ADC_THROTTLE_MAX_VALUE, 16, 96));
   motor_controller_set_current (ui16_temp);
 
   // throttle will setup motor speed from 0 to 29km/h (in 26 inch wheel, Q85 328RPM)
-//  ui16_temp = map (ui8_ADC_throttle, ADC_THROTTLE_MIN_VALUE, ADC_THROTTLE_MAX_VALUE, 0, MOTOR_OVER_SPEED_ERPS);
-//  motor_controller_set_speed_erps (ui16_temp);
+  ui16_temp = map (ui8_ADC_throttle, ADC_THROTTLE_MIN_VALUE, ADC_THROTTLE_MAX_VALUE, 0, MOTOR_OVER_SPEED_ERPS);
+  motor_controller_set_speed_erps (ui16_temp);
 }
 
 uint8_t cruise_control (uint8_t ui8_value)

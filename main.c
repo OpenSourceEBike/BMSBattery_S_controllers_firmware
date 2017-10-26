@@ -91,10 +91,7 @@ int main (void)
   while (1)
   {
 #ifdef DEBUG_UART
-//      printf ("%d, %d, %d\n", ui8_duty_cycle, motor_get_motor_speed_erps (), ui16_adc_read_motor_total_current ());
-//    printf ("%d, %d, %d\n", ui8_duty_cycle, motor_get_motor_speed_erps (), (ui16_ADC_iq_current_filtered - 127));
-
-      printf ("%d, %d, %d, %d, %d\n", ui8_duty_cycle, ui16_target_current, motor_get_motor_speed_erps (), ui16_ADC_motor_current_filtered, ui8_ADC_iq_current);
+    printf ("%d, %d, %d, %d\n", ui8_duty_cycle, ui16_target_current, motor_get_motor_speed_erps (), ui16_ADC_motor_current_filtered);
 #endif
 
     // because of continue; at the end of each if code block that will stop the while (1) loop there,

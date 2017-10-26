@@ -26,11 +26,8 @@ int32_t map (int32_t x, int32_t in_min, int32_t in_max, int32_t out_min, int32_t
     return (x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
 }
 
-//void delay_ms (uint16_t delay)
-//{
-//  uint16_t ui16_initial_time;
-//
-//  ui16_initial_time = TIM2_GetCounter ();
-//
-//  while ((TIM2_GetCounter () - ui16_initial_time) < delay) ;
-//}
+uint8_t ui8_min (uint8_t value_a, uint8_t value_b)
+{
+  if (value_a < value_b) return value_a;
+  else return value_b;
+}

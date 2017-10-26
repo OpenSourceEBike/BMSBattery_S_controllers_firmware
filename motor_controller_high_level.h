@@ -20,7 +20,6 @@
 #define MOTOR_CONTROLLER_ERROR_06_SHORT_CIRCUIT 0x21
 #define MOTOR_CONTROLLER_ERROR_91_BATTERY_UNDER_VOLTAGE 0x91
 
-extern uint8_t ui16_ADC_iq_current_filtered;
 extern uint16_t ui16_ADC_motor_current_filtered;
 extern uint16_t ui16_target_current;
 

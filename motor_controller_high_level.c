@@ -14,6 +14,7 @@
 #include "motor_controller_low_level.h"
 #include "motor_controller_high_level.h"
 #include "pwm.h"
+#include "utils.h"
 
 uint16_t ui16_target_erps = 0;
 uint16_t ui16_target_current = 0;
@@ -29,15 +30,22 @@ uint16_t ui16_ADC_motor_current_filtered;
 uint8_t ui8_motor_controller_error = MOTOR_CONTROLLER_ERROR_EMPTY;
 
 void motor_battery_voltage_protection (void);
-void motor_current_controller (void); // call every 100ms
-void motor_speed_controller (void); // call every 100ms
-void motor_read_iq_current (void);
+uint8_t motor_current_controller (uint8_t ui8_current_pwm_duty_cycle); // call every 100ms
+uint8_t motor_speed_controller (uint8_t ui8_current_pwm_duty_cycle); // call every 100ms
 
 void motor_controller_high_level (void)
 {
+  uint8_t ui8_current_pwm_duty_cycle;
+  uint8_t ui8_pwm_duty_cycle_a;
+  uint8_t ui8_pwm_duty_cycle_b;
+
   motor_battery_voltage_protection ();
-  motor_current_controller ();
-//  motor_speed_controller ();
+
+  ui8_current_pwm_duty_cycle = pwm_get_duty_cycle ();
+  ui8_pwm_duty_cycle_a = motor_current_controller (ui8_current_pwm_duty_cycle);
+  ui8_pwm_duty_cycle_b = motor_speed_controller (ui8_current_pwm_duty_cycle);
+  // apply the value that is lower
+  motor_set_pwm_duty_cycle_target (ui8_min (ui8_pwm_duty_cycle_a, ui8_pwm_duty_cycle_b));
 }
 
 void motor_controller_set_speed_erps (uint16_t ui16_erps)
@@ -51,7 +59,7 @@ void motor_controller_set_current (uint16_t ui16_current)
 }
 
 // call every 100ms
-void motor_speed_controller (void)
+uint8_t motor_speed_controller (uint8_t ui8_current_pwm_duty_cycle)
 {
   int16_t i16_error;
   int16_t i16_output;
@@ -59,8 +67,7 @@ void motor_speed_controller (void)
 
   if (ui16_target_erps < 5)
   {
-    motor_set_pwm_duty_cycle_target (0);
-    return;
+    return 0;
   }
 
   i16_motor_speed_erps = (int16_t) motor_get_motor_speed_erps ();
@@ -76,15 +83,15 @@ void motor_speed_controller (void)
   else if (i16_output < (-MOTOR_SPEED_CONTROLLER_OUTPUT_MAX)) i16_output = -MOTOR_SPEED_CONTROLLER_OUTPUT_MAX;
   i16_output >>= 5; // divide to 64, as MOTOR_SPEED_CONTROLLER_KP is 64x; avoid using floats
 
-  i16_output = pwm_get_duty_cycle () + i16_output;
+  i16_output = ui8_current_pwm_duty_cycle + i16_output;
   if (i16_output > PWM_VALUE_DUTY_CYCLE_MAX) i16_output = PWM_VALUE_DUTY_CYCLE_MAX;
   if (i16_output < 0) i16_output = 0;
 
-  motor_set_pwm_duty_cycle_target ((uint8_t) i16_output);
+  return (uint8_t) i16_output;
 }
 
 // call every 100ms
-void motor_current_controller (void)
+uint8_t motor_current_controller (uint8_t ui8_current_pwm_duty_cycle)
 {
   int16_t i16_error;
   int16_t i16_output;
@@ -92,17 +99,14 @@ void motor_current_controller (void)
 
   // low pass filter the current readed value, to avoid possible fast spikes/noise
   ui16_ADC_motor_current_accumulated -= ui16_ADC_motor_current_accumulated >> 4;
-//  ui16_ADC_motor_current_accumulated += ui16_adc_read_motor_total_current ();
-  ui16_ADC_motor_current_accumulated +=   ui8_ADC_iq_current;
+  ui16_ADC_motor_current_accumulated += ui16_adc_read_motor_total_current ();
   ui16_ADC_motor_current_filtered = ui16_ADC_motor_current_accumulated >> 4;
 
-//  i16_motor_current = ui16_ADC_motor_current_filtered - ADC_MOTOR_CURRENT_MAX_ZERO_VALUE_10B;
-  i16_motor_current = ui16_ADC_motor_current_filtered - 129;
+  i16_motor_current = ui16_ADC_motor_current_filtered - ADC_MOTOR_CURRENT_MAX_ZERO_VALUE_10B;
   // make sure current is not negative, we are not here to control negative/regen current
   if (i16_motor_current < 0)
   {
-    motor_set_pwm_duty_cycle_target (0);
-    return;
+    return 0;
   }
 
   i16_error = ui16_target_current - i16_motor_current;
@@ -113,11 +117,11 @@ void motor_current_controller (void)
   else if (i16_output < (-MOTOR_CURRENT_CONTROLLER_OUTPUT_MAX)) i16_output = -MOTOR_CURRENT_CONTROLLER_OUTPUT_MAX;
   i16_output >>= 5; // divide to 64, avoid using floats
 
-  i16_output = pwm_get_duty_cycle () + i16_output;
+  i16_output = ui8_current_pwm_duty_cycle + i16_output;
   if (i16_output > PWM_VALUE_DUTY_CYCLE_MAX) i16_output = PWM_VALUE_DUTY_CYCLE_MAX;
   if (i16_output < 0) i16_output = 0;
 
-  motor_set_pwm_duty_cycle_target ((uint8_t) i16_output);
+  return (uint8_t) i16_output;
 }
 
 void motor_battery_voltage_protection (void)
@@ -163,13 +167,6 @@ uint8_t motor_controller_get_error (void)
   return ui8_motor_controller_error;
 }
 
-void motor_read_iq_current (void)
-{
-  // low pass filter the Iq current readed value
-  ui16_ADC_iq_current_accumulated -= ui16_ADC_iq_current_accumulated >> 3;
-  ui16_ADC_iq_current_accumulated += ui8_ADC_iq_current;
-  ui16_ADC_iq_current_filtered = ui16_ADC_iq_current_accumulated >> 3;
-}
 
 
 
