@@ -28,6 +28,13 @@ uint16_t ui16_ADC_motor_current_filtered;
 
 uint8_t ui8_motor_controller_error = MOTOR_CONTROLLER_ERROR_EMPTY;
 
+
+int16_t i16_error;
+int16_t i16_p_term;
+static int16_t i16_i_term = 0;
+int16_t i16_output;
+int16_t i16_motor_current;
+
 void motor_battery_voltage_protection (void);
 void motor_current_controller (void); // call every 100ms
 void motor_speed_controller (void); // call every 100ms
@@ -86,9 +93,7 @@ void motor_speed_controller (void)
 // call every 100ms
 void motor_current_controller (void)
 {
-  int16_t i16_error;
-  int16_t i16_output;
-  int16_t i16_motor_current;
+
 
   // low pass filter the current readed value, to avoid possible fast spikes/noise
   ui16_ADC_motor_current_accumulated -= ui16_ADC_motor_current_accumulated >> 5;
@@ -104,11 +109,17 @@ void motor_current_controller (void)
   }
 
   i16_error = ui16_target_current - i16_motor_current;
-  i16_output = i16_error * MOTOR_CURRENT_CONTROLLER_KP;
+  i16_p_term = i16_error * MOTOR_CURRENT_CONTROLLER_KP;
+//  i16_i_term += i16_error * MOTOR_CURRENT_CONTROLLER_KI;
+  // windup control
+  if (i16_i_term > MOTOR_CURRENT_CONTROLLER_OUTPUT_MAX) i16_i_term = MOTOR_CURRENT_CONTROLLER_OUTPUT_MAX;
+  else if (i16_i_term < 1) i16_i_term = 0;
 
+  i16_output = i16_p_term + i16_i_term;
   // limit max output value
   if (i16_output > MOTOR_CURRENT_CONTROLLER_OUTPUT_MAX) i16_output = MOTOR_CURRENT_CONTROLLER_OUTPUT_MAX;
   else if (i16_output < (-MOTOR_CURRENT_CONTROLLER_OUTPUT_MAX)) i16_output = -MOTOR_CURRENT_CONTROLLER_OUTPUT_MAX;
+  i16_output >>= 5; // divide to 64, avoid using floats
 
   i16_output = pwm_get_duty_cycle () + i16_output;
   if (i16_output > PWM_VALUE_DUTY_CYCLE_MAX) i16_output = PWM_VALUE_DUTY_CYCLE_MAX;
