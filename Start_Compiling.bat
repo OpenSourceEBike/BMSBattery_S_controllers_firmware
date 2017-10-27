@@ -1,4 +1,4 @@
-PATH = %PATH%C:\STMicroelectronics\st_toolset\stvp
+PATH = %PATH%C:\STMicroelectronics\st_toolset\stvp;C:\SDCC\bin;
 
 del main.hex
 make -f Makefile_windows clean

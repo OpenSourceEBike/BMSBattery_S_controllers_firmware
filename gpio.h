@@ -38,6 +38,7 @@
  * PB4  (ADC_AIN4)    | in  | ??  | throttle
  * PD0                | in  | ??  | PAS
  * PC5                | in  | ??  | SPEED
+ * PD7                | in  | ??  | OverCurrent
  *
  *
  */
@@ -56,6 +57,9 @@
 
 #define BATTERY_VOLTAGE__PIN      GPIO_PIN_6
 #define BATTERY_VOLTAGE__PORT     GPIOE
+
+#define CURRENT_MOTOR_TOTAL_OVER__PIN  GPIO_PIN_7
+#define CURRENT_MOTOR_TOTAL_OVER__PORT GPIOD
 
 #if ((MOTOR_TYPE == MOTOR_TYPE_Q85) || (MOTOR_TYPE == MOTOR_TYPE_EUC2))
   #define HALL_SENSOR_A__PIN      GPIO_PIN_0

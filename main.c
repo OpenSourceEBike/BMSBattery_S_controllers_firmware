@@ -245,9 +245,8 @@ int main (void)
 	  ui16_setpoint = cruise_control (ui16_setpoint);
 #endif
 
-     // pwm_set_duty_cycle ((uint8_t)ui16_setpoint);
+     pwm_set_duty_cycle ((uint8_t)ui16_setpoint);
 
-      pwm_set_duty_cycle ((uint8_t)ui16_sum_torque); //for test of display communication
 
 
 	  /****************************************************************************/

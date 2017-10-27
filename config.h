@@ -21,6 +21,13 @@
 #define current_cal_b -312
 #define THROTTLE
 
+#define LEVEL_1 20
+#define LEVEL_2 40
+#define LEVEL_3 60
+#define LEVEL_4 80
+#define LEVEL_5 100
+
+
 #define DISPLAY_TYPE_KINGMETER_618U (1<<4)                  // King-Meter 618U protocol (KM5s, EBS-LCD2, J-LCD, SW-LCD)
 #define DISPLAY_TYPE_KINGMETER      (DISPLAY_TYPE_KINGMETER_618U|DISPLAY_TYPE_KINGMETER_901U)
 

@@ -19,8 +19,17 @@
 
 // PAS signal
 void EXTI_PORTD_IRQHandler(void) __interrupt(EXTI_PORTD_IRQHANDLER)
-{
-  ui8_PAS_Flag = 1; //just setting flag in interrupt handler
+{ //find the pin that has caused the interrupt
+  if (!GPIO_ReadInputPin(PAS__PORT, PAS__PIN)) //PAS handling
+    {
+      ui8_PAS_Flag = 1; //just setting flag in interrupt handler
+     }
+
+  if (!GPIO_ReadInputPin(CURRENT_MOTOR_TOTAL_OVER__PORT,CURRENT_MOTOR_TOTAL_OVER__PIN)) //over current handling
+      {
+      TIM1_CtrlPWMOutputs(DISABLE); //set phases floating
+      while (1) {} // infinitve loop, user has to
+       }
 
 }
 

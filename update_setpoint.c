@@ -25,6 +25,7 @@
 static uint32_t ui32_setpoint; // local version of setpoint
 uint32_t ui32_SPEED_km_h; //global variable Speed
 static int16_t i16_delta; // difference between setpoint and actual value
+int16_t i16_assistlevel[5]={LEVEL_1, LEVEL_2, LEVEL_3, LEVEL_4, LEVEL_5}; // difference between setpoint and actual value
 
 int8_t uint_PWM_Enable=0;
 
@@ -60,7 +61,7 @@ uint16_t update_setpoint (uint16_t speed, uint16_t PAS, uint16_t sumtorque, uint
 
   }else {								//if none of the overruling boundaries are concerned, calculate new setpoint
 #ifdef TORQUESENSOR
-  ui32_setpoint=(fummelfaktor*sumtorque)/PAS; 						//calculate setpoint
+  ui32_setpoint=(i16_assistlevel[ui8_assistlevel_global-1]/100*fummelfaktor*sumtorque)/PAS; 						//calculate setpoint
   //printf("vor: spd %d, pas %d, sumtor %d, setpoint %lu\n", speed, PAS, sumtorque, ui32_setpoint);
 
   i16_delta=(ui32_setpoint-setpoint_old)/p_factor; 					//simple p-controller to avoid big steps in setpoint value course
