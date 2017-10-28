@@ -253,12 +253,12 @@ if(ui8_cheat_state==1) //second step, make sure the brake is hold according to d
 	ui8_cheat_state=0;
 	ui8_cheat_counter=0;
       }
-    else if (GPIO_ReadInputPin(BRAKE__PORT, BRAKE__PIN) && ui8_cheat_counter>CHEAT_TIME_1+12) //brake is released according to cheatcode
+    else if (GPIO_ReadInputPin(BRAKE__PORT, BRAKE__PIN) && ui8_cheat_counter>CHEAT_TIME_1+25) //brake is released according to cheatcode
     {
       ui8_cheat_state=2;
       ui8_cheat_counter=0;
     }
-    else if (!GPIO_ReadInputPin(BRAKE__PORT, BRAKE__PIN)&&ui8_cheat_counter>CHEAT_TIME_1+12) //brake is released too late
+    else if (!GPIO_ReadInputPin(BRAKE__PORT, BRAKE__PIN)&&ui8_cheat_counter>CHEAT_TIME_1+25) //brake is released too late
         {
           ui8_cheat_state=0;
           ui8_cheat_counter=0;
@@ -273,12 +273,12 @@ if(ui8_cheat_state==2) //third step, make sure the brake is released according t
 	ui8_cheat_state=0;
 	ui8_cheat_counter=0;
       }
-    else if (!GPIO_ReadInputPin(BRAKE__PORT, BRAKE__PIN) && ui8_cheat_counter>CHEAT_TIME_2+12) //brake is hold according to cheatcode
+    else if (!GPIO_ReadInputPin(BRAKE__PORT, BRAKE__PIN) && ui8_cheat_counter>CHEAT_TIME_2+25) //brake is hold according to cheatcode
     {
       ui8_cheat_state=3;
       ui8_cheat_counter=0;
     }
-    else if (GPIO_ReadInputPin(BRAKE__PORT, BRAKE__PIN)&&ui8_cheat_counter>CHEAT_TIME_2+12) //brake is hold too late
+    else if (GPIO_ReadInputPin(BRAKE__PORT, BRAKE__PIN)&&ui8_cheat_counter>CHEAT_TIME_2+25) //brake is hold too late
         {
           ui8_cheat_state=0;
           ui8_cheat_counter=0;
@@ -293,12 +293,12 @@ if(ui8_cheat_state==3) //second step, make sure the brake is hold according to d
 	ui8_cheat_state=0;
 	ui8_cheat_counter=0;
       }
-    else if (GPIO_ReadInputPin(BRAKE__PORT, BRAKE__PIN) && ui8_cheat_counter>CHEAT_TIME_3+12) //brake is released according to cheatcode
+    else if (GPIO_ReadInputPin(BRAKE__PORT, BRAKE__PIN) && ui8_cheat_counter>CHEAT_TIME_3+25) //brake is released according to cheatcode
     {
       ui8_cheat_state=4;
       ui8_cheat_counter=0;
     }
-    else if (!GPIO_ReadInputPin(BRAKE__PORT, BRAKE__PIN)&&ui8_cheat_counter>CHEAT_TIME_3+12) //brake is released too late
+    else if (!GPIO_ReadInputPin(BRAKE__PORT, BRAKE__PIN)&&ui8_cheat_counter>CHEAT_TIME_3+25) //brake is released too late
         {
           ui8_cheat_state=0;
           ui8_cheat_counter=0;
@@ -329,7 +329,7 @@ if(ui8_cheat_state==3) //second step, make sure the brake is hold according to d
 
 
 
-            printf("cheatstate, %d, erps, %d, setpoint, %d, correction value, %d\n", ui8_cheat_state, ui16_motor_speed_erps, ui16_setpoint, ui8_position_correction_value);
+            printf("cheatstate, %d, km/h %lu, erps, %d, setpoint, %d, correction value, %d\n", ui8_cheat_state, ui32_SPEED_km_h, ui16_SPEED, ui16_setpoint, ui8_position_correction_value);
       //      printf("%d, %d, %d\n", ui8_motor_state, ui16_motor_speed_erps, ui8_position_correction_value);
 
 

@@ -31,7 +31,7 @@ int8_t uint_PWM_Enable=0;
 
 uint16_t update_setpoint (uint16_t speed, uint16_t PAS, uint16_t sumtorque, uint16_t setpoint_old)
 {
-   ui32_SPEED_km_h=(wheel_circumference*PWM_CYCLES_SECOND*36L)/(100000L*(uint32_t)speed);			//calculate speed in km/h conversion fr	om sec to hour --> *3600, conversion from mm to km --> /1000000, tic frequency 15625 Hz
+   ui32_SPEED_km_h=(wheel_circumference*PWM_CYCLES_SECOND*36L)/(10000L*(uint32_t)speed);			//calculate speed in km/h conversion fr	om sec to hour --> *3600, conversion from mm to km --> /1000000, tic frequency 15625 Hz
   if(ui16_SPEED_Counter>40000){ui32_SPEED_km_h=0;}     //if wheel isn't turning, reset speed
   if(ui8_BatteryVoltage<BATTERY_VOLTAGE_MIN_VALUE){
       ui32_setpoint=0; 	// highest priority: Stop motor for undervoltage protection
