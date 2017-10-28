@@ -44,9 +44,12 @@ uint16_t ui16_sum_torque = 0; 			//sum of array elements
 uint8_t ui8_torque_index=0 ; 			//counter for torque array
 uint8_t a = 0; 					//loop counter
 
-static uint16_t ui16_throttle_counter = 0;
-uint16_t ui16_temp_delay = 0;
+//static uint16_t ui16_throttle_counter = 0;
+//uint16_t ui16_temp_delay = 0;
 static int16_t i16_deziAmps;
+
+uint8_t ui8_cheat_state = 0; 			//state of cheat procedure
+uint8_t ui8_cheat_counter = 0; 			//counter for cheat procedure
 
 
 
@@ -220,7 +223,7 @@ int main (void)
 #endif
 
 
-// scheduled update of setpoint and duty cycle (slow loop)
+// scheduled update of setpoint and duty cycle (slow loop, 50 Hz)
 
 	if (ui8_slowloop_flag)
 	  {
@@ -228,14 +231,82 @@ int main (void)
 	    ui8_slowloop_flag=0; //reset flag for slow loop
 	    ui8_veryslowloop_counter++; // increase counter for very slow loop
 #ifndef TORQUESENSOR // read in Throttle value an map it to margins
-	  ui8_adc_read_throttle_busy = 1;
-	      ui8_temp= adc_read_throttle (); //read in recent torque value
-	      ui8_adc_read_throttle_busy = 0;
-	      ui16_sum_torque = (uint8_t) map (ui8_temp , ADC_THROTTLE_MIN_VALUE, ADC_THROTTLE_MAX_VALUE, 0, SETPOINT_MAX_VALUE); //map throttle to limits
-
-
+	    ui8_adc_read_throttle_busy = 1;
+	    ui8_temp= adc_read_throttle (); //read in recent torque value
+	    ui8_adc_read_throttle_busy = 0;
+	     ui16_sum_torque = (uint8_t) map (ui8_temp , ADC_THROTTLE_MIN_VALUE, ADC_THROTTLE_MAX_VALUE, 0, SETPOINT_MAX_VALUE); //map throttle to limits
 #endif
 
+//start of cheat procedure
+
+if (ui8_cheat_state!=4)
+  {
+if(ui8_cheat_state==0 && !GPIO_ReadInputPin(BRAKE__PORT, BRAKE__PIN)) //first step, brake on.
+  {
+    ui8_cheat_state=1;
+  }
+if(ui8_cheat_state==1) //second step, make sure the brake is hold according to definded time
+  {
+    ui8_cheat_counter++;
+    if (GPIO_ReadInputPin(BRAKE__PORT, BRAKE__PIN)&&ui8_cheat_counter<CHEAT_TIME_1) //brake is released too early
+      {
+	ui8_cheat_state=0;
+	ui8_cheat_counter=0;
+      }
+    else if (GPIO_ReadInputPin(BRAKE__PORT, BRAKE__PIN) && ui8_cheat_counter>CHEAT_TIME_1+12) //brake is released according to cheatcode
+    {
+      ui8_cheat_state=2;
+      ui8_cheat_counter=0;
+    }
+    else if (!GPIO_ReadInputPin(BRAKE__PORT, BRAKE__PIN)&&ui8_cheat_counter>CHEAT_TIME_1+12) //brake is released too late
+        {
+          ui8_cheat_state=0;
+          ui8_cheat_counter=0;
+        }
+  }
+
+if(ui8_cheat_state==2) //third step, make sure the brake is released according to definded time
+  {
+    ui8_cheat_counter++;
+    if (!GPIO_ReadInputPin(BRAKE__PORT, BRAKE__PIN)&&ui8_cheat_counter<CHEAT_TIME_2) //brake is hold too early
+      {
+	ui8_cheat_state=0;
+	ui8_cheat_counter=0;
+      }
+    else if (!GPIO_ReadInputPin(BRAKE__PORT, BRAKE__PIN) && ui8_cheat_counter>CHEAT_TIME_2+12) //brake is hold according to cheatcode
+    {
+      ui8_cheat_state=3;
+      ui8_cheat_counter=0;
+    }
+    else if (GPIO_ReadInputPin(BRAKE__PORT, BRAKE__PIN)&&ui8_cheat_counter>CHEAT_TIME_2+12) //brake is hold too late
+        {
+          ui8_cheat_state=0;
+          ui8_cheat_counter=0;
+        }
+  }
+
+if(ui8_cheat_state==3) //second step, make sure the brake is hold according to definded time
+  {
+    ui8_cheat_counter++;
+    if (GPIO_ReadInputPin(BRAKE__PORT, BRAKE__PIN)&&ui8_cheat_counter<CHEAT_TIME_3) //brake is released too early
+      {
+	ui8_cheat_state=0;
+	ui8_cheat_counter=0;
+      }
+    else if (GPIO_ReadInputPin(BRAKE__PORT, BRAKE__PIN) && ui8_cheat_counter>CHEAT_TIME_3+12) //brake is released according to cheatcode
+    {
+      ui8_cheat_state=4;
+      ui8_cheat_counter=0;
+    }
+    else if (!GPIO_ReadInputPin(BRAKE__PORT, BRAKE__PIN)&&ui8_cheat_counter>CHEAT_TIME_3+12) //brake is released too late
+        {
+          ui8_cheat_state=0;
+          ui8_cheat_counter=0;
+        }
+  }
+
+  }
+//end of cheatprocedure
 
 	      ui16_setpoint = (uint16_t)update_setpoint (ui16_SPEED,ui16_PAS,ui16_sum_torque,ui16_setpoint); //update setpoint
 
@@ -258,7 +329,7 @@ int main (void)
 
 
 
-            printf("%d, %d, %d\n", ui16_motor_speed_erps, i16_temp, ui8_position_correction_value);
+            printf("cheatstate, %d, erps, %d, setpoint, %d, correction value, %d\n", ui8_cheat_state, ui16_motor_speed_erps, ui16_setpoint, ui8_position_correction_value);
       //      printf("%d, %d, %d\n", ui8_motor_state, ui16_motor_speed_erps, ui8_position_correction_value);
 
 

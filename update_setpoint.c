@@ -55,7 +55,7 @@ uint16_t update_setpoint (uint16_t speed, uint16_t PAS, uint16_t sumtorque, uint
       }  //next priority: reduce (old) setpoint if battery current is too high
 
 
-  }else if (ui32_SPEED_km_h>limit && setpoint_old>(ui32_SPEED_km_h-limit)){
+  }else if (ui32_SPEED_km_h>limit && setpoint_old>(ui32_SPEED_km_h-limit) && ui8_cheat_state!=4){
       ui32_setpoint=(uint32_t)setpoint_old-(ui32_SPEED_km_h-limit); 	//next priority: reduce (old) setpoint, if you are riding too fast
       //printf("Speed too high!\n");
 
