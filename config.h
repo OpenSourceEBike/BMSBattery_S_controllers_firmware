@@ -8,32 +8,28 @@
 #ifndef CONFIG_H_
 #define CONFIG_H_
 
-#define limit 20
+#define limit 25
 #define timeout 3125
 #define wheel_circumference 2000L
 #define fummelfaktor 64L
 #define ADC_THROTTLE_MIN_VALUE 43
 #define ADC_THROTTLE_MAX_VALUE 182
-#define BATTERY_VOLTAGE_MIN_VALUE 80
-#define BATTERY_CURRENT_MAX_VALUE 343
+#define BATTERY_VOLTAGE_MIN_VALUE 127
+#define BATTERY_CURRENT_MAX_VALUE 462
 #define MOTOR_ROTOR_DELTA_PHASE_ANGLE_RIGHT 214
 #define current_cal_a 10
 #define current_cal_b -312
-#define THROTTLE
-
 #define LEVEL_1 20
 #define LEVEL_2 40
 #define LEVEL_3 60
 #define LEVEL_4 80
 #define LEVEL_5 100
-
 #define CHEAT_TIME_1 50
 #define CHEAT_TIME_2 50
 #define CHEAT_TIME_3 50
-
-#define DISPLAY_TYPE_KINGMETER_618U (1<<4)                  // King-Meter 618U protocol (KM5s, EBS-LCD2, J-LCD, SW-LCD)
-#define DISPLAY_TYPE_KINGMETER      (DISPLAY_TYPE_KINGMETER_618U|DISPLAY_TYPE_KINGMETER_901U)
-
-#define DISPLAY_TYPE DISPLAY_TYPE_KINGMETER                // Set your display type here. CHANGES ONLY HERE!
+#define THROTTLE
+#define DISPLAY_TYPE_KINGMETER_618U (1<<4) // King-Meter 618U protocol (KM5s, EBS-LCD2, J-LCD, SW-LCD)
+#define DISPLAY_TYPE_KINGMETER  // (DISPLAY_TYPE_KINGMETER_618U|DISPLAY_TYPE_KINGMETER_901U)
+##define DISPLAY_TYPE DISPLAY_TYPE_KINGMETER  // Set your display type here. CHANGES ONLY HERE!
 
 #endif /* CONFIG_H_ */
