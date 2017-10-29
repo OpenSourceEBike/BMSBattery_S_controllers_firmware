@@ -23,13 +23,13 @@ import java.io.BufferedWriter;
 import java.io.FileWriter; 
 import java.io.IOException; 
 import java.io.PrintWriter;
-import com.jgoodies.forms.factories.DefaultComponentFactory;
 import javax.swing.SwingConstants; 
 import javax.swing.JOptionPane;
 import javax.swing.JRadioButton;
 import javax.swing.ButtonGroup;
+import javax.swing.JList;
 
-public class ErsterVersuch extends JFrame {
+public class OSEC extends JFrame {
 
 	private JPanel contentPane;
 	private JTextField txtPasTimeout;
@@ -54,6 +54,16 @@ public class ErsterVersuch extends JFrame {
 	private JTextField txtBatteryCurcalb;
 	private JLabel lblDiplayType;
 	private final ButtonGroup buttonGroup = new ButtonGroup();
+	private JTextField Assist_Level_1;
+	private JTextField Assist_Level_2;
+	private JTextField Assist_Level_3;
+	private JTextField Assist_Level_4;
+	private JLabel lblAssistLevel_3;
+	private JLabel lblAssistLevel_4;
+	private JTextField Assist_Level_5;
+	private JTextField Cheat_Time_1;
+	private JTextField Cheat_Time_2;
+	private JTextField Cheat_Time_3;
 	
 	
 
@@ -64,7 +74,7 @@ public class ErsterVersuch extends JFrame {
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
 				try {
-					ErsterVersuch frame = new ErsterVersuch();
+					OSEC frame = new OSEC();
 					frame.setVisible(true);
 				} catch (Exception e) {
 					e.printStackTrace();
@@ -76,18 +86,19 @@ public class ErsterVersuch extends JFrame {
 	/**
 	 * Create the frame.
 	 */
-	public ErsterVersuch() {
+	public OSEC() {
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		setBounds(100, 100, 452, 570);
+		setBounds(100, 100, 500, 706);
 		contentPane = new JPanel();
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
 		setContentPane(contentPane);
 		contentPane.setLayout(null);
 		
-		JLabel lblTollesProgramm = new JLabel("OSEC Parameter Configurator");
+		JLabel lblTollesProgramm = new JLabel("C#ROME-B Parameter Configurator");
+		lblTollesProgramm.setHorizontalAlignment(SwingConstants.CENTER);
 		lblTollesProgramm.setForeground(Color.BLUE);
 		lblTollesProgramm.setFont(new Font("Tahoma", Font.PLAIN, 18));
-		lblTollesProgramm.setBounds(5, 16, 255, 34);
+		lblTollesProgramm.setBounds(57, 11, 326, 34);
 		contentPane.add(lblTollesProgramm);
 		
 		JLabel lblPasTimeout = new JLabel("PAS Timeout");
@@ -190,6 +201,90 @@ public class ErsterVersuch extends JFrame {
 		lblBatteryCurrentCal_1.setBounds(5, 415, 131, 14);
 		contentPane.add(lblBatteryCurrentCal_1);
 		
+		JLabel lblAssistLevel = new JLabel("Assist Level 1");
+		lblAssistLevel.setBounds(295, 95, 114, 14);
+		contentPane.add(lblAssistLevel);
+		
+		Assist_Level_1 = new JTextField();
+		Assist_Level_1.setText("20");
+		Assist_Level_1.setColumns(10);
+		Assist_Level_1.setBounds(382, 92, 86, 20);
+		contentPane.add(Assist_Level_1);
+		
+		JLabel lblAssistLevel_1 = new JLabel("Assist Level 2");
+		lblAssistLevel_1.setBounds(295, 122, 114, 14);
+		contentPane.add(lblAssistLevel_1);
+		
+		Assist_Level_2 = new JTextField();
+		Assist_Level_2.setText("40");
+		Assist_Level_2.setColumns(10);
+		Assist_Level_2.setBounds(382, 119, 86, 20);
+		contentPane.add(Assist_Level_2);
+		
+		JLabel lblAssistLevel_2 = new JLabel("Assist Level 3");
+		lblAssistLevel_2.setBounds(295, 149, 114, 14);
+		contentPane.add(lblAssistLevel_2);
+		
+		Assist_Level_3 = new JTextField();
+		Assist_Level_3.setText("60");
+		Assist_Level_3.setColumns(10);
+		Assist_Level_3.setBounds(382, 146, 86, 20);
+		contentPane.add(Assist_Level_3);
+		
+		Assist_Level_4 = new JTextField();
+		Assist_Level_4.setText("80");
+		Assist_Level_4.setColumns(10);
+		Assist_Level_4.setBounds(382, 173, 86, 20);
+		contentPane.add(Assist_Level_4);
+		
+		lblAssistLevel_3 = new JLabel("Assist Level 4");
+		lblAssistLevel_3.setBounds(295, 176, 114, 14);
+		contentPane.add(lblAssistLevel_3);
+		
+		lblAssistLevel_4 = new JLabel("Assist Level 5");
+		lblAssistLevel_4.setBounds(295, 204, 114, 14);
+		contentPane.add(lblAssistLevel_4);
+		
+		Assist_Level_5 = new JTextField();
+		Assist_Level_5.setText("100");
+		Assist_Level_5.setColumns(10);
+		Assist_Level_5.setBounds(382, 201, 86, 20);
+		contentPane.add(Assist_Level_5);
+		
+		JList list = new JList();
+		list.setBounds(441, 177, 1, 1);
+		contentPane.add(list);
+		
+		JLabel lblCheattime = new JLabel("Cheat-time 1");
+		lblCheattime.setBounds(295, 257, 114, 14);
+		contentPane.add(lblCheattime);
+		
+		Cheat_Time_1 = new JTextField();
+		Cheat_Time_1.setText("50");
+		Cheat_Time_1.setColumns(10);
+		Cheat_Time_1.setBounds(382, 254, 86, 20);
+		contentPane.add(Cheat_Time_1);
+		
+		JLabel lblCheattime_1 = new JLabel("Cheat-time 2");
+		lblCheattime_1.setBounds(295, 291, 114, 14);
+		contentPane.add(lblCheattime_1);
+		
+		Cheat_Time_2 = new JTextField();
+		Cheat_Time_2.setText("50");
+		Cheat_Time_2.setColumns(10);
+		Cheat_Time_2.setBounds(382, 288, 86, 20);
+		contentPane.add(Cheat_Time_2);
+		
+		JLabel lblCheattime_2 = new JLabel("Cheat-time 3");
+		lblCheattime_2.setBounds(295, 322, 114, 14);
+		contentPane.add(lblCheattime_2);
+		
+		Cheat_Time_3 = new JTextField();
+		Cheat_Time_3.setText("50");
+		Cheat_Time_3.setColumns(10);
+		Cheat_Time_3.setBounds(382, 319, 86, 20);
+		contentPane.add(Cheat_Time_3);
+		
 		lblHttpsopensourceebikefirmwarebitbucketio = new JButton("https://opensourceebikefirmware.bitbucket.io/");
 		lblHttpsopensourceebikefirmwarebitbucketio.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
@@ -207,13 +302,14 @@ public class ErsterVersuch extends JFrame {
 			}
 		});
 		lblHttpsopensourceebikefirmwarebitbucketio.setForeground(Color.BLUE);
-		lblHttpsopensourceebikefirmwarebitbucketio.setBounds(65, 476, 309, 29);
+		lblHttpsopensourceebikefirmwarebitbucketio.setBounds(68, 627, 309, 29);
 		contentPane.add(lblHttpsopensourceebikefirmwarebitbucketio);
 		
 		lblOpenSourceFirmware = new JLabel("Open Source Firmware for E-Bike Controller");
+		lblOpenSourceFirmware.setHorizontalAlignment(SwingConstants.CENTER);
 		lblOpenSourceFirmware.setFont(new Font("Tahoma", Font.PLAIN, 11));
 		lblOpenSourceFirmware.setForeground(Color.BLUE);
-		lblOpenSourceFirmware.setBounds(5, 47, 255, 14);
+		lblOpenSourceFirmware.setBounds(97, 42, 255, 14);
 		contentPane.add(lblOpenSourceFirmware);
 		
 		txtMaxbatterycurrent = new JTextField();
@@ -238,38 +334,38 @@ public class ErsterVersuch extends JFrame {
 		
 		JRadioButton rdbtnThrottle = new JRadioButton("Throttle");
 		Ridingmode.add(rdbtnThrottle);
-		rdbtnThrottle.setBounds(259, 220, 109, 23);
+		rdbtnThrottle.setBounds(127, 506, 109, 23);
 		contentPane.add(rdbtnThrottle);
 		
 		JRadioButton rdbtnThrottlePas = new JRadioButton("Throttle and PAS");
 		Ridingmode.add(rdbtnThrottlePas);
-		rdbtnThrottlePas.setBounds(259, 244, 149, 23);
+		rdbtnThrottlePas.setBounds(127, 530, 149, 23);
 		contentPane.add(rdbtnThrottlePas);
 		
 		JRadioButton rdbtnTorqueSensor = new JRadioButton("Torquesensor");
 		rdbtnTorqueSensor.setSelected(true);
 		Ridingmode.add(rdbtnTorqueSensor);
-		rdbtnTorqueSensor.setBounds(259, 270, 144, 23);
+		rdbtnTorqueSensor.setBounds(127, 556, 144, 23);
 		contentPane.add(rdbtnTorqueSensor);
 		
 		JLabel lblRideMode = new JLabel("Ride Mode");
 		lblRideMode.setFont(new Font("Tahoma", Font.BOLD, 12));
-		lblRideMode.setBounds(259, 201, 86, 14);
+		lblRideMode.setBounds(127, 487, 86, 14);
 		contentPane.add(lblRideMode);
 		
 		lblDiplayType = new JLabel("Display Type");
 		lblDiplayType.setFont(new Font("Tahoma", Font.BOLD, 12));
-		lblDiplayType.setBounds(259, 321, 86, 14);
+		lblDiplayType.setBounds(5, 487, 86, 14);
 		contentPane.add(lblDiplayType);
 		
 		JRadioButton rdbtnNone = new JRadioButton("None");
 		buttonGroup.add(rdbtnNone);
-		rdbtnNone.setBounds(259, 342, 109, 23);
+		rdbtnNone.setBounds(5, 508, 109, 23);
 		contentPane.add(rdbtnNone);
 		
 		JRadioButton rdbtnKingmeterJlcd = new JRadioButton("Kingmeter J-LCD");
 		buttonGroup.add(rdbtnKingmeterJlcd);
-		rdbtnKingmeterJlcd.setBounds(259, 368, 149, 23);
+		rdbtnKingmeterJlcd.setBounds(5, 532, 149, 23);
 		contentPane.add(rdbtnKingmeterJlcd);
 		
 		JButton btnWriteoptionsbyte = new JButton("Write Option Bytes");
@@ -303,7 +399,7 @@ public class ErsterVersuch extends JFrame {
 				}
 			}
 		});
-		btnWriteoptionsbyte.setBounds(259, 94, 167, 51);
+		btnWriteoptionsbyte.setBounds(295, 541, 167, 51);
 		contentPane.add(btnWriteoptionsbyte);
 		
 		btnWriteConfiguration = new JButton("Write Configuration");
@@ -344,6 +440,22 @@ public class ErsterVersuch extends JFrame {
 		            pWriter.println(text_to_save); 
 		            text_to_save = "#define current_cal_b " + txtBatteryCurcalb.getText();
 		            pWriter.println(text_to_save); 
+		            text_to_save = "#define LEVEL_1 " + Assist_Level_1.getText();
+		            pWriter.println(text_to_save); 
+		            text_to_save = "#define LEVEL_2 " + Assist_Level_2.getText();
+		            pWriter.println(text_to_save); 
+		            text_to_save = "#define LEVEL_3 " + Assist_Level_3.getText();
+		            pWriter.println(text_to_save);
+		            text_to_save = "#define LEVEL_4 " + Assist_Level_4.getText();
+		            pWriter.println(text_to_save);
+		            text_to_save = "#define LEVEL_5 " + Assist_Level_5.getText();
+		            pWriter.println(text_to_save);
+		            text_to_save = "#define CHEAT_TIME_1 " + Cheat_Time_1.getText();
+		            pWriter.println(text_to_save);
+		            text_to_save = "#define CHEAT_TIME_2 " + Cheat_Time_2.getText();
+		            pWriter.println(text_to_save);
+		            text_to_save = "#define CHEAT_TIME_3 " + Cheat_Time_3.getText();
+		            pWriter.println(text_to_save);
 
 		    		if (rdbtnTorqueSensor.isSelected()){ 
 			            text_to_save = "#define TORQUESENSOR";
@@ -386,8 +498,10 @@ public class ErsterVersuch extends JFrame {
 		});
 		btnWriteConfiguration.setFont(new Font("Tahoma", Font.BOLD, 12));
 		btnWriteConfiguration.setForeground(Color.BLUE);
-		btnWriteConfiguration.setBounds(259, 25, 167, 58);
+		btnWriteConfiguration.setBounds(295, 471, 167, 58);
 		contentPane.add(btnWriteConfiguration);
+		
+
 		
 		
 		
