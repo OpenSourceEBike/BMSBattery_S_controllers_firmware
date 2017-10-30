@@ -54,11 +54,14 @@ int main (void);
 // Brake signal interrupt
 void EXTI_PORTA_IRQHandler(void) __interrupt(EXTI_PORTA_IRQHANDLER);
 
-// motor overcurrent interrupt
+// Motor overcurrent interrupt
 void EXTI_PORTD_IRQHandler(void) __interrupt(EXTI_PORTD_IRQHANDLER);
 
 // Timer1/PWM period interrupt
 void TIM1_UPD_OVF_TRG_BRK_IRQHandler(void) __interrupt(TIM1_UPD_OVF_TRG_BRK_IRQHANDLER);
+
+// UART2 Receive interrupt
+void UART2_IRQHandler(void) __interrupt(UART2_IRQHANDLER);
 
 /////////////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////////////

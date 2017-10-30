@@ -18,15 +18,17 @@ void uart_init (void)
 {
   UART2_DeInit();
 #ifdef DEBUG_UART
-  UART2_Init((uint32_t)115200,
+  UART2_Init((uint32_t) 115200,
 #else
-  UART2_Init((uint32_t)9600,
+  UART2_Init((uint32_t) 9600,
 #endif
 	     UART2_WORDLENGTH_8D,
 	     UART2_STOPBITS_1,
 	     UART2_PARITY_NO,
 	     UART2_SYNCMODE_CLOCK_DISABLE,
 	     UART2_MODE_TXRX_ENABLE);
+
+  UART2_ITConfig(UART2_IT_RXNE_OR, ENABLE);
 }
 
 #if __SDCC_REVISION < 9624

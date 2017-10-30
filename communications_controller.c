@@ -8,6 +8,7 @@
 
 #include <stdint.h>
 #include <stdio.h>
+#include "stm8s_uart2.h"
 #include "main.h"
 #include "uart.h"
 #include "motor_controller_low_level.h"
@@ -83,6 +84,60 @@ void communications_controller (void)
 #ifndef DEBUG_UART
     putchar (tx_buffer [ui8_i]);
 #endif
+  }
+}
+
+void UART2_IRQHandler(void) __interrupt(UART2_IRQHANDLER)
+{
+  static uint8_t rx_buffer[13];
+  static uint8_t ui8_rx_counter = 0;
+  uint8_t ui8_byte_received;
+  static uint8_t ui8_state_machine = 0;
+
+  if(UART2_GetFlagStatus(UART2_FLAG_RXNE) == SET)
+  {
+    ui8_byte_received = UART2_ReceiveData8 ();
+
+    switch (ui8_state_machine)
+    {
+      case 0:
+      if (ui8_byte_received == 0x32)
+      {
+	rx_buffer[0] = ui8_byte_received;
+	ui8_rx_counter++;
+	ui8_state_machine = 1;
+      }
+      else
+      {
+	ui8_rx_counter = 0;
+	ui8_state_machine = 0;
+      }
+      break;
+
+      case 1:
+      if (ui8_byte_received == 0x0e)
+      {
+	rx_buffer[1] = ui8_byte_received;
+	ui8_rx_counter++;
+	ui8_state_machine = 2;
+      }
+      else
+      {
+	ui8_rx_counter = 0;
+	ui8_state_machine = 0;
+      }
+      break;
+
+      case 2:
+      rx_buffer[2] = ui8_byte_received;
+
+      ui8_rx_counter = 0;
+      ui8_state_machine = 0;
+      break;
+
+      default:
+      break;
+    }
   }
 }
 
