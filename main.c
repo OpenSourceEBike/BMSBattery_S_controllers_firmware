@@ -329,7 +329,7 @@ if(ui8_cheat_state==3) //second step, make sure the brake is hold according to d
 
 
 
-            printf("cheatstate, %d, km/h %lu, erps, %d, setpoint, %d, correction value, %d\n", ui8_cheat_state, ui32_SPEED_km_h, ui16_SPEED, ui16_setpoint, ui8_position_correction_value);
+            printf("cheatstate, %d, km/h %lu, Voltage, %d, setpoint, %d, correction value, %d\n", ui8_cheat_state, ui32_SPEED_km_h, ui8_BatteryVoltage, ui16_setpoint, ui8_position_correction_value);
       //      printf("%d, %d, %d\n", ui8_motor_state, ui16_motor_speed_erps, ui8_position_correction_value);
 
 
