@@ -354,8 +354,7 @@ void pwm_init_bipolar_4q (void)
 
 void pwm_init_6_steps (void)
 {
-// TIM1 Peripheral Configuration
-  TIM1_DeInit();
+  TIM1_CtrlPWMOutputs(DISABLE);
 
   TIM1_TimeBaseInit(0, // TIM1_Prescaler = 0
 		     TIM1_COUNTERMODE_UP,
@@ -397,6 +396,11 @@ void pwm_init_6_steps (void)
 		  TIM1_BREAK_DISABLE,
 		  TIM1_BREAKPOLARITY_LOW,
 		  TIM1_AUTOMATICOUTPUT_DISABLE);
+
+  // put the phases to a valid state
+  pwm_phase_a_disable (ui8_duty_cycle);
+  pwm_phase_b_disable (ui8_duty_cycle);
+  pwm_phase_c_disable (ui8_duty_cycle);
 
   TIM1_ITConfig(TIM1_IT_UPDATE, ENABLE);
   TIM1_Cmd(ENABLE); // TIM1 counter enable
@@ -446,7 +450,7 @@ void pwm_apply_duty_cycle (uint8_t ui8_duty_cycle_value)
 {
   uint8_t ui8_temp;
 
-  if (ui8_motor_interpolation_state == NO_INTERPOLATION_60_DEGREES)
+  if (ui8_motor_commutation_type == BLOCK_COMMUTATION)
   {
     TIM1_SetCompare1((uint16_t) (ui8_duty_cycle_value << 2));
     TIM1_SetCompare2((uint16_t) (ui8_duty_cycle_value << 2));

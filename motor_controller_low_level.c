@@ -28,7 +28,7 @@ uint8_t ui8_motor_rotor_absolute_position = 0; // in 360/256 degrees
 uint8_t ui8_position_correction_value = 127; // in 360/256 degrees
 uint8_t ui8_interpolation_angle = 0;
 
-uint8_t ui8_motor_interpolation_state = NO_INTERPOLATION_60_DEGREES;
+uint8_t ui8_motor_commutation_type = BLOCK_COMMUTATION;
 uint8_t ui8_motor_state = MOTOR_STATE_COAST;
 uint8_t ui8_motor_controller_state = MOTOR_CONTROLLER_STATE_OK;
 
@@ -66,13 +66,13 @@ void hall_sensors_read_and_action (void)
     switch (ui8_hall_sensors)
     {
       case 3:
-      if (ui8_motor_interpolation_state == NO_INTERPOLATION_60_DEGREES)
+      if (ui8_motor_commutation_type == BLOCK_COMMUTATION)
       {
 	pwm_phase_a_enable_pwm (ui8_duty_cycle);
 	pwm_phase_b_disable (ui8_duty_cycle);
 	pwm_phase_c_enable_low (ui8_duty_cycle);
       }
-      else if (ui8_motor_interpolation_state == INTERPOLATION_60_DEGREES)
+      else if (ui8_motor_commutation_type == SINEWAVE_INTERPOLATION_60_DEGREES)
       {
 	ui8_motor_rotor_absolute_position = ANGLE_180 + MOTOR_ROTOR_DELTA_PHASE_ANGLE_RIGHT;
       }
@@ -87,50 +87,56 @@ void hall_sensors_read_and_action (void)
 	ui16_motor_speed_erps = PWM_CYCLES_SECOND / ui16_PWM_cycles_counter_total; // this division takes ~4.2us
       }
 
-      // update motor state based on motor speed
+      // update motor commutation state based on motor speed
 #if MOTOR_TYPE == MOTOR_TYPE_Q85
-      if ((ui16_motor_speed_erps > 125) &&
-	  (ui8_motor_interpolation_state == INTERPOLATION_60_DEGREES))
+      if ((ui16_motor_speed_erps > 120) &&
+	  (ui8_motor_commutation_type == SINEWAVE_INTERPOLATION_60_DEGREES))
       {
-	ui8_motor_interpolation_state = INTERPOLATION_360_DEGREES;
+#ifdef DO_SINEWAVE_INTERPOLATION_360_DEGREES
+	ui8_motor_commutation_type = SINEWAVE_INTERPOLATION_360_DEGREES;
 	ui8_motor_state = MOTOR_STATE_RUNNING;
+#endif
       }
-      if ((ui16_motor_speed_erps < 100) &&
-	  (ui8_motor_interpolation_state == INTERPOLATION_360_DEGREES))
+      if ((ui16_motor_speed_erps < 90) &&
+	  (ui8_motor_commutation_type == SINEWAVE_INTERPOLATION_360_DEGREES))
       {
-	ui8_motor_interpolation_state = INTERPOLATION_60_DEGREES;
+	ui8_motor_commutation_type = SINEWAVE_INTERPOLATION_60_DEGREES;
 	ui8_motor_state = MOTOR_STATE_RUNNING;
       }
 
-      if ((ui16_motor_speed_erps > 75) &&
-	  (ui8_motor_interpolation_state == NO_INTERPOLATION_60_DEGREES))
+      if ((ui16_motor_speed_erps > 60) &&
+	  (ui8_motor_commutation_type == BLOCK_COMMUTATION))
       {
-	ui8_motor_interpolation_state = INTERPOLATION_60_DEGREES;
+	ui8_motor_commutation_type = SINEWAVE_INTERPOLATION_60_DEGREES;
 	ui8_motor_state = MOTOR_STATE_RUNNING;
 
 	pwm_init_bipolar_4q ();
       }
-      if ((ui16_motor_speed_erps < 50) &&
-	  (ui8_motor_interpolation_state == INTERPOLATION_60_DEGREES))
+      if ((ui16_motor_speed_erps < 30) &&
+	  (ui8_motor_commutation_type == SINEWAVE_INTERPOLATION_60_DEGREES))
       {
-	ui8_motor_interpolation_state = NO_INTERPOLATION_60_DEGREES;
+	ui8_motor_commutation_type = BLOCK_COMMUTATION;
 	ui8_motor_state = MOTOR_STATE_RUNNING;
 
 	pwm_init_6_steps ();
+	// put the phases to a valid state
+	pwm_phase_a_disable (ui8_duty_cycle);
+	pwm_phase_b_disable (ui8_duty_cycle);
+	pwm_phase_c_disable (ui8_duty_cycle);
       }
 #elif MOTOR_TYPE == MOTOR_TYPE_EUC2
       if (ui16_motor_speed_erps > 3)
       {
-	ui8_motor_interpolation_state = INTERPOLATION_60_DEGREES;
+	ui8_motor_commutation_type = SINEWAVE_INTERPOLATION_60_DEGREES;
 	ui8_motor_state = MOTOR_STATE_RUNNING;
       }
       else
       {
-	ui8_motor_interpolation_state = NO_INTERPOLATION_60_DEGREES;
+	ui8_motor_commutation_type = BLOCK_COMMUTATION;
       }
 #endif
 
-      if (ui8_motor_interpolation_state == NO_INTERPOLATION_60_DEGREES)
+      if (ui8_motor_commutation_type == BLOCK_COMMUTATION)
       {
 	pwm_phase_a_enable_pwm (ui8_duty_cycle);
 	pwm_phase_b_enable_low (ui8_duty_cycle);
@@ -143,13 +149,13 @@ void hall_sensors_read_and_action (void)
       break;
 
       case 5:
-      if (ui8_motor_interpolation_state == NO_INTERPOLATION_60_DEGREES)
+      if (ui8_motor_commutation_type == BLOCK_COMMUTATION)
       {
 	pwm_phase_a_disable (ui8_duty_cycle);
 	pwm_phase_b_enable_low (ui8_duty_cycle);
 	pwm_phase_c_enable_pwm (ui8_duty_cycle);
       }
-      else if (ui8_motor_interpolation_state == INTERPOLATION_60_DEGREES)
+      else if (ui8_motor_commutation_type == SINEWAVE_INTERPOLATION_60_DEGREES)
       {
 	ui8_motor_rotor_absolute_position = ANGLE_300 + MOTOR_ROTOR_DELTA_PHASE_ANGLE_RIGHT;
       }
@@ -162,7 +168,7 @@ void hall_sensors_read_and_action (void)
 #if (MOTOR_TYPE == MOTOR_TYPE_EUC2)
       if (ui8_motor_state == MOTOR_STATE_RUNNING)
       {
-	if (ui8_motor_interpolation_state == INTERPOLATION_60_DEGREES)
+	if (ui8_motor_commutation_type == SINEWAVE_INTERPOLATION_60_DEGREES)
 	{
 	  if (ui8_ADC_id_current > 127)
 	  {
@@ -177,8 +183,8 @@ void hall_sensors_read_and_action (void)
 #elif (MOTOR_TYPE == MOTOR_TYPE_Q85)
       if (ui8_motor_state == MOTOR_STATE_RUNNING)
       {
-	if ((ui8_motor_interpolation_state == INTERPOLATION_60_DEGREES) ||
-	   (ui8_motor_interpolation_state == INTERPOLATION_360_DEGREES))
+	if ((ui8_motor_commutation_type == SINEWAVE_INTERPOLATION_60_DEGREES) ||
+	   (ui8_motor_commutation_type == SINEWAVE_INTERPOLATION_360_DEGREES))
 	{
 	  if (ui8_ADC_id_current > 127)
 	  {
@@ -196,13 +202,13 @@ void hall_sensors_read_and_action (void)
       }
 #endif
 
-      if (ui8_motor_interpolation_state == NO_INTERPOLATION_60_DEGREES)
+      if (ui8_motor_commutation_type == BLOCK_COMMUTATION)
       {
 	pwm_phase_a_enable_low (ui8_duty_cycle);
 	pwm_phase_b_disable (ui8_duty_cycle);
 	pwm_phase_c_enable_pwm (ui8_duty_cycle);
       }
-      else if (ui8_motor_interpolation_state == INTERPOLATION_60_DEGREES)
+      else if (ui8_motor_commutation_type == SINEWAVE_INTERPOLATION_60_DEGREES)
       {
 	ui8_motor_rotor_absolute_position = ANGLE_1 + MOTOR_ROTOR_DELTA_PHASE_ANGLE_RIGHT;
       }
@@ -211,26 +217,26 @@ void hall_sensors_read_and_action (void)
       case 6:
       ui8_half_e_rotation_flag = 1;
 
-      if (ui8_motor_interpolation_state == NO_INTERPOLATION_60_DEGREES)
+      if (ui8_motor_commutation_type == BLOCK_COMMUTATION)
       {
 	pwm_phase_a_enable_low (ui8_duty_cycle);
 	pwm_phase_b_enable_pwm (ui8_duty_cycle);
 	pwm_phase_c_disable (ui8_duty_cycle);
       }
-      else if (ui8_motor_interpolation_state == INTERPOLATION_60_DEGREES)
+      else if (ui8_motor_commutation_type == SINEWAVE_INTERPOLATION_60_DEGREES)
       {
 	ui8_motor_rotor_absolute_position = ANGLE_60 + MOTOR_ROTOR_DELTA_PHASE_ANGLE_RIGHT;
       }
       break;
 
       case 2:
-      if (ui8_motor_interpolation_state == NO_INTERPOLATION_60_DEGREES)
+      if (ui8_motor_commutation_type == BLOCK_COMMUTATION)
       {
 	pwm_phase_a_disable (ui8_duty_cycle);
 	pwm_phase_b_enable_pwm (ui8_duty_cycle);
 	pwm_phase_c_enable_low (ui8_duty_cycle);
       }
-      else if (ui8_motor_interpolation_state == INTERPOLATION_60_DEGREES)
+      else if (ui8_motor_commutation_type == SINEWAVE_INTERPOLATION_60_DEGREES)
       {
 	ui8_motor_rotor_absolute_position = ANGLE_120 + MOTOR_ROTOR_DELTA_PHASE_ANGLE_RIGHT;
       }
@@ -261,8 +267,9 @@ void motor_fast_loop (void)
     ui16_motor_speed_erps = 0;
     ui16_PWM_cycles_counter_total = 0xffff;
     ui8_position_correction_value = 127;
-    ui8_motor_interpolation_state = NO_INTERPOLATION_60_DEGREES;
+    ui8_motor_commutation_type = BLOCK_COMMUTATION;
     ui8_motor_state = MOTOR_STATE_STOP;
+    pwm_init_6_steps ();
     ui8_hall_sensors_last = 0; // this way we force execution of hall sensors code
   }
 
@@ -270,7 +277,7 @@ void motor_fast_loop (void)
 #if DO_INTERPOLATION == 1
   // calculate the interpolation angle
   // interpolation seems a problem when motor starts, so avoid to do it at very low speed
-  if (ui8_motor_interpolation_state == INTERPOLATION_60_DEGREES)
+  if (ui8_motor_commutation_type == SINEWAVE_INTERPOLATION_60_DEGREES)
   {
     ui8_interpolation_angle = (ui16_PWM_cycles_counter_6 << 8) / ui16_PWM_cycles_counter_total;
 #if MOTOR_TYPE == MOTOR_TYPE_Q85
@@ -279,7 +286,7 @@ void motor_fast_loop (void)
     ui8_motor_rotor_position = ui8_motor_rotor_absolute_position + ui8_position_correction_value - ui8_interpolation_angle;
 #endif
   }
-  else if (ui8_motor_interpolation_state == INTERPOLATION_360_DEGREES)
+  else if (ui8_motor_commutation_type == SINEWAVE_INTERPOLATION_360_DEGREES)
   {
     ui8_interpolation_angle = (ui16_PWM_cycles_counter << 8) / ui16_PWM_cycles_counter_total;
 #if MOTOR_TYPE == MOTOR_TYPE_Q85
@@ -288,7 +295,7 @@ void motor_fast_loop (void)
     ui8_motor_rotor_position = ui8_motor_rotor_absolute_position + ui8_position_correction_value - ui8_interpolation_angle;
 #endif
   }
-  else // MOTOR_STATE_COAST || MOTOR_STATE_RUNNING_NO_INTERPOLATION_60_DEGREES
+  else
 #endif
   {
     ui8_motor_rotor_position = ui8_motor_rotor_absolute_position;
@@ -349,7 +356,7 @@ void motor_init (void)
 
   motor_set_current_max (ADC_MOTOR_CURRENT_MAX);
   motor_set_regen_current_max (ADC_MOTOR_REGEN_CURRENT_MAX);
-  motor_set_pwm_duty_cycle_ramp_inverse_step (PWM_DUTY_CYCLE_RAMP_INVERSE_STEP);
+  motor_set_pwm_duty_cycle_ramp_inverse_step (30); // each step = 64us
 }
 
 void motor_set_pwm_duty_cycle_target (uint8_t value)

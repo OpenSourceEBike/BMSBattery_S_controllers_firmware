@@ -13,9 +13,9 @@
 #include "interrupts.h"
 
 // motor states
-#define NO_INTERPOLATION_60_DEGREES 2
-#define INTERPOLATION_60_DEGREES 3
-#define INTERPOLATION_360_DEGREES 4
+#define BLOCK_COMMUTATION 1
+#define SINEWAVE_INTERPOLATION_60_DEGREES 2
+#define SINEWAVE_INTERPOLATION_360_DEGREES 3
 
 #define MOTOR_STATE_STOP 0
 #define MOTOR_STATE_COAST 1
@@ -29,7 +29,7 @@
 
 extern uint8_t ui8_motor_rotor_position;
 extern uint8_t ui8_position_correction_value;
-extern uint8_t ui8_motor_interpolation_state;
+extern uint8_t ui8_motor_commutation_type;
 extern uint16_t ui16_PWM_cycles_counter_total;
 extern uint8_t ui8_ADC_id_current;
 extern uint8_t ui8_motor_total_current_flag;

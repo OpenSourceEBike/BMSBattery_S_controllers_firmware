@@ -16,6 +16,8 @@
 
 #define MOTOR_TYPE MOTOR_TYPE_Q85
 
+//#define DO_SINEWAVE_INTERPOLATION_360_DEGREES
+
 // MOTOR_TYPE_EUC2
 // 28V --> 66 ERPs
 // 0.424 for each ERPs
@@ -31,7 +33,7 @@
 #define ADC_MOTOR_CURRENT_MAX_ZERO_VALUE 79
 #define ADC_MOTOR_CURRENT_MAX_ZERO_VALUE_10B 317
 #define ADC_MOTOR_CURRENT_MAX_MED_VALUE_10B 10144 // ADC_MOTOR_CURRENT_MAX_ZERO_VALUE_10B << 5
-#define ADC_MOTOR_CURRENT_MAX 30 // 30 = 15A; 1 --> 0.5A
+#define ADC_MOTOR_CURRENT_MAX 20 // 30 = 15A; 1 --> 0.5A
 #define ADC_MOTOR_REGEN_CURRENT_MAX 2 	//1 --> 0.5A
 
 // ADC Battery voltage
@@ -56,7 +58,7 @@
 #define MOTOR_ROTOR_DELTA_PHASE_ANGLE_RIGHT 235 // best value found
 #endif
 
-#define PWM_CYCLES_COUNTER_MAX 4000 // bei h�heren Werten wird angenommen, der Motor steht.
+#define PWM_CYCLES_COUNTER_MAX 3125 // 5 erps minimum speed; 1/5 = 200ms; 200ms/64us = 3125
 #define PWM_CYCLES_SECOND 15625L // 1 / 64us(PWM period)
 
 #define PWM_DUTY_CYCLE_RAMP_INVERSE_STEP 127
@@ -75,7 +77,8 @@
 #define ANGLE_360 255
 
 //#define MOTOR_OVER_SPEED_ERPS 390 // motor max speed, protection max value | 40 points for the sinewave at max speed
-#define MOTOR_OVER_SPEED_ERPS 500
+#define MOTOR_OVER_SPEED_ERPS 520
+
 #define MOTOR_SPEED_CONTROLLER_KP 2 // x << 5
 #define MOTOR_SPEED_CONTROLLER_OUTPUT_MAX 8160 // PWM max duty_cycle << 5
 
@@ -98,6 +101,8 @@
 
 // *************************************************************************** //
 // BATTERY
+
+//#define BATTERY_OVER_VOLTAGE_PROTECTION
 
 // Considering the follow voltage values for each li-ion battery cell
 // State of charge 		| voltage
