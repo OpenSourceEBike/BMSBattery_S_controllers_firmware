@@ -56,7 +56,7 @@
 #define MOTOR_ROTOR_DELTA_PHASE_ANGLE_RIGHT 235 // best value found
 #endif
 
-#define PWM_CYCLES_COUNTER_MAX 4000 // bei h�heren Werten wird angenommen, der Motor steht.
+#define PWM_CYCLES_COUNTER_MAX 3125 // 5 erps minimum speed; 1/5 = 200ms; 200ms/64us = 3125
 #define PWM_CYCLES_SECOND 15625L // 1 / 64us(PWM period)
 
 #define PWM_DUTY_CYCLE_RAMP_INVERSE_STEP 127
@@ -75,7 +75,8 @@
 #define ANGLE_360 255
 
 //#define MOTOR_OVER_SPEED_ERPS 390 // motor max speed, protection max value | 40 points for the sinewave at max speed
-#define MOTOR_OVER_SPEED_ERPS 500
+#define MOTOR_OVER_SPEED_ERPS 600
+
 #define MOTOR_SPEED_CONTROLLER_KP 2 // x << 5
 #define MOTOR_SPEED_CONTROLLER_OUTPUT_MAX 8160 // PWM max duty_cycle << 5
 

@@ -35,17 +35,17 @@ uint8_t motor_speed_controller (uint8_t ui8_current_pwm_duty_cycle); // call eve
 
 void motor_controller_high_level (void)
 {
-  uint8_t ui8_current_pwm_duty_cycle;
-  uint8_t ui8_pwm_duty_cycle_a;
-  uint8_t ui8_pwm_duty_cycle_b;
-
-  motor_battery_voltage_protection ();
-
-  ui8_current_pwm_duty_cycle = pwm_get_duty_cycle ();
-  ui8_pwm_duty_cycle_a = motor_current_controller (ui8_current_pwm_duty_cycle);
-  ui8_pwm_duty_cycle_b = motor_speed_controller (ui8_current_pwm_duty_cycle);
-  // apply the value that is lower
-  motor_set_pwm_duty_cycle_target (ui8_min (ui8_pwm_duty_cycle_a, ui8_pwm_duty_cycle_b));
+//  uint8_t ui8_current_pwm_duty_cycle;
+//  uint8_t ui8_pwm_duty_cycle_a;
+//  uint8_t ui8_pwm_duty_cycle_b;
+//
+//  motor_battery_voltage_protection ();
+//
+//  ui8_current_pwm_duty_cycle = pwm_get_duty_cycle ();
+//  ui8_pwm_duty_cycle_a = motor_current_controller (ui8_current_pwm_duty_cycle);
+//  ui8_pwm_duty_cycle_b = motor_speed_controller (ui8_current_pwm_duty_cycle);
+//  // apply the value that is lower
+//  motor_set_pwm_duty_cycle_target (ui8_min (ui8_pwm_duty_cycle_a, ui8_pwm_duty_cycle_b));
 }
 
 void motor_controller_set_speed_erps (uint16_t ui16_erps)

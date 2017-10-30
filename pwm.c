@@ -446,7 +446,7 @@ void pwm_apply_duty_cycle (uint8_t ui8_duty_cycle_value)
 {
   uint8_t ui8_temp;
 
-  if (ui8_motor_interpolation_state == NO_INTERPOLATION_60_DEGREES)
+  if (ui8_motor_commutation_type == BLOCK_COMMUTATION)
   {
     TIM1_SetCompare1((uint16_t) (ui8_duty_cycle_value << 2));
     TIM1_SetCompare2((uint16_t) (ui8_duty_cycle_value << 2));
