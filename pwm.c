@@ -276,7 +276,7 @@ uint8_t ui8_svm_table [SVM_TABLE_LEN] =
 };
 
 volatile uint8_t ui8_duty_cycle = 0;
-uint8_t ui8_duty_cycle_target;
+uint8_t ui8_duty_cycle_target = 0;
 uint8_t ui8_duty_cycle_ramp_inverse_step;
 uint8_t ui8_counter_duty_cycle_ramp = 0;
 uint8_t ui8_value_a;
@@ -354,7 +354,7 @@ void pwm_init_bipolar_4q (void)
 
 void pwm_init_6_steps (void)
 {
-// TIM1 Peripheral Configuration
+  TIM1_CtrlPWMOutputs(DISABLE);
   TIM1_DeInit();
 
   TIM1_TimeBaseInit(0, // TIM1_Prescaler = 0

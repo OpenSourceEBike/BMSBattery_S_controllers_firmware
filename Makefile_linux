@@ -67,7 +67,7 @@ all: $(PNAME)
 # How to build the overall program
 $(PNAME): $(MAINSRC) $(RELS)
 	$(CC) $(INCLUDES) $(CFLAGS) $(ELF_FLAGS) $(LIBS) $(MAINSRC) $(RELS)
-	$(SIZE) $(PNAME).elf
+	$(SIZE) $(PNAME).elf -A
 	$(OBJCOPY) -O binary $(ELF_SECTIONS_TO_REMOVE) $(PNAME).elf $(PNAME).bin
 #	$(OBJCOPY) -O ihex $(ELF_SECTIONS_TO_REMOVE) $(PNAME).elf $(PNAME).hex
 

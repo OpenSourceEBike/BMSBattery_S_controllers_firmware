@@ -32,6 +32,9 @@ uint8_t ui8_motor_commutation_type = BLOCK_COMMUTATION;
 uint8_t ui8_motor_state = MOTOR_STATE_COAST;
 uint8_t ui8_motor_controller_state = MOTOR_CONTROLLER_STATE_OK;
 
+uint16_t ui16_PWM_cycles_counter_total_acc = 0;
+uint16_t ui16_PWM_cycles_counter_total_fil = 0;
+
 uint8_t ui8_hall_sensors = 0;
 uint8_t ui8_hall_sensors_last = 0;
 
@@ -59,7 +62,7 @@ void hall_sensors_read_and_action (void)
 {
   // read hall sensors signal pins and mask other pins
   ui8_hall_sensors = (GPIO_ReadInputData (HALL_SENSORS__PORT) & (HALL_SENSORS_MASK));
-  if (ui8_hall_sensors != ui8_hall_sensors_last)
+  if ((ui8_hall_sensors != ui8_hall_sensors_last) && (pwm_get_duty_cycle () > 10))
   {
     ui8_hall_sensors_last = ui8_hall_sensors;
 
@@ -82,14 +85,22 @@ void hall_sensors_read_and_action (void)
       if (ui8_half_e_rotation_flag == 1)
       {
 	ui8_half_e_rotation_flag = 0;
-	ui16_PWM_cycles_counter_total = ui16_PWM_cycles_counter;
+//	ui16_PWM_cycles_counter_total = ui16_PWM_cycles_counter;
+//	ui16_PWM_cycles_counter = 0;
+//	ui16_motor_speed_erps = PWM_CYCLES_SECOND / ui16_PWM_cycles_counter_total; // this division takes ~4.2us
+
+
+	ui16_PWM_cycles_counter_total_acc -= ui16_PWM_cycles_counter_total_acc >> 2;
+	ui16_PWM_cycles_counter_total_acc += ui16_PWM_cycles_counter;
+	ui16_PWM_cycles_counter_total = ui16_PWM_cycles_counter_total_acc >> 2;
 	ui16_PWM_cycles_counter = 0;
+
 	ui16_motor_speed_erps = PWM_CYCLES_SECOND / ui16_PWM_cycles_counter_total; // this division takes ~4.2us
       }
 
       // update motor commutation state based on motor speed
 #if MOTOR_TYPE == MOTOR_TYPE_Q85
-      if ((ui16_motor_speed_erps > 40) && (ui8_motor_commutation_type == BLOCK_COMMUTATION))
+      if ((ui16_motor_speed_erps > 30) && (ui8_motor_commutation_type == BLOCK_COMMUTATION))
       {
 	ui8_motor_commutation_type = SINEWAVE;
 	ui8_motor_state = MOTOR_STATE_RUNNING;
@@ -229,7 +240,6 @@ void motor_fast_loop (void)
   }
   else
   {
-    TIM1_CtrlPWMOutputs(DISABLE); // start by disable PWM
     ui16_PWM_cycles_counter = 0;
     ui16_PWM_cycles_counter_6 = 0;
     ui16_motor_speed_erps = 0;
@@ -238,6 +248,10 @@ void motor_fast_loop (void)
     ui8_motor_commutation_type = BLOCK_COMMUTATION;
     ui8_motor_state = MOTOR_STATE_STOP;
     pwm_init_6_steps ();
+    // put the phases to a valid state
+    pwm_phase_a_disable (ui8_duty_cycle);
+    pwm_phase_b_disable (ui8_duty_cycle);
+    pwm_phase_c_disable (ui8_duty_cycle);
     ui8_hall_sensors_last = 0; // this way we force execution of hall sensors code
   }
 

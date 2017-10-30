@@ -34,7 +34,7 @@ void throttle_pas_torque_sensor_controller (void)
   ui8_ADC_throttle = ui8_adc_read_throttle ();
 
   // throttle will setup motor pwm duty_cycle
-  ui8_temp = (uint8_t) (map ((int32_t) ui8_ADC_throttle, ADC_THROTTLE_MIN_VALUE, ADC_THROTTLE_MAX_VALUE, 0, 255));
+  ui8_temp = (uint8_t) (map ((int32_t) ui8_ADC_throttle, ADC_THROTTLE_MIN_VALUE, ADC_THROTTLE_MAX_VALUE, 0, 245));
 //  ui8_temp = cruise_control (ui8_temp);
   motor_set_pwm_duty_cycle_target (ui8_temp);
 
