@@ -472,9 +472,9 @@ public class OSEC extends JFrame {
 		    		if (rdbtnKingmeterJlcd.isSelected()){ 
 			            text_to_save = "#define DISPLAY_TYPE_KINGMETER_618U (1<<4) // King-Meter 618U protocol (KM5s, EBS-LCD2, J-LCD, SW-LCD)";
 			            pWriter.println(text_to_save); 		
-			            text_to_save = "#define DISPLAY_TYPE_KINGMETER  // (DISPLAY_TYPE_KINGMETER_618U|DISPLAY_TYPE_KINGMETER_901U)";
+			            text_to_save = "#define DISPLAY_TYPE_KINGMETER (DISPLAY_TYPE_KINGMETER_618U|DISPLAY_TYPE_KINGMETER_901U)";
 			            pWriter.println(text_to_save);
-			            text_to_save = "##define DISPLAY_TYPE DISPLAY_TYPE_KINGMETER  // Set your display type here. CHANGES ONLY HERE!";
+			            text_to_save = "#define DISPLAY_TYPE DISPLAY_TYPE_KINGMETER  // Set your display type here. CHANGES ONLY HERE!";
 			            pWriter.println(text_to_save);
 		    		}
 		            pWriter.println("\r\n#endif /* CONFIG_H_ */"); 
