@@ -50,12 +50,13 @@ EXTRASRCS = \
 
 HEADERS = adc.h brake.h gpio.h interrupts.h main.h pwm.h timers.h uart.h utils.h motor_controller_low_level.h motor_controller_high_level.h \
 	throttle_pas_torque_sensor_controller.h communications_controller.h
+
 # The list of .rel files can be derived from the list of their source files
 RELS = $(EXTRASRCS:.c=.rel)
 
 INCLUDES = -I$(IDIR) -I. 
 CFLAGS   = -m$(PLATFORM) -Ddouble=float --std-c99 --nolospre
-ELF_FLAGS = --out-fmt-elf --debug
+ELF_FLAGS = --out-fmt-ihx --debug
 LIBS     = 
 
 # This just provides the conventional target name "all"; it is optional
@@ -65,9 +66,9 @@ all: $(PNAME)
 # How to build the overall program
 $(PNAME): $(MAINSRC) $(RELS)
 	$(CC) $(INCLUDES) $(CFLAGS) $(ELF_FLAGS) $(LIBS) $(MAINSRC) $(RELS)
-	$(SIZE) $(PNAME).elf
-	$(OBJCOPY) -O binary $(ELF_SECTIONS_TO_REMOVE) $(PNAME).elf $(PNAME).bin
-	$(OBJCOPY) -O ihex $(ELF_SECTIONS_TO_REMOVE) $(PNAME).elf $(PNAME).hex
+# $(SIZE) $(PNAME).elf
+# $(OBJCOPY) -O binary $(ELF_SECTIONS_TO_REMOVE) $(PNAME).elf $(PNAME).bin
+# $(OBJCOPY) -O ihex $(ELF_SECTIONS_TO_REMOVE) $(PNAME).elf $(PNAME).hex
 
 # How to build any .rel file from its corresponding .c file
 # GNU would have you use a pattern rule for this, but that's GNU-specific

@@ -28,7 +28,7 @@ uint8_t ui8_ADC_throttle;
 void throttle_pas_torque_sensor_controller (void)
 {
   uint8_t ui8_temp;
-  uint16_t ui16_temp;
+ // uint16_t ui16_temp;
 
   // only throttle implemented for now
   ui8_ADC_throttle = ui8_adc_read_throttle ();
