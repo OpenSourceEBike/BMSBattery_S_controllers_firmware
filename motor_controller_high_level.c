@@ -17,6 +17,7 @@
 #include "utils.h"
 
 uint16_t ui16_target_erps = 0;
+uint16_t ui16_target_erps_max = 0;
 uint16_t ui16_target_current = 0;
 
 uint16_t ui16_ADC_battery_voltage_accumulated = BATTERY_VOLTAGE_MED_VALUE;
@@ -51,6 +52,11 @@ void motor_controller_high_level (void)
 void motor_controller_set_speed_erps (uint16_t ui16_erps)
 {
   ui16_target_erps = ui16_erps;
+}
+
+void motor_controller_set_speed_erps_max (uint16_t ui16_erps)
+{
+  ui16_target_erps_max = ui16_erps;
 }
 
 void motor_controller_set_current (uint16_t ui16_current)

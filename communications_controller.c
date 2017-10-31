@@ -15,15 +15,22 @@
 #include "motor_controller_high_level.h"
 #include "communications_controller.h"
 
+uint8_t rx_buffer[13];
+uint8_t ui8_received_package_flag = 0;
+
 void communications_controller (void)
 {
   static uint8_t tx_buffer[12];
-  uint8_t ui8_i = 0;
-  uint8_t ui8_crc = 0;
+  uint8_t ui8_i;
+  uint8_t ui8_crc;
   uint16_t ui16_wheel_period_ms;
-  static uint16_t ui16_battery_volts;
-  static uint16_t ui16_battery_soc;
-  static uint8_t ui16_error;
+  uint16_t ui16_battery_volts;
+  uint16_t ui16_battery_soc;
+  uint8_t ui16_error;
+
+  /********************************************************************************************/
+  // Prepare and send packate to LCD
+  //
 
   // calc wheel period in ms
   ui16_wheel_period_ms = (motor_get_er_PWM_ticks () * (MOTOR_NUMBER_MAGNETS >> 1) * MOTOR_REDUCTION_RATIO) / MOTOR_PWM_TICKS_PER_MS;
@@ -72,6 +79,7 @@ void communications_controller (void)
   tx_buffer [11] = 0;
 
   // calculate CRC xor
+  ui8_crc = 0;
   for (ui8_i = 1; ui8_i <= 11; ui8_i++)
   {
     ui8_crc ^= tx_buffer[ui8_i];
@@ -85,11 +93,34 @@ void communications_controller (void)
     putchar (tx_buffer [ui8_i]);
 #endif
   }
+
+  /********************************************************************************************/
+  // Process received package from the LCD
+  //
+
+  // see if we have a received package to be processed
+  if (ui8_received_package_flag)
+  {
+    // validation of the package data
+    ui8_crc = 0;
+    for (ui8_i = 0; ui8_i <= 12; ui8_i++)
+    {
+      if (ui8_i == 7) continue; // don't xor B5 (B7 in our case)
+      ui8_crc ^= rx_buffer[ui8_i];
+    }
+
+    if ((ui8_crc ^ 9) == rx_buffer [7]) // see if CRC is ok
+    {
+
+    }
+  }
 }
 
+// This is the interrupt that happesn when UART2 receives data. We need it to be the fastest possible and so
+// we do: receive every byte and assembly as a package, finally, signal that we have a package to process (on main slow loop)
+// and disable the interrupt. The interrupt should be enable again on main loop, after the package being processed
 void UART2_IRQHandler(void) __interrupt(UART2_IRQHANDLER)
 {
-  static uint8_t rx_buffer[13];
   static uint8_t ui8_rx_counter = 0;
   uint8_t ui8_byte_received;
   static uint8_t ui8_state_machine = 0;
@@ -101,10 +132,9 @@ void UART2_IRQHandler(void) __interrupt(UART2_IRQHANDLER)
     switch (ui8_state_machine)
     {
       case 0:
-      if (ui8_byte_received == 0x32)
+      if (ui8_byte_received == 50) // see if we get start package byte 1
       {
-	rx_buffer[0] = ui8_byte_received;
-	ui8_rx_counter++;
+	rx_buffer[ui8_rx_counter++] = ui8_byte_received;
 	ui8_state_machine = 1;
       }
       else
@@ -115,10 +145,9 @@ void UART2_IRQHandler(void) __interrupt(UART2_IRQHANDLER)
       break;
 
       case 1:
-      if (ui8_byte_received == 0x0e)
+      if (ui8_byte_received == 14)  // see if we get start package byte 1
       {
-	rx_buffer[1] = ui8_byte_received;
-	ui8_rx_counter++;
+	rx_buffer[ui8_rx_counter++] = ui8_byte_received;
 	ui8_state_machine = 2;
       }
       else
@@ -129,10 +158,16 @@ void UART2_IRQHandler(void) __interrupt(UART2_IRQHANDLER)
       break;
 
       case 2:
-      rx_buffer[2] = ui8_byte_received;
+      rx_buffer[ui8_rx_counter++] = ui8_byte_received;
 
-      ui8_rx_counter = 0;
-      ui8_state_machine = 0;
+      // see if is the last byte of the package
+      if (ui8_rx_counter > 11)
+      {
+	ui8_rx_counter = 0;
+	ui8_state_machine = 0;
+	ui8_received_package_flag = 1; // signal that we have a full pachage to be processed
+//	UART2->CR2 &= (1 << 5); // disable UART2 receive interrupt
+      }
       break;
 
       default:
@@ -140,4 +175,3 @@ void UART2_IRQHandler(void) __interrupt(UART2_IRQHANDLER)
     }
   }
 }
-
