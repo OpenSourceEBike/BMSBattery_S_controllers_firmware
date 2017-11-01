@@ -12,5 +12,6 @@
 #include "main.h"
 
 void communications_controller (void);
+uint8_t communications_get_assist_level (void);
 
 #endif /* _COMMUNICATIONS_CONTROLLER__H_ */
