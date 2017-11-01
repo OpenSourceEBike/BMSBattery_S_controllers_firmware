@@ -17,7 +17,7 @@
 #include "utils.h"
 
 uint16_t ui16_target_erps = 0;
-uint16_t ui16_target_erps_max = 0;
+volatile uint16_t ui16_target_erps_max = 0;
 uint16_t ui16_target_current = 0;
 
 uint16_t ui16_ADC_battery_voltage_accumulated = BATTERY_VOLTAGE_MED_VALUE;
@@ -36,17 +36,17 @@ uint8_t motor_speed_controller (uint8_t ui8_current_pwm_duty_cycle); // call eve
 
 void motor_controller_high_level (void)
 {
-//  uint8_t ui8_current_pwm_duty_cycle;
-//  uint8_t ui8_pwm_duty_cycle_a;
-//  uint8_t ui8_pwm_duty_cycle_b;
-//
-//  motor_battery_voltage_protection ();
-//
-//  ui8_current_pwm_duty_cycle = pwm_get_duty_cycle ();
-//  ui8_pwm_duty_cycle_a = motor_current_controller (ui8_current_pwm_duty_cycle);
-//  ui8_pwm_duty_cycle_b = motor_speed_controller (ui8_current_pwm_duty_cycle);
-//  // apply the value that is lower
-//  motor_set_pwm_duty_cycle_target (ui8_min (ui8_pwm_duty_cycle_a, ui8_pwm_duty_cycle_b));
+  uint8_t ui8_current_pwm_duty_cycle;
+  uint8_t ui8_pwm_duty_cycle_a;
+  uint8_t ui8_pwm_duty_cycle_b;
+
+  motor_battery_voltage_protection ();
+
+  ui8_current_pwm_duty_cycle = pwm_get_duty_cycle ();
+  ui8_pwm_duty_cycle_a = motor_current_controller (ui8_current_pwm_duty_cycle);
+  ui8_pwm_duty_cycle_b = motor_speed_controller (ui8_current_pwm_duty_cycle);
+  // apply the value that is lower
+  motor_set_pwm_duty_cycle_target (ui8_min (ui8_pwm_duty_cycle_a, ui8_pwm_duty_cycle_b));
 }
 
 void motor_controller_set_speed_erps (uint16_t ui16_erps)
@@ -57,6 +57,11 @@ void motor_controller_set_speed_erps (uint16_t ui16_erps)
 void motor_controller_set_speed_erps_max (uint16_t ui16_erps)
 {
   ui16_target_erps_max = ui16_erps;
+}
+
+uint16_t motor_controller_get_speed_erps_max (void)
+{
+  return ui16_target_erps_max;
 }
 
 void motor_controller_set_current (uint16_t ui16_current)
@@ -109,10 +114,10 @@ uint8_t motor_current_controller (uint8_t ui8_current_pwm_duty_cycle)
   ui16_ADC_motor_current_filtered = ui16_ADC_motor_current_accumulated >> 4;
 
   i16_motor_current = ui16_ADC_motor_current_filtered - ADC_MOTOR_CURRENT_MAX_ZERO_VALUE_10B;
-  // make sure current is not negative, we are not here to control negative/regen current
+  // make sure current is not negative, we are here not to control negative/regen current
   if (i16_motor_current < 0)
   {
-    return 0;
+    i16_motor_current = 0;
   }
 
   i16_error = ui16_target_current - i16_motor_current;

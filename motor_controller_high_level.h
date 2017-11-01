@@ -27,6 +27,7 @@ void motor_controller_high_level (void);
 uint8_t motor_get_ADC_battery_voltage_filtered (void);
 void motor_controller_set_speed_erps (uint16_t erps);
 void motor_controller_set_speed_erps_max (uint16_t erps);
+uint16_t motor_controller_get_speed_erps_max (void);
 void motor_controller_set_current (uint16_t ui16_current);
 void motor_controller_set_error (uint8_t error);
 void motor_controller_clear_error (void);
