@@ -7,10 +7,14 @@
  */
 
 #include <stdint.h>
+#include <stdio.h>
 #include "stm8s.h"
 #include "gpio.h"
 #include "stm8s_adc1.h"
 #include "adc.h"
+uint8_t i;
+uint16_t ui16_motor_total_current_offset = 0;
+
 
 void adc_init (void)
 {
@@ -41,6 +45,25 @@ void adc_init (void)
   ADC1_ScanModeCmd (ENABLE);
 
   ADC1_Cmd (ENABLE);
+//read in a few values to let the ACD stabilize
+  for (i = 0; i <8; i++)
+   {
+      adc_trigger ();
+      ui16_motor_total_current_offset += ui16_adc_read_motor_total_current ();
+      printf(" %d\n", ui16_motor_total_current_offset);
+   }
+  //read the Offset for ui16_motor_total_current
+  ui16_motor_total_current_offset = 0;
+
+  for (i = 0; i <16; i++)
+   {
+      adc_trigger ();
+      ui16_motor_total_current_offset += ui16_adc_read_motor_total_current ();
+      printf("%d\n", ui16_motor_total_current_offset);
+   }
+  ui16_motor_total_current_offset =(ui16_motor_total_current_offset>>4)-1;
+  printf(" %d\n", ui16_motor_total_current_offset);
+  printf(" %d\n", ui16_motor_total_current_offset>>2);
 }
 
 inline void adc_trigger (void)
