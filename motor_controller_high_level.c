@@ -18,7 +18,7 @@
 #include "communications_controller.h"
 
 uint16_t ui16_target_erps = 0;
-volatile uint16_t ui16_target_erps_max = 0;
+volatile uint16_t ui16_target_erps_max = MOTOR_OVER_SPEED_ERPS;
 uint8_t ui8_target_current = 0;
 
 uint16_t ui16_ADC_battery_voltage_accumulated = BATTERY_VOLTAGE_MED_VALUE;

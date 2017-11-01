@@ -21,7 +21,7 @@ uint8_t ui8_max_speed;
 uint8_t ui8_wheel_size;
 volatile uint8_t ui8_power_assist_control_mode;
 uint8_t ui8_controller_max_current;
-volatile float f_controller_max_current;
+volatile float f_controller_max_current = 1;
 float f_wheel_size;
 uint8_t ui8_motor_characteristic;
 
@@ -137,59 +137,59 @@ void communications_controller (void)
       switch (ui8_wheel_size)
       {
 	case 0x12: // 6''
-	  f_wheel_size = 0.46875;
+	f_wheel_size = 0.46875;
 	break;
 
 	case 0x0a: // 8''
-	  f_wheel_size = 0.62847;
+	f_wheel_size = 0.62847;
 	break;
 
 	case 0x0e: // 10''
-	  f_wheel_size = 0.78819;
+	f_wheel_size = 0.78819;
 	break;
 
 	case 0x02: // 12''
-	  f_wheel_size = 0.94791;
+	f_wheel_size = 0.94791;
 	break;
 
 	case 0x06: // 14''
-	  f_wheel_size = 1.10764;
+	f_wheel_size = 1.10764;
 	break;
 
 	case 0x00: // 16''
-	  f_wheel_size = 1.26736;
+	f_wheel_size = 1.26736;
 	break;
 
 	case 0x04: // 18''
-	  f_wheel_size = 1.42708;
+	f_wheel_size = 1.42708;
 	break;
 
 	case 0x08: // 20''
-	  f_wheel_size = 1.57639;
+	f_wheel_size = 1.57639;
 	break;
 
 	case 0x0c: // 22''
-	  f_wheel_size = 1.74305;
+	f_wheel_size = 1.74305;
 	break;
 
 	case 0x10: // 24''
-	  f_wheel_size = 1.89583;
+	f_wheel_size = 1.89583;
 	break;
 
 	case 0x14: // 26''
-	  f_wheel_size = 2.0625;
+	f_wheel_size = 2.0625;
 	break;
 
 	case 0x18: // 700c
-	  f_wheel_size = 2.17361;
+	f_wheel_size = 2.17361;
 	break;
 
 	case 0x1c: // 28''
-	  f_wheel_size = 2.19444;
+	f_wheel_size = 2.19444;
 	break;
 
 	case 0x1e: // 29''
-	  f_wheel_size = 2.25;
+	f_wheel_size = 2.25;
 	break;
 
 	default:
@@ -252,6 +252,8 @@ void communications_controller (void)
       f_temp = 3600.0 * f_wheel_size;
       f_temp = ((float) ui32_temp) / f_temp;
       motor_controller_set_speed_erps_max ((uint16_t) f_temp);
+
+      UART2->CR2 |= (1 << 5); // enable UART2 receive interrupt as we are now ready to receive a new package
     }
   }
 }
@@ -301,8 +303,8 @@ void UART2_IRQHandler(void) __interrupt(UART2_IRQHANDLER)
       {
 	ui8_rx_counter = 0;
 	ui8_state_machine = 0;
-	ui8_received_package_flag = 1; // signal that we have a full pachage to be processed
-//	UART2->CR2 &= (1 << 5); // disable UART2 receive interrupt
+	ui8_received_package_flag = 1; // signal that we have a full package to be processed
+	UART2->CR2 &= ~(1 << 5); // disable UART2 receive interrupt
       }
       break;
 
