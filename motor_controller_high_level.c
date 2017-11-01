@@ -19,7 +19,7 @@
 
 uint16_t ui16_target_erps = 0;
 volatile uint16_t ui16_target_erps_max = 0;
-uint16_t ui16_target_current = 0;
+uint8_t ui8_target_current = 0;
 
 uint16_t ui16_ADC_battery_voltage_accumulated = BATTERY_VOLTAGE_MED_VALUE;
 uint8_t ui8_ADC_battery_voltage_filtered;
@@ -68,9 +68,9 @@ uint16_t motor_controller_get_speed_erps_max (void)
   return ui16_target_erps_max;
 }
 
-void motor_controller_set_current (uint16_t ui16_current)
+void motor_controller_set_current (uint8_t ui8_current)
 {
-  ui16_target_current = ui16_current;
+  ui8_target_current = ui8_current;
 }
 
 // call every 100ms
@@ -124,7 +124,7 @@ uint8_t motor_current_controller (uint8_t ui8_current_pwm_duty_cycle)
     i16_motor_current = 0;
   }
 
-  i16_error = ui16_target_current - i16_motor_current;
+  i16_error = ((int16_t) ui8_target_current) - i16_motor_current;
   i16_output = i16_error * MOTOR_CURRENT_CONTROLLER_KP;
 
   // limit max output value

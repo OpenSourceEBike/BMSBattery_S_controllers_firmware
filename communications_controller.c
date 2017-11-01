@@ -20,6 +20,8 @@ volatile uint8_t ui8_assist_level = 1;
 uint8_t ui8_max_speed;
 uint8_t ui8_wheel_size;
 volatile uint8_t ui8_power_assist_control_mode;
+uint8_t ui8_controller_max_current;
+volatile float f_controller_max_current;
 float f_wheel_size;
 uint8_t ui8_motor_characteristic;
 
@@ -130,67 +132,118 @@ void communications_controller (void)
       ui8_wheel_size = ((ui8_rx_buffer [6] & 192) >> 6) | ((ui8_rx_buffer [4] & 7) << 2);
       ui8_max_speed = 10 + ((ui8_rx_buffer [4] & 248) >> 3) | (ui8_rx_buffer [6] & 32);
       ui8_power_assist_control_mode = ui8_rx_buffer [6] & 8;
+      ui8_controller_max_current = (ui8_rx_buffer [9] & 15);
 
       switch (ui8_wheel_size)
       {
 	case 0x12: // 6''
-	f_wheel_size = 0.46875;
+	  f_wheel_size = 0.46875;
 	break;
 
 	case 0x0a: // 8''
-	f_wheel_size = 0.62847;
+	  f_wheel_size = 0.62847;
 	break;
 
 	case 0x0e: // 10''
-	f_wheel_size = 0.78819;
+	  f_wheel_size = 0.78819;
 	break;
 
 	case 0x02: // 12''
-	f_wheel_size = 0.94791;
+	  f_wheel_size = 0.94791;
 	break;
 
 	case 0x06: // 14''
-	f_wheel_size = 1.10764;
+	  f_wheel_size = 1.10764;
 	break;
 
 	case 0x00: // 16''
-	f_wheel_size = 1.26736;
+	  f_wheel_size = 1.26736;
 	break;
 
 	case 0x04: // 18''
-	f_wheel_size = 1.42708;
+	  f_wheel_size = 1.42708;
 	break;
 
 	case 0x08: // 20''
-	f_wheel_size = 1.57639;
+	  f_wheel_size = 1.57639;
 	break;
 
 	case 0x0c: // 22''
-	f_wheel_size = 1.74305;
+	  f_wheel_size = 1.74305;
 	break;
 
 	case 0x10: // 24''
-	f_wheel_size = 1.89583;
+	  f_wheel_size = 1.89583;
 	break;
 
 	case 0x14: // 26''
-	f_wheel_size = 2.0625;
+	  f_wheel_size = 2.0625;
 	break;
 
 	case 0x18: // 700c
-	f_wheel_size = 2.17361;
+	  f_wheel_size = 2.17361;
 	break;
 
 	case 0x1c: // 28''
-	f_wheel_size = 2.19444;
+	  f_wheel_size = 2.19444;
 	break;
 
 	case 0x1e: // 29''
-	f_wheel_size = 2.25;
+	  f_wheel_size = 2.25;
 	break;
 
 	default:
 	break;
+      }
+
+      switch (ui8_controller_max_current)
+      {
+      	case 0:
+      	f_controller_max_current = 0.1;
+      	break;
+
+      	case 1:
+      	f_controller_max_current = 0.25;
+      	break;
+
+      	case 2:
+      	f_controller_max_current = 0.33;
+      	break;
+
+      	case 3:
+      	f_controller_max_current = 0.5;
+      	break;
+
+      	case 4:
+      	f_controller_max_current = 0.667;
+      	break;
+
+      	case 5:
+      	f_controller_max_current = 0.752;
+      	break;
+
+      	case 6:
+      	f_controller_max_current = 0.8;
+      	break;
+
+      	case 7:
+      	f_controller_max_current = 0.833;
+      	break;
+
+      	case 8:
+      	f_controller_max_current = 0.87;
+      	break;
+
+      	case 9:
+      	f_controller_max_current = 0.91;
+      	break;
+
+      	case 10:
+      	f_controller_max_current = 1.0;
+      	break;
+
+      	default:
+      	break;
       }
 
       // (ui8_max_speed * 1000 * (ui8_motor_characteristic / 2)) / (3600 * f_wheel_size)
@@ -262,4 +315,9 @@ void UART2_IRQHandler(void) __interrupt(UART2_IRQHANDLER)
 uint8_t communications_get_assist_level (void)
 {
   return ui8_assist_level;
+}
+
+float communications_get_controller_max_current_factor (void)
+{
+  return f_controller_max_current;
 }

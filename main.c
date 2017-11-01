@@ -80,15 +80,8 @@ int main (void)
   pwm_init_6_steps ();
   hall_sensor_init ();
   adc_init ();
-
   motor_init ();
-  motor_set_current_max (ADC_MOTOR_CURRENT_MAX); // 1 --> 0.5A
-  motor_set_regen_current_max (4); // 1 --> 0.5A
-  motor_controller_set_speed_erps (0);
-
   enableInterrupts ();
-
-  hall_sensors_read_and_action (); // needed to start the motor
 
   while (1)
   {

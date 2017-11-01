@@ -15,5 +15,6 @@ extern volatile uint8_t ui8_power_assist_control_mode;
 
 void communications_controller (void);
 uint8_t communications_get_assist_level (void);
+float communications_get_controller_max_current_factor (void);
 
 #endif /* _COMMUNICATIONS_CONTROLLER__H_ */

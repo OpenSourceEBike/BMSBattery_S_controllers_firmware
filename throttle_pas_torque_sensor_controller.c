@@ -29,10 +29,11 @@ uint8_t ui8_ADC_throttle;
 
 void throttle_pas_torque_sensor_controller (void)
 {
-  uint8_t ui8_temp;
+  static uint8_t ui8_temp;
   uint16_t ui16_temp;
   uint8_t ui8_current_pwm_duty_cycle;
   uint8_t ui8_pwm_duty_cycle_a;
+  static float f_temp;
 
   // only throttle implemented for now
   ui8_ADC_throttle = ui8_adc_read_throttle ();
@@ -67,14 +68,13 @@ void throttle_pas_torque_sensor_controller (void)
   }
   else
   {
-    // throttle will setup motor current from 0A to ~14A
-    ui16_temp = 16 * communications_get_assist_level (); // 80 = 10A; 80/5 = 16
-    ui16_temp = (uint16_t) (map ((int32_t) ui8_ADC_throttle, ADC_THROTTLE_MIN_VALUE, ADC_THROTTLE_MAX_VALUE, 0, ui16_temp));
-    motor_controller_set_current (ui16_temp);
+    ui8_temp = (uint8_t) (((float) (24 * communications_get_assist_level ())) * communications_get_controller_max_current_factor ()); // 120 = 15A; 120/5 = 24
+    ui8_temp = (uint8_t) (map ((uint32_t) ui8_ADC_throttle, ADC_THROTTLE_MIN_VALUE, ADC_THROTTLE_MAX_VALUE, 0, (uint32_t) ui8_temp));
+    motor_controller_set_current (ui8_temp);
 
-    // throttle will setup motor speed from 0 to max erps
+    // throttle will setup motor speed
     ui16_temp = (motor_controller_get_speed_erps_max () / 5) * communications_get_assist_level ();
-    ui16_temp = map (ui8_ADC_throttle, ADC_THROTTLE_MIN_VALUE, ADC_THROTTLE_MAX_VALUE, 0, ui16_temp);
+    ui16_temp = map ((uint32_t) ui8_ADC_throttle, ADC_THROTTLE_MIN_VALUE, ADC_THROTTLE_MAX_VALUE, 0, (uint32_t) ui16_temp);
     motor_controller_set_speed_erps (ui16_temp);
   }
 }
