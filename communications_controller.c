@@ -131,44 +131,63 @@ void communications_controller (void)
 
       switch (ui8_wheel_size)
       {
-	case 0x0e: // 10 ''
-	f_wheel_size = 0;
+	case 0x12: // 6''
+	f_wheel_size = 0.46875;
 	break;
 
-	case 0x02: // 12 ''
-	f_wheel_size = 0;
+	case 0x0a: // 8''
+	f_wheel_size = 0.62847;
 	break;
 
-	case 0x06: // 14 ''
-	f_wheel_size = 0;
+	case 0x0e: // 10''
+	f_wheel_size = 0.78819;
 	break;
 
-	case 0x00: // 16 ''
-	f_wheel_size = 1.49540;
+	case 0x02: // 12''
+	f_wheel_size = 0.94791;
 	break;
 
-	case 0x04: // 18 ''
-	f_wheel_size = 0;
+	case 0x06: // 14''
+	f_wheel_size = 1.10764;
 	break;
 
-	case 0x08: // 20 ''
-	f_wheel_size = 1.71531;
+	case 0x00: // 16''
+	f_wheel_size = 1.26736;
 	break;
 
-	case 0x0c: // 22 ''
-	f_wheel_size = 0;
+	case 0x04: // 18''
+	f_wheel_size = 1.42708;
 	break;
 
-	case 0x10: // 24 ''
-	f_wheel_size = 2.03261;
+	case 0x08: // 20''
+	f_wheel_size = 1.57639;
 	break;
 
-	case 0x14: // 26 ''
-	f_wheel_size = 2.15513;
+	case 0x0c: // 22''
+	f_wheel_size = 1.74305;
 	break;
 
-	case 0x18: // 700c ''
-	f_wheel_size = 2.35305;
+	case 0x10: // 24''
+	f_wheel_size = 1.89583;
+	break;
+
+	case 0x14: // 26''
+	f_wheel_size = 2.0625;
+	break;
+
+	case 0x18: // 700c
+	f_wheel_size = 2.17361;
+	break;
+
+	case 0x1c: // 28''
+	f_wheel_size = 2.19444;
+	break;
+
+	case 0x1e: // 29''
+	f_wheel_size = 2.25;
+	break;
+
+	default:
 	break;
       }
 
