@@ -16,7 +16,7 @@
 #include "communications_controller.h"
 
 uint8_t ui8_received_package_flag = 0;
-volatile uint8_t ui8_assist_level = 1;
+volatile uint8_t ui8_assist_level = 5;
 uint8_t ui8_max_speed;
 uint8_t ui8_wheel_size;
 volatile uint8_t ui8_power_assist_control_mode;
