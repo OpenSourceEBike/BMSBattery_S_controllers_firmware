@@ -11,6 +11,8 @@
 
 #include "main.h"
 
+extern volatile uint8_t ui8_power_assist_control_mode;
+
 void communications_controller (void);
 uint8_t communications_get_assist_level (void);
 

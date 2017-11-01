@@ -19,6 +19,7 @@ uint8_t ui8_received_package_flag = 0;
 volatile uint8_t ui8_assist_level = 1;
 uint8_t ui8_max_speed;
 uint8_t ui8_wheel_size;
+volatile uint8_t ui8_power_assist_control_mode;
 float f_wheel_size;
 uint8_t ui8_motor_characteristic;
 
@@ -128,6 +129,7 @@ void communications_controller (void)
       ui8_motor_characteristic = ui8_rx_buffer [5];
       ui8_wheel_size = ((ui8_rx_buffer [6] & 192) >> 6) | ((ui8_rx_buffer [4] & 7) << 2);
       ui8_max_speed = 10 + ((ui8_rx_buffer [4] & 248) >> 3) | (ui8_rx_buffer [6] & 32);
+      ui8_power_assist_control_mode = ui8_rx_buffer [6] & 8;
 
       switch (ui8_wheel_size)
       {

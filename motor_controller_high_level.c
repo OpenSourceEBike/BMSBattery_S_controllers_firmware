@@ -15,6 +15,7 @@
 #include "motor_controller_high_level.h"
 #include "pwm.h"
 #include "utils.h"
+#include "communications_controller.h"
 
 uint16_t ui16_target_erps = 0;
 volatile uint16_t ui16_target_erps_max = 0;
@@ -42,11 +43,14 @@ void motor_controller_high_level (void)
 
   motor_battery_voltage_protection ();
 
-  ui8_current_pwm_duty_cycle = pwm_get_duty_cycle ();
-  ui8_pwm_duty_cycle_a = motor_current_controller (ui8_current_pwm_duty_cycle);
-  ui8_pwm_duty_cycle_b = motor_speed_controller (ui8_current_pwm_duty_cycle);
-  // apply the value that is lower
-  motor_set_pwm_duty_cycle_target (ui8_min (ui8_pwm_duty_cycle_a, ui8_pwm_duty_cycle_b));
+  if (!ui8_power_assist_control_mode) // speed + current controllers
+  {
+      ui8_current_pwm_duty_cycle = pwm_get_duty_cycle ();
+      ui8_pwm_duty_cycle_a = motor_current_controller (ui8_current_pwm_duty_cycle);
+      ui8_pwm_duty_cycle_b = motor_speed_controller (ui8_current_pwm_duty_cycle);
+      // apply the value that is lower
+      motor_set_pwm_duty_cycle_target (ui8_min (ui8_pwm_duty_cycle_a, ui8_pwm_duty_cycle_b));
+  }
 }
 
 void motor_controller_set_speed_erps (uint16_t ui16_erps)

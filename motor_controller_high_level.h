@@ -32,5 +32,6 @@ void motor_controller_set_current (uint16_t ui16_current);
 void motor_controller_set_error (uint8_t error);
 void motor_controller_clear_error (void);
 uint8_t motor_controller_get_error (void);
+uint8_t motor_speed_controller (uint8_t ui8_current_pwm_duty_cycle);
 
 #endif /* _MOTOR_CONTROLLER_HIGH_LEVEL_H_ */
