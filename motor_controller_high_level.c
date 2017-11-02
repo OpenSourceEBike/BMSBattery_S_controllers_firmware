@@ -117,7 +117,7 @@ uint8_t motor_current_controller (uint8_t ui8_current_pwm_duty_cycle)
   ui16_ADC_motor_current_accumulated += ui16_adc_read_motor_total_current ();
   ui16_ADC_motor_current_filtered = ui16_ADC_motor_current_accumulated >> 4;
 
-  i16_motor_current = ui16_ADC_motor_current_filtered - ui16_motor_total_current_offset;
+  i16_motor_current = (int16_t) (ui16_ADC_motor_current_filtered - ui16_motor_total_current_offset_10b);
   // make sure current is not negative, we are here not to control negative/regen current
   if (i16_motor_current < 0)
   {

@@ -40,7 +40,9 @@ uint8_t ui8_ADC_id_current = 0;
 uint8_t ui8_ADC_motor_current_max;
 uint8_t ui8_ADC_motor_regen_current_max;
 
-uint8_t ui8_adc_motor_total_current = 0;
+uint8_t ui8_adc_motor_total_current;
+uint8_t ui8_motor_total_current_offset;
+uint16_t ui16_motor_total_current_offset_10b;
 
 uint8_t ui8_half_e_rotation_flag = 0;
 
@@ -371,7 +373,7 @@ void motor_set_current_max (uint8_t value)
 
 uint8_t motor_get_current_max (void)
 {
-  return ui8_adc_motor_total_current - (ui16_motor_total_current_offset>>2);
+  return ui8_adc_motor_total_current - ui8_motor_total_current_offset;
 }
 
 void motor_set_regen_current_max (uint8_t value)

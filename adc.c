@@ -12,12 +12,12 @@
 #include "gpio.h"
 #include "stm8s_adc1.h"
 #include "adc.h"
-uint8_t i;
-uint16_t ui16_motor_total_current_offset = 0;
-
 
 void adc_init (void)
 {
+  uint8_t ui8_i;
+  uint16_t ui16_counter;
+
   //init GPIO for the used ADC pins
   GPIO_Init(GPIOB,
 	    (THROTTLE__PIN || CURRENT_PHASE_B__PIN || CURRENT_MOTOR_TOTAL__PIN),
@@ -33,9 +33,7 @@ void adc_init (void)
   //init ADC1 peripheral
   ADC1_Init(ADC1_CONVERSIONMODE_SINGLE,
 	    ADC1_CHANNEL_9,
-//	    ADC1_PRESSEL_FCPU_D2,
-	    ADC1_PRESSEL_FCPU_D4, // may take about 35us to convert all 10 channels, which seems ok for the 64us PWM period
-				  // being slower should improve the noise on ADC measurements
+	    ADC1_PRESSEL_FCPU_D2,
             ADC1_EXTTRIG_TIM,
 	    DISABLE,
 	    ADC1_ALIGN_LEFT,
@@ -43,27 +41,30 @@ void adc_init (void)
             DISABLE);
 
   ADC1_ScanModeCmd (ENABLE);
-
   ADC1_Cmd (ENABLE);
-//read in a few values to let the ACD stabilize
-  for (i = 0; i <8; i++)
-   {
-      adc_trigger ();
-      ui16_motor_total_current_offset += ui16_adc_read_motor_total_current ();
-      printf(" %d\n", ui16_motor_total_current_offset);
-   }
-  //read the Offset for ui16_motor_total_current
-  ui16_motor_total_current_offset = 0;
 
-  for (i = 0; i <16; i++)
-   {
-      adc_trigger ();
-      ui16_motor_total_current_offset += ui16_adc_read_motor_total_current ();
-      printf("%d\n", ui16_motor_total_current_offset);
-   }
-  ui16_motor_total_current_offset =(ui16_motor_total_current_offset>>4)-1;
-  printf(" %d\n", ui16_motor_total_current_offset);
-  printf(" %d\n", ui16_motor_total_current_offset>>2);
+  //********************************************************************************
+  // next code is for "calibrating" the offset value of ADC motor total current
+  // read and discard few samples of ADC, to make sure the next samples are ok
+  for (ui8_i = 0; ui8_i < 4; ui8_i++)
+  {
+    ui16_counter = TIM2_GetCounter () + 10;
+    while (TIM2_GetCounter () < ui16_counter) ; // delay
+    adc_trigger ();
+    ui8_motor_total_current_offset = ui8_adc_read_motor_total_current ();
+  }
+
+  // read and average a few values of ADC
+  ui16_motor_total_current_offset_10b = 0;
+  for (ui8_i = 0; ui8_i < 16; ui8_i++)
+  {
+    ui16_counter = TIM2_GetCounter () + 10;
+    while (TIM2_GetCounter () < ui16_counter) ;
+    adc_trigger ();
+    ui16_motor_total_current_offset_10b += ui16_adc_read_motor_total_current ();
+  }
+  ui16_motor_total_current_offset_10b >>= 4;
+  ui8_motor_total_current_offset = ui16_motor_total_current_offset_10b >> 2;
 }
 
 inline void adc_trigger (void)
