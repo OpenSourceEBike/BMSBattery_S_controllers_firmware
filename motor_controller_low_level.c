@@ -37,8 +37,8 @@ uint8_t ui8_hall_sensors_last = 0;
 
 uint8_t ui8_ADC_id_current = 0;
 
-uint8_t ui8_ADC_motor_current_max;
-uint8_t ui8_ADC_motor_regen_current_max;
+uint8_t ui8_adc_motor_current_max;
+uint8_t ui8_adc_motor_regen_current_max;
 
 uint8_t ui8_adc_motor_total_current;
 uint8_t ui8_motor_total_current_offset;
@@ -368,7 +368,7 @@ void motor_set_pwm_duty_cycle_target (uint8_t value)
 
 void motor_set_current_max (uint8_t value)
 {
-  ui8_ADC_motor_current_max = value;
+  ui8_adc_motor_current_max = value;
 }
 
 uint8_t motor_get_current_max (void)
@@ -378,7 +378,7 @@ uint8_t motor_get_current_max (void)
 
 void motor_set_regen_current_max (uint8_t value)
 {
-  ui8_ADC_motor_regen_current_max = value;
+  ui8_adc_motor_regen_current_max = value;
 }
 
 void motor_set_pwm_duty_cycle_ramp_inverse_step (uint8_t value)

@@ -21,14 +21,14 @@
 #define MOTOR_CONTROLLER_ERROR_91_BATTERY_UNDER_VOLTAGE 0x91
 
 extern uint16_t ui16_ADC_motor_current_filtered;
-extern uint8_t ui8_target_current;
+extern uint16_t ui16_target_current;
 
 void motor_controller_high_level (void);
 uint8_t motor_get_ADC_battery_voltage_filtered (void);
 void motor_controller_set_speed_erps (uint16_t erps);
 void motor_controller_set_speed_erps_max (uint16_t erps);
 uint16_t motor_controller_get_speed_erps_max (void);
-void motor_controller_set_current (uint8_t ui8_current);
+void motor_controller_set_current (uint16_t ui16_current);
 void motor_controller_set_error (uint8_t error);
 void motor_controller_clear_error (void);
 uint8_t motor_controller_get_error (void);

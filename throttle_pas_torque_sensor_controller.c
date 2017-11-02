@@ -68,9 +68,10 @@ void throttle_pas_torque_sensor_controller (void)
   }
   else
   {
-    ui8_temp = (uint8_t) (((float) (24 * communications_get_assist_level ())) * communications_get_controller_max_current_factor ()); // 120 = 15A; 120/5 = 24
-    ui8_temp = (uint8_t) (map ((uint32_t) ui8_ADC_throttle, ADC_THROTTLE_MIN_VALUE, ADC_THROTTLE_MAX_VALUE, 0, (uint32_t) ui8_temp));
-    motor_controller_set_current (ui8_temp);
+    // throttle will setup motor current
+    ui16_temp = (uint16_t) (((float) ADC_MOTOR_CURRENT_MAX_10B) * communications_get_controller_max_current_factor ());
+    ui16_temp = (uint16_t) (map ((uint32_t) ui8_ADC_throttle, ADC_THROTTLE_MIN_VALUE, ADC_THROTTLE_MAX_VALUE, 0, (uint32_t) ui16_temp));
+    motor_controller_set_current (ui16_temp);
 
     // throttle will setup motor speed
     ui16_temp = (motor_controller_get_speed_erps_max () / 5) * communications_get_assist_level ();
