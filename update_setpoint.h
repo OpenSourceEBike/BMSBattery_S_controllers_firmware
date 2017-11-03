@@ -9,9 +9,9 @@
 #ifndef _update_setpoint_H
 #define _update_setpoint_H
 
-#define p_factor 8			//P-factor for speed control loop
-#define max_change 8			//maximum sudden change of setpoint before the motor stops working
-//#define current_cal_a 1			// factor a for Battery Current linear calibration
+#define p_factor 4L			//P-factor for speed control loop
+#define max_change 4L			//maximum sudden change of setpoint before the motor stops working
+//#define current_cal_a 1		// factor a for Battery Current linear calibration
 //#define current_cal_b -70		// factor a for Battery Current linear calibration
 #include "main.h"
 

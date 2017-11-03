@@ -62,7 +62,7 @@ uint16_t ui16_PAS = 32000;		//cadence in timetics
 uint8_t ui8_PAS_Flag = 0; 		//flag for PAS interrupt
 uint8_t ui8_SPEED_Flag = 0; 		//flag for SPEED interrupt
 
-uint8_t ui8_assistlevel_global = 1;// for debugging of display communication
+uint8_t ui8_assistlevel_global = 3;// for debugging of display communication
 
 /////////////////////////////////////////////////////////////////////////////////////////////
 //// Functions prototypes
@@ -328,7 +328,7 @@ if(ui8_cheat_state==3) //second step, make sure the brake is hold according to d
 
 
 
-            printf("cheatstate, %d, km/h %lu, Voltage, %d, setpoint, %d, correction value, %d\n", ui8_cheat_state, ui32_SPEED_km_h, ui8_BatteryVoltage, ui16_setpoint, ui8_position_correction_value);
+      //printf("cheatstate, %d, km/h %lu, Voltage, %d, setpoint, %d, correction value, %d\n", ui8_cheat_state, ui32_SPEED_km_h, ui8_BatteryVoltage, ui16_setpoint, ui8_position_correction_value);
       //      printf("%d, %d, %d\n", ui8_motor_state, ui16_motor_speed_erps, ui8_position_correction_value);
 
 
