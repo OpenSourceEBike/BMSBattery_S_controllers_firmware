@@ -18,7 +18,7 @@
 #define SVM_TABLE_LEN_x1024 262144 //(256 * 1024)
 
 
-#define SETPOINT_MAX_VALUE 237		//maximum value for setpoint, taken from map function
+#define SETPOINT_MAX_VALUE 255		//maximum value for setpoint, taken from map function
 
 #define NUMBER_OF_PAS_MAGS 16 //16 for sensor from BMSBattery, 32 for Sempu-Sensor
 

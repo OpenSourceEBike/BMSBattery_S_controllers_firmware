@@ -26,7 +26,7 @@ static uint32_t ui32_setpoint; // local version of setpoint
 uint32_t ui32_SPEED_km_h; //global variable Speed
 static int16_t i16_delta; // difference between setpoint and actual value
 int16_t i16_assistlevel[5]={LEVEL_1, LEVEL_2, LEVEL_3, LEVEL_4, LEVEL_5}; // difference between setpoint and actual value
-
+int16_t uint16_current_target=0;
 int8_t uint_PWM_Enable=0;
 
 uint16_t update_setpoint (uint16_t speed, uint16_t PAS, uint16_t sumtorque, uint16_t setpoint_old)
@@ -66,11 +66,11 @@ uint16_t update_setpoint (uint16_t speed, uint16_t PAS, uint16_t sumtorque, uint
 
   i16_delta=(ui32_setpoint-setpoint_old)/p_factor; 					//simple p-controller to avoid big steps in setpoint value course
   if (i16_delta>max_change){i16_delta=max_change;}					//limit max change of setpoint to avoid motor stopping by fault
-  if (i16_delta<setpoint_old){ui32_setpoint=(uint32_t)setpoint_old+(uint32_t)i16_delta;}				//adjust setpoint relatively to the old setpoint
+  if (i16_delta*i16_delta)/i16_delta<setpoint_old){ui32_setpoint=(uint32_t)setpoint_old+(uint32_t)i16_delta;}	//adjust setpoint relatively to the old setpoint, avoiding negative values
   if (ui32_setpoint>SETPOINT_MAX_VALUE){ui32_setpoint=SETPOINT_MAX_VALUE;}	//cut setpoint values to the defined maximum
 #endif
 
-#ifdef THROTTLE
+#if defined(THROTTLE)  || defined(THROTTLE_AND_PAS)
   if (sumtorque>10 && setpoint_old-10>sumtorque){
       TIM1_CtrlPWMOutputs(DISABLE);
       uint_PWM_Enable=0;
@@ -89,13 +89,23 @@ uint16_t update_setpoint (uint16_t speed, uint16_t PAS, uint16_t sumtorque, uint
   }
 #endif
 
-#ifdef THROTTLE_AND_PAS
-  if (sumtorque>setpoint_old){
-    ui32_setpoint=(uint32_t)(setpoint_old+((sumtorque-setpoint_old)>>3));
+#ifdef TORQUE_SIMULATION
+
+  if (PAS>RAMP_END) //if you are pedaling slower than defined ramp end, current is proportional to cadence
+    {
+      uint16_current_target= RAMP_END/PAS*i16_assistlevel[ui8_assistlevel_global-1]/100*BATTERY_CURRENT_MAX_VALUE;
+      }
+  else
+    {
+      uint16_current_target= i16_assistlevel[ui8_assistlevel_global-1]/100*BATTERY_CURRENT_MAX_VALUE;
     }
-    else if (sumtorque<setpoint_old){
-    ui32_setpoint=(uint32_t)(setpoint_old-((setpoint_old-sumtorque)>>3));
-    }
+
+  i16_delta=(uint16_current_target-ui16_BatteryCurrent)/p_factor; 					//simple p-controller to avoid big steps in setpoint value course
+  if (i16_delta>max_change){i16_delta=max_change;}					//limit max change of setpoint to avoid motor stopping by fault
+  if (((i16_delta*i16_delta)/i16_delta)<setpoint_old){ui32_setpoint=(uint32_t)setpoint_old+(uint32_t)i16_delta;}	//adjust setpoint relatively to the old setpoint avoiding negative values
+  if (ui32_setpoint>SETPOINT_MAX_VALUE){ui32_setpoint=SETPOINT_MAX_VALUE;}
+
+
 #endif
   }
 

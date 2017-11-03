@@ -182,8 +182,8 @@ int main (void)
     	ui16_SPEED=56000L; 	//Set Display to 0 km/h
 
         }
-
-#ifdef THROTTLEANDPAS
+//in case of THROTTLEANDPAS or THORQUE_SIMULATION, process the PAS routine
+#if defined(THROTTLEANDPAS)
 	      if (ui8_PAS_Flag == 1)
 	      	              {
 	      	                ui16_PAS=ui16_PAS_Counter; 		//save recent cadence
@@ -195,8 +195,8 @@ int main (void)
 #endif
 
 
-#ifdef TORQUESENSOR
-    //	Update cadence and torque after PAS interrupt occurrence
+#if defined(TORQUESENSOR) || defined(TORQUE_SIMULATION)
+    //	Update cadence, torque and battery current after PAS interrupt occurrence
     if (ui8_PAS_Flag == 1)
     {
       ui16_PAS=ui16_PAS_Counter; 		//save recent cadence
@@ -215,8 +215,6 @@ int main (void)
 	   }
       ui8_torque_index++;
       if (ui8_torque_index>NUMBER_OF_PAS_MAGS-1){ui8_torque_index=0;} //reset index counter
-
-
     }
 
 
@@ -230,11 +228,12 @@ int main (void)
 	    //printf("MainSlowLoop\n");
 	    ui8_slowloop_flag=0; //reset flag for slow loop
 	    ui8_veryslowloop_counter++; // increase counter for very slow loop
-#ifndef TORQUESENSOR // read in Throttle value an map it to margins
+
+#if defined(THROTTLE)  || defined(THROTTLE_AND_PAS) // read in Throttle value an map it to margins
 	    ui8_adc_read_throttle_busy = 1;
-	    ui8_temp= adc_read_throttle (); //read in recent torque value
+	    ui8_temp= adc_read_throttle (); //read in value from adc
 	    ui8_adc_read_throttle_busy = 0;
-	     ui16_sum_torque = (uint8_t) map (ui8_temp , ADC_THROTTLE_MIN_VALUE, ADC_THROTTLE_MAX_VALUE, 0, SETPOINT_MAX_VALUE); //map throttle to limits
+	    ui16_sum_torque = (uint8_t) map (ui8_temp , ADC_THROTTLE_MIN_VALUE, ADC_THROTTLE_MAX_VALUE, 0, SETPOINT_MAX_VALUE); //map throttle to limits
 #endif
 
 //start of cheat procedure

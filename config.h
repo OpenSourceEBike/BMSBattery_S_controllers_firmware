@@ -8,6 +8,8 @@
 #ifndef CONFIG_H_
 #define CONFIG_H_
 
+
+#define NUMBER_OF_PAS_MAGS 16
 #define limit 25
 #define timeout 3125
 #define wheel_circumference 2000L
@@ -27,7 +29,8 @@
 #define CHEAT_TIME_1 50
 #define CHEAT_TIME_2 50
 #define CHEAT_TIME_3 50
-#define THROTTLE
+#define TORQUE_SIMULATION
+#define RAMP_END 977
 
 
 #define DISPLAY_TYPE_KINGMETER_618U (1<<4)                  // King-Meter 618U protocol (KM5s, EBS-LCD2, J-LCD, SW-LCD)
