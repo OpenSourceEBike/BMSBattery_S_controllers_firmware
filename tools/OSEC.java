@@ -64,6 +64,7 @@ public class OSEC extends JFrame {
 	private JTextField Cheat_Time_1;
 	private JTextField Cheat_Time_2;
 	private JTextField Cheat_Time_3;
+	private JTextField ramp_end;
 	
 	
 
@@ -328,29 +329,45 @@ public class OSEC extends JFrame {
 		contentPane.add(txtUndervoltage);
 		txtUndervoltage.setColumns(10);
 		
+		JLabel lblRampEnd = new JLabel("Ramp end");
+		lblRampEnd.setBounds(295, 353, 67, 14);
+		contentPane.add(lblRampEnd);
+		
+		ramp_end = new JTextField();
+		ramp_end.setText("977");
+		ramp_end.setColumns(10);
+		ramp_end.setBounds(382, 350, 86, 20);
+		contentPane.add(ramp_end);
+		
 		JLabel lblUndervoltageLimit = new JLabel("Undervoltage limit");
 		lblUndervoltageLimit.setBounds(5, 322, 121, 14);
 		contentPane.add(lblUndervoltageLimit);
 		
 		JRadioButton rdbtnThrottle = new JRadioButton("Throttle");
 		Ridingmode.add(rdbtnThrottle);
-		rdbtnThrottle.setBounds(127, 506, 109, 23);
+		rdbtnThrottle.setBounds(136, 506, 109, 23);
 		contentPane.add(rdbtnThrottle);
 		
 		JRadioButton rdbtnThrottlePas = new JRadioButton("Throttle and PAS");
 		Ridingmode.add(rdbtnThrottlePas);
-		rdbtnThrottlePas.setBounds(127, 530, 149, 23);
+		rdbtnThrottlePas.setBounds(136, 530, 149, 23);
 		contentPane.add(rdbtnThrottlePas);
 		
 		JRadioButton rdbtnTorqueSensor = new JRadioButton("Torquesensor");
 		rdbtnTorqueSensor.setSelected(true);
 		Ridingmode.add(rdbtnTorqueSensor);
-		rdbtnTorqueSensor.setBounds(127, 556, 144, 23);
+		rdbtnTorqueSensor.setBounds(136, 556, 144, 23);
 		contentPane.add(rdbtnTorqueSensor);
+		
+		JRadioButton rdbtnTorquesimulation = new JRadioButton("Torque-Simulation");
+		rdbtnTorquesimulation.setSelected(true);
+		Ridingmode.add(rdbtnTorquesimulation);
+		rdbtnTorquesimulation.setBounds(136, 582, 144, 23);
+		contentPane.add(rdbtnTorquesimulation);
 		
 		JLabel lblRideMode = new JLabel("Ride Mode");
 		lblRideMode.setFont(new Font("Tahoma", Font.BOLD, 12));
-		lblRideMode.setBounds(127, 487, 86, 14);
+		lblRideMode.setBounds(136, 487, 86, 14);
 		contentPane.add(lblRideMode);
 		
 		lblDiplayType = new JLabel("Display Type");
@@ -359,13 +376,14 @@ public class OSEC extends JFrame {
 		contentPane.add(lblDiplayType);
 		
 		JRadioButton rdbtnNone = new JRadioButton("None");
+		rdbtnNone.setSelected(true);
 		buttonGroup.add(rdbtnNone);
 		rdbtnNone.setBounds(5, 508, 109, 23);
 		contentPane.add(rdbtnNone);
 		
 		JRadioButton rdbtnKingmeterJlcd = new JRadioButton("Kingmeter J-LCD");
 		buttonGroup.add(rdbtnKingmeterJlcd);
-		rdbtnKingmeterJlcd.setBounds(5, 532, 149, 23);
+		rdbtnKingmeterJlcd.setBounds(5, 532, 131, 23);
 		contentPane.add(rdbtnKingmeterJlcd);
 		
 		JButton btnWriteoptionsbyte = new JButton("Write Option Bytes");
@@ -418,7 +436,10 @@ public class OSEC extends JFrame {
 		            		"\r\n" + 
 		            		"#ifndef CONFIG_H_\r\n" + 
 		            		"#define CONFIG_H_\r\n"); 
-		            String text_to_save = "#define limit " + txtSpeedlimit.getText();
+		            
+		            String text_to_save = "#define NUMBER_OF_PAS_MAGS " + txtNumberOfPas.getText();
+		            pWriter.println(text_to_save); 
+		            text_to_save = "#define limit " + txtSpeedlimit.getText();
 		            pWriter.println(text_to_save); 
 		            text_to_save = "#define timeout " + txtPasTimeout.getText();
 		            pWriter.println(text_to_save); 
@@ -432,13 +453,13 @@ public class OSEC extends JFrame {
 		            pWriter.println(text_to_save); 
 		            text_to_save = "#define BATTERY_VOLTAGE_MIN_VALUE " + txtUndervoltage.getText();
 		            pWriter.println(text_to_save); 
-		            text_to_save = "#define BATTERY_CURRENT_MAX_VALUE " + txtMaxbatterycurrent.getText();
+		            text_to_save = "#define BATTERY_CURRENT_MAX_VALUE " + txtMaxbatterycurrent.getText()+"L";
 		            pWriter.println(text_to_save); 
 		            text_to_save = "#define MOTOR_ROTOR_DELTA_PHASE_ANGLE_RIGHT " + txtMotor_specific_angle.getText();
 		            pWriter.println(text_to_save); 
 		            text_to_save = "#define current_cal_a " + txtBatteryCurcala.getText();
 		            pWriter.println(text_to_save); 
-		            text_to_save = "#define current_cal_b " + txtBatteryCurcalb.getText();
+		            text_to_save = "#define current_cal_b " + txtBatteryCurcalb.getText()+"L";
 		            pWriter.println(text_to_save); 
 		            text_to_save = "#define LEVEL_1 " + Assist_Level_1.getText();
 		            pWriter.println(text_to_save); 
@@ -456,7 +477,10 @@ public class OSEC extends JFrame {
 		            pWriter.println(text_to_save);
 		            text_to_save = "#define CHEAT_TIME_3 " + Cheat_Time_3.getText();
 		            pWriter.println(text_to_save);
-
+		            text_to_save = "#define RAMP_END " + ramp_end.getText();
+		            pWriter.println(text_to_save);
+		            
+		            
 		    		if (rdbtnTorqueSensor.isSelected()){ 
 			            text_to_save = "#define TORQUESENSOR";
 			            pWriter.println(text_to_save); 		                
@@ -469,6 +493,11 @@ public class OSEC extends JFrame {
 			            text_to_save = "#define THROTTLE";
 			            pWriter.println(text_to_save); 		                
 		    		}
+		    		if (rdbtnTorquesimulation.isSelected()){ 
+			            text_to_save = "#define TORQUE_SIMULATION";
+			            pWriter.println(text_to_save); 		                
+		    		}
+		    		
 		    		if (rdbtnKingmeterJlcd.isSelected()){ 
 			            text_to_save = "#define DISPLAY_TYPE_KINGMETER_618U (1<<4) // King-Meter 618U protocol (KM5s, EBS-LCD2, J-LCD, SW-LCD)";
 			            pWriter.println(text_to_save); 		
@@ -500,6 +529,10 @@ public class OSEC extends JFrame {
 		btnWriteConfiguration.setForeground(Color.BLUE);
 		btnWriteConfiguration.setBounds(295, 471, 167, 58);
 		contentPane.add(btnWriteConfiguration);
+		
+
+		
+
 		
 
 		

@@ -62,13 +62,21 @@ uint16_t update_setpoint (uint16_t speed, uint16_t PAS, uint16_t sumtorque, uint
 
   }else {								//if none of the overruling boundaries are concerned, calculate new setpoint
 #ifdef TORQUESENSOR
-  ui32_setpoint=(i16_assistlevel[ui8_assistlevel_global-1]/100*fummelfaktor*sumtorque)/PAS; 						//calculate setpoint
+  ui32_setpoint=((i16_assistlevel[ui8_assistlevel_global-1]*fummelfaktor*sumtorque))/(PAS*100); 						//calculate setpoint
   //printf("vor: spd %d, pas %d, sumtor %d, setpoint %lu\n", speed, PAS, sumtorque, ui32_setpoint);
 
-  i16_delta=(ui32_setpoint-setpoint_old)/p_factor; 					//simple p-controller to avoid big steps in setpoint value course
-  if (i16_delta>max_change){i16_delta=max_change;}					//limit max change of setpoint to avoid motor stopping by fault
-  if (i16_delta*i16_delta)/i16_delta<setpoint_old){ui32_setpoint=(uint32_t)setpoint_old+(uint32_t)i16_delta;}	//adjust setpoint relatively to the old setpoint, avoiding negative values
-  if (ui32_setpoint>SETPOINT_MAX_VALUE){ui32_setpoint=SETPOINT_MAX_VALUE;}	//cut setpoint values to the defined maximum
+  if (i16_delta<max_change*(-1)){i16_delta=max_change*(-1);}
+  if (i16_delta>max_change){i16_delta=max_change;}//limit max change of setpoint to avoid motor stopping by fault
+
+
+   if (i16_delta>((int16_t)setpoint_old)*(-1)) //avoid values < 0 for setpoint
+     {
+
+       ui32_setpoint=(uint32_t)(setpoint_old + i16_delta);
+       //printf("setpoint %lu, Delta %d, current %d, current_target %d, temp %d\n", ui32_setpoint, i16_delta, ui16_BatteryCurrent, uint16_current_target, uint16_temp);
+     }
+   if (ui32_setpoint>SETPOINT_MAX_VALUE){ui32_setpoint=SETPOINT_MAX_VALUE;}
+
 #endif
 
 #if defined(THROTTLE)  || defined(THROTTLE_AND_PAS)
