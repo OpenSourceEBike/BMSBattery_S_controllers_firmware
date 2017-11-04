@@ -53,29 +53,27 @@ void throttle_pas_torque_sensor_controller (void)
   ui8_ADC_throttle = cruise_control (ui8_ADC_throttle);
 #endif
 
+//      ui8_temp = (uint8_t) (map ((int32_t) ui8_ADC_throttle, ADC_THROTTLE_MIN_VALUE, ADC_THROTTLE_MAX_VALUE, 0, 255));
+//      motor_set_pwm_duty_cycle_target (ui8_temp);
+
   if (ui8_power_assist_control_mode)
   {
-    // throttle will setup motor pwm duty_cycle
-    ui8_temp = (uint8_t) (map ((int32_t) ui8_ADC_throttle, ADC_THROTTLE_MIN_VALUE, ADC_THROTTLE_MAX_VALUE, 0, 255));
+    // setup motor current
+    ui16_temp = (uint16_t) (((float) ADC_MOTOR_CURRENT_MAX_10B) * communications_get_controller_max_current_factor () * ((float) communications_get_assist_level () / 5.0));
+    motor_controller_set_current (ui16_temp);
 
     // apply max erps speed to the speed controller
     motor_controller_set_speed_erps (motor_controller_get_speed_erps_max ());
-
-    ui8_current_pwm_duty_cycle = pwm_get_duty_cycle ();
-    ui8_pwm_duty_cycle_a = motor_speed_controller (ui8_current_pwm_duty_cycle);
-    // apply the value that is lower
-    motor_set_pwm_duty_cycle_target (ui8_min (ui8_temp, ui8_pwm_duty_cycle_a));
   }
   else
   {
     // throttle will setup motor current
-    ui16_temp = (uint16_t) (((float) ADC_MOTOR_CURRENT_MAX_10B) * communications_get_controller_max_current_factor ());
+    ui16_temp = (uint16_t) (((float) ADC_MOTOR_CURRENT_MAX_10B) * communications_get_controller_max_current_factor () * ((float) communications_get_assist_level () / 5.0));
     ui16_temp = (uint16_t) (map ((uint32_t) ui8_ADC_throttle, ADC_THROTTLE_MIN_VALUE, ADC_THROTTLE_MAX_VALUE, 0, (uint32_t) ui16_temp));
     motor_controller_set_current (ui16_temp);
 
     // throttle will setup motor speed
-    ui16_temp = (motor_controller_get_speed_erps_max () / 5) * communications_get_assist_level ();
-    ui16_temp = map ((uint32_t) ui8_ADC_throttle, ADC_THROTTLE_MIN_VALUE, ADC_THROTTLE_MAX_VALUE, 0, (uint32_t) ui16_temp);
+    ui16_temp = map ((uint32_t) ui8_ADC_throttle, ADC_THROTTLE_MIN_VALUE, ADC_THROTTLE_MAX_VALUE, 0, (uint32_t) motor_controller_get_speed_erps_max ());
     motor_controller_set_speed_erps (ui16_temp);
   }
 }

@@ -90,14 +90,14 @@ void hall_sensors_read_and_action (void)
       }
 
       // update motor commutation state based on motor speed
-#if MOTOR_TYPE == MOTOR_TYPE_Q85
+#if (MOTOR_TYPE == MOTOR_TYPE_Q85) || (MOTOR_TYPE == MOTOR_TYPE_Q100)
+#ifdef DO_SINEWAVE_INTERPOLATION_360_DEGREES
       if ((ui16_motor_speed_erps > 120) &&
 	  (ui8_motor_commutation_type == SINEWAVE_INTERPOLATION_60_DEGREES))
       {
-#ifdef DO_SINEWAVE_INTERPOLATION_360_DEGREES
+
 	ui8_motor_commutation_type = SINEWAVE_INTERPOLATION_360_DEGREES;
 	ui8_motor_state = MOTOR_STATE_RUNNING;
-#endif
       }
       if ((ui16_motor_speed_erps < 90) &&
 	  (ui8_motor_commutation_type == SINEWAVE_INTERPOLATION_360_DEGREES))
@@ -105,26 +105,14 @@ void hall_sensors_read_and_action (void)
 	ui8_motor_commutation_type = SINEWAVE_INTERPOLATION_60_DEGREES;
 	ui8_motor_state = MOTOR_STATE_RUNNING;
       }
-
-      if ((ui16_motor_speed_erps > 60) &&
+#endif
+      if ((ui16_motor_speed_erps > 80) &&
 	  (ui8_motor_commutation_type == BLOCK_COMMUTATION))
       {
 	ui8_motor_commutation_type = SINEWAVE_INTERPOLATION_60_DEGREES;
 	ui8_motor_state = MOTOR_STATE_RUNNING;
 
 	pwm_init_bipolar_4q ();
-      }
-      if ((ui16_motor_speed_erps < 30) &&
-	  (ui8_motor_commutation_type == SINEWAVE_INTERPOLATION_60_DEGREES))
-      {
-	ui8_motor_commutation_type = BLOCK_COMMUTATION;
-	ui8_motor_state = MOTOR_STATE_RUNNING;
-
-	pwm_init_6_steps ();
-	// put the phases to a valid state
-	pwm_phase_a_disable (ui8_duty_cycle);
-	pwm_phase_b_disable (ui8_duty_cycle);
-	pwm_phase_c_disable (ui8_duty_cycle);
       }
 #elif MOTOR_TYPE == MOTOR_TYPE_EUC2
       if (ui16_motor_speed_erps > 3)
@@ -182,17 +170,17 @@ void hall_sensors_read_and_action (void)
 	  }
 	}
       }
-#elif (MOTOR_TYPE == MOTOR_TYPE_Q85)
+#elif (MOTOR_TYPE == MOTOR_TYPE_Q85) || (MOTOR_TYPE == MOTOR_TYPE_Q100)
       if (ui8_motor_state == MOTOR_STATE_RUNNING)
       {
 	if ((ui8_motor_commutation_type == SINEWAVE_INTERPOLATION_60_DEGREES) ||
 	   (ui8_motor_commutation_type == SINEWAVE_INTERPOLATION_360_DEGREES))
 	{
-	  if (ui8_ADC_id_current > 127)
+	  if (ui8_ADC_id_current > 112)
 	  {
 	    ui8_position_correction_value--;
 	  }
-	  else if (ui8_ADC_id_current < 125)
+	  else if (ui8_ADC_id_current < 110)
 	  {
 	    ui8_position_correction_value++;
 	  }
@@ -282,7 +270,7 @@ void motor_fast_loop (void)
   if (ui8_motor_commutation_type == SINEWAVE_INTERPOLATION_60_DEGREES)
   {
     ui8_interpolation_angle = (ui16_PWM_cycles_counter_6 << 8) / ui16_PWM_cycles_counter_total;
-#if MOTOR_TYPE == MOTOR_TYPE_Q85
+#if (MOTOR_TYPE == MOTOR_TYPE_Q85) || (MOTOR_TYPE == MOTOR_TYPE_Q100)
     ui8_motor_rotor_position = ui8_motor_rotor_absolute_position + ui8_position_correction_value + ui8_interpolation_angle;
 #elif MOTOR_TYPE == MOTOR_TYPE_EUC2
     ui8_motor_rotor_position = ui8_motor_rotor_absolute_position + ui8_position_correction_value - ui8_interpolation_angle;
@@ -291,7 +279,7 @@ void motor_fast_loop (void)
   else if (ui8_motor_commutation_type == SINEWAVE_INTERPOLATION_360_DEGREES)
   {
     ui8_interpolation_angle = (ui16_PWM_cycles_counter << 8) / ui16_PWM_cycles_counter_total;
-#if MOTOR_TYPE == MOTOR_TYPE_Q85
+#if (MOTOR_TYPE == MOTOR_TYPE_Q85) || (MOTOR_TYPE == MOTOR_TYPE_Q100)
     ui8_motor_rotor_position = ui8_motor_rotor_absolute_position + ui8_position_correction_value + ui8_interpolation_angle;
 #elif MOTOR_TYPE == MOTOR_TYPE_EUC2
     ui8_motor_rotor_position = ui8_motor_rotor_absolute_position + ui8_position_correction_value - ui8_interpolation_angle;
@@ -358,11 +346,13 @@ void motor_init (void)
 
   motor_set_current_max (ADC_MOTOR_CURRENT_MAX);
   motor_set_regen_current_max (ADC_MOTOR_REGEN_CURRENT_MAX);
-  motor_set_pwm_duty_cycle_ramp_inverse_step (30); // each step = 64us
+  motor_set_pwm_duty_cycle_ramp_inverse_step (PWM_DUTY_CYCLE_RAMP_INVERSE_STEP); // each step = 64us
 }
 
 void motor_set_pwm_duty_cycle_target (uint8_t value)
 {
+  if (value > PWM_VALUE_DUTY_CYCLE_MAX) { value = PWM_VALUE_DUTY_CYCLE_MAX; }
+
   pwm_set_duty_cycle_target (value);
 }
 
@@ -381,9 +371,9 @@ void motor_set_regen_current_max (uint8_t value)
   ui8_adc_motor_regen_current_max = value;
 }
 
-void motor_set_pwm_duty_cycle_ramp_inverse_step (uint8_t value)
+void motor_set_pwm_duty_cycle_ramp_inverse_step (uint16_t value)
 {
-  ui8_duty_cycle_ramp_inverse_step = value;
+  ui16_duty_cycle_ramp_inverse_step = value;
 }
 
 uint16_t motor_get_motor_speed_erps (void)

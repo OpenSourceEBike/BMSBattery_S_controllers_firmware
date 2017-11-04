@@ -277,8 +277,8 @@ uint8_t ui8_svm_table [SVM_TABLE_LEN] =
 
 volatile uint8_t ui8_duty_cycle = 0;
 uint8_t ui8_duty_cycle_target;
-uint8_t ui8_duty_cycle_ramp_inverse_step;
-uint8_t ui8_counter_duty_cycle_ramp = 0;
+uint16_t ui16_duty_cycle_ramp_inverse_step;
+uint16_t ui16_counter_duty_cycle_ramp = 0;
 uint8_t ui8_value_a;
 uint8_t ui8_value_b;
 uint8_t ui8_value_c;
@@ -427,9 +427,9 @@ void pwm_duty_cycle_controller (void)
   }
   else // no motor current limits, adjust duty_cycle to duty_cycle_target, including ramping
   {
-    if (ui8_counter_duty_cycle_ramp++ >= ui8_duty_cycle_ramp_inverse_step)
+    if (ui16_counter_duty_cycle_ramp++ >= ui16_duty_cycle_ramp_inverse_step)
     {
-      ui8_counter_duty_cycle_ramp = 0;
+      ui16_counter_duty_cycle_ramp = 0;
 
       // implement duty_cycle ramp
       if (ui8_duty_cycle_target > ui8_duty_cycle)

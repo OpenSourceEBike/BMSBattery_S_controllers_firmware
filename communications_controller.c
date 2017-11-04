@@ -49,7 +49,7 @@ void communications_controller (void)
   //
 
   // calc wheel period in ms
-  ui16_wheel_period_ms = (motor_get_er_PWM_ticks () * (ui8_motor_characteristic >> 1) / MOTOR_PWM_TICKS_PER_MS;
+  ui16_wheel_period_ms = (motor_get_er_PWM_ticks () * (ui8_motor_characteristic >> 1)) / MOTOR_PWM_TICKS_PER_MS;
 
   // calc battery pack state of charge (SOC)
   ui16_battery_volts = motor_get_ADC_battery_voltage_filtered () * ADC_BATTERY_VOLTAGE_K;

@@ -17,7 +17,7 @@
 extern uint8_t ui8_svm_table [SVM_TABLE_LEN];
 extern uint8_t ui8_duty_cycle_target;
 extern volatile uint8_t ui8_duty_cycle;
-extern uint8_t ui8_duty_cycle_ramp_inverse_step;
+extern uint16_t ui16_duty_cycle_ramp_inverse_step;
 
 void pwm_init_6_steps (void);
 void pwm_phase_a_disable (uint8_t _duty_cycle_value);

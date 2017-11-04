@@ -62,12 +62,9 @@
 #define BATTERY_VOLTAGE__PIN      GPIO_PIN_6
 #define BATTERY_VOLTAGE__PORT     GPIOE
 
-#if ((MOTOR_TYPE == MOTOR_TYPE_Q85) || (MOTOR_TYPE == MOTOR_TYPE_EUC2))
-  #define HALL_SENSOR_A__PIN      GPIO_PIN_0
-  #define HALL_SENSOR_B__PIN      GPIO_PIN_1
-  #define HALL_SENSOR_C__PIN      GPIO_PIN_2
-#else
-#endif
+#define HALL_SENSOR_A__PIN      GPIO_PIN_0
+#define HALL_SENSOR_B__PIN      GPIO_PIN_1
+#define HALL_SENSOR_C__PIN      GPIO_PIN_2
 
 #define HALL_SENSOR_A__PORT       GPIOE
 #define HALL_SENSOR_B__PORT       GPIOE

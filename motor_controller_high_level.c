@@ -40,16 +40,24 @@ void motor_controller_high_level (void)
   uint8_t ui8_current_pwm_duty_cycle;
   uint8_t ui8_pwm_duty_cycle_a;
   uint8_t ui8_pwm_duty_cycle_b;
+  uint8_t ui8_pwm_duty_cycle_c;
 
   motor_battery_voltage_protection ();
 
-  if (!ui8_power_assist_control_mode) // speed + current controllers
+  ui8_current_pwm_duty_cycle = pwm_get_duty_cycle ();
+  ui8_pwm_duty_cycle_a = motor_current_controller (ui8_current_pwm_duty_cycle);
+  ui8_pwm_duty_cycle_b = motor_speed_controller (ui8_current_pwm_duty_cycle);
+
+  if (ui8_power_assist_control_mode)
   {
-      ui8_current_pwm_duty_cycle = pwm_get_duty_cycle ();
-      ui8_pwm_duty_cycle_a = motor_current_controller (ui8_current_pwm_duty_cycle);
-      ui8_pwm_duty_cycle_b = motor_speed_controller (ui8_current_pwm_duty_cycle);
-      // apply the value that is lower
-      motor_set_pwm_duty_cycle_target (ui8_min (ui8_pwm_duty_cycle_a, ui8_pwm_duty_cycle_b));
+    ui8_pwm_duty_cycle_c = (uint8_t) (map ((int32_t) ui8_ADC_throttle, ADC_THROTTLE_MIN_VALUE, ADC_THROTTLE_MAX_VALUE, 0, PWM_VALUE_DUTY_CYCLE_MAX));
+    // apply the value that is lower
+    motor_set_pwm_duty_cycle_target (ui8_min (ui8_min (ui8_pwm_duty_cycle_a, ui8_pwm_duty_cycle_b), ui8_pwm_duty_cycle_c));
+  }
+  else
+  {
+    // apply the value that is lower
+    motor_set_pwm_duty_cycle_target (ui8_min (ui8_pwm_duty_cycle_a, ui8_pwm_duty_cycle_b));
   }
 }
 
@@ -143,9 +151,8 @@ void motor_battery_voltage_protection (void)
 {
   // low pass filter the voltage readed value, to avoid possible fast spikes/noise
   ui16_ADC_battery_voltage_accumulated -= ui16_ADC_battery_voltage_accumulated >> 6;
-  ui16_ADC_battery_voltage_accumulated += ui8_adc_read_battery_voltage ();
+  ui16_ADC_battery_voltage_accumulated += ((uint16_t) ui8_adc_read_battery_voltage ());
   ui8_ADC_battery_voltage_filtered = ui16_ADC_battery_voltage_accumulated >> 6;
-
 
   if (ui8_ADC_battery_voltage_filtered > BATTERY_VOLTAGE_MAX_VALUE)
   {

@@ -23,6 +23,8 @@
 extern uint16_t ui16_ADC_motor_current_filtered;
 extern uint16_t ui16_target_current;
 
+extern uint8_t ui8_ADC_battery_voltage_filtered;
+
 void motor_controller_high_level (void);
 uint8_t motor_get_ADC_battery_voltage_filtered (void);
 void motor_controller_set_speed_erps (uint16_t erps);
