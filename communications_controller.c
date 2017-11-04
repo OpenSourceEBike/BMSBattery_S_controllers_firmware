@@ -23,7 +23,7 @@ volatile uint8_t ui8_power_assist_control_mode;
 uint8_t ui8_controller_max_current;
 volatile float f_controller_max_current = 1;
 float f_wheel_size;
-uint8_t ui8_motor_characteristic;
+uint8_t ui8_motor_characteristic = 0;
 
 uint8_t ui8_tx_buffer[12];
 uint8_t ui8_i;
@@ -49,7 +49,7 @@ void communications_controller (void)
   //
 
   // calc wheel period in ms
-  ui16_wheel_period_ms = (motor_get_er_PWM_ticks () * (MOTOR_NUMBER_MAGNETS >> 1) * MOTOR_REDUCTION_RATIO) / MOTOR_PWM_TICKS_PER_MS;
+  ui16_wheel_period_ms = (motor_get_er_PWM_ticks () * (ui8_motor_characteristic >> 1) / MOTOR_PWM_TICKS_PER_MS;
 
   // calc battery pack state of charge (SOC)
   ui16_battery_volts = motor_get_ADC_battery_voltage_filtered () * ADC_BATTERY_VOLTAGE_K;
