@@ -10,11 +10,13 @@
 #include "stm8s.h"
 #include "gpio.h"
 #include "stm8s_adc1.h"
+#include "config.h"
+
 
 uint8_t adc_throttle_busy_flag = 0;
 uint8_t ui8_BatteryVoltage = 0;
 uint16_t ui16_BatteryCurrent = 0;
-uint16_t ui16_BatteryCurrent_accumulated = 0;
+uint16_t ui16_BatteryCurrent_accumulated = (-1*current_cal_b)<<3;
 uint8_t delay_counter;
 
 void adc_init (void)

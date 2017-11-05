@@ -8,6 +8,7 @@
 
 #include <stdint.h>
 #include <stdio.h>
+#include <float.h>
 #include "stm8s.h"
 #include "stm8s_it.h"
 #include "gpio.h"
@@ -22,12 +23,13 @@
 #include "config.h"
 
 
+
 static uint32_t ui32_setpoint; // local version of setpoint
 uint32_t ui32_SPEED_km_h; //global variable Speed
 static int16_t i16_delta; // difference between setpoint and actual value
 int16_t i16_assistlevel[5]={LEVEL_1, LEVEL_2, LEVEL_3, LEVEL_4, LEVEL_5}; // difference between setpoint and actual value
 uint16_t uint16_current_target=0;
-uint16_t uint16_temp=0;
+float float_temp=-1.15;
 int8_t uint_PWM_Enable=0;
 
 uint16_t update_setpoint (uint16_t speed, uint16_t PAS, uint16_t sumtorque, uint16_t setpoint_old)
@@ -73,7 +75,7 @@ uint16_t update_setpoint (uint16_t speed, uint16_t PAS, uint16_t sumtorque, uint
      {
 
        ui32_setpoint=(uint32_t)(setpoint_old + i16_delta);
-       //printf("setpoint %lu, Delta %d, current %d, current_target %d, temp %d\n", ui32_setpoint, i16_delta, ui16_BatteryCurrent, uint16_current_target, uint16_temp);
+       //printf("setpoint %lu, Delta %d, current %d, current_target %d, temp %d\n", ui32_setpoint, i16_delta, ui16_BatteryCurrent, uint16_current_target, float_temp);
      }
    if (ui32_setpoint>SETPOINT_MAX_VALUE){ui32_setpoint=SETPOINT_MAX_VALUE;}
 
@@ -103,10 +105,10 @@ uint16_t update_setpoint (uint16_t speed, uint16_t PAS, uint16_t sumtorque, uint
   if (PAS>RAMP_END) //if you are pedaling slower than defined ramp end, current is proportional to cadence
     {
       uint16_current_target= (i16_assistlevel[ui8_assistlevel_global-1]*(BATTERY_CURRENT_MAX_VALUE+current_cal_b)/100);
-      uint16_temp=(RAMP_END<<3)/(PAS);
+      float_temp=((float)RAMP_END)/((float)PAS);
 
-      uint16_current_target= ((uint16_current_target*uint16_temp)>>3)-current_cal_b;
-      printf("PAS %d, RAMP_END %d, temp %d\n", PAS, RAMP_END, uint16_temp);
+      uint16_current_target= ((int16_t)(uint16_current_target)*(int16_t)(float_temp*100))/100-current_cal_b;
+      //printf("PAS %d, delta %d, current target %d\n", PAS, (int16_t)(float_temp*100), uint16_current_target);
     }
   else
     {
@@ -126,7 +128,7 @@ uint16_t update_setpoint (uint16_t speed, uint16_t PAS, uint16_t sumtorque, uint
     {
 
       ui32_setpoint=(uint32_t)(setpoint_old + i16_delta);
-      //printf("setpoint %lu, Delta %d, current %d, current_target %d, temp %d\n", ui32_setpoint, i16_delta, ui16_BatteryCurrent, uint16_current_target, uint16_temp);
+      printf("setpoint %lu, Delta %d, current %d, PAS %d, current_target %d\n", ui32_setpoint, i16_delta, ui16_BatteryCurrent, PAS, uint16_current_target);
     }
   if (ui32_setpoint>SETPOINT_MAX_VALUE){ui32_setpoint=SETPOINT_MAX_VALUE;}
 
