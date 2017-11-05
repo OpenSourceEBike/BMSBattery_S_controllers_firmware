@@ -277,8 +277,10 @@ uint8_t ui8_svm_table [SVM_TABLE_LEN] =
 
 volatile uint8_t ui8_duty_cycle = 0;
 uint8_t ui8_duty_cycle_target;
-uint16_t ui16_duty_cycle_ramp_inverse_step;
-uint16_t ui16_counter_duty_cycle_ramp = 0;
+uint16_t ui16_duty_cycle_ramp_up_inverse_step;
+uint16_t ui16_duty_cycle_ramp_down_inverse_step;
+uint16_t ui16_counter_duty_cycle_ramp_up = 0;
+uint16_t ui16_counter_duty_cycle_ramp_down = 0;
 uint8_t ui8_value_a;
 uint8_t ui8_value_b;
 uint8_t ui8_value_c;
@@ -427,20 +429,39 @@ void pwm_duty_cycle_controller (void)
   }
   else // no motor current limits, adjust duty_cycle to duty_cycle_target, including ramping
   {
-    if (ui16_counter_duty_cycle_ramp++ >= ui16_duty_cycle_ramp_inverse_step)
+    // implement duty_cycle ramp
+    if (ui8_duty_cycle_target > ui8_duty_cycle)
     {
-      ui16_counter_duty_cycle_ramp = 0;
-
-      // implement duty_cycle ramp
-      if (ui8_duty_cycle_target > ui8_duty_cycle)
+      if (ui16_counter_duty_cycle_ramp_up++ >= ui16_duty_cycle_ramp_up_inverse_step)
       {
+	ui16_counter_duty_cycle_ramp_up = 0;
 	ui8_duty_cycle++;
       }
-      else if (ui8_duty_cycle_target < ui8_duty_cycle)
+    }
+    else if (ui8_duty_cycle_target < ui8_duty_cycle)
+    {
+      if (ui16_counter_duty_cycle_ramp_down++ >= ui16_duty_cycle_ramp_down_inverse_step)
       {
+	ui16_counter_duty_cycle_ramp_down = 0;
 	ui8_duty_cycle--;
       }
     }
+
+
+//    if (ui16_counter_duty_cycle_ramp++ >= ui16_duty_cycle_ramp_inverse_step)
+//    {
+//      ui16_counter_duty_cycle_ramp = 0;
+//
+//      // implement duty_cycle ramp
+//      if (ui8_duty_cycle_target > ui8_duty_cycle)
+//      {
+//	ui8_duty_cycle++;
+//      }
+//      else if (ui8_duty_cycle_target < ui8_duty_cycle)
+//      {
+//	ui8_duty_cycle--;
+//      }
+//    }
   }
 
   pwm_apply_duty_cycle (ui8_duty_cycle);

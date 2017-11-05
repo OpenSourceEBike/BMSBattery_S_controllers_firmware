@@ -68,6 +68,49 @@ void hall_sensors_read_and_action (void)
     switch (ui8_hall_sensors)
     {
       case 3:
+//debug_pin_set ();
+
+// read here the phase B current: FOC Id current
+ui8_ADC_id_current = ui8_adc_read_phase_B_current ();
+
+#if (MOTOR_TYPE == MOTOR_TYPE_EUC2)
+if (ui8_motor_state == MOTOR_STATE_RUNNING)
+{
+	if (ui8_motor_commutation_type == SINEWAVE_INTERPOLATION_60_DEGREES)
+	{
+	  if (ui8_ADC_id_current > 127)
+	  {
+	    ui8_position_correction_value++;
+	  }
+	  else if (ui8_ADC_id_current < 125)
+	  {
+	    ui8_position_correction_value--;
+	  }
+	}
+}
+#elif (MOTOR_TYPE == MOTOR_TYPE_Q85) || (MOTOR_TYPE == MOTOR_TYPE_Q100)
+if (ui8_motor_state == MOTOR_STATE_RUNNING)
+{
+//	if ((ui8_motor_commutation_type == SINEWAVE_INTERPOLATION_60_DEGREES) ||
+//	   (ui8_motor_commutation_type == SINEWAVE_INTERPOLATION_360_DEGREES))
+	if (ui16_motor_speed_erps > 120)
+	{
+	  if (ui8_ADC_id_current > 140)
+	  {
+	    ui8_position_correction_value++;
+	  }
+	  else if (ui8_ADC_id_current < 138)
+	  {
+	    ui8_position_correction_value--;
+	  }
+	}
+	else
+	{
+	  ui8_position_correction_value = 127; // keep using the reset value
+	}
+}
+#endif
+
       if (ui8_motor_commutation_type == BLOCK_COMMUTATION)
       {
 	pwm_phase_a_enable_pwm (ui8_duty_cycle);
@@ -92,21 +135,21 @@ void hall_sensors_read_and_action (void)
       // update motor commutation state based on motor speed
 #if (MOTOR_TYPE == MOTOR_TYPE_Q85) || (MOTOR_TYPE == MOTOR_TYPE_Q100)
 #ifdef DO_SINEWAVE_INTERPOLATION_360_DEGREES
-      if ((ui16_motor_speed_erps > 120) &&
+      if ((ui16_motor_speed_erps > 180) &&
 	  (ui8_motor_commutation_type == SINEWAVE_INTERPOLATION_60_DEGREES))
       {
 
 	ui8_motor_commutation_type = SINEWAVE_INTERPOLATION_360_DEGREES;
 	ui8_motor_state = MOTOR_STATE_RUNNING;
       }
-      if ((ui16_motor_speed_erps < 90) &&
+      if ((ui16_motor_speed_erps < 140) &&
 	  (ui8_motor_commutation_type == SINEWAVE_INTERPOLATION_360_DEGREES))
       {
 	ui8_motor_commutation_type = SINEWAVE_INTERPOLATION_60_DEGREES;
 	ui8_motor_state = MOTOR_STATE_RUNNING;
       }
 #endif
-      if ((ui16_motor_speed_erps > 80) &&
+      if ((ui16_motor_speed_erps > 100) &&
 	  (ui8_motor_commutation_type == BLOCK_COMMUTATION))
       {
 	ui8_motor_commutation_type = SINEWAVE_INTERPOLATION_60_DEGREES;
@@ -152,45 +195,7 @@ void hall_sensors_read_and_action (void)
       break;
 
       case 4:
-      // read here the phase B current: FOC Id current
-      ui8_ADC_id_current = ui8_adc_read_phase_B_current ();
-
-#if (MOTOR_TYPE == MOTOR_TYPE_EUC2)
-      if (ui8_motor_state == MOTOR_STATE_RUNNING)
-      {
-	if (ui8_motor_commutation_type == SINEWAVE_INTERPOLATION_60_DEGREES)
-	{
-	  if (ui8_ADC_id_current > 127)
-	  {
-	    ui8_position_correction_value++;
-	  }
-	  else if (ui8_ADC_id_current < 125)
-	  {
-	    ui8_position_correction_value--;
-	  }
-	}
-      }
-#elif (MOTOR_TYPE == MOTOR_TYPE_Q85) || (MOTOR_TYPE == MOTOR_TYPE_Q100)
-      if (ui8_motor_state == MOTOR_STATE_RUNNING)
-      {
-	if ((ui8_motor_commutation_type == SINEWAVE_INTERPOLATION_60_DEGREES) ||
-	   (ui8_motor_commutation_type == SINEWAVE_INTERPOLATION_360_DEGREES))
-	{
-	  if (ui8_ADC_id_current > 112)
-	  {
-	    ui8_position_correction_value--;
-	  }
-	  else if (ui8_ADC_id_current < 110)
-	  {
-	    ui8_position_correction_value++;
-	  }
-	}
-	else
-	{
-	  ui8_position_correction_value = 127; // keep using the reset value
-	}
-      }
-#endif
+//debug_pin_reset ();
 
       if (ui8_motor_commutation_type == BLOCK_COMMUTATION)
       {
@@ -346,7 +351,8 @@ void motor_init (void)
 
   motor_set_current_max (ADC_MOTOR_CURRENT_MAX);
   motor_set_regen_current_max (ADC_MOTOR_REGEN_CURRENT_MAX);
-  motor_set_pwm_duty_cycle_ramp_inverse_step (PWM_DUTY_CYCLE_RAMP_INVERSE_STEP); // each step = 64us
+  motor_set_pwm_duty_cycle_ramp_up_inverse_step (60); // each step = 64us
+  motor_set_pwm_duty_cycle_ramp_down_inverse_step (30); // each step = 64us
 }
 
 void motor_set_pwm_duty_cycle_target (uint8_t value)
@@ -371,9 +377,14 @@ void motor_set_regen_current_max (uint8_t value)
   ui8_adc_motor_regen_current_max = value;
 }
 
-void motor_set_pwm_duty_cycle_ramp_inverse_step (uint16_t value)
+void motor_set_pwm_duty_cycle_ramp_up_inverse_step (uint16_t value)
 {
-  ui16_duty_cycle_ramp_inverse_step = value;
+  ui16_duty_cycle_ramp_up_inverse_step = value;
+}
+
+void motor_set_pwm_duty_cycle_ramp_down_inverse_step (uint16_t value)
+{
+  ui16_duty_cycle_ramp_down_inverse_step = value;
 }
 
 uint16_t motor_get_motor_speed_erps (void)
