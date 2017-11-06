@@ -23,9 +23,9 @@ uint8_t ui8_cruise_value = 0;
 uint8_t ui8_cruise_output = 0;
 uint8_t ui8_cruise_counter = 0;
 
-uint8_t cruise_control (uint8_t ui8_value);
+uint8_t ui8_adc_throttle_value;
 
-uint8_t ui8_ADC_throttle;
+uint8_t cruise_control (uint8_t ui8_value);
 
 void throttle_pas_torque_sensor_controller (void)
 {
@@ -36,12 +36,12 @@ void throttle_pas_torque_sensor_controller (void)
   static float f_temp;
 
   // only throttle implemented for now
-  ui8_ADC_throttle = ui8_adc_read_throttle ();
+  ui8_adc_throttle_value = ui8_adc_read_throttle ();
 
   // verify if throttle is connect or if there is any error
   // if error: error symbol on LCD will be shown
-  if ((ui8_ADC_throttle < ADC_THROTTLE_MIN_VALUE_ERROR) ||
-      (ui8_ADC_throttle > ADC_THROTTLE_MAX_VALUE_ERROR))
+  if ((ui8_adc_throttle_value < ADC_THROTTLE_MIN_VALUE_ERROR) ||
+      (ui8_adc_throttle_value > ADC_THROTTLE_MAX_VALUE_ERROR))
   {
     motor_controller_set_state (MOTOR_CONTROLLER_STATE_THROTTLE_ERROR);
     motor_disable_PWM ();
@@ -50,7 +50,7 @@ void throttle_pas_torque_sensor_controller (void)
 
 #define DO_CRUISE_CONTROL 1
 #if DO_CRUISE_CONTROL == 1
-  ui8_ADC_throttle = cruise_control (ui8_ADC_throttle);
+  ui8_adc_throttle_value = cruise_control (ui8_adc_throttle_value);
 #endif
 
 //      ui8_temp = (uint8_t) (map ((int32_t) ui8_ADC_throttle, ADC_THROTTLE_MIN_VALUE, ADC_THROTTLE_MAX_VALUE, 0, 255));
@@ -69,11 +69,11 @@ void throttle_pas_torque_sensor_controller (void)
   {
     // throttle will setup motor current
     ui16_temp = (uint16_t) (((float) ADC_MOTOR_CURRENT_MAX_10B) * communications_get_controller_max_current_factor () * ((float) communications_get_assist_level () / 5.0));
-    ui16_temp = (uint16_t) (map ((uint32_t) ui8_ADC_throttle, ADC_THROTTLE_MIN_VALUE, ADC_THROTTLE_MAX_VALUE, 0, (uint32_t) ui16_temp));
+    ui16_temp = (uint16_t) (map ((uint32_t) ui8_adc_throttle_value, ADC_THROTTLE_MIN_VALUE, ADC_THROTTLE_MAX_VALUE, 0, (uint32_t) ui16_temp));
     motor_controller_set_current (ui16_temp);
 
     // throttle will setup motor speed
-    ui16_temp = map ((uint32_t) ui8_ADC_throttle, ADC_THROTTLE_MIN_VALUE, ADC_THROTTLE_MAX_VALUE, 0, (uint32_t) motor_controller_get_speed_erps_max ());
+    ui16_temp = map ((uint32_t) ui8_adc_throttle_value, ADC_THROTTLE_MIN_VALUE, ADC_THROTTLE_MAX_VALUE, 0, (uint32_t) motor_controller_get_speed_erps_max ());
     motor_controller_set_speed_erps (ui16_temp);
   }
 }
@@ -120,13 +120,18 @@ uint8_t cruise_control (uint8_t ui8_value)
   return ui8_cruise_output;
 }
 
-void set_cruise_control_state (uint8_t value)
+uint8_t cruise_control_is_set (void)
 {
-  ui8_cruise_state = value;
+  return ui8_cruise_state ? 1: 0;
 }
 
-void stop_cruise_control (void)
+void cruise_control_stop (void)
 {
-  set_cruise_control_state (0);
+  ui8_cruise_state = 0;
+}
+
+uint8_t throttle_is_set (void)
+{
+  return (ui8_adc_throttle_value > ADC_THROTTLE_MIN_VALUE) ? 1: 0;
 }
 

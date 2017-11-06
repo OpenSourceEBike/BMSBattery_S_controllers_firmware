@@ -95,11 +95,13 @@ if (ui8_motor_state == MOTOR_STATE_RUNNING)
 //	   (ui8_motor_commutation_type == SINEWAVE_INTERPOLATION_360_DEGREES))
 	if (ui16_motor_speed_erps > 120)
 	{
-	  if (ui8_ADC_id_current > 140)
+//	  if (ui8_ADC_id_current > 140) // 140 ok for a Q100 motor; these value may differ from motor to motor
+	  if (ui8_ADC_id_current > 127)
 	  {
 	    ui8_position_correction_value++;
 	  }
-	  else if (ui8_ADC_id_current < 138)
+//	  else if (ui8_ADC_id_current < 138) // 138 ok for a Q100 motor; these value may differ from motor to motor
+	  else if (ui8_ADC_id_current < 125)
 	  {
 	    ui8_position_correction_value--;
 	  }

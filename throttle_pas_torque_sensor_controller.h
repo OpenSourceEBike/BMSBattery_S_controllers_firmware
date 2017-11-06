@@ -14,6 +14,8 @@
 
 void throttle_pas_torque_sensor_controller (void);
 void set_cruise_control_state (uint8_t value);
-void stop_cruise_control (void);
+void cruise_control_stop (void);
+uint8_t cruise_control_is_set (void);
+uint8_t throttle_is_set (void);
 
 #endif /* _THROTTLE_PAS_TORQUE_SENSOR_CONTROLLER_H_ */

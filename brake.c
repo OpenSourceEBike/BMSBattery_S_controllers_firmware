@@ -25,7 +25,7 @@ void EXTI_PORTA_IRQHandler(void) __interrupt(EXTI_PORTA_IRQHANDLER)
   {
     motor_controller_set_state (MOTOR_CONTROLLER_STATE_BRAKE);
     motor_disable_PWM ();
-    stop_cruise_control ();
+    cruise_control_stop ();
   }
   else
   {

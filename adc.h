@@ -20,7 +20,7 @@
 extern uint8_t adc_throttle_busy_flag;
 extern uint8_t ui8_BatteryVoltage;
 extern uint8_t ui8_BatteryCurrent;
-extern uint8_t ui8_ADC_throttle;
+extern uint8_t ui8_adc_throttle_value;
 extern uint8_t ui8_motor_total_current_offset;
 extern uint16_t ui16_motor_total_current_offset_10b;
 

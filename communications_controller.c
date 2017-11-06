@@ -14,6 +14,8 @@
 #include "motor_controller_low_level.h"
 #include "motor_controller_high_level.h"
 #include "communications_controller.h"
+#include "throttle_pas_torque_sensor_controller.h"
+#include "brake.h"
 
 uint8_t ui8_received_package_flag = 0;
 volatile uint8_t ui8_assist_level = 5;
@@ -43,6 +45,7 @@ void communications_controller (void)
   float f_temp;
   uint32_t ui32_temp;
   uint16_t ui16_temp;
+  uint8_t ui8_moving_indication = 0;
 
   /********************************************************************************************/
   // Prepare and send packate to LCD
@@ -68,6 +71,13 @@ void communications_controller (void)
     ui16_error = 0;
   }
 
+  // prepare moving indication info
+  // the first ifs have higher priority!
+  if (brake_is_set ()) { ui8_moving_indication = (1 << 5); }
+  else if (cruise_control_is_set ()) { ui8_moving_indication = (1 << 3); }
+  else if (throttle_is_set ()) { ui8_moving_indication = (1 << 1); }
+//  else if (pas_is_set ()) { ui8_moving_indication = (1 << 4); }
+
   // preparing the package
   // B0: start package (?)
   ui8_tx_buffer [0] = 65;
@@ -85,7 +95,7 @@ void communications_controller (void)
   ui8_tx_buffer [6] = 0;
   // B7: moving mode indication, bit
   // throttle: 2
-  ui8_tx_buffer [7] = 2;
+  ui8_tx_buffer [7] = ui8_moving_indication;
   // B8: 4x controller current
   ui8_tx_buffer [8] = motor_get_current_max () << 1;
   // B9: motor temperature

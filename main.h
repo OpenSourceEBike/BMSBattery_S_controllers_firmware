@@ -14,14 +14,14 @@
 #define CONTROLLER_TYPE_S06S 1
 #define CONTROLLER_TYPE_S12S 2
 
-#define CONTROLLER_TYPE CONTROLLER_TYPE_S06S
+#define CONTROLLER_TYPE CONTROLLER_TYPE_S12S
 
 
 #define MOTOR_TYPE_Q85 1
 #define MOTOR_TYPE_Q100 3
 #define MOTOR_TYPE_EUC2 2
 
-#define MOTOR_TYPE MOTOR_TYPE_Q100
+#define MOTOR_TYPE MOTOR_TYPE_Q85
 
 #define DO_SINEWAVE_INTERPOLATION_360_DEGREES
 
@@ -120,9 +120,9 @@
 // *************************************************************************** //
 // BATTERY
 
-//#define BATTERY_LI_ION_CELLS_NUMBER 7 // 7S = 24V battery pack
+#define BATTERY_LI_ION_CELLS_NUMBER 7 // 7S = 24V battery pack
 //#define BATTERY_LI_ION_CELLS_NUMBER 10 // 10S = 36V battery pack
-#define BATTERY_LI_ION_CELLS_NUMBER 13 // 13S = 48V battery pack
+//#define BATTERY_LI_ION_CELLS_NUMBER 13 // 13S = 48V battery pack
 
 // ADC Battery voltage
 // 29.8V --> 110 (8bits ADC)

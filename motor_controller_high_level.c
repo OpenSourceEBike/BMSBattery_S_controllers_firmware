@@ -50,7 +50,7 @@ void motor_controller_high_level (void)
 
   if (ui8_power_assist_control_mode)
   {
-    ui8_pwm_duty_cycle_c = (uint8_t) (map ((int32_t) ui8_ADC_throttle, ADC_THROTTLE_MIN_VALUE, ADC_THROTTLE_MAX_VALUE, 0, PWM_VALUE_DUTY_CYCLE_MAX));
+    ui8_pwm_duty_cycle_c = (uint8_t) (map ((int32_t) ui8_adc_throttle_value, ADC_THROTTLE_MIN_VALUE, ADC_THROTTLE_MAX_VALUE, 0, PWM_VALUE_DUTY_CYCLE_MAX));
     // apply the value that is lower
     motor_set_pwm_duty_cycle_target (ui8_min (ui8_min (ui8_pwm_duty_cycle_a, ui8_pwm_duty_cycle_b), ui8_pwm_duty_cycle_c));
   }
