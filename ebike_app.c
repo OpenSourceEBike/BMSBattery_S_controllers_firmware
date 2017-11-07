@@ -19,14 +19,13 @@
 #include "uart.h"
 #include "brake.h"
 
-// if this variables are no global, SDCC will throw the error: xxx.asm:612: Error: <r> relocation error
+// cruise control variables
 uint8_t ui8_cruise_state = 0;
-uint8_t ui8_cruise_value = 0;
 uint8_t ui8_cruise_output = 0;
 uint8_t ui8_cruise_counter = 0;
+uint8_t ui8_cruise_value = 0;
 
-uint8_t ui8_adc_throttle_value;
-
+// communications variables
 uint8_t ui8_received_package_flag = 0;
 volatile uint8_t ui8_assist_level;
 uint8_t ui8_max_speed;
@@ -35,7 +34,6 @@ volatile uint8_t ui8_power_assist_control_mode;
 uint8_t ui8_controller_max_current;
 volatile float f_controller_max_current;
 uint8_t ui8_motor_characteristic = 0;
-
 uint8_t ui8_tx_buffer[12];
 uint8_t ui8_i;
 uint8_t ui8_crc;
@@ -43,19 +41,19 @@ uint16_t ui16_wheel_period_ms;
 uint16_t ui16_battery_volts;
 uint16_t ui16_battery_soc;
 uint8_t ui16_error;
-
 uint8_t ui8_rx_buffer[13];
 uint8_t ui8_rx_counter = 0;
 uint8_t ui8_byte_received;
 uint8_t ui8_state_machine = 0;
 
-float f_get_controller_max_current (uint8_t ui8_controller_max_current);
-void set_speed_to_motor_controller (uint8_t ui8_motor_characteristic, uint8_t ui8_wheel_size, uint8_t ui8_max_speed);
+uint8_t ui8_adc_throttle_value;
 
-uint8_t ebike_app_cruise_control (uint8_t ui8_value);
+// function prototypes
 void throttle_pas_torque_sensor_controller (void);
-
 void communications_controller (void);
+uint8_t ebike_app_cruise_control (uint8_t ui8_value);
+void set_speed_erps_max_to_motor_controller (uint8_t ui8_motor_characteristic, uint8_t ui8_wheel_size, uint8_t ui8_max_speed);
+float f_get_controller_max_current (uint8_t ui8_controller_max_current);
 
 void ebike_app_controller (void)
 {
@@ -271,7 +269,7 @@ void communications_controller (void)
       ui8_controller_max_current = (ui8_rx_buffer [9] & 15);
 
       f_controller_max_current = f_get_controller_max_current (ui8_controller_max_current);
-      set_speed_to_motor_controller (ui8_motor_characteristic, ui8_wheel_size, ui8_max_speed);
+      set_speed_erps_max_to_motor_controller (ui8_motor_characteristic, ui8_wheel_size, ui8_max_speed);
 
       UART2->CR2 |= (1 << 5); // enable UART2 receive interrupt as we are now ready to receive a new package
     }
@@ -339,7 +337,7 @@ void communications_set_controller_max_current_factor (float value)
   f_controller_max_current = value;
 }
 
-void set_speed_to_motor_controller (uint8_t ui8_motor_characteristic, uint8_t ui8_wheel_size, uint8_t ui8_max_speed)
+void set_speed_erps_max_to_motor_controller (uint8_t ui8_motor_characteristic, uint8_t ui8_wheel_size, uint8_t ui8_max_speed)
 {
   float f_wheel_size;
   uint32_t ui32_temp;

@@ -46,8 +46,8 @@ int main (void);
 
 // Local VS global variables
 // Sometimes I got the following error when compiling the firmware: motor.asm:750: Error: <r> relocation error
-// and the solution was to avoid using local variables and define them as global instead
-// Other times, I got code that did not work until I put the variables global.
+// when I have this code inside a function: "static uint8_t ui8_cruise_counter = 0;"
+// and the solution was define the variable as global instead
 
 // Brake signal interrupt
 void EXTI_PORTA_IRQHandler(void) __interrupt(EXTI_PORTA_IRQHANDLER);

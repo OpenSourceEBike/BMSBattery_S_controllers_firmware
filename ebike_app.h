@@ -13,10 +13,7 @@
 #include "main.h"
 
 void ebike_app_controller (void);
-void set_cruise_control_state (uint8_t value);
 void ebike_app_cruise_control_stop (void);
-uint8_t ebike_app_cruise_control_is_set (void);
-uint8_t throttle_is_set (void);
 uint8_t ebike_app_get_power_assist_control_mode (void);
 
 #endif /* _EBIKE_APP_H_ */

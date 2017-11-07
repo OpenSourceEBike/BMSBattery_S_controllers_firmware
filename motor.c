@@ -336,20 +336,20 @@ uint8_t ui8_value_b;
 uint8_t ui8_value_c;
 uint16_t ui16_value;
 
+// functions prototypes
 void pwm_duty_cycle_controller (void);
 void battery_voltage_protection (void);
 uint8_t motor_current_controller (void);
 uint8_t motor_speed_controller (void);
+void hall_sensors_read_and_action (void);
+void motor_fast_loop (void);
 inline void pwm_apply_duty_cycle (void);
 
 void TIM1_UPD_OVF_TRG_BRK_IRQHandler(void) __interrupt(TIM1_UPD_OVF_TRG_BRK_IRQHANDLER)
 {
-  adc_trigger ();
-
+  adc_trigger (); // starts ADC scan conversion of all channels
   hall_sensors_read_and_action ();
-
   motor_fast_loop ();
-
   TIM1_ClearITPendingBit(TIM1_IT_UPDATE);
 }
 
@@ -615,11 +615,6 @@ void motor_controller_set_state (uint8_t ui8_state)
 void motor_controller_reset_state (uint8_t ui8_state)
 {
   ui8_motor_controller_state &= ~ui8_state;
-}
-
-uint8_t motor_controller_get_state (void)
-{
-  return ui8_motor_controller_state;
 }
 
 uint8_t motor_controller_state_is_set (uint8_t ui8_state)
@@ -913,7 +908,7 @@ inline void pwm_apply_duty_cycle (void)
     TIM1_SetCompare2((uint16_t) (ui8_duty_cycle << 2));
     TIM1_SetCompare3((uint16_t) (ui8_duty_cycle << 2));
 
-    if (motor_controller_get_state () == MOTOR_CONTROLLER_STATE_OK)
+    if (ui8_motor_controller_state == MOTOR_CONTROLLER_STATE_OK)
     {
       motor_enable_PWM ();
     }
@@ -970,7 +965,7 @@ inline void pwm_apply_duty_cycle (void)
     TIM1_SetCompare2((uint16_t) (ui8_value_c << 1));
     TIM1_SetCompare3((uint16_t) (ui8_value_b << 1));
 
-    if (motor_controller_get_state () == MOTOR_CONTROLLER_STATE_OK)
+    if (ui8_motor_controller_state == MOTOR_CONTROLLER_STATE_OK)
     {
       motor_enable_PWM ();
     }
