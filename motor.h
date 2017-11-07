@@ -9,6 +9,8 @@
 #ifndef _MOTOR_H_
 #define _MOTOR_H_
 
+#include <stdint.h>
+
 // motor states
 #define BLOCK_COMMUTATION 			1
 #define SINEWAVE_INTERPOLATION_60_DEGREES 	2
@@ -56,7 +58,6 @@ void motor_controller_set_current (uint16_t ui16_current);
 void motor_controller_set_error (uint8_t ui8_error);
 void motor_controller_clear_error (void);
 uint8_t motor_controller_get_error (void);
-uint8_t motor_speed_controller (uint8_t ui8_current_pwm_duty_cycle);
 void motor_set_pwm_duty_cycle (uint8_t ui8_value);
 void hall_sensor_init (void); // must be called before using the motor
 void motor_init (void); // must be called before using the motor

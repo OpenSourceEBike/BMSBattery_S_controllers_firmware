@@ -21,8 +21,6 @@
 #include "timers.h"
 #include "pwm.h"
 #include "config.h"
-#include "motor_controller_high_level.h"
-#include "communications_controller.h"
 #include "ebike_app.h"
 #include "motor.h"
 

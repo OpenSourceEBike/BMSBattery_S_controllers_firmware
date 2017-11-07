@@ -10,12 +10,14 @@
 
 #include <stdint.h>
 #include "stm8s.h"
+#include "stm8s_gpio.h"
+#include "interrupts.h"
 #include "adc.h"
 #include "utils.h"
-#include "motor_controller_high_level.h"
-#include "communications_controller.h"
 #include "motor.h"
 #include "pwm.h"
+#include "uart.h"
+#include "brake.h"
 
 // if this variables are no global, SDCC will throw the error: xxx.asm:612: Error: <r> relocation error
 uint8_t ui8_cruise_state = 0;
@@ -51,14 +53,17 @@ float f_get_controller_max_current (uint8_t ui8_controller_max_current);
 void set_speed_to_motor_controller (uint8_t ui8_motor_characteristic, uint8_t ui8_wheel_size, uint8_t ui8_max_speed);
 
 uint8_t ebike_app_cruise_control (uint8_t ui8_value);
+void throttle_pas_torque_sensor_controller (void);
+
+void communications_controller (void);
 
 void ebike_app_controller (void)
 {
   communications_controller ();
-  throttle_pas_torque_Sensor_controller ();
+  throttle_pas_torque_sensor_controller ();
 }
 
-void throttle_pas_torque_Sensor_controller (void)
+void throttle_pas_torque_sensor_controller (void)
 {
   static uint8_t ui8_temp;
   uint16_t ui16_temp;
@@ -88,7 +93,7 @@ void throttle_pas_torque_Sensor_controller (void)
   if (ui8_power_assist_control_mode)
   {
     // setup motor current
-    ui16_temp = (uint16_t) (((float) ADC_MOTOR_CURRENT_MAX_10B) * communications_get_controller_max_current_factor () * ((float) communications_get_assist_level () / 5.0));
+    ui16_temp = (uint16_t) (((float) ADC_MOTOR_CURRENT_MAX_10B) * f_controller_max_current * (((float) ui8_assist_level) / 5.0));
     motor_controller_set_current (ui16_temp);
 
     // apply max erps speed to the speed controller
@@ -97,7 +102,7 @@ void throttle_pas_torque_Sensor_controller (void)
   else
   {
     // throttle will setup motor current
-    ui16_temp = (uint16_t) (((float) ADC_MOTOR_CURRENT_MAX_10B) * communications_get_controller_max_current_factor () * ((float) communications_get_assist_level () / 5.0));
+    ui16_temp = (uint16_t) (((float) ADC_MOTOR_CURRENT_MAX_10B) * f_controller_max_current * (((float) ui8_assist_level) / 5.0));
     ui16_temp = (uint16_t) (map ((uint32_t) ui8_temp, ADC_THROTTLE_MIN_VALUE, ADC_THROTTLE_MAX_VALUE, 0, (uint32_t) ui16_temp));
     motor_controller_set_current (ui16_temp);
 
@@ -166,9 +171,6 @@ uint8_t throttle_is_set (void)
 
 void communications_controller (void)
 {
-  float f_temp;
-  uint32_t ui32_temp;
-  uint16_t ui16_temp;
   uint8_t ui8_moving_indication = 0;
 
   /********************************************************************************************/
@@ -332,22 +334,12 @@ void UART2_IRQHandler(void) __interrupt(UART2_IRQHANDLER)
   }
 }
 
-uint8_t communications_get_assist_level (void)
-{
-  return ui8_assist_level;
-}
-
-float communications_get_controller_max_current_factor (void)
-{
-  return f_controller_max_current;
-}
-
 void communications_set_controller_max_current_factor (float value)
 {
   f_controller_max_current = value;
 }
 
-void set_speed_to_motor_controller (uint8_t ui8_motor_characteristic, uint8_t ui8_wheel_size, uint8_t ui8_max_speed);
+void set_speed_to_motor_controller (uint8_t ui8_motor_characteristic, uint8_t ui8_wheel_size, uint8_t ui8_max_speed)
 {
   float f_wheel_size;
   uint32_t ui32_temp;
@@ -411,7 +403,8 @@ void set_speed_to_motor_controller (uint8_t ui8_motor_characteristic, uint8_t ui
     f_wheel_size = 2.25;
     break;
 
-    default:
+    default: // 26''
+    f_wheel_size = 2.0625;
     break;
   }
 

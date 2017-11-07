@@ -10,14 +10,16 @@
 
 #include <stdint.h>
 #include <stdio.h>
+#include "interrupts.h"
 #include "stm8s_gpio.h"
 #include "stm8s_tim1.h"
+#include "ebike_app.h"
 #include "gpio.h"
 #include "pwm.h"
 #include "config.h"
 #include "adc.h"
-#include "motor_controller_high_level.h"
-#include "communications_controller.h"
+#include "utils.h"
+#include "uart.h"
 
 #define SVM_TABLE_LEN 256
 
@@ -334,6 +336,12 @@ uint8_t ui8_value_b;
 uint8_t ui8_value_c;
 uint16_t ui16_value;
 
+void pwm_duty_cycle_controller (void);
+void battery_voltage_protection (void);
+uint8_t motor_current_controller (void);
+uint8_t motor_speed_controller (void);
+inline void pwm_apply_duty_cycle (void);
+
 void TIM1_UPD_OVF_TRG_BRK_IRQHandler(void) __interrupt(TIM1_UPD_OVF_TRG_BRK_IRQHANDLER)
 {
   adc_trigger ();
@@ -403,9 +411,9 @@ void hall_sensors_read_and_action (void)
 
       if (ui8_motor_commutation_type == BLOCK_COMMUTATION)
       {
-	pwm_phase_a_enable_pwm (ui8_duty_cycle);
-	pwm_phase_b_disable (ui8_duty_cycle);
-	pwm_phase_c_enable_low (ui8_duty_cycle);
+	pwm_phase_a_enable_pwm ();
+	pwm_phase_b_disable ();
+	pwm_phase_c_enable_low ();
       }
       else if (ui8_motor_commutation_type == SINEWAVE_INTERPOLATION_60_DEGREES)
       {
@@ -461,9 +469,9 @@ void hall_sensors_read_and_action (void)
 
       if (ui8_motor_commutation_type == BLOCK_COMMUTATION)
       {
-	pwm_phase_a_enable_pwm (ui8_duty_cycle);
-	pwm_phase_b_enable_low (ui8_duty_cycle);
-	pwm_phase_c_disable (ui8_duty_cycle);
+	pwm_phase_a_enable_pwm ();
+	pwm_phase_b_enable_low ();
+	pwm_phase_c_disable ();
       }
       else
       {
@@ -475,8 +483,8 @@ void hall_sensors_read_and_action (void)
       if (ui8_motor_commutation_type == BLOCK_COMMUTATION)
       {
 	pwm_phase_a_disable ();
-	pwm_phase_b_enable_low (ui8_duty_cycle);
-	pwm_phase_c_enable_pwm (ui8_duty_cycle);
+	pwm_phase_b_enable_low ();
+	pwm_phase_c_enable_pwm ();
       }
       else if (ui8_motor_commutation_type == SINEWAVE_INTERPOLATION_60_DEGREES)
       {
@@ -489,9 +497,9 @@ void hall_sensors_read_and_action (void)
 
       if (ui8_motor_commutation_type == BLOCK_COMMUTATION)
       {
-	pwm_phase_a_enable_low (ui8_duty_cycle);
-	pwm_phase_b_disable (ui8_duty_cycle);
-	pwm_phase_c_enable_pwm (ui8_duty_cycle);
+	pwm_phase_a_enable_low ();
+	pwm_phase_b_disable ();
+	pwm_phase_c_enable_pwm ();
       }
       else if (ui8_motor_commutation_type == SINEWAVE_INTERPOLATION_60_DEGREES)
       {
@@ -504,9 +512,9 @@ void hall_sensors_read_and_action (void)
 
       if (ui8_motor_commutation_type == BLOCK_COMMUTATION)
       {
-	pwm_phase_a_enable_low (ui8_duty_cycle);
-	pwm_phase_b_enable_pwm (ui8_duty_cycle);
-	pwm_phase_c_disable (ui8_duty_cycle);
+	pwm_phase_a_enable_low ();
+	pwm_phase_b_enable_pwm ();
+	pwm_phase_c_disable ();
       }
       else if (ui8_motor_commutation_type == SINEWAVE_INTERPOLATION_60_DEGREES)
       {
@@ -518,8 +526,8 @@ void hall_sensors_read_and_action (void)
       if (ui8_motor_commutation_type == BLOCK_COMMUTATION)
       {
 	pwm_phase_a_disable ();
-	pwm_phase_b_enable_pwm (ui8_duty_cycle);
-	pwm_phase_c_enable_low (ui8_duty_cycle);
+	pwm_phase_b_enable_pwm ();
+	pwm_phase_c_enable_low ();
       }
       else if (ui8_motor_commutation_type == SINEWAVE_INTERPOLATION_60_DEGREES)
       {
@@ -892,18 +900,18 @@ void pwm_duty_cycle_controller (void)
     }
   }
 
-  pwm_apply_duty_cycle (ui8_duty_cycle);
+  pwm_apply_duty_cycle ();
 }
 
-void pwm_apply_duty_cycle (uint8_t ui8_duty_cycle_value)
+inline void pwm_apply_duty_cycle (void)
 {
   uint8_t ui8_temp;
 
   if (ui8_motor_commutation_type == BLOCK_COMMUTATION)
   {
-    TIM1_SetCompare1((uint16_t) (ui8_duty_cycle_value << 2));
-    TIM1_SetCompare2((uint16_t) (ui8_duty_cycle_value << 2));
-    TIM1_SetCompare3((uint16_t) (ui8_duty_cycle_value << 2));
+    TIM1_SetCompare1((uint16_t) (ui8_duty_cycle << 2));
+    TIM1_SetCompare2((uint16_t) (ui8_duty_cycle << 2));
+    TIM1_SetCompare3((uint16_t) (ui8_duty_cycle << 2));
 
     if (motor_controller_get_state () == MOTOR_CONTROLLER_STATE_OK)
     {
@@ -916,13 +924,13 @@ void pwm_apply_duty_cycle (uint8_t ui8_duty_cycle_value)
     ui8_temp = ui8_svm_table[ui8_motor_rotor_position];
     if (ui8_temp > MIDDLE_PWM_VALUE_DUTY_CYCLE_MAX)
     {
-      ui16_value = ((uint16_t) (ui8_temp - MIDDLE_PWM_VALUE_DUTY_CYCLE_MAX)) * ui8_duty_cycle_value;
+      ui16_value = ((uint16_t) (ui8_temp - MIDDLE_PWM_VALUE_DUTY_CYCLE_MAX)) * ui8_duty_cycle;
       ui8_temp = (uint8_t) (ui16_value >> 8);
       ui8_value_a = MIDDLE_PWM_VALUE_DUTY_CYCLE_MAX + ui8_temp;
     }
     else
     {
-      ui16_value = ((uint16_t) (MIDDLE_PWM_VALUE_DUTY_CYCLE_MAX - ui8_temp)) * ui8_duty_cycle_value;
+      ui16_value = ((uint16_t) (MIDDLE_PWM_VALUE_DUTY_CYCLE_MAX - ui8_temp)) * ui8_duty_cycle;
       ui8_temp = (uint8_t) (ui16_value >> 8);
       ui8_value_a = MIDDLE_PWM_VALUE_DUTY_CYCLE_MAX - ui8_temp;
     }
@@ -931,13 +939,13 @@ void pwm_apply_duty_cycle (uint8_t ui8_duty_cycle_value)
     ui8_temp = ui8_svm_table[(uint8_t) (ui8_motor_rotor_position + 85 /* 120º */)];
     if (ui8_temp > MIDDLE_PWM_VALUE_DUTY_CYCLE_MAX)
     {
-      ui16_value = ((uint16_t) (ui8_temp - MIDDLE_PWM_VALUE_DUTY_CYCLE_MAX)) * ui8_duty_cycle_value;
+      ui16_value = ((uint16_t) (ui8_temp - MIDDLE_PWM_VALUE_DUTY_CYCLE_MAX)) * ui8_duty_cycle;
       ui8_temp = (uint8_t) (ui16_value >> 8);
       ui8_value_b = MIDDLE_PWM_VALUE_DUTY_CYCLE_MAX + ui8_temp;
     }
     else
     {
-      ui16_value = ((uint16_t) (MIDDLE_PWM_VALUE_DUTY_CYCLE_MAX - ui8_temp)) * ui8_duty_cycle_value;
+      ui16_value = ((uint16_t) (MIDDLE_PWM_VALUE_DUTY_CYCLE_MAX - ui8_temp)) * ui8_duty_cycle;
       ui8_temp = (uint8_t) (ui16_value >> 8);
       ui8_value_b = MIDDLE_PWM_VALUE_DUTY_CYCLE_MAX - ui8_temp;
     }
@@ -946,13 +954,13 @@ void pwm_apply_duty_cycle (uint8_t ui8_duty_cycle_value)
     ui8_temp = ui8_svm_table[(uint8_t) (ui8_motor_rotor_position + 171 /* 240º */)];
     if (ui8_temp > MIDDLE_PWM_VALUE_DUTY_CYCLE_MAX)
     {
-      ui16_value = ((uint16_t) (ui8_temp - MIDDLE_PWM_VALUE_DUTY_CYCLE_MAX)) * ui8_duty_cycle_value;
+      ui16_value = ((uint16_t) (ui8_temp - MIDDLE_PWM_VALUE_DUTY_CYCLE_MAX)) * ui8_duty_cycle;
       ui8_temp = (uint8_t) (ui16_value >> 8);
       ui8_value_c = MIDDLE_PWM_VALUE_DUTY_CYCLE_MAX + ui8_temp;
     }
     else
     {
-      ui16_value = ((uint16_t) (MIDDLE_PWM_VALUE_DUTY_CYCLE_MAX - ui8_temp)) * ui8_duty_cycle_value;
+      ui16_value = ((uint16_t) (MIDDLE_PWM_VALUE_DUTY_CYCLE_MAX - ui8_temp)) * ui8_duty_cycle;
       ui8_temp = (uint8_t) (ui16_value >> 8);
       ui8_value_c = MIDDLE_PWM_VALUE_DUTY_CYCLE_MAX - ui8_temp;
     }
