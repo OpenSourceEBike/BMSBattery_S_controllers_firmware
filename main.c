@@ -21,14 +21,14 @@
 #include "timers.h"
 #include "pwm.h"
 #include "config.h"
-#include "motor_controller_low_level.h"
 #include "motor_controller_high_level.h"
-#include "throttle_pas_torque_sensor_controller.h"
 #include "communications_controller.h"
+#include "ebike_app.h"
+#include "motor.h"
 
 uint16_t ui16_TIM2_counter = 0;
 uint16_t ui16_motor_controller_counter = 0;
-uint16_t ui16_throttle_pas_torque_sensor_controller_counter = 0;
+uint16_t ui16_ebike_app_controller_counter = 0;
 uint16_t ui16_communications_controller_counter = 0;
 
 /////////////////////////////////////////////////////////////////////////////////////////////
@@ -80,6 +80,7 @@ int main (void)
   pwm_init_6_steps ();
   hall_sensor_init ();
   adc_init ();
+//  eeprom_data_storage_init ();
   motor_init ();
   enableInterrupts ();
 
@@ -95,23 +96,15 @@ int main (void)
     if ((ui16_TIM2_counter - ui16_motor_controller_counter) > 100) // every 100ms
     {
       ui16_motor_controller_counter = ui16_TIM2_counter;
-      motor_controller_high_level ();
+      motor_controller ();
       continue;
     }
 
     ui16_TIM2_counter = TIM2_GetCounter ();
-    if ((ui16_TIM2_counter - ui16_communications_controller_counter) > 150) // every 100ms
+    if ((ui16_TIM2_counter - ui16_ebike_app_controller_counter) > 100) // every 100ms
     {
-      ui16_communications_controller_counter = ui16_TIM2_counter;
-      communications_controller ();
-      continue;
-    }
-
-    ui16_TIM2_counter = TIM2_GetCounter ();
-    if ((ui16_TIM2_counter - ui16_throttle_pas_torque_sensor_controller_counter) > 100) // every 100ms
-    {
-      ui16_throttle_pas_torque_sensor_controller_counter = ui16_TIM2_counter;
-      throttle_pas_torque_sensor_controller ();
+      ui16_ebike_app_controller_counter = ui16_TIM2_counter;
+      ebike_app_controller ();
       continue;
     }
   }

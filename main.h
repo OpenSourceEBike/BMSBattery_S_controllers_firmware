@@ -34,10 +34,6 @@
 #define MOTOR_KVOLTS_PER_ERPS 107 //0.424 << 8 EUC2 motor
 #endif
 
-#define SVM_TABLE_LEN 256
-#define SVM_TABLE_LEN_x1024 262144 //(256 * 1024)
-
-
 #if CONTROLLER_TYPE == CONTROLLER_TYPE_S06S
 #define ADC_MOTOR_CURRENT_MAX_MED_VALUE_10B 10144 // ADC_MOTOR_CURRENT_MAX_ZERO_VALUE_10B << 5
 #define ADC_MOTOR_CURRENT_MAX 15 // 30 = 15A; 1 --> 0.5A
@@ -116,6 +112,15 @@
 #define DISPLAY_TYPE_KINGMETER 1
 #define DISPLAY_TYPE DISPLAY_TYPE_KINGMETER
 
+// *************************************************************************** //
+// EEPROM memory variables default values
+
+#define DEFAULT_VALUE_ASSIST_LEVEL 		2
+#define DEFAULT_VALUE_MOTOR_CHARACTARISTIC 	202 // for Q85 motor (12.6 * 16)
+#define DEFAULT_VALUE_WHEEL_SIZE	 	20 // 26''
+#define DEFAULT_VALUE_MAX_SPEED	 		25
+#define DEFAULT_VALUE_POWER_ASSIST_CONTROL_MODE 1
+#define DEFAULT_VALUE_CONTROLLER_MAX_CURRENT	10
 
 // *************************************************************************** //
 // BATTERY

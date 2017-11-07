@@ -1,7 +1,7 @@
 /*
- * EGG OpenSource EBike firmware
+ * BMSBattery S series motor controllers firmware
  *
- * Copyright (C) Casainho, 2015, 2106, 2017.
+ * Copyright (C) Casainho, 2017.
  *
  * Released under the GPL License, Version 3
  */
@@ -13,10 +13,9 @@
 #include "main.h"
 #include "interrupts.h"
 #include "brake.h"
-#include "motor_controller_high_level.h"
-#include "motor_controller_low_level.h"
+#include "ebike_app.h"
+#include "motor.h"
 #include "pwm.h"
-#include "throttle_pas_torque_sensor_controller.h"
 
 // Brake signal
 void EXTI_PORTA_IRQHandler(void) __interrupt(EXTI_PORTA_IRQHANDLER)
@@ -25,13 +24,13 @@ void EXTI_PORTA_IRQHandler(void) __interrupt(EXTI_PORTA_IRQHANDLER)
   {
     motor_controller_set_state (MOTOR_CONTROLLER_STATE_BRAKE);
     motor_disable_PWM ();
-    cruise_control_stop ();
+    ebike_app_cruise_control_stop ();
   }
   else
   {
     motor_controller_reset_state (MOTOR_CONTROLLER_STATE_BRAKE);
     motor_enable_PWM ();
-    ui8_duty_cycle = 0;
+    motor_set_pwm_duty_cycle (0);
   }
 }
 
@@ -55,12 +54,3 @@ BitStatus brake_is_set (void)
     return 0;
 }
 
-void brake_coast_enable (void)
-{
-  TIM1->BKR &= (uint8_t) ~(TIM1_BKR_MOE);
-}
-
-void brake_coast_disable (void)
-{
-  TIM1->BKR |= (uint8_t) (TIM1_BKR_MOE);
-}
