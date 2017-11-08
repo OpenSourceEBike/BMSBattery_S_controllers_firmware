@@ -28,26 +28,23 @@ void eeprom_init (void)
   uint8_t ui8_i;
   uint8_t ui8_data;
 
-  /* Define FLASH programming time */
-  FLASH_SetProgrammingTime(FLASH_PROGRAMTIME_STANDARD);
-
-  /* Unlock Data memory */
-  FLASH_Unlock(FLASH_MEMTYPE_DATA);
-  /* Wait until Data EEPROM area unlocked flag is set*/
-  while (FLASH_GetFlagStatus(FLASH_FLAG_DUL) == RESET) ;
-
   /****************************************************************************/
   // start by reading address 0 and see if value is different from our key,
   // if so mean that eeprom memory is clean and we need to populate: should happen after erasing the microcontroller
   ui8_data = FLASH_ReadByte (ADDRESS_KEY);
   if (ui8_data != KEY) // verify if our key exist
   {
+    FLASH_SetProgrammingTime(FLASH_PROGRAMTIME_STANDARD);
+    FLASH_Unlock(FLASH_MEMTYPE_DATA);
+    while (FLASH_GetFlagStatus(FLASH_FLAG_DUL) == RESET) ;
+
     // flash all the default values
     for (ui8_i = 0; ui8_i < 7; ui8_i++)
     {
       FLASH_ProgramByte(EEPROM_BASE_ADDRESS + ui8_i, array_default_values [ui8_i]);
       FLASH_GetFlagStatus (FLASH_FLAG_EOP) ;
     }
+    FLASH_Lock(FLASH_MEMTYPE_DATA);
 
     eeprom_read_values_to_variables ();
   }
