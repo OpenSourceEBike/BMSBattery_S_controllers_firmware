@@ -278,7 +278,7 @@ void communications_controller (void)
       UART2->CR2 |= (1 << 5); // enable UART2 receive interrupt as we are now ready to receive a new package
     }
 
-    // now write values to EEPROM, but only if one of them them changed
+    // now write values to EEPROM, but only if one of them changed
     eeprom_write_if_values_changed ();
   }
 }

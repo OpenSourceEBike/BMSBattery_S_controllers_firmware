@@ -47,12 +47,12 @@ void eeprom_read_values_to_variables (void)
 {
   struc_lcd_configuration_variables *p_lcd_configuration_variables = ebike_app_get_lcd_configuration_variables ();
 
-  p_lcd_configuration_variables->ui8_assist_level = FLASH_ReadByte(ADDRESS_ASSIST_LEVEL);
-  p_lcd_configuration_variables->ui8_motor_characteristic = FLASH_ReadByte(ADDRESS_MOTOR_CHARACTARISTIC);
-  p_lcd_configuration_variables->ui8_wheel_size = FLASH_ReadByte(ADDRESS_WHEEL_SIZE);
-  p_lcd_configuration_variables->ui8_max_speed = FLASH_ReadByte(ADDRESS_MAX_SPEED);
-  p_lcd_configuration_variables->ui8_power_assist_control_mode = FLASH_ReadByte(ADDRESS_POWER_ASSIST_CONTROL_MODE);
-  p_lcd_configuration_variables->ui8_controller_max_current = FLASH_ReadByte(ADDRESS_CONTROLLER_MAX_CURRENT);
+  p_lcd_configuration_variables->ui8_assist_level = FLASH_ReadByte (ADDRESS_ASSIST_LEVEL);
+  p_lcd_configuration_variables->ui8_motor_characteristic = FLASH_ReadByte (ADDRESS_MOTOR_CHARACTARISTIC);
+  p_lcd_configuration_variables->ui8_wheel_size = FLASH_ReadByte (ADDRESS_WHEEL_SIZE);
+  p_lcd_configuration_variables->ui8_max_speed = FLASH_ReadByte (ADDRESS_MAX_SPEED);
+  p_lcd_configuration_variables->ui8_power_assist_control_mode = FLASH_ReadByte (ADDRESS_POWER_ASSIST_CONTROL_MODE);
+  p_lcd_configuration_variables->ui8_controller_max_current = FLASH_ReadByte (ADDRESS_CONTROLLER_MAX_CURRENT);
 }
 
 void eeprom_write_if_values_changed (void)
@@ -61,12 +61,12 @@ void eeprom_write_if_values_changed (void)
   static uint8_t array_values [7];
 
   // see if the values differ from the ones on EEPROM and if so, write all of them to EEPROM
-  if ((p_lcd_configuration_variables->ui8_assist_level != FLASH_ReadByte(ADDRESS_ASSIST_LEVEL)) ||
-      (p_lcd_configuration_variables->ui8_motor_characteristic != FLASH_ReadByte(ADDRESS_MOTOR_CHARACTARISTIC)) ||
-      (p_lcd_configuration_variables->ui8_wheel_size != FLASH_ReadByte(ADDRESS_WHEEL_SIZE)) ||
-      (p_lcd_configuration_variables->ui8_max_speed != FLASH_ReadByte(ADDRESS_MAX_SPEED)) ||
-      (p_lcd_configuration_variables->ui8_power_assist_control_mode != FLASH_ReadByte(ADDRESS_POWER_ASSIST_CONTROL_MODE)) ||
-      (p_lcd_configuration_variables->ui8_controller_max_current != FLASH_ReadByte(ADDRESS_CONTROLLER_MAX_CURRENT)))
+  if ((p_lcd_configuration_variables->ui8_assist_level != FLASH_ReadByte (ADDRESS_ASSIST_LEVEL)) ||
+      (p_lcd_configuration_variables->ui8_motor_characteristic != FLASH_ReadByte (ADDRESS_MOTOR_CHARACTARISTIC)) ||
+      (p_lcd_configuration_variables->ui8_wheel_size != FLASH_ReadByte (ADDRESS_WHEEL_SIZE)) ||
+      (p_lcd_configuration_variables->ui8_max_speed != FLASH_ReadByte (ADDRESS_MAX_SPEED)) ||
+      (p_lcd_configuration_variables->ui8_power_assist_control_mode != FLASH_ReadByte (ADDRESS_POWER_ASSIST_CONTROL_MODE)) ||
+      (p_lcd_configuration_variables->ui8_controller_max_current != FLASH_ReadByte (ADDRESS_CONTROLLER_MAX_CURRENT)))
   {
     array_values [0] = KEY;
     array_values [1] = p_lcd_configuration_variables->ui8_assist_level;
@@ -84,14 +84,14 @@ void eeprom_write_array (uint8_t *array_values)
 {
   uint8_t ui8_i;
 
-  FLASH_SetProgrammingTime(FLASH_PROGRAMTIME_STANDARD);
-  FLASH_Unlock(FLASH_MEMTYPE_DATA);
-  while (FLASH_GetFlagStatus(FLASH_FLAG_DUL) == RESET) ;
+  FLASH_SetProgrammingTime (FLASH_PROGRAMTIME_STANDARD);
+  FLASH_Unlock (FLASH_MEMTYPE_DATA);
+  while (!FLASH_GetFlagStatus (FLASH_FLAG_DUL)) ;
 
   for (ui8_i = 0; ui8_i < 7; ui8_i++)
   {
-    FLASH_ProgramByte(EEPROM_BASE_ADDRESS + ui8_i, *array_values++);
-    FLASH_GetFlagStatus (FLASH_FLAG_EOP) ;
+    FLASH_ProgramByte (EEPROM_BASE_ADDRESS + ui8_i, *array_values++);
+    while (!FLASH_GetFlagStatus (FLASH_FLAG_EOP)) ;
   }
-  FLASH_Lock(FLASH_MEMTYPE_DATA);
+  FLASH_Lock (FLASH_MEMTYPE_DATA);
 }
