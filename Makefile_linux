@@ -37,6 +37,7 @@ EXTRASRCS = \
 	$(SDIR)/stm8s_tim1.c \
 	$(SDIR)/stm8s_tim2.c \
 	$(SDIR)/stm8s_adc1.c \
+	$(SDIR)/stm8s_flash.c \
 	gpio.c \
 	utils.c \
 	uart.c \
@@ -44,10 +45,11 @@ EXTRASRCS = \
 	brake.c \
 	timers.c \
 	pwm.c \
+	eeprom.c \
 	motor.c \
 	ebike_app.c \
 
-HEADERS = adc.h brake.h gpio.h interrupts.h main.h pwm.h timers.h uart.h utils.h motor.h ebike_app.h
+HEADERS = adc.h brake.h gpio.h interrupts.h main.h pwm.h timers.h uart.h utils.h motor.h ebike_app.h eeprom.h
 
 # The list of .rel files can be derived from the list of their source files
 RELS = $(EXTRASRCS:.c=.rel)

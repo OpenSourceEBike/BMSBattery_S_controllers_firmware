@@ -705,6 +705,7 @@ void motor_controller (void)
   uint8_t ui8_pwm_duty_cycle_a;
   uint8_t ui8_pwm_duty_cycle_b;
   uint8_t ui8_pwm_duty_cycle_c;
+  struc_lcd_configuration_variables *p_lcd_configuration_variables = ebike_app_get_lcd_configuration_variables ();
 
   battery_voltage_protection ();
 
@@ -712,7 +713,7 @@ void motor_controller (void)
   ui8_pwm_duty_cycle_a = motor_current_controller ();
   ui8_pwm_duty_cycle_b = motor_speed_controller ();
 
-  if (ebike_app_get_power_assist_control_mode ())
+  if (p_lcd_configuration_variables->ui8_power_assist_control_mode)
   {
     ui8_pwm_duty_cycle_c = (uint8_t) (map ((int32_t) ebike_app_get_adc_throttle_value_cruise_control (), ADC_THROTTLE_MIN_VALUE, ADC_THROTTLE_MAX_VALUE, 0, PWM_VALUE_DUTY_CYCLE_MAX));
     // apply the value that is lower

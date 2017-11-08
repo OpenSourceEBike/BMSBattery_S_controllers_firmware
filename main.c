@@ -22,6 +22,7 @@
 #include "pwm.h"
 #include "config.h"
 #include "ebike_app.h"
+#include "eeprom.h"
 #include "motor.h"
 
 uint16_t ui16_TIM2_counter = 0;
@@ -78,7 +79,7 @@ int main (void)
   pwm_init_6_steps ();
   hall_sensor_init ();
   adc_init ();
-//  eeprom_data_storage_init ();
+  eeprom_init ();
   motor_init ();
   enableInterrupts ();
 

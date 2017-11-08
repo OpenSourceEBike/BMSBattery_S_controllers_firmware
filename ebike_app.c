@@ -26,6 +26,7 @@ uint8_t ui8_cruise_counter = 0;
 uint8_t ui8_cruise_value = 0;
 
 // communications variables
+struc_lcd_configuration_variables lcd_configuration_variables;
 uint8_t ui8_received_package_flag = 0;
 volatile uint8_t ui8_assist_level;
 uint8_t ui8_max_speed;
@@ -33,7 +34,7 @@ uint8_t ui8_wheel_size;
 volatile uint8_t ui8_power_assist_control_mode;
 uint8_t ui8_controller_max_current;
 volatile float f_controller_max_current;
-uint8_t ui8_motor_characteristic = 0;
+uint8_t ui8_motor_characteristic;
 uint8_t ui8_tx_buffer[12];
 uint8_t ui8_i;
 uint8_t ui8_crc;
@@ -53,7 +54,7 @@ uint8_t ui8_adc_throttle_value_cruise_control;
 void throttle_pas_torque_sensor_controller (void);
 void communications_controller (void);
 uint8_t ebike_app_cruise_control (uint8_t ui8_value);
-void set_speed_erps_max_to_motor_controller (uint8_t ui8_motor_characteristic, uint8_t ui8_wheel_size, uint8_t ui8_max_speed);
+void set_speed_erps_max_to_motor_controller (struc_lcd_configuration_variables *lcd_configuration_variables);
 float f_get_controller_max_current (uint8_t ui8_controller_max_current);
 
 void ebike_app_controller (void)
@@ -263,15 +264,15 @@ void communications_controller (void)
 
     if ((ui8_crc ^ 9) == ui8_rx_buffer [7]) // see if CRC is ok
     {
-      ui8_assist_level = ui8_rx_buffer [3] & 7;
-      ui8_motor_characteristic = ui8_rx_buffer [5];
-      ui8_wheel_size = ((ui8_rx_buffer [6] & 192) >> 6) | ((ui8_rx_buffer [4] & 7) << 2);
-      ui8_max_speed = 10 + ((ui8_rx_buffer [4] & 248) >> 3) | (ui8_rx_buffer [6] & 32);
-      ui8_power_assist_control_mode = ui8_rx_buffer [6] & 8;
-      ui8_controller_max_current = (ui8_rx_buffer [9] & 15);
+      lcd_configuration_variables.ui8_assist_level = ui8_rx_buffer [3] & 7;
+      lcd_configuration_variables.ui8_motor_characteristic = ui8_rx_buffer [5];
+      lcd_configuration_variables.ui8_wheel_size = ((ui8_rx_buffer [6] & 192) >> 6) | ((ui8_rx_buffer [4] & 7) << 2);
+      lcd_configuration_variables.ui8_max_speed = 10 + ((ui8_rx_buffer [4] & 248) >> 3) | (ui8_rx_buffer [6] & 32);
+      lcd_configuration_variables.ui8_power_assist_control_mode = ui8_rx_buffer [6] & 8;
+      lcd_configuration_variables.ui8_controller_max_current = (ui8_rx_buffer [9] & 15);
 
-      f_controller_max_current = f_get_controller_max_current (ui8_controller_max_current);
-      set_speed_erps_max_to_motor_controller (ui8_motor_characteristic, ui8_wheel_size, ui8_max_speed);
+      f_controller_max_current = f_get_controller_max_current (lcd_configuration_variables.ui8_controller_max_current);
+      set_speed_erps_max_to_motor_controller (&lcd_configuration_variables);
 
       UART2->CR2 |= (1 << 5); // enable UART2 receive interrupt as we are now ready to receive a new package
     }
@@ -339,13 +340,13 @@ void communications_set_controller_max_current_factor (float value)
   f_controller_max_current = value;
 }
 
-void set_speed_erps_max_to_motor_controller (uint8_t ui8_motor_characteristic, uint8_t ui8_wheel_size, uint8_t ui8_max_speed)
+void set_speed_erps_max_to_motor_controller (struc_lcd_configuration_variables *lcd_configuration_variables)
 {
   float f_wheel_size;
   uint32_t ui32_temp;
   float f_temp;
 
-  switch (ui8_wheel_size)
+  switch (lcd_configuration_variables->ui8_wheel_size)
   {
     case 0x12: // 6''
     f_wheel_size = 0.46875;
@@ -409,8 +410,8 @@ void set_speed_erps_max_to_motor_controller (uint8_t ui8_motor_characteristic, u
   }
 
   // (ui8_max_speed * 1000 * (ui8_motor_characteristic / 2)) / (3600 * f_wheel_size)
-  ui32_temp = ((uint32_t) ui8_max_speed) * 1000; // in meters/hour
-  ui32_temp *= ((uint32_t) (ui8_motor_characteristic >> 1));
+  ui32_temp = ((uint32_t) lcd_configuration_variables->ui8_max_speed) * 1000; // in meters/hour
+  ui32_temp *= ((uint32_t) (lcd_configuration_variables->ui8_motor_characteristic >> 1));
   f_temp = 3600.0 * f_wheel_size;
   f_temp = ((float) ui32_temp) / f_temp;
   motor_controller_set_speed_erps_max ((uint16_t) f_temp);
@@ -467,15 +468,16 @@ float f_get_controller_max_current (uint8_t ui8_controller_max_current)
     break;
 
     default:
+    f_controller_max_current = 1.0;
     break;
   }
 
   return f_controller_max_current;
 }
 
-uint8_t ebike_app_get_power_assist_control_mode (void)
+struc_lcd_configuration_variables *ebike_app_get_lcd_configuration_variables (void)
 {
-  return ui8_power_assist_control_mode;
+  return &lcd_configuration_variables;
 }
 
 uint8_t ebike_app_get_adc_throttle_value_cruise_control (void)
