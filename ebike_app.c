@@ -47,6 +47,7 @@ uint8_t ui8_byte_received;
 uint8_t ui8_state_machine = 0;
 
 uint8_t ui8_adc_throttle_value;
+uint8_t ui8_adc_throttle_value_cruise_control;
 
 // function prototypes
 void throttle_pas_torque_sensor_controller (void);
@@ -63,9 +64,8 @@ void ebike_app_controller (void)
 
 void throttle_pas_torque_sensor_controller (void)
 {
-  static uint8_t ui8_temp;
+  uint8_t ui8_temp;
   uint16_t ui16_temp;
-  static float f_temp;
 
   // only throttle implemented for now
   ui8_adc_throttle_value = ui8_adc_read_throttle ();
@@ -82,10 +82,10 @@ void throttle_pas_torque_sensor_controller (void)
 
 #define DO_CRUISE_CONTROL 1
 #if DO_CRUISE_CONTROL == 1
-  ui8_temp = ebike_app_cruise_control (ui8_adc_throttle_value);
+  ui8_adc_throttle_value_cruise_control = ebike_app_cruise_control (ui8_adc_throttle_value);
 #endif
 
-//      ui8_temp = (uint8_t) (map ((int32_t) ui8_temp, ADC_THROTTLE_MIN_VALUE, ADC_THROTTLE_MAX_VALUE, 0, 255));
+//      ui8_temp = (uint8_t) (map ((int32_t) ui8_adc_throttle_value_cruise_control, ADC_THROTTLE_MIN_VALUE, ADC_THROTTLE_MAX_VALUE, 0, 255));
 //      motor_set_pwm_duty_cycle_target (ui8_temp);
 
   if (ui8_power_assist_control_mode)
@@ -101,11 +101,11 @@ void throttle_pas_torque_sensor_controller (void)
   {
     // throttle will setup motor current
     ui16_temp = (uint16_t) (((float) ADC_MOTOR_CURRENT_MAX_10B) * f_controller_max_current * (((float) ui8_assist_level) / 5.0));
-    ui16_temp = (uint16_t) (map ((uint32_t) ui8_temp, ADC_THROTTLE_MIN_VALUE, ADC_THROTTLE_MAX_VALUE, 0, (uint32_t) ui16_temp));
+    ui16_temp = (uint16_t) (map ((uint32_t) ui8_adc_throttle_value_cruise_control, ADC_THROTTLE_MIN_VALUE, ADC_THROTTLE_MAX_VALUE, 0, (uint32_t) ui16_temp));
     motor_controller_set_current (ui16_temp);
 
     // throttle will setup motor speed
-    ui16_temp = map ((uint32_t) ui8_temp, ADC_THROTTLE_MIN_VALUE, ADC_THROTTLE_MAX_VALUE, 0, (uint32_t) motor_controller_get_speed_erps_max ());
+    ui16_temp = map ((uint32_t) ui8_adc_throttle_value_cruise_control, ADC_THROTTLE_MIN_VALUE, ADC_THROTTLE_MAX_VALUE, 0, (uint32_t) motor_controller_get_speed_erps_max ());
     motor_controller_set_speed_erps (ui16_temp);
   }
 }
@@ -113,8 +113,9 @@ void throttle_pas_torque_sensor_controller (void)
 uint8_t ebike_app_cruise_control (uint8_t ui8_value)
 {
   // Cruise control
-  if (ui8_cruise_state == 0)
+  switch (ui8_cruise_state)
   {
+    case 0:
     if ((ui8_value > CRUISE_CONTROL_MIN_VALUE) &&
 	((ui8_value > (ui8_cruise_value - CRUISE_CONTROL_MIN_VALUE)) || (ui8_value < (ui8_cruise_value + CRUISE_CONTROL_MIN_VALUE))))
     {
@@ -135,18 +136,19 @@ uint8_t ebike_app_cruise_control (uint8_t ui8_value)
       ui8_cruise_value = ui8_value;
       ui8_cruise_output = ui8_cruise_value;
     }
-  }
-  else if (ui8_cruise_state == 1)
-  {
+    break;
+
+    case 1:
     if (ui8_value < CRUISE_CONTROL_MIN_VALUE) { ui8_cruise_state = 2; }
-  }
-  else if (ui8_cruise_state == 2)
-  {
+    break;
+
+    case 2:
     if (ui8_value > CRUISE_CONTROL_MIN_VALUE)
     {
       ui8_cruise_state = 0;
       ui8_cruise_output = ui8_value;
     }
+    break;
   }
 
   return ui8_cruise_output;
@@ -154,7 +156,7 @@ uint8_t ebike_app_cruise_control (uint8_t ui8_value)
 
 uint8_t ebike_app_cruise_control_is_set (void)
 {
-  return ui8_cruise_state ? 1: 0;
+  return (ui8_cruise_state ? 1: 0);
 }
 
 void ebike_app_cruise_control_stop (void)
@@ -474,4 +476,9 @@ float f_get_controller_max_current (uint8_t ui8_controller_max_current)
 uint8_t ebike_app_get_power_assist_control_mode (void)
 {
   return ui8_power_assist_control_mode;
+}
+
+uint8_t ebike_app_get_adc_throttle_value_cruise_control (void)
+{
+  return ui8_adc_throttle_value_cruise_control;
 }
