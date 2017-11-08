@@ -14,11 +14,11 @@
 
 typedef struct _lcd_configuration_variables
 {
-  volatile uint8_t ui8_assist_level;
+  uint8_t ui8_assist_level;
   uint8_t ui8_motor_characteristic;
   uint8_t ui8_wheel_size;
   uint8_t ui8_max_speed;
-  volatile uint8_t ui8_power_assist_control_mode;
+  uint8_t ui8_power_assist_control_mode;
   uint8_t ui8_controller_max_current;
 } struc_lcd_configuration_variables;
 

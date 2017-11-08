@@ -23,5 +23,6 @@
 #define ADDRESS_CONTROLLER_MAX_CURRENT		6 + EEPROM_BASE_ADDRESS
 
 void eeprom_init (void);
+void eeprom_write_if_values_changed (void);
 
 #endif /* _EEPROM_H_ */

@@ -18,6 +18,7 @@
 #include "pwm.h"
 #include "uart.h"
 #include "brake.h"
+#include "eeprom.h"
 
 // cruise control variables
 uint8_t ui8_cruise_state = 0;
@@ -26,7 +27,7 @@ uint8_t ui8_cruise_counter = 0;
 uint8_t ui8_cruise_value = 0;
 
 // communications variables
-struc_lcd_configuration_variables lcd_configuration_variables;
+volatile struc_lcd_configuration_variables lcd_configuration_variables;
 uint8_t ui8_received_package_flag = 0;
 volatile uint8_t ui8_assist_level;
 uint8_t ui8_max_speed;
@@ -276,6 +277,9 @@ void communications_controller (void)
 
       UART2->CR2 |= (1 << 5); // enable UART2 receive interrupt as we are now ready to receive a new package
     }
+
+    // now write values to EEPROM, but only if one of them them changed
+    eeprom_write_if_values_changed ();
   }
 }
 
