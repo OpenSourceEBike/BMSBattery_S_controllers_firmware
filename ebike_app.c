@@ -29,13 +29,7 @@ uint8_t ui8_cruise_value = 0;
 // communications variables
 volatile struc_lcd_configuration_variables lcd_configuration_variables;
 uint8_t ui8_received_package_flag = 0;
-volatile uint8_t ui8_assist_level;
-uint8_t ui8_max_speed;
-uint8_t ui8_wheel_size;
-volatile uint8_t ui8_power_assist_control_mode;
-uint8_t ui8_controller_max_current;
 volatile float f_controller_max_current;
-uint8_t ui8_motor_characteristic;
 uint8_t ui8_tx_buffer[12];
 uint8_t ui8_i;
 uint8_t ui8_crc;
@@ -87,13 +81,13 @@ void throttle_pas_torque_sensor_controller (void)
   ui8_adc_throttle_value_cruise_control = ebike_app_cruise_control (ui8_adc_throttle_value);
 #endif
 
-//      ui8_temp = (uint8_t) (map ((int32_t) ui8_adc_throttle_value_cruise_control, ADC_THROTTLE_MIN_VALUE, ADC_THROTTLE_MAX_VALUE, 0, 255));
-//      motor_set_pwm_duty_cycle_target (ui8_temp);
+//  ui8_temp = (uint8_t) (map ((int32_t) ui8_adc_throttle_value_cruise_control, ADC_THROTTLE_MIN_VALUE, ADC_THROTTLE_MAX_VALUE, 0, 255));
+//  motor_set_pwm_duty_cycle_target (ui8_temp);
 
-  if (ui8_power_assist_control_mode)
+  if (lcd_configuration_variables.ui8_power_assist_control_mode)
   {
     // setup motor current
-    ui16_temp = (uint16_t) (((float) ADC_MOTOR_CURRENT_MAX_10B) * f_controller_max_current * (((float) ui8_assist_level) / 5.0));
+    ui16_temp = (uint16_t) (((float) ADC_MOTOR_CURRENT_MAX_10B) * f_controller_max_current * (((float) lcd_configuration_variables.ui8_assist_level) / 5.0));
     motor_controller_set_current (ui16_temp);
 
     // apply max erps speed to the speed controller
@@ -102,7 +96,7 @@ void throttle_pas_torque_sensor_controller (void)
   else
   {
     // throttle will setup motor current
-    ui16_temp = (uint16_t) (((float) ADC_MOTOR_CURRENT_MAX_10B) * f_controller_max_current * (((float) ui8_assist_level) / 5.0));
+    ui16_temp = (uint16_t) (((float) ADC_MOTOR_CURRENT_MAX_10B) * f_controller_max_current * (((float) lcd_configuration_variables.ui8_assist_level) / 5.0));
     ui16_temp = (uint16_t) (map ((uint32_t) ui8_adc_throttle_value_cruise_control, ADC_THROTTLE_MIN_VALUE, ADC_THROTTLE_MAX_VALUE, 0, (uint32_t) ui16_temp));
     motor_controller_set_current (ui16_temp);
 
@@ -180,7 +174,7 @@ void communications_controller (void)
   //
 
   // calc wheel period in ms
-  ui16_wheel_period_ms = (motor_get_er_PWM_ticks () * (ui8_motor_characteristic >> 1)) / MOTOR_PWM_TICKS_PER_MS;
+  ui16_wheel_period_ms = (motor_get_er_PWM_ticks () * (lcd_configuration_variables.ui8_motor_characteristic >> 1)) / MOTOR_PWM_TICKS_PER_MS;
 
   // calc battery pack state of charge (SOC)
   ui16_battery_volts = motor_get_ADC_battery_voltage_filtered () * ADC_BATTERY_VOLTAGE_K;
