@@ -12,7 +12,7 @@
 #include "motor.h"
 #include "stm8s.h"
 #include "stm8s_uart2.h"
-#include "pwm.h"
+#include "main.h"
 
 void uart_init (void)
 {

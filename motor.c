@@ -336,6 +336,8 @@ uint8_t ui8_value_b;
 uint8_t ui8_value_c;
 uint16_t ui16_value;
 
+uint8_t ui8_commutation_number = 0;
+
 // functions prototypes
 void pwm_duty_cycle_controller (void);
 void battery_voltage_protection (void);
@@ -364,6 +366,7 @@ void hall_sensors_read_and_action (void)
     switch (ui8_hall_sensors)
     {
       case 3:
+	ui8_commutation_number = 1;
 //debug_pin_set ();
 
       // read here the phase B current: FOC Id current
@@ -414,6 +417,9 @@ void hall_sensors_read_and_action (void)
 	pwm_phase_a_enable_pwm ();
 	pwm_phase_b_disable ();
 	pwm_phase_c_enable_low ();
+
+	//	if (ui8_duty_cycle > 1) { ui8_duty_cycle--; }
+//		ui8_duty_cycle = 0;
       }
       else if (ui8_motor_commutation_type == SINEWAVE_INTERPOLATION_60_DEGREES)
       {
@@ -422,6 +428,7 @@ void hall_sensors_read_and_action (void)
       break;
 
       case 1:
+	ui8_commutation_number = 2;
       if (ui8_half_e_rotation_flag == 1)
       {
 	ui8_half_e_rotation_flag = 0;
@@ -450,10 +457,10 @@ void hall_sensors_read_and_action (void)
       if ((ui16_motor_speed_erps > 100) &&
 	  (ui8_motor_commutation_type == BLOCK_COMMUTATION))
       {
-	ui8_motor_commutation_type = SINEWAVE_INTERPOLATION_60_DEGREES;
-	ui8_motor_state = MOTOR_STATE_RUNNING;
-
-	pwm_init_bipolar_4q ();
+//	ui8_motor_commutation_type = SINEWAVE_INTERPOLATION_60_DEGREES;
+//	ui8_motor_state = MOTOR_STATE_RUNNING;
+//
+//	pwm_init_bipolar_4q ();
       }
 #elif MOTOR_TYPE == MOTOR_TYPE_EUC2
       if (ui16_motor_speed_erps > 3)
@@ -472,6 +479,9 @@ void hall_sensors_read_and_action (void)
 	pwm_phase_a_enable_pwm ();
 	pwm_phase_b_enable_low ();
 	pwm_phase_c_disable ();
+
+	//	if (ui8_duty_cycle > 1) { ui8_duty_cycle--; }
+//		ui8_duty_cycle = 0;
       }
       else
       {
@@ -480,11 +490,15 @@ void hall_sensors_read_and_action (void)
       break;
 
       case 5:
+	ui8_commutation_number = 3;
       if (ui8_motor_commutation_type == BLOCK_COMMUTATION)
       {
 	pwm_phase_a_disable ();
 	pwm_phase_b_enable_low ();
 	pwm_phase_c_enable_pwm ();
+
+	//	if (ui8_duty_cycle > 1) { ui8_duty_cycle--; }
+//		ui8_duty_cycle = 0;
       }
       else if (ui8_motor_commutation_type == SINEWAVE_INTERPOLATION_60_DEGREES)
       {
@@ -493,6 +507,7 @@ void hall_sensors_read_and_action (void)
       break;
 
       case 4:
+	ui8_commutation_number = 4;
 //debug_pin_reset ();
 
       if (ui8_motor_commutation_type == BLOCK_COMMUTATION)
@@ -500,6 +515,9 @@ void hall_sensors_read_and_action (void)
 	pwm_phase_a_enable_low ();
 	pwm_phase_b_disable ();
 	pwm_phase_c_enable_pwm ();
+
+	//	if (ui8_duty_cycle > 1) { ui8_duty_cycle--; }
+//		ui8_duty_cycle = 0;
       }
       else if (ui8_motor_commutation_type == SINEWAVE_INTERPOLATION_60_DEGREES)
       {
@@ -508,6 +526,7 @@ void hall_sensors_read_and_action (void)
       break;
 
       case 6:
+	ui8_commutation_number = 5;
       ui8_half_e_rotation_flag = 1;
 
       if (ui8_motor_commutation_type == BLOCK_COMMUTATION)
@@ -515,6 +534,9 @@ void hall_sensors_read_and_action (void)
 	pwm_phase_a_enable_low ();
 	pwm_phase_b_enable_pwm ();
 	pwm_phase_c_disable ();
+
+	//	if (ui8_duty_cycle > 1) { ui8_duty_cycle--; }
+//		ui8_duty_cycle = 0;
       }
       else if (ui8_motor_commutation_type == SINEWAVE_INTERPOLATION_60_DEGREES)
       {
@@ -523,11 +545,15 @@ void hall_sensors_read_and_action (void)
       break;
 
       case 2:
+	ui8_commutation_number = 6;
       if (ui8_motor_commutation_type == BLOCK_COMMUTATION)
       {
 	pwm_phase_a_disable ();
 	pwm_phase_b_enable_pwm ();
 	pwm_phase_c_enable_low ();
+
+	//	if (ui8_duty_cycle > 1) { ui8_duty_cycle--; }
+//		ui8_duty_cycle = 0;
       }
       else if (ui8_motor_commutation_type == SINEWAVE_INTERPOLATION_60_DEGREES)
       {
@@ -562,7 +588,7 @@ void motor_fast_loop (void)
     ui8_position_correction_value = 127;
     ui8_motor_commutation_type = BLOCK_COMMUTATION;
     ui8_motor_state = MOTOR_STATE_STOP;
-    pwm_init_6_steps ();
+//    pwm_init_6_steps ();
     ui8_hall_sensors_last = 0; // this way we force execution of hall sensors code
   }
 
@@ -642,9 +668,10 @@ void motor_init (void)
 			    EXTI_SENSITIVITY_FALL_LOW);
   /***************************************************************************************/
 
-  motor_set_current_max (ADC_MOTOR_CURRENT_MAX);
+//  motor_set_current_max (ADC_MOTOR_CURRENT_MAX);
+  motor_set_current_max (6);
   motor_set_regen_current_max (ADC_MOTOR_REGEN_CURRENT_MAX);
-  motor_set_pwm_duty_cycle_ramp_up_inverse_step (60); // each step = 64us
+  motor_set_pwm_duty_cycle_ramp_up_inverse_step (45); // each step = 64us
   motor_set_pwm_duty_cycle_ramp_down_inverse_step (30); // each step = 64us
 }
 
@@ -709,21 +736,21 @@ void motor_controller (void)
 
   battery_voltage_protection ();
 
-  ui8_current_pwm_duty_cycle = ui8_duty_cycle;
-  ui8_pwm_duty_cycle_a = motor_current_controller ();
-  ui8_pwm_duty_cycle_b = motor_speed_controller ();
-
-  if (p_lcd_configuration_variables->ui8_power_assist_control_mode)
-  {
-    ui8_pwm_duty_cycle_c = (uint8_t) (map ((int32_t) ebike_app_get_adc_throttle_value_cruise_control (), ADC_THROTTLE_MIN_VALUE, ADC_THROTTLE_MAX_VALUE, 0, PWM_VALUE_DUTY_CYCLE_MAX));
-    // apply the value that is lower
-    motor_set_pwm_duty_cycle_target (ui8_min (ui8_min (ui8_pwm_duty_cycle_a, ui8_pwm_duty_cycle_b), ui8_pwm_duty_cycle_c));
-  }
-  else
-  {
-    // apply the value that is lower
-    motor_set_pwm_duty_cycle_target (ui8_min (ui8_pwm_duty_cycle_a, ui8_pwm_duty_cycle_b));
-  }
+//  ui8_current_pwm_duty_cycle = ui8_duty_cycle;
+//  ui8_pwm_duty_cycle_a = motor_current_controller ();
+//  ui8_pwm_duty_cycle_b = motor_speed_controller ();
+//
+//  if (p_lcd_configuration_variables->ui8_power_assist_control_mode)
+//  {
+//    ui8_pwm_duty_cycle_c = (uint8_t) (map ((int32_t) ebike_app_get_adc_throttle_value_cruise_control (), ADC_THROTTLE_MIN_VALUE, ADC_THROTTLE_MAX_VALUE, 0, PWM_VALUE_DUTY_CYCLE_MAX));
+//    // apply the value that is lower
+//    motor_set_pwm_duty_cycle_target (ui8_min (ui8_min (ui8_pwm_duty_cycle_a, ui8_pwm_duty_cycle_b), ui8_pwm_duty_cycle_c));
+//  }
+//  else
+//  {
+//    // apply the value that is lower
+//    motor_set_pwm_duty_cycle_target (ui8_min (ui8_pwm_duty_cycle_a, ui8_pwm_duty_cycle_b));
+//  }
 }
 
 void motor_controller_set_speed_erps (uint16_t ui16_erps)

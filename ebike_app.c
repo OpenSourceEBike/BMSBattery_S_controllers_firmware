@@ -81,29 +81,29 @@ void throttle_pas_torque_sensor_controller (void)
   ui8_adc_throttle_value_cruise_control = ebike_app_cruise_control (ui8_adc_throttle_value);
 #endif
 
-//  ui8_temp = (uint8_t) (map ((int32_t) ui8_adc_throttle_value_cruise_control, ADC_THROTTLE_MIN_VALUE, ADC_THROTTLE_MAX_VALUE, 0, 255));
-//  motor_set_pwm_duty_cycle_target (ui8_temp);
-
-  if (lcd_configuration_variables.ui8_power_assist_control_mode)
-  {
-    // setup motor current
-    ui16_temp = (uint16_t) (((float) ADC_MOTOR_CURRENT_MAX_10B) * f_controller_max_current * (((float) lcd_configuration_variables.ui8_assist_level) / 5.0));
-    motor_controller_set_current (ui16_temp);
-
-    // apply max erps speed to the speed controller
-    motor_controller_set_speed_erps (motor_controller_get_speed_erps_max ());
-  }
-  else
-  {
-    // throttle will setup motor current
-    ui16_temp = (uint16_t) (((float) ADC_MOTOR_CURRENT_MAX_10B) * f_controller_max_current * (((float) lcd_configuration_variables.ui8_assist_level) / 5.0));
-    ui16_temp = (uint16_t) (map ((uint32_t) ui8_adc_throttle_value_cruise_control, ADC_THROTTLE_MIN_VALUE, ADC_THROTTLE_MAX_VALUE, 0, (uint32_t) ui16_temp));
-    motor_controller_set_current (ui16_temp);
-
-    // throttle will setup motor speed
-    ui16_temp = map ((uint32_t) ui8_adc_throttle_value_cruise_control, ADC_THROTTLE_MIN_VALUE, ADC_THROTTLE_MAX_VALUE, 0, (uint32_t) motor_controller_get_speed_erps_max ());
-    motor_controller_set_speed_erps (ui16_temp);
-  }
+  ui8_temp = (uint8_t) (map ((int32_t) ui8_adc_throttle_value_cruise_control, ADC_THROTTLE_MIN_VALUE, ADC_THROTTLE_MAX_VALUE, 0, 255));
+  motor_set_pwm_duty_cycle_target (ui8_temp);
+//
+//  if (lcd_configuration_variables.ui8_power_assist_control_mode)
+//  {
+//    // setup motor current
+//    ui16_temp = (uint16_t) (((float) ADC_MOTOR_CURRENT_MAX_10B) * f_controller_max_current * (((float) lcd_configuration_variables.ui8_assist_level) / 5.0));
+//    motor_controller_set_current (ui16_temp);
+//
+//    // apply max erps speed to the speed controller
+//    motor_controller_set_speed_erps (motor_controller_get_speed_erps_max ());
+//  }
+//  else
+//  {
+//    // throttle will setup motor current
+//    ui16_temp = (uint16_t) (((float) ADC_MOTOR_CURRENT_MAX_10B) * f_controller_max_current * (((float) lcd_configuration_variables.ui8_assist_level) / 5.0));
+//    ui16_temp = (uint16_t) (map ((uint32_t) ui8_adc_throttle_value_cruise_control, ADC_THROTTLE_MIN_VALUE, ADC_THROTTLE_MAX_VALUE, 0, (uint32_t) ui16_temp));
+//    motor_controller_set_current (ui16_temp);
+//
+//    // throttle will setup motor speed
+//    ui16_temp = map ((uint32_t) ui8_adc_throttle_value_cruise_control, ADC_THROTTLE_MIN_VALUE, ADC_THROTTLE_MAX_VALUE, 0, (uint32_t) motor_controller_get_speed_erps_max ());
+//    motor_controller_set_speed_erps (ui16_temp);
+//  }
 }
 
 uint8_t ebike_app_cruise_control (uint8_t ui8_value)
@@ -266,15 +266,16 @@ void communications_controller (void)
       lcd_configuration_variables.ui8_power_assist_control_mode = ui8_rx_buffer [6] & 8;
       lcd_configuration_variables.ui8_controller_max_current = (ui8_rx_buffer [9] & 15);
 
-      f_controller_max_current = f_get_controller_max_current (lcd_configuration_variables.ui8_controller_max_current);
-      set_speed_erps_max_to_motor_controller (&lcd_configuration_variables);
-
       // now write values to EEPROM, but only if one of them changed
       eeprom_write_if_values_changed ();
-
-      UART2->CR2 |= (1 << 5); // enable UART2 receive interrupt as we are now ready to receive a new package
     }
+
+    UART2->CR2 |= (1 << 5); // enable UART2 receive interrupt as we are now ready to receive a new package
   }
+
+  // do here some tasks that must be done even if we don't receive a package from the LCD
+  f_controller_max_current = f_get_controller_max_current (lcd_configuration_variables.ui8_controller_max_current);
+  set_speed_erps_max_to_motor_controller (&lcd_configuration_variables);
 }
 
 // This is the interrupt that happesn when UART2 receives data. We need it to be the fastest possible and so

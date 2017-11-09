@@ -11,6 +11,7 @@
 #include "stm8s_tim1.h"
 #include "gpio.h"
 #include "pwm.h"
+#include "motor.h"
 
 void pwm_init_bipolar_4q (void)
 {
@@ -156,7 +157,7 @@ void pwm_phase_a_enable_pwm (void)
   TIM1_OC3Init(TIM1_OCMODE_PWM1,
 	       TIM1_OUTPUTSTATE_ENABLE,
 	       TIM1_OUTPUTNSTATE_DISABLE,
-	       0,
+	       ui8_duty_cycle,
 	       TIM1_OCPOLARITY_HIGH,
 	       TIM1_OCNPOLARITY_LOW,
 	       TIM1_OCIDLESTATE_RESET,
@@ -217,7 +218,7 @@ void pwm_phase_b_enable_pwm (void)
   TIM1_OC2Init(TIM1_OCMODE_PWM1,
 	       TIM1_OUTPUTSTATE_ENABLE,
 	       TIM1_OUTPUTNSTATE_DISABLE,
-	       0,
+	       ui8_duty_cycle,
 	       TIM1_OCPOLARITY_HIGH,
 	       TIM1_OCNPOLARITY_LOW,
 	       TIM1_OCIDLESTATE_RESET,
@@ -278,7 +279,7 @@ void pwm_phase_c_enable_pwm (void)
   TIM1_OC1Init(TIM1_OCMODE_PWM1,
 	       TIM1_OUTPUTSTATE_ENABLE,
 	       TIM1_OUTPUTNSTATE_DISABLE,
-	       0,
+	       ui8_duty_cycle,
 	       TIM1_OCPOLARITY_HIGH,
 	       TIM1_OCNPOLARITY_LOW,
 	       TIM1_OCIDLESTATE_RESET,

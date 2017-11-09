@@ -35,6 +35,15 @@
 #define MOTOR_CONTROLLER_ERROR_06_SHORT_CIRCUIT		0x21
 #define MOTOR_CONTROLLER_ERROR_91_BATTERY_UNDER_VOLTAGE 0x91
 
+extern uint8_t ui8_motor_commutation_type;
+extern uint8_t ui8_position_correction_value;
+extern uint8_t ui8_adc_motor_total_current;
+extern uint8_t ui8_motor_total_current_offset;
+extern volatile uint8_t ui8_duty_cycle;
+extern uint8_t ui8_duty_cycle_target;
+extern uint8_t ui8_commutation_number;
+extern volatile uint8_t ui8_duty_cycle;
+
 /***************************************************************************************/
 // Motor interface
 void hall_sensor_init (void); // must be called before using the motor
