@@ -46,7 +46,7 @@ void pwm_init_bipolar_4q (void)
 	       255, // initial duty_cycle value
 	       TIM1_OCPOLARITY_HIGH,
 	       TIM1_OCNPOLARITY_LOW,
-	       TIM1_OCIDLESTATE_SET,
+	       TIM1_OCIDLESTATE_RESET,
 	       TIM1_OCIDLESTATE_SET);
 
   TIM1_OC3Init(TIM1_OCMODE_PWM1,
@@ -132,184 +132,244 @@ void pwm_init_6_steps (void)
 
 void pwm_phase_a_disable (void)
 {
-  TIM1_OC3Init(TIM1_OCMODE_PWM1,
-	       TIM1_OUTPUTNSTATE_DISABLE,
-  	       TIM1_OUTPUTNSTATE_DISABLE,
-	       0,
-  	       TIM1_OCPOLARITY_HIGH,
-  	       TIM1_OCNPOLARITY_LOW,
-  	       TIM1_OCIDLESTATE_RESET,
-  	       TIM1_OCNIDLESTATE_SET);
+//  TIM1_OC3Init(TIM1_OCMODE_PWM1,
+//	       TIM1_OUTPUTNSTATE_DISABLE,
+//  	       TIM1_OUTPUTNSTATE_DISABLE,
+//	       0,
+//  	       TIM1_OCPOLARITY_HIGH,
+//  	       TIM1_OCNPOLARITY_LOW,
+//  	       TIM1_OCIDLESTATE_RESET,
+//  	       TIM1_OCNIDLESTATE_SET);
+//
+//  // disable pin
+//  GPIO_Init(PMW_PHASE_A_HIGH__PORT,
+//	    PMW_PHASE_A_HIGH__PIN,
+//	    GPIO_MODE_OUT_PP_LOW_FAST);
+//
+//  // disable pin
+//  GPIO_Init(PMW_PHASE_A_LOW__PORT,
+//	    PMW_PHASE_A_LOW__PIN,
+//	    GPIO_MODE_OUT_PP_HIGH_FAST);
 
-  // disable pin
-  GPIO_Init(PMW_PHASE_A_HIGH__PORT,
-	    PMW_PHASE_A_HIGH__PIN,
-	    GPIO_MODE_OUT_PP_LOW_FAST);
-
-  // disable pin
-  GPIO_Init(PMW_PHASE_A_LOW__PORT,
-	    PMW_PHASE_A_LOW__PIN,
-	    GPIO_MODE_OUT_PP_HIGH_FAST);
+  // PWM channel N as IO pin and output high (disable power mosfet)
+  PMW_PHASE_A_LOW__PORT->ODR |= (uint8_t)PMW_PHASE_A_LOW__PIN;
+  PMW_PHASE_A_LOW__PORT->DDR |= (uint8_t)PMW_PHASE_A_LOW__PIN;
+  // disable PWM channel pins
+  TIM1->CCER2 &= (uint8_t)(~( TIM1_CCER2_CC3E | TIM1_CCER2_CC3NE));
 }
 
 void pwm_phase_a_enable_pwm (void)
 {
-  TIM1_OC3Init(TIM1_OCMODE_PWM1,
-	       TIM1_OUTPUTSTATE_ENABLE,
-	       TIM1_OUTPUTNSTATE_DISABLE,
-	       ui8_duty_cycle,
-	       TIM1_OCPOLARITY_HIGH,
-	       TIM1_OCNPOLARITY_LOW,
-	       TIM1_OCIDLESTATE_RESET,
-	       TIM1_OCNIDLESTATE_SET);
+//  TIM1_OC3Init(TIM1_OCMODE_PWM1,
+//	       TIM1_OUTPUTSTATE_ENABLE,
+//	       TIM1_OUTPUTNSTATE_DISABLE,
+//	       ui8_duty_cycle,
+//	       TIM1_OCPOLARITY_HIGH,
+//	       TIM1_OCNPOLARITY_LOW,
+//	       TIM1_OCIDLESTATE_RESET,
+//	       TIM1_OCNIDLESTATE_SET);
+//
+//  // disable pin
+//  GPIO_Init(PMW_PHASE_A_LOW__PORT,
+//	    PMW_PHASE_A_LOW__PIN,
+//	    GPIO_MODE_OUT_PP_HIGH_FAST);
 
-  // disable pin
-  GPIO_Init(PMW_PHASE_A_LOW__PORT,
-	    PMW_PHASE_A_LOW__PIN,
-	    GPIO_MODE_OUT_PP_HIGH_FAST);
+  // PWM channel N as IO pin and output high (disable power mosfet)
+  PMW_PHASE_A_LOW__PORT->ODR |= (uint8_t)PMW_PHASE_A_LOW__PIN;
+  PMW_PHASE_A_LOW__PORT->DDR |= (uint8_t)PMW_PHASE_A_LOW__PIN;
+  // disable PWM n channel
+  TIM1->CCER2 &= (uint8_t)(~(TIM1_CCER2_CC3NE));
+  // enable PWM p channel
+  TIM1->CCER2 |= (uint8_t)(TIM1_CCER2_CC3E);
 }
 
 void pwm_phase_a_enable_low (void)
 {
-  TIM1_OC3Init(TIM1_OCMODE_PWM1,
-	       TIM1_OUTPUTNSTATE_DISABLE,
-  	       TIM1_OUTPUTNSTATE_DISABLE,
-	       0,
-	       TIM1_OCPOLARITY_HIGH,
-	       TIM1_OCNPOLARITY_LOW,
-	       TIM1_OCIDLESTATE_RESET,
-	       TIM1_OCNIDLESTATE_SET);
+//  TIM1_OC3Init(TIM1_OCMODE_PWM1,
+//	       TIM1_OUTPUTNSTATE_DISABLE,
+//  	       TIM1_OUTPUTNSTATE_DISABLE,
+//	       0,
+//	       TIM1_OCPOLARITY_HIGH,
+//	       TIM1_OCNPOLARITY_LOW,
+//	       TIM1_OCIDLESTATE_RESET,
+//	       TIM1_OCNIDLESTATE_SET);
+//
+//  // disable pin
+//  GPIO_Init(PMW_PHASE_A_HIGH__PORT,
+//	    PMW_PHASE_A_HIGH__PIN,
+//	    GPIO_MODE_OUT_PP_LOW_FAST);
+//
+//  // enable pin
+//  GPIO_Init(PMW_PHASE_A_LOW__PORT,
+//	    PMW_PHASE_A_LOW__PIN,
+//	    GPIO_MODE_OUT_PP_LOW_FAST);
 
-  // disable pin
-  GPIO_Init(PMW_PHASE_A_HIGH__PORT,
-	    PMW_PHASE_A_HIGH__PIN,
-	    GPIO_MODE_OUT_PP_LOW_FAST);
-
-  // enable pin
-  GPIO_Init(PMW_PHASE_A_LOW__PORT,
-	    PMW_PHASE_A_LOW__PIN,
-	    GPIO_MODE_OUT_PP_LOW_FAST);
+  // disable PWM channel pins
+  TIM1->CCER2 &= (uint8_t)(~( TIM1_CCER2_CC3E | TIM1_CCER2_CC3NE));
+  // PWM channel N as IO pin and output low (enable power mosfet)
+  PMW_PHASE_A_LOW__PORT->ODR &= (uint8_t)~PMW_PHASE_A_LOW__PIN;
+  PMW_PHASE_A_LOW__PORT->DDR |= (uint8_t)PMW_PHASE_A_LOW__PIN;
 }
 
 void pwm_phase_b_disable (void)
 {
-  TIM1_OC2Init(TIM1_OCMODE_PWM1,
-	       TIM1_OUTPUTNSTATE_DISABLE,
-  	       TIM1_OUTPUTNSTATE_DISABLE,
-	       0,
-  	       TIM1_OCPOLARITY_HIGH,
-  	       TIM1_OCNPOLARITY_LOW,
-  	       TIM1_OCIDLESTATE_RESET,
-  	       TIM1_OCNIDLESTATE_SET);
+//  TIM1_OC2Init(TIM1_OCMODE_PWM1,
+//	       TIM1_OUTPUTNSTATE_DISABLE,
+//  	       TIM1_OUTPUTNSTATE_DISABLE,
+//	       0,
+//  	       TIM1_OCPOLARITY_HIGH,
+//  	       TIM1_OCNPOLARITY_LOW,
+//  	       TIM1_OCIDLESTATE_RESET,
+//  	       TIM1_OCNIDLESTATE_SET);
+//
+//  // disable pin
+//  GPIO_Init(PMW_PHASE_B_HIGH__PORT,
+//	    PMW_PHASE_B_HIGH__PIN,
+//	    GPIO_MODE_OUT_PP_LOW_FAST);
+//
+//  // disable pin
+//  GPIO_Init(PMW_PHASE_B_LOW__PORT,
+//	    PMW_PHASE_B_LOW__PIN,
+//	    GPIO_MODE_OUT_PP_HIGH_FAST);
 
-  // disable pin
-  GPIO_Init(PMW_PHASE_B_HIGH__PORT,
-	    PMW_PHASE_B_HIGH__PIN,
-	    GPIO_MODE_OUT_PP_LOW_FAST);
-
-  // disable pin
-  GPIO_Init(PMW_PHASE_B_LOW__PORT,
-	    PMW_PHASE_B_LOW__PIN,
-	    GPIO_MODE_OUT_PP_HIGH_FAST);
+  // PWM channel N as IO pin and output high (disable power mosfet)
+  PMW_PHASE_B_LOW__PORT->ODR |= (uint8_t)PMW_PHASE_B_LOW__PIN;
+  PMW_PHASE_B_LOW__PORT->DDR |= (uint8_t)PMW_PHASE_B_LOW__PIN;
+  // disable PWM channel pins
+  TIM1->CCER1 &= (uint8_t)(~( TIM1_CCER1_CC2E | TIM1_CCER1_CC2NE));
 }
 
 void pwm_phase_b_enable_pwm (void)
 {
-  TIM1_OC2Init(TIM1_OCMODE_PWM1,
-	       TIM1_OUTPUTSTATE_ENABLE,
-	       TIM1_OUTPUTNSTATE_DISABLE,
-	       ui8_duty_cycle,
-	       TIM1_OCPOLARITY_HIGH,
-	       TIM1_OCNPOLARITY_LOW,
-	       TIM1_OCIDLESTATE_RESET,
-	       TIM1_OCNIDLESTATE_SET);
+//  TIM1_OC2Init(TIM1_OCMODE_PWM1,
+//	       TIM1_OUTPUTSTATE_ENABLE,
+//	       TIM1_OUTPUTNSTATE_DISABLE,
+//	       ui8_duty_cycle,
+//	       TIM1_OCPOLARITY_HIGH,
+//	       TIM1_OCNPOLARITY_LOW,
+//	       TIM1_OCIDLESTATE_RESET,
+//	       TIM1_OCNIDLESTATE_SET);
+//
+//  // disable pin
+//  GPIO_Init(PMW_PHASE_B_LOW__PORT,
+//	    PMW_PHASE_B_LOW__PIN,
+//	    GPIO_MODE_OUT_PP_HIGH_FAST);
 
-  // disable pin
-  GPIO_Init(PMW_PHASE_B_LOW__PORT,
-	    PMW_PHASE_B_LOW__PIN,
-	    GPIO_MODE_OUT_PP_HIGH_FAST);
+  // PWM channel N as IO pin and output high (disable power mosfet)
+  PMW_PHASE_B_LOW__PORT->ODR |= (uint8_t)PMW_PHASE_B_LOW__PIN;
+  PMW_PHASE_B_LOW__PORT->DDR |= (uint8_t)PMW_PHASE_B_LOW__PIN;
+  // disable PWM n channel
+  TIM1->CCER1 &= (uint8_t)(~(TIM1_CCER1_CC2NE));
+  // enable PWM p channel
+  TIM1->CCER1 |= (uint8_t)(TIM1_CCER1_CC2E);
 }
 
 void pwm_phase_b_enable_low (void)
 {
-  TIM1_OC2Init(TIM1_OCMODE_PWM1,
-	       TIM1_OUTPUTNSTATE_DISABLE,
-  	       TIM1_OUTPUTNSTATE_DISABLE,
-	       0,
-	       TIM1_OCPOLARITY_HIGH,
-	       TIM1_OCNPOLARITY_LOW,
-	       TIM1_OCIDLESTATE_RESET,
-	       TIM1_OCNIDLESTATE_SET);
+//  TIM1_OC2Init(TIM1_OCMODE_PWM1,
+//	       TIM1_OUTPUTNSTATE_DISABLE,
+//  	       TIM1_OUTPUTNSTATE_DISABLE,
+//	       0,
+//	       TIM1_OCPOLARITY_HIGH,
+//	       TIM1_OCNPOLARITY_LOW,
+//	       TIM1_OCIDLESTATE_RESET,
+//	       TIM1_OCNIDLESTATE_SET);
+//
+//  // disable pin
+//  GPIO_Init(PMW_PHASE_B_HIGH__PORT,
+//	    PMW_PHASE_B_HIGH__PIN,
+//	    GPIO_MODE_OUT_PP_LOW_FAST);
+//
+//  // enable pin
+//  GPIO_Init(PMW_PHASE_B_LOW__PORT,
+//	    PMW_PHASE_B_LOW__PIN,
+//	    GPIO_MODE_OUT_PP_LOW_FAST);
 
-  // disable pin
-  GPIO_Init(PMW_PHASE_B_HIGH__PORT,
-	    PMW_PHASE_B_HIGH__PIN,
-	    GPIO_MODE_OUT_PP_LOW_FAST);
-
-  // enable pin
-  GPIO_Init(PMW_PHASE_B_LOW__PORT,
-	    PMW_PHASE_B_LOW__PIN,
-	    GPIO_MODE_OUT_PP_LOW_FAST);
+  // disable PWM channel pins
+  TIM1->CCER1 &= (uint8_t)(~( TIM1_CCER1_CC2E | TIM1_CCER1_CC2NE));
+  // PWM channel N as IO pin and output low (enable power mosfet)
+  PMW_PHASE_B_LOW__PORT->ODR &= (uint8_t)~PMW_PHASE_B_LOW__PIN;
+  PMW_PHASE_B_LOW__PORT->DDR |= (uint8_t)PMW_PHASE_B_LOW__PIN;
 }
 
 void pwm_phase_c_disable (void)
 {
-  TIM1_OC1Init(TIM1_OCMODE_PWM1,
-	       TIM1_OUTPUTNSTATE_DISABLE,
-  	       TIM1_OUTPUTNSTATE_DISABLE,
-	       0,
-  	       TIM1_OCPOLARITY_HIGH,
-  	       TIM1_OCNPOLARITY_LOW,
-  	       TIM1_OCIDLESTATE_RESET,
-  	       TIM1_OCNIDLESTATE_SET);
+//  TIM1_OC1Init(TIM1_OCMODE_PWM1,
+//	       TIM1_OUTPUTNSTATE_DISABLE,
+//  	       TIM1_OUTPUTNSTATE_DISABLE,
+//	       0,
+//  	       TIM1_OCPOLARITY_HIGH,
+//  	       TIM1_OCNPOLARITY_LOW,
+//  	       TIM1_OCIDLESTATE_RESET,
+//  	       TIM1_OCNIDLESTATE_SET);
+//
+//  // disable pin
+//  GPIO_Init(PMW_PHASE_C_HIGH__PORT,
+//	    PMW_PHASE_C_HIGH__PIN,
+//	    GPIO_MODE_OUT_PP_LOW_FAST);
+//
+//  // disable pin
+//  GPIO_Init(PMW_PHASE_C_LOW__PORT,
+//	    PMW_PHASE_C_LOW__PIN,
+//	    GPIO_MODE_OUT_PP_HIGH_FAST);
 
-  // disable pin
-  GPIO_Init(PMW_PHASE_C_HIGH__PORT,
-	    PMW_PHASE_C_HIGH__PIN,
-	    GPIO_MODE_OUT_PP_LOW_FAST);
-
-  // disable pin
-  GPIO_Init(PMW_PHASE_C_LOW__PORT,
-	    PMW_PHASE_C_LOW__PIN,
-	    GPIO_MODE_OUT_PP_HIGH_FAST);
+  // PWM channel N as IO pin and output high (disable power mosfet)
+  PMW_PHASE_C_LOW__PORT->ODR |= (uint8_t)PMW_PHASE_C_LOW__PIN;
+  PMW_PHASE_C_LOW__PORT->DDR |= (uint8_t)PMW_PHASE_C_LOW__PIN;
+  // disable PWM channel pins
+  TIM1->CCER1 &= (uint8_t)(~( TIM1_CCER1_CC1E | TIM1_CCER1_CC1NE));
 }
 
 void pwm_phase_c_enable_pwm (void)
 {
-  TIM1_OC1Init(TIM1_OCMODE_PWM1,
-	       TIM1_OUTPUTSTATE_ENABLE,
-	       TIM1_OUTPUTNSTATE_DISABLE,
-	       ui8_duty_cycle,
-	       TIM1_OCPOLARITY_HIGH,
-	       TIM1_OCNPOLARITY_LOW,
-	       TIM1_OCIDLESTATE_RESET,
-	       TIM1_OCNIDLESTATE_SET);
+//  TIM1_OC1Init(TIM1_OCMODE_PWM1,
+//	       TIM1_OUTPUTSTATE_ENABLE,
+//	       TIM1_OUTPUTNSTATE_DISABLE,
+//	       ui8_duty_cycle,
+//	       TIM1_OCPOLARITY_HIGH,
+//	       TIM1_OCNPOLARITY_LOW,
+//	       TIM1_OCIDLESTATE_RESET,
+//	       TIM1_OCNIDLESTATE_SET);
+//
+//  // disable pin
+//  GPIO_Init(PMW_PHASE_C_LOW__PORT,
+//	    PMW_PHASE_C_LOW__PIN,
+//	    GPIO_MODE_OUT_PP_HIGH_FAST);
 
-  // disable pin
-  GPIO_Init(PMW_PHASE_C_LOW__PORT,
-	    PMW_PHASE_C_LOW__PIN,
-	    GPIO_MODE_OUT_PP_HIGH_FAST);
+  // PWM channel N as IO pin and output high (disable power mosfet)
+  PMW_PHASE_C_LOW__PORT->ODR |= (uint8_t)PMW_PHASE_C_LOW__PIN;
+  PMW_PHASE_C_LOW__PORT->DDR |= (uint8_t)PMW_PHASE_C_LOW__PIN;
+  // disable PWM n channel
+  TIM1->CCER1 &= (uint8_t)(~(TIM1_CCER1_CC1NE));
+  // enable PWM p channel
+  TIM1->CCER1 |= (uint8_t)(TIM1_CCER1_CC1E);
 }
 
 void pwm_phase_c_enable_low (void)
 {
-  TIM1_OC1Init(TIM1_OCMODE_PWM1,
-	       TIM1_OUTPUTNSTATE_DISABLE,
-  	       TIM1_OUTPUTNSTATE_DISABLE,
-	       0,
-	       TIM1_OCPOLARITY_HIGH,
-	       TIM1_OCNPOLARITY_LOW,
-	       TIM1_OCIDLESTATE_RESET,
-	       TIM1_OCNIDLESTATE_SET);
+//  TIM1_OC1Init(TIM1_OCMODE_PWM1,
+//	       TIM1_OUTPUTNSTATE_DISABLE,
+//  	       TIM1_OUTPUTNSTATE_DISABLE,
+//	       0,
+//	       TIM1_OCPOLARITY_HIGH,
+//	       TIM1_OCNPOLARITY_LOW,
+//	       TIM1_OCIDLESTATE_RESET,
+//	       TIM1_OCNIDLESTATE_SET);
+//
+//  // disable pin
+//  GPIO_Init(PMW_PHASE_C_HIGH__PORT,
+//	    PMW_PHASE_C_HIGH__PIN,
+//	    GPIO_MODE_OUT_PP_LOW_FAST);
+//
+//  // enable pin
+//  GPIO_Init(PMW_PHASE_C_LOW__PORT,
+//	    PMW_PHASE_C_LOW__PIN,
+//	    GPIO_MODE_OUT_PP_LOW_FAST);
 
-  // disable pin
-  GPIO_Init(PMW_PHASE_C_HIGH__PORT,
-	    PMW_PHASE_C_HIGH__PIN,
-	    GPIO_MODE_OUT_PP_LOW_FAST);
-
-  // enable pin
-  GPIO_Init(PMW_PHASE_C_LOW__PORT,
-	    PMW_PHASE_C_LOW__PIN,
-	    GPIO_MODE_OUT_PP_LOW_FAST);
+  // disable PWM channel pins
+  TIM1->CCER1 &= (uint8_t)(~( TIM1_CCER1_CC1E | TIM1_CCER1_CC1NE));
+  // PWM channel N as IO pin and output low (enable power mosfet)
+  PMW_PHASE_C_LOW__PORT->ODR &= (uint8_t)~PMW_PHASE_C_LOW__PIN;
+  PMW_PHASE_C_LOW__PORT->DDR |= (uint8_t)PMW_PHASE_C_LOW__PIN;
 }
 

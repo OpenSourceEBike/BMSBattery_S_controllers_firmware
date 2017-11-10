@@ -414,9 +414,25 @@ void hall_sensors_read_and_action (void)
 
       if (ui8_motor_commutation_type == BLOCK_COMMUTATION)
       {
-	pwm_phase_a_enable_pwm ();
-	pwm_phase_b_disable ();
-	pwm_phase_c_enable_low ();
+	  // PWM channel N as IO pin and output high (disable power mosfet)
+	  PMW_PHASE_A_LOW__PORT->ODR |= (uint8_t)PMW_PHASE_A_LOW__PIN;
+	  PMW_PHASE_A_LOW__PORT->DDR |= (uint8_t)PMW_PHASE_A_LOW__PIN;
+	  // disable PWM n channel
+	  TIM1->CCER2 &= (uint8_t)(~(TIM1_CCER2_CC3NE));
+	  // enable PWM p channel
+	  TIM1->CCER2 |= (uint8_t)(TIM1_CCER2_CC3E);
+
+	  // PWM channel N as IO pin and output high (disable power mosfet)
+	  PMW_PHASE_B_LOW__PORT->ODR |= (uint8_t)PMW_PHASE_B_LOW__PIN;
+	  PMW_PHASE_B_LOW__PORT->DDR |= (uint8_t)PMW_PHASE_B_LOW__PIN;
+	  // disable PWM channel pins
+	  TIM1->CCER1 &= (uint8_t)(~( TIM1_CCER1_CC2E | TIM1_CCER1_CC2NE));
+
+	  // disable PWM channel pins
+	  TIM1->CCER1 &= (uint8_t)(~( TIM1_CCER1_CC1E | TIM1_CCER1_CC1NE));
+	  // PWM channel N as IO pin and output low (enable power mosfet)
+	  PMW_PHASE_C_LOW__PORT->ODR &= (uint8_t)~PMW_PHASE_C_LOW__PIN;
+	  PMW_PHASE_C_LOW__PORT->DDR |= (uint8_t)PMW_PHASE_C_LOW__PIN;
 
 	//	if (ui8_duty_cycle > 1) { ui8_duty_cycle--; }
 //		ui8_duty_cycle = 0;
@@ -476,9 +492,25 @@ void hall_sensors_read_and_action (void)
 
       if (ui8_motor_commutation_type == BLOCK_COMMUTATION)
       {
-	pwm_phase_a_enable_pwm ();
-	pwm_phase_b_enable_low ();
-	pwm_phase_c_disable ();
+	  // PWM channel N as IO pin and output high (disable power mosfet)
+	  PMW_PHASE_A_LOW__PORT->ODR |= (uint8_t)PMW_PHASE_A_LOW__PIN;
+	  PMW_PHASE_A_LOW__PORT->DDR |= (uint8_t)PMW_PHASE_A_LOW__PIN;
+	  // disable PWM n channel
+	  TIM1->CCER2 &= (uint8_t)(~(TIM1_CCER2_CC3NE));
+	  // enable PWM p channel
+	  TIM1->CCER2 |= (uint8_t)(TIM1_CCER2_CC3E);
+
+	  // disable PWM channel pins
+	  TIM1->CCER1 &= (uint8_t)(~( TIM1_CCER1_CC2E | TIM1_CCER1_CC2NE));
+	  // PWM channel N as IO pin and output low (enable power mosfet)
+	  PMW_PHASE_B_LOW__PORT->ODR &= (uint8_t)~PMW_PHASE_B_LOW__PIN;
+	  PMW_PHASE_B_LOW__PORT->DDR |= (uint8_t)PMW_PHASE_B_LOW__PIN;
+
+	  // PWM channel N as IO pin and output high (disable power mosfet)
+	  PMW_PHASE_C_LOW__PORT->ODR |= (uint8_t)PMW_PHASE_C_LOW__PIN;
+	  PMW_PHASE_C_LOW__PORT->DDR |= (uint8_t)PMW_PHASE_C_LOW__PIN;
+	  // disable PWM channel pins
+	  TIM1->CCER1 &= (uint8_t)(~( TIM1_CCER1_CC1E | TIM1_CCER1_CC1NE));
 
 	//	if (ui8_duty_cycle > 1) { ui8_duty_cycle--; }
 //		ui8_duty_cycle = 0;
@@ -493,9 +525,25 @@ void hall_sensors_read_and_action (void)
 	ui8_commutation_number = 3;
       if (ui8_motor_commutation_type == BLOCK_COMMUTATION)
       {
-	pwm_phase_a_disable ();
-	pwm_phase_b_enable_low ();
-	pwm_phase_c_enable_pwm ();
+	  // PWM channel N as IO pin and output high (disable power mosfet)
+	  PMW_PHASE_A_LOW__PORT->ODR |= (uint8_t)PMW_PHASE_A_LOW__PIN;
+	  PMW_PHASE_A_LOW__PORT->DDR |= (uint8_t)PMW_PHASE_A_LOW__PIN;
+	  // disable PWM channel pins
+	  TIM1->CCER2 &= (uint8_t)(~( TIM1_CCER2_CC3E | TIM1_CCER2_CC3NE));
+
+	  // disable PWM channel pins
+	  TIM1->CCER1 &= (uint8_t)(~( TIM1_CCER1_CC2E | TIM1_CCER1_CC2NE));
+	  // PWM channel N as IO pin and output low (enable power mosfet)
+	  PMW_PHASE_B_LOW__PORT->ODR &= (uint8_t)~PMW_PHASE_B_LOW__PIN;
+	  PMW_PHASE_B_LOW__PORT->DDR |= (uint8_t)PMW_PHASE_B_LOW__PIN;
+
+	  // PWM channel N as IO pin and output high (disable power mosfet)
+	  PMW_PHASE_C_LOW__PORT->ODR |= (uint8_t)PMW_PHASE_C_LOW__PIN;
+	  PMW_PHASE_C_LOW__PORT->DDR |= (uint8_t)PMW_PHASE_C_LOW__PIN;
+	  // disable PWM n channel
+	  TIM1->CCER1 &= (uint8_t)(~(TIM1_CCER1_CC1NE));
+	  // enable PWM p channel
+	  TIM1->CCER1 |= (uint8_t)(TIM1_CCER1_CC1E);
 
 	//	if (ui8_duty_cycle > 1) { ui8_duty_cycle--; }
 //		ui8_duty_cycle = 0;
@@ -512,9 +560,25 @@ void hall_sensors_read_and_action (void)
 
       if (ui8_motor_commutation_type == BLOCK_COMMUTATION)
       {
-	pwm_phase_a_enable_low ();
-	pwm_phase_b_disable ();
-	pwm_phase_c_enable_pwm ();
+	  // disable PWM channel pins
+	  TIM1->CCER2 &= (uint8_t)(~( TIM1_CCER2_CC3E | TIM1_CCER2_CC3NE));
+	  // PWM channel N as IO pin and output low (enable power mosfet)
+	  PMW_PHASE_A_LOW__PORT->ODR &= (uint8_t)~PMW_PHASE_A_LOW__PIN;
+	  PMW_PHASE_A_LOW__PORT->DDR |= (uint8_t)PMW_PHASE_A_LOW__PIN;
+
+	  // PWM channel N as IO pin and output high (disable power mosfet)
+	  PMW_PHASE_B_LOW__PORT->ODR |= (uint8_t)PMW_PHASE_B_LOW__PIN;
+	  PMW_PHASE_B_LOW__PORT->DDR |= (uint8_t)PMW_PHASE_B_LOW__PIN;
+	  // disable PWM channel pins
+	  TIM1->CCER1 &= (uint8_t)(~( TIM1_CCER1_CC2E | TIM1_CCER1_CC2NE));
+
+	  // PWM channel N as IO pin and output high (disable power mosfet)
+	  PMW_PHASE_C_LOW__PORT->ODR |= (uint8_t)PMW_PHASE_C_LOW__PIN;
+	  PMW_PHASE_C_LOW__PORT->DDR |= (uint8_t)PMW_PHASE_C_LOW__PIN;
+	  // disable PWM n channel
+	  TIM1->CCER1 &= (uint8_t)(~(TIM1_CCER1_CC1NE));
+	  // enable PWM p channel
+	  TIM1->CCER1 |= (uint8_t)(TIM1_CCER1_CC1E);
 
 	//	if (ui8_duty_cycle > 1) { ui8_duty_cycle--; }
 //		ui8_duty_cycle = 0;
@@ -531,9 +595,25 @@ void hall_sensors_read_and_action (void)
 
       if (ui8_motor_commutation_type == BLOCK_COMMUTATION)
       {
-	pwm_phase_a_enable_low ();
-	pwm_phase_b_enable_pwm ();
-	pwm_phase_c_disable ();
+	  // disable PWM channel pins
+	  TIM1->CCER2 &= (uint8_t)(~( TIM1_CCER2_CC3E | TIM1_CCER2_CC3NE));
+	  // PWM channel N as IO pin and output low (enable power mosfet)
+	  PMW_PHASE_A_LOW__PORT->ODR &= (uint8_t)~PMW_PHASE_A_LOW__PIN;
+	  PMW_PHASE_A_LOW__PORT->DDR |= (uint8_t)PMW_PHASE_A_LOW__PIN;
+
+	  // PWM channel N as IO pin and output high (disable power mosfet)
+	  PMW_PHASE_B_LOW__PORT->ODR |= (uint8_t)PMW_PHASE_B_LOW__PIN;
+	  PMW_PHASE_B_LOW__PORT->DDR |= (uint8_t)PMW_PHASE_B_LOW__PIN;
+	  // disable PWM n channel
+	  TIM1->CCER1 &= (uint8_t)(~(TIM1_CCER1_CC2NE));
+	  // enable PWM p channel
+	  TIM1->CCER1 |= (uint8_t)(TIM1_CCER1_CC2E);
+
+	  // PWM channel N as IO pin and output high (disable power mosfet)
+	  PMW_PHASE_C_LOW__PORT->ODR |= (uint8_t)PMW_PHASE_C_LOW__PIN;
+	  PMW_PHASE_C_LOW__PORT->DDR |= (uint8_t)PMW_PHASE_C_LOW__PIN;
+	  // disable PWM channel pins
+	  TIM1->CCER1 &= (uint8_t)(~( TIM1_CCER1_CC1E | TIM1_CCER1_CC1NE));
 
 	//	if (ui8_duty_cycle > 1) { ui8_duty_cycle--; }
 //		ui8_duty_cycle = 0;
@@ -548,9 +628,25 @@ void hall_sensors_read_and_action (void)
 	ui8_commutation_number = 6;
       if (ui8_motor_commutation_type == BLOCK_COMMUTATION)
       {
-	pwm_phase_a_disable ();
-	pwm_phase_b_enable_pwm ();
-	pwm_phase_c_enable_low ();
+	  // PWM channel N as IO pin and output high (disable power mosfet)
+	  PMW_PHASE_A_LOW__PORT->ODR |= (uint8_t)PMW_PHASE_A_LOW__PIN;
+	  PMW_PHASE_A_LOW__PORT->DDR |= (uint8_t)PMW_PHASE_A_LOW__PIN;
+	  // disable PWM channel pins
+	  TIM1->CCER2 &= (uint8_t)(~( TIM1_CCER2_CC3E | TIM1_CCER2_CC3NE));
+
+	  // PWM channel N as IO pin and output high (disable power mosfet)
+	  PMW_PHASE_B_LOW__PORT->ODR |= (uint8_t)PMW_PHASE_B_LOW__PIN;
+	  PMW_PHASE_B_LOW__PORT->DDR |= (uint8_t)PMW_PHASE_B_LOW__PIN;
+	  // disable PWM n channel
+	  TIM1->CCER1 &= (uint8_t)(~(TIM1_CCER1_CC2NE));
+	  // enable PWM p channel
+	  TIM1->CCER1 |= (uint8_t)(TIM1_CCER1_CC2E);
+
+	  // disable PWM channel pins
+	  TIM1->CCER1 &= (uint8_t)(~( TIM1_CCER1_CC1E | TIM1_CCER1_CC1NE));
+	  // PWM channel N as IO pin and output low (enable power mosfet)
+	  PMW_PHASE_C_LOW__PORT->ODR &= (uint8_t)~PMW_PHASE_C_LOW__PIN;
+	  PMW_PHASE_C_LOW__PORT->DDR |= (uint8_t)PMW_PHASE_C_LOW__PIN;
 
 	//	if (ui8_duty_cycle > 1) { ui8_duty_cycle--; }
 //		ui8_duty_cycle = 0;
