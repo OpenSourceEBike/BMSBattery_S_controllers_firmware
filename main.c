@@ -76,58 +76,15 @@ int main (void)
   debug_pin_init ();
   timer2_init ();
   uart_init ();
-  pwm_init_6_steps ();
+  pwm_init_bipolar_4q ();
   hall_sensor_init ();
   adc_init ();
   eeprom_init ();
   motor_init ();
   enableInterrupts ();
 
-  // disable pin
-  GPIO_Init(PMW_PHASE_A_HIGH__PORT,
-	    PMW_PHASE_A_HIGH__PIN,
-	    GPIO_MODE_OUT_PP_LOW_FAST);
-
-  // disable pin
-  GPIO_Init(PMW_PHASE_A_LOW__PORT,
-	    PMW_PHASE_A_LOW__PIN,
-	    GPIO_MODE_OUT_PP_HIGH_FAST);
-
-  // disable pin
-  GPIO_Init(PMW_PHASE_B_HIGH__PORT,
-	    PMW_PHASE_B_HIGH__PIN,
-	    GPIO_MODE_OUT_PP_LOW_FAST);
-
-  // disable pin
-  GPIO_Init(PMW_PHASE_B_LOW__PORT,
-	    PMW_PHASE_B_LOW__PIN,
-	    GPIO_MODE_OUT_PP_HIGH_FAST);
-
-  // disable pin
-  GPIO_Init(PMW_PHASE_C_HIGH__PORT,
-	    PMW_PHASE_C_HIGH__PIN,
-	    GPIO_MODE_OUT_PP_LOW_FAST);
-
-  // disable pin
-  GPIO_Init(PMW_PHASE_C_LOW__PORT,
-	    PMW_PHASE_C_LOW__PIN,
-	    GPIO_MODE_OUT_PP_HIGH_FAST);
-
   while (1)
   {
-//	  TIM1_CtrlPWMOutputs(ENABLE);
-//	  TIM1_SetCompare1(255);
-//	  TIM1_SetCompare2(255);
-//	  TIM1_SetCompare3(255);
-//
-//      while (1)
-//	{
-//	  pwm_phase_a_disable ();
-//	  pwm_phase_a_enable_pwm ();
-//	  pwm_phase_a_enable_low ();
-//	}
-
-
 #ifdef DEBUG_UART
     printf ("%d, %d, %d, %d, %d\n", motor_get_motor_speed_erps (), ui8_duty_cycle_target, ui8_commutation_number, ui8_duty_cycle, (ui8_adc_motor_total_current - ui8_motor_total_current_offset));
 #endif

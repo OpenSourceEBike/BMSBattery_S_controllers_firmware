@@ -366,85 +366,27 @@ void hall_sensors_read_and_action (void)
     switch (ui8_hall_sensors)
     {
       case 3:
-	ui8_commutation_number = 1;
-//debug_pin_set ();
+      ui8_commutation_number = 1;
 
       // read here the phase B current: FOC Id current
       ui8_ADC_id_current = ui8_adc_read_phase_B_current ();
 
-      #if (MOTOR_TYPE == MOTOR_TYPE_EUC2)
-      if (ui8_motor_state == MOTOR_STATE_RUNNING)
+      if (ui16_motor_speed_erps > 100)
       {
-	      if (ui8_motor_commutation_type == SINEWAVE_INTERPOLATION_60_DEGREES)
-	      {
-		if (ui8_ADC_id_current > 127)
-		{
-		  ui8_position_correction_value++;
-		}
-		else if (ui8_ADC_id_current < 125)
-		{
-		  ui8_position_correction_value--;
-		}
-	      }
+	if (ui8_ADC_id_current > 127) { ui8_position_correction_value++; }
+	else if (ui8_ADC_id_current < 125) { ui8_position_correction_value--; }
       }
-      #elif (MOTOR_TYPE == MOTOR_TYPE_Q85) || (MOTOR_TYPE == MOTOR_TYPE_Q100)
-      if (ui8_motor_state == MOTOR_STATE_RUNNING)
-      {
-//	if ((ui8_motor_commutation_type == SINEWAVE_INTERPOLATION_60_DEGREES) ||
-//	   (ui8_motor_commutation_type == SINEWAVE_INTERPOLATION_360_DEGREES))
-	if (ui16_motor_speed_erps > 120)
-	{
-//	  if (ui8_ADC_id_current > 140) // 140 ok for a Q100 motor; these value may differ from motor to motor
-	  if (ui8_ADC_id_current > 127)
-	  {
-	    ui8_position_correction_value++;
-	  }
-//	  else if (ui8_ADC_id_current < 138) // 138 ok for a Q100 motor; these value may differ from motor to motor
-	  else if (ui8_ADC_id_current < 125)
-	  {
-	    ui8_position_correction_value--;
-	  }
-	}
-	else
-	{
-	  ui8_position_correction_value = 127; // keep using the reset value
-	}
-      }
-#endif
+      else { ui8_position_correction_value = 127; } // keep using the reset value
 
-      if (ui8_motor_commutation_type == BLOCK_COMMUTATION)
-      {
-	  // PWM channel N as IO pin and output high (disable power mosfet)
-	  PMW_PHASE_A_LOW__PORT->ODR |= (uint8_t)PMW_PHASE_A_LOW__PIN;
-	  PMW_PHASE_A_LOW__PORT->DDR |= (uint8_t)PMW_PHASE_A_LOW__PIN;
-	  // disable PWM n channel
-	  TIM1->CCER2 &= (uint8_t)(~(TIM1_CCER2_CC3NE));
-	  // enable PWM p channel
-	  TIM1->CCER2 |= (uint8_t)(TIM1_CCER2_CC3E);
-
-	  // PWM channel N as IO pin and output high (disable power mosfet)
-	  PMW_PHASE_B_LOW__PORT->ODR |= (uint8_t)PMW_PHASE_B_LOW__PIN;
-	  PMW_PHASE_B_LOW__PORT->DDR |= (uint8_t)PMW_PHASE_B_LOW__PIN;
-	  // disable PWM channel pins
-	  TIM1->CCER1 &= (uint8_t)(~( TIM1_CCER1_CC2E | TIM1_CCER1_CC2NE));
-
-	  // disable PWM channel pins
-	  TIM1->CCER1 &= (uint8_t)(~( TIM1_CCER1_CC1E | TIM1_CCER1_CC1NE));
-	  // PWM channel N as IO pin and output low (enable power mosfet)
-	  PMW_PHASE_C_LOW__PORT->ODR &= (uint8_t)~PMW_PHASE_C_LOW__PIN;
-	  PMW_PHASE_C_LOW__PORT->DDR |= (uint8_t)PMW_PHASE_C_LOW__PIN;
-
-	//	if (ui8_duty_cycle > 1) { ui8_duty_cycle--; }
-//		ui8_duty_cycle = 0;
-      }
-      else if (ui8_motor_commutation_type == SINEWAVE_INTERPOLATION_60_DEGREES)
+      if (ui8_motor_commutation_type != SINEWAVE_INTERPOLATION_360_DEGREES)
       {
 	ui8_motor_rotor_absolute_position = ANGLE_180 + MOTOR_ROTOR_DELTA_PHASE_ANGLE_RIGHT;
       }
       break;
 
       case 1:
-	ui8_commutation_number = 2;
+      ui8_commutation_number = 2;
+
       if (ui8_half_e_rotation_flag == 1)
       {
 	ui8_half_e_rotation_flag = 0;
@@ -454,7 +396,6 @@ void hall_sensors_read_and_action (void)
       }
 
       // update motor commutation state based on motor speed
-#if (MOTOR_TYPE == MOTOR_TYPE_Q85) || (MOTOR_TYPE == MOTOR_TYPE_Q100)
 #ifdef DO_SINEWAVE_INTERPOLATION_360_DEGREES
       if ((ui16_motor_speed_erps > 180) &&
 	  (ui8_motor_commutation_type == SINEWAVE_INTERPOLATION_60_DEGREES))
@@ -475,183 +416,47 @@ void hall_sensors_read_and_action (void)
       {
 //	ui8_motor_commutation_type = SINEWAVE_INTERPOLATION_60_DEGREES;
 //	ui8_motor_state = MOTOR_STATE_RUNNING;
-//
-//	pwm_init_bipolar_4q ();
       }
-#elif MOTOR_TYPE == MOTOR_TYPE_EUC2
-      if (ui16_motor_speed_erps > 3)
-      {
-	ui8_motor_commutation_type = SINEWAVE_INTERPOLATION_60_DEGREES;
-	ui8_motor_state = MOTOR_STATE_RUNNING;
-      }
-      else
-      {
-	ui8_motor_commutation_type = BLOCK_COMMUTATION;
-      }
-#endif
 
-      if (ui8_motor_commutation_type == BLOCK_COMMUTATION)
-      {
-	  // PWM channel N as IO pin and output high (disable power mosfet)
-	  PMW_PHASE_A_LOW__PORT->ODR |= (uint8_t)PMW_PHASE_A_LOW__PIN;
-	  PMW_PHASE_A_LOW__PORT->DDR |= (uint8_t)PMW_PHASE_A_LOW__PIN;
-	  // disable PWM n channel
-	  TIM1->CCER2 &= (uint8_t)(~(TIM1_CCER2_CC3NE));
-	  // enable PWM p channel
-	  TIM1->CCER2 |= (uint8_t)(TIM1_CCER2_CC3E);
-
-	  // disable PWM channel pins
-	  TIM1->CCER1 &= (uint8_t)(~( TIM1_CCER1_CC2E | TIM1_CCER1_CC2NE));
-	  // PWM channel N as IO pin and output low (enable power mosfet)
-	  PMW_PHASE_B_LOW__PORT->ODR &= (uint8_t)~PMW_PHASE_B_LOW__PIN;
-	  PMW_PHASE_B_LOW__PORT->DDR |= (uint8_t)PMW_PHASE_B_LOW__PIN;
-
-	  // PWM channel N as IO pin and output high (disable power mosfet)
-	  PMW_PHASE_C_LOW__PORT->ODR |= (uint8_t)PMW_PHASE_C_LOW__PIN;
-	  PMW_PHASE_C_LOW__PORT->DDR |= (uint8_t)PMW_PHASE_C_LOW__PIN;
-	  // disable PWM channel pins
-	  TIM1->CCER1 &= (uint8_t)(~( TIM1_CCER1_CC1E | TIM1_CCER1_CC1NE));
-
-	//	if (ui8_duty_cycle > 1) { ui8_duty_cycle--; }
-//		ui8_duty_cycle = 0;
-      }
-      else
+      if (ui8_motor_commutation_type != SINEWAVE_INTERPOLATION_360_DEGREES)
       {
 	ui8_motor_rotor_absolute_position = ANGLE_240 + MOTOR_ROTOR_DELTA_PHASE_ANGLE_RIGHT;
       }
       break;
 
       case 5:
-	ui8_commutation_number = 3;
-      if (ui8_motor_commutation_type == BLOCK_COMMUTATION)
-      {
-	  // PWM channel N as IO pin and output high (disable power mosfet)
-	  PMW_PHASE_A_LOW__PORT->ODR |= (uint8_t)PMW_PHASE_A_LOW__PIN;
-	  PMW_PHASE_A_LOW__PORT->DDR |= (uint8_t)PMW_PHASE_A_LOW__PIN;
-	  // disable PWM channel pins
-	  TIM1->CCER2 &= (uint8_t)(~( TIM1_CCER2_CC3E | TIM1_CCER2_CC3NE));
+      ui8_commutation_number = 3;
 
-	  // disable PWM channel pins
-	  TIM1->CCER1 &= (uint8_t)(~( TIM1_CCER1_CC2E | TIM1_CCER1_CC2NE));
-	  // PWM channel N as IO pin and output low (enable power mosfet)
-	  PMW_PHASE_B_LOW__PORT->ODR &= (uint8_t)~PMW_PHASE_B_LOW__PIN;
-	  PMW_PHASE_B_LOW__PORT->DDR |= (uint8_t)PMW_PHASE_B_LOW__PIN;
-
-	  // PWM channel N as IO pin and output high (disable power mosfet)
-	  PMW_PHASE_C_LOW__PORT->ODR |= (uint8_t)PMW_PHASE_C_LOW__PIN;
-	  PMW_PHASE_C_LOW__PORT->DDR |= (uint8_t)PMW_PHASE_C_LOW__PIN;
-	  // disable PWM n channel
-	  TIM1->CCER1 &= (uint8_t)(~(TIM1_CCER1_CC1NE));
-	  // enable PWM p channel
-	  TIM1->CCER1 |= (uint8_t)(TIM1_CCER1_CC1E);
-
-	//	if (ui8_duty_cycle > 1) { ui8_duty_cycle--; }
-//		ui8_duty_cycle = 0;
-      }
-      else if (ui8_motor_commutation_type == SINEWAVE_INTERPOLATION_60_DEGREES)
+      if (ui8_motor_commutation_type != SINEWAVE_INTERPOLATION_360_DEGREES)
       {
 	ui8_motor_rotor_absolute_position = ANGLE_300 + MOTOR_ROTOR_DELTA_PHASE_ANGLE_RIGHT;
       }
       break;
 
       case 4:
-	ui8_commutation_number = 4;
-//debug_pin_reset ();
+      ui8_commutation_number = 4;
 
-      if (ui8_motor_commutation_type == BLOCK_COMMUTATION)
-      {
-	  // disable PWM channel pins
-	  TIM1->CCER2 &= (uint8_t)(~( TIM1_CCER2_CC3E | TIM1_CCER2_CC3NE));
-	  // PWM channel N as IO pin and output low (enable power mosfet)
-	  PMW_PHASE_A_LOW__PORT->ODR &= (uint8_t)~PMW_PHASE_A_LOW__PIN;
-	  PMW_PHASE_A_LOW__PORT->DDR |= (uint8_t)PMW_PHASE_A_LOW__PIN;
-
-	  // PWM channel N as IO pin and output high (disable power mosfet)
-	  PMW_PHASE_B_LOW__PORT->ODR |= (uint8_t)PMW_PHASE_B_LOW__PIN;
-	  PMW_PHASE_B_LOW__PORT->DDR |= (uint8_t)PMW_PHASE_B_LOW__PIN;
-	  // disable PWM channel pins
-	  TIM1->CCER1 &= (uint8_t)(~( TIM1_CCER1_CC2E | TIM1_CCER1_CC2NE));
-
-	  // PWM channel N as IO pin and output high (disable power mosfet)
-	  PMW_PHASE_C_LOW__PORT->ODR |= (uint8_t)PMW_PHASE_C_LOW__PIN;
-	  PMW_PHASE_C_LOW__PORT->DDR |= (uint8_t)PMW_PHASE_C_LOW__PIN;
-	  // disable PWM n channel
-	  TIM1->CCER1 &= (uint8_t)(~(TIM1_CCER1_CC1NE));
-	  // enable PWM p channel
-	  TIM1->CCER1 |= (uint8_t)(TIM1_CCER1_CC1E);
-
-	//	if (ui8_duty_cycle > 1) { ui8_duty_cycle--; }
-//		ui8_duty_cycle = 0;
-      }
-      else if (ui8_motor_commutation_type == SINEWAVE_INTERPOLATION_60_DEGREES)
+      if (ui8_motor_commutation_type != SINEWAVE_INTERPOLATION_360_DEGREES)
       {
 	ui8_motor_rotor_absolute_position = ANGLE_1 + MOTOR_ROTOR_DELTA_PHASE_ANGLE_RIGHT;
       }
       break;
 
       case 6:
-	ui8_commutation_number = 5;
+      ui8_commutation_number = 5;
+
       ui8_half_e_rotation_flag = 1;
 
-      if (ui8_motor_commutation_type == BLOCK_COMMUTATION)
-      {
-	  // disable PWM channel pins
-	  TIM1->CCER2 &= (uint8_t)(~( TIM1_CCER2_CC3E | TIM1_CCER2_CC3NE));
-	  // PWM channel N as IO pin and output low (enable power mosfet)
-	  PMW_PHASE_A_LOW__PORT->ODR &= (uint8_t)~PMW_PHASE_A_LOW__PIN;
-	  PMW_PHASE_A_LOW__PORT->DDR |= (uint8_t)PMW_PHASE_A_LOW__PIN;
-
-	  // PWM channel N as IO pin and output high (disable power mosfet)
-	  PMW_PHASE_B_LOW__PORT->ODR |= (uint8_t)PMW_PHASE_B_LOW__PIN;
-	  PMW_PHASE_B_LOW__PORT->DDR |= (uint8_t)PMW_PHASE_B_LOW__PIN;
-	  // disable PWM n channel
-	  TIM1->CCER1 &= (uint8_t)(~(TIM1_CCER1_CC2NE));
-	  // enable PWM p channel
-	  TIM1->CCER1 |= (uint8_t)(TIM1_CCER1_CC2E);
-
-	  // PWM channel N as IO pin and output high (disable power mosfet)
-	  PMW_PHASE_C_LOW__PORT->ODR |= (uint8_t)PMW_PHASE_C_LOW__PIN;
-	  PMW_PHASE_C_LOW__PORT->DDR |= (uint8_t)PMW_PHASE_C_LOW__PIN;
-	  // disable PWM channel pins
-	  TIM1->CCER1 &= (uint8_t)(~( TIM1_CCER1_CC1E | TIM1_CCER1_CC1NE));
-
-	//	if (ui8_duty_cycle > 1) { ui8_duty_cycle--; }
-//		ui8_duty_cycle = 0;
-      }
-      else if (ui8_motor_commutation_type == SINEWAVE_INTERPOLATION_60_DEGREES)
+      if (ui8_motor_commutation_type != SINEWAVE_INTERPOLATION_360_DEGREES)
       {
 	ui8_motor_rotor_absolute_position = ANGLE_60 + MOTOR_ROTOR_DELTA_PHASE_ANGLE_RIGHT;
       }
       break;
 
       case 2:
-	ui8_commutation_number = 6;
-      if (ui8_motor_commutation_type == BLOCK_COMMUTATION)
-      {
-	  // PWM channel N as IO pin and output high (disable power mosfet)
-	  PMW_PHASE_A_LOW__PORT->ODR |= (uint8_t)PMW_PHASE_A_LOW__PIN;
-	  PMW_PHASE_A_LOW__PORT->DDR |= (uint8_t)PMW_PHASE_A_LOW__PIN;
-	  // disable PWM channel pins
-	  TIM1->CCER2 &= (uint8_t)(~( TIM1_CCER2_CC3E | TIM1_CCER2_CC3NE));
+      ui8_commutation_number = 6;
 
-	  // PWM channel N as IO pin and output high (disable power mosfet)
-	  PMW_PHASE_B_LOW__PORT->ODR |= (uint8_t)PMW_PHASE_B_LOW__PIN;
-	  PMW_PHASE_B_LOW__PORT->DDR |= (uint8_t)PMW_PHASE_B_LOW__PIN;
-	  // disable PWM n channel
-	  TIM1->CCER1 &= (uint8_t)(~(TIM1_CCER1_CC2NE));
-	  // enable PWM p channel
-	  TIM1->CCER1 |= (uint8_t)(TIM1_CCER1_CC2E);
-
-	  // disable PWM channel pins
-	  TIM1->CCER1 &= (uint8_t)(~( TIM1_CCER1_CC1E | TIM1_CCER1_CC1NE));
-	  // PWM channel N as IO pin and output low (enable power mosfet)
-	  PMW_PHASE_C_LOW__PORT->ODR &= (uint8_t)~PMW_PHASE_C_LOW__PIN;
-	  PMW_PHASE_C_LOW__PORT->DDR |= (uint8_t)PMW_PHASE_C_LOW__PIN;
-
-	//	if (ui8_duty_cycle > 1) { ui8_duty_cycle--; }
-//		ui8_duty_cycle = 0;
-      }
-      else if (ui8_motor_commutation_type == SINEWAVE_INTERPOLATION_60_DEGREES)
+      if (ui8_motor_commutation_type != SINEWAVE_INTERPOLATION_360_DEGREES)
       {
 	ui8_motor_rotor_absolute_position = ANGLE_120 + MOTOR_ROTOR_DELTA_PHASE_ANGLE_RIGHT;
       }
@@ -669,13 +474,15 @@ void hall_sensors_read_and_action (void)
 // runs every 64us (PWM frequency)
 void motor_fast_loop (void)
 {
+  uint8_t ui8_temp;
+
   // count number of fast loops / PWM cycles
   if (ui16_PWM_cycles_counter < PWM_CYCLES_COUNTER_MAX)
   {
     ui16_PWM_cycles_counter++;
     ui16_PWM_cycles_counter_6++;
   }
-  else
+  else // happens when motor is stopped or almost stopped
   {
     ui16_PWM_cycles_counter = 0;
     ui16_PWM_cycles_counter_6 = 0;
@@ -684,9 +491,11 @@ void motor_fast_loop (void)
     ui8_position_correction_value = 127;
     ui8_motor_commutation_type = BLOCK_COMMUTATION;
     ui8_motor_state = MOTOR_STATE_STOP;
-//    pwm_init_6_steps ();
     ui8_hall_sensors_last = 0; // this way we force execution of hall sensors code
   }
+
+  /****************************************************************************/
+  // Sinewave interpolation
 
 #define DO_INTERPOLATION 1 // may be usefull to disable interpolation when debugging
 #if DO_INTERPOLATION == 1
@@ -695,28 +504,120 @@ void motor_fast_loop (void)
   if (ui8_motor_commutation_type == SINEWAVE_INTERPOLATION_60_DEGREES)
   {
     ui8_interpolation_angle = (ui16_PWM_cycles_counter_6 << 8) / ui16_PWM_cycles_counter_total;
-#if (MOTOR_TYPE == MOTOR_TYPE_Q85) || (MOTOR_TYPE == MOTOR_TYPE_Q100)
     ui8_motor_rotor_position = ui8_motor_rotor_absolute_position + ui8_position_correction_value + ui8_interpolation_angle;
-#elif MOTOR_TYPE == MOTOR_TYPE_EUC2
-    ui8_motor_rotor_position = ui8_motor_rotor_absolute_position + ui8_position_correction_value - ui8_interpolation_angle;
-#endif
   }
   else if (ui8_motor_commutation_type == SINEWAVE_INTERPOLATION_360_DEGREES)
   {
     ui8_interpolation_angle = (ui16_PWM_cycles_counter << 8) / ui16_PWM_cycles_counter_total;
-#if (MOTOR_TYPE == MOTOR_TYPE_Q85) || (MOTOR_TYPE == MOTOR_TYPE_Q100)
     ui8_motor_rotor_position = ui8_motor_rotor_absolute_position + ui8_position_correction_value + ui8_interpolation_angle;
-#elif MOTOR_TYPE == MOTOR_TYPE_EUC2
-    ui8_motor_rotor_position = ui8_motor_rotor_absolute_position + ui8_position_correction_value - ui8_interpolation_angle;
-#endif
   }
   else
 #endif
   {
     ui8_motor_rotor_position = ui8_motor_rotor_absolute_position;
   }
+  /****************************************************************************/
 
-  pwm_duty_cycle_controller ();
+  /****************************************************************************/
+  // PWM duty_cycle controller
+
+  // verify motor max current limit
+  ui8_adc_motor_total_current = ui8_adc_read_motor_total_current ();
+  if (ui8_adc_motor_total_current > ui8_adc_motor_current_max)  // motor max current, reduce duty_cycle
+  {
+    if (ui8_duty_cycle > 0)
+    {
+      ui8_duty_cycle--;
+    }
+  }
+  // verify motor max regen current limit
+  else if (ui8_adc_motor_total_current < ui8_adc_motor_regen_current_max)  // motor max current, increase duty_cycle
+  {
+    if (ui8_duty_cycle < 255)
+    {
+      ui8_duty_cycle++;
+    }
+  }
+  else // no motor current limits, adjust duty_cycle to duty_cycle_target, including ramping
+  {
+    if (ui8_duty_cycle_target > ui8_duty_cycle)
+    {
+      if (ui16_counter_duty_cycle_ramp_up++ >= ui16_duty_cycle_ramp_up_inverse_step)
+      {
+	ui16_counter_duty_cycle_ramp_up = 0;
+	ui8_duty_cycle++;
+      }
+    }
+    else if (ui8_duty_cycle_target < ui8_duty_cycle)
+    {
+      if (ui16_counter_duty_cycle_ramp_down++ >= ui16_duty_cycle_ramp_down_inverse_step)
+      {
+	ui16_counter_duty_cycle_ramp_down = 0;
+	ui8_duty_cycle--;
+      }
+    }
+  }
+  /****************************************************************************/
+
+  /****************************************************************************/
+  // PWM apply duty_cycle
+
+  // scale and apply _duty_cycle
+  ui8_temp = ui8_svm_table[ui8_motor_rotor_position];
+  if (ui8_temp > MIDDLE_PWM_VALUE_DUTY_CYCLE_MAX)
+  {
+    ui16_value = ((uint16_t) (ui8_temp - MIDDLE_PWM_VALUE_DUTY_CYCLE_MAX)) * ui8_duty_cycle;
+    ui8_temp = (uint8_t) (ui16_value >> 8);
+    ui8_value_a = MIDDLE_PWM_VALUE_DUTY_CYCLE_MAX + ui8_temp;
+  }
+  else
+  {
+    ui16_value = ((uint16_t) (MIDDLE_PWM_VALUE_DUTY_CYCLE_MAX - ui8_temp)) * ui8_duty_cycle;
+    ui8_temp = (uint8_t) (ui16_value >> 8);
+    ui8_value_a = MIDDLE_PWM_VALUE_DUTY_CYCLE_MAX - ui8_temp;
+  }
+
+  // add 120 degrees and limit
+  ui8_temp = ui8_svm_table[(uint8_t) (ui8_motor_rotor_position + 85 /* 120º */)];
+  if (ui8_temp > MIDDLE_PWM_VALUE_DUTY_CYCLE_MAX)
+  {
+    ui16_value = ((uint16_t) (ui8_temp - MIDDLE_PWM_VALUE_DUTY_CYCLE_MAX)) * ui8_duty_cycle;
+    ui8_temp = (uint8_t) (ui16_value >> 8);
+    ui8_value_b = MIDDLE_PWM_VALUE_DUTY_CYCLE_MAX + ui8_temp;
+  }
+  else
+  {
+    ui16_value = ((uint16_t) (MIDDLE_PWM_VALUE_DUTY_CYCLE_MAX - ui8_temp)) * ui8_duty_cycle;
+    ui8_temp = (uint8_t) (ui16_value >> 8);
+    ui8_value_b = MIDDLE_PWM_VALUE_DUTY_CYCLE_MAX - ui8_temp;
+  }
+
+  // subtract 120 degrees and limit
+  ui8_temp = ui8_svm_table[(uint8_t) (ui8_motor_rotor_position + 171 /* 240º */)];
+  if (ui8_temp > MIDDLE_PWM_VALUE_DUTY_CYCLE_MAX)
+  {
+    ui16_value = ((uint16_t) (ui8_temp - MIDDLE_PWM_VALUE_DUTY_CYCLE_MAX)) * ui8_duty_cycle;
+    ui8_temp = (uint8_t) (ui16_value >> 8);
+    ui8_value_c = MIDDLE_PWM_VALUE_DUTY_CYCLE_MAX + ui8_temp;
+  }
+  else
+  {
+    ui16_value = ((uint16_t) (MIDDLE_PWM_VALUE_DUTY_CYCLE_MAX - ui8_temp)) * ui8_duty_cycle;
+    ui8_temp = (uint8_t) (ui16_value >> 8);
+    ui8_value_c = MIDDLE_PWM_VALUE_DUTY_CYCLE_MAX - ui8_temp;
+  }
+
+  // set final duty_cycle value
+  TIM1_SetCompare1((uint16_t) (ui8_value_a << 1));
+  TIM1_SetCompare2((uint16_t) (ui8_value_c << 1));
+  TIM1_SetCompare3((uint16_t) (ui8_value_b << 1));
+
+  if (ui8_motor_controller_state == MOTOR_CONTROLLER_STATE_OK)
+  {
+    // enable PWM outputs
+    TIM1_CtrlPWMOutputs(ENABLE);
+  }
+  /****************************************************************************/
 }
 
 void motor_disable_PWM (void)
@@ -765,7 +666,7 @@ void motor_init (void)
   /***************************************************************************************/
 
 //  motor_set_current_max (ADC_MOTOR_CURRENT_MAX);
-  motor_set_current_max (6);
+  motor_set_current_max (30);
   motor_set_regen_current_max (ADC_MOTOR_REGEN_CURRENT_MAX);
   motor_set_pwm_duty_cycle_ramp_up_inverse_step (45); // each step = 64us
   motor_set_pwm_duty_cycle_ramp_down_inverse_step (30); // each step = 64us
@@ -778,19 +679,19 @@ void motor_set_pwm_duty_cycle_target (uint8_t ui8_value)
   ui8_duty_cycle_target = ui8_value;
 }
 
-void motor_set_current_max (uint8_t value)
+void motor_set_current_max (uint8_t ui8_value)
 {
-  ui8_adc_motor_current_max = value;
+  ui8_adc_motor_current_max = ui8_motor_total_current_offset + ui8_value;
 }
 
 uint8_t motor_get_current_max (void)
 {
-  return ui8_adc_motor_total_current - ui8_motor_total_current_offset;
+  return ui8_adc_motor_current_max;
 }
 
 void motor_set_regen_current_max (uint8_t ui8_value)
 {
-  ui8_adc_motor_regen_current_max = ui8_value;
+  ui8_adc_motor_regen_current_max = ui8_motor_total_current_offset - ui8_value;
 }
 
 void motor_set_pwm_duty_cycle_ramp_up_inverse_step (uint16_t ui16_value)
@@ -978,122 +879,6 @@ void motor_controller_clear_error (void)
 uint8_t motor_controller_get_error (void)
 {
   return ui8_motor_controller_error;
-}
-
-void pwm_duty_cycle_controller (void)
-{
-  // verify motor max current limit
-  ui8_adc_motor_total_current = ui8_adc_read_motor_total_current ();
-  if (ui8_adc_motor_total_current > (ui8_motor_total_current_offset + ui8_adc_motor_current_max))  // motor max current, reduce duty_cycle
-  {
-    if (ui8_duty_cycle > 0)
-    {
-      ui8_duty_cycle--;
-    }
-  }
-  // verify motor max regen current limit
-  else if (ui8_adc_motor_total_current < (ui8_motor_total_current_offset - ui8_adc_motor_regen_current_max))  // motor max current, increase duty_cycle
-  {
-    if (ui8_duty_cycle < 255)
-    {
-      ui8_duty_cycle++;
-    }
-  }
-  else // no motor current limits, adjust duty_cycle to duty_cycle_target, including ramping
-  {
-    if (ui8_duty_cycle_target > ui8_duty_cycle)
-    {
-      if (ui16_counter_duty_cycle_ramp_up++ >= ui16_duty_cycle_ramp_up_inverse_step)
-      {
-	ui16_counter_duty_cycle_ramp_up = 0;
-	ui8_duty_cycle++;
-      }
-    }
-    else if (ui8_duty_cycle_target < ui8_duty_cycle)
-    {
-      if (ui16_counter_duty_cycle_ramp_down++ >= ui16_duty_cycle_ramp_down_inverse_step)
-      {
-	ui16_counter_duty_cycle_ramp_down = 0;
-	ui8_duty_cycle--;
-      }
-    }
-  }
-
-  pwm_apply_duty_cycle ();
-}
-
-inline void pwm_apply_duty_cycle (void)
-{
-  uint8_t ui8_temp;
-
-  if (ui8_motor_commutation_type == BLOCK_COMMUTATION)
-  {
-    TIM1_SetCompare1((uint16_t) (ui8_duty_cycle << 2));
-    TIM1_SetCompare2((uint16_t) (ui8_duty_cycle << 2));
-    TIM1_SetCompare3((uint16_t) (ui8_duty_cycle << 2));
-
-    if (ui8_motor_controller_state == MOTOR_CONTROLLER_STATE_OK)
-    {
-      motor_enable_PWM ();
-    }
-  }
-  else
-  {
-    // scale and apply _duty_cycle
-    ui8_temp = ui8_svm_table[ui8_motor_rotor_position];
-    if (ui8_temp > MIDDLE_PWM_VALUE_DUTY_CYCLE_MAX)
-    {
-      ui16_value = ((uint16_t) (ui8_temp - MIDDLE_PWM_VALUE_DUTY_CYCLE_MAX)) * ui8_duty_cycle;
-      ui8_temp = (uint8_t) (ui16_value >> 8);
-      ui8_value_a = MIDDLE_PWM_VALUE_DUTY_CYCLE_MAX + ui8_temp;
-    }
-    else
-    {
-      ui16_value = ((uint16_t) (MIDDLE_PWM_VALUE_DUTY_CYCLE_MAX - ui8_temp)) * ui8_duty_cycle;
-      ui8_temp = (uint8_t) (ui16_value >> 8);
-      ui8_value_a = MIDDLE_PWM_VALUE_DUTY_CYCLE_MAX - ui8_temp;
-    }
-
-    // add 120 degrees and limit
-    ui8_temp = ui8_svm_table[(uint8_t) (ui8_motor_rotor_position + 85 /* 120º */)];
-    if (ui8_temp > MIDDLE_PWM_VALUE_DUTY_CYCLE_MAX)
-    {
-      ui16_value = ((uint16_t) (ui8_temp - MIDDLE_PWM_VALUE_DUTY_CYCLE_MAX)) * ui8_duty_cycle;
-      ui8_temp = (uint8_t) (ui16_value >> 8);
-      ui8_value_b = MIDDLE_PWM_VALUE_DUTY_CYCLE_MAX + ui8_temp;
-    }
-    else
-    {
-      ui16_value = ((uint16_t) (MIDDLE_PWM_VALUE_DUTY_CYCLE_MAX - ui8_temp)) * ui8_duty_cycle;
-      ui8_temp = (uint8_t) (ui16_value >> 8);
-      ui8_value_b = MIDDLE_PWM_VALUE_DUTY_CYCLE_MAX - ui8_temp;
-    }
-
-    // subtract 120 degrees and limit
-    ui8_temp = ui8_svm_table[(uint8_t) (ui8_motor_rotor_position + 171 /* 240º */)];
-    if (ui8_temp > MIDDLE_PWM_VALUE_DUTY_CYCLE_MAX)
-    {
-      ui16_value = ((uint16_t) (ui8_temp - MIDDLE_PWM_VALUE_DUTY_CYCLE_MAX)) * ui8_duty_cycle;
-      ui8_temp = (uint8_t) (ui16_value >> 8);
-      ui8_value_c = MIDDLE_PWM_VALUE_DUTY_CYCLE_MAX + ui8_temp;
-    }
-    else
-    {
-      ui16_value = ((uint16_t) (MIDDLE_PWM_VALUE_DUTY_CYCLE_MAX - ui8_temp)) * ui8_duty_cycle;
-      ui8_temp = (uint8_t) (ui16_value >> 8);
-      ui8_value_c = MIDDLE_PWM_VALUE_DUTY_CYCLE_MAX - ui8_temp;
-    }
-
-    // set final duty_cycle value
-    TIM1_SetCompare1((uint16_t) (ui8_value_a << 1));
-    TIM1_SetCompare2((uint16_t) (ui8_value_c << 1));
-    TIM1_SetCompare3((uint16_t) (ui8_value_b << 1));
-
-    if (ui8_motor_controller_state == MOTOR_CONTROLLER_STATE_OK)
-    {
-      motor_enable_PWM ();
-    }
-  }
 }
 
 void motor_set_pwm_duty_cycle (uint8_t ui8_value)

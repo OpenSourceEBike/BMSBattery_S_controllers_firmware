@@ -9,7 +9,6 @@
 #ifndef _PWM_H
 #define _PWM_H
 
-void pwm_init_6_steps (void);
 void pwm_init_bipolar_4q (void);
 void pwm_phase_a_disable (void);
 void pwm_phase_a_enable_pwm (void);
