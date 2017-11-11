@@ -9,7 +9,7 @@
 #ifndef _MAIN_H_
 #define _MAIN_H_
 
-#define DEBUG_UART
+//#define DEBUG_UART
 
 #define CONTROLLER_TYPE_S06S 1
 #define CONTROLLER_TYPE_S12S 2
@@ -22,8 +22,6 @@
 #define MOTOR_TYPE_EUC2 2
 
 #define MOTOR_TYPE MOTOR_TYPE_Q85
-
-//#define DO_SINEWAVE_INTERPOLATION_360_DEGREES
 
 // MOTOR_TYPE_EUC2
 // 28V --> 66 ERPs
@@ -46,16 +44,16 @@
 //#define ADC_MOTOR_REGEN_CURRENT_MAX 4 	// 1 --> 0.5A
 
 #define ADC_MOTOR_CURRENT_MAX_MED_VALUE_10B 10144 // ADC_MOTOR_CURRENT_MAX_ZERO_VALUE_10B << 5
-#define ADC_MOTOR_CURRENT_MAX 10 // 50 = 25A; 1 --> 0.5A
-#define ADC_MOTOR_CURRENT_MAX_10B 200 // 200 = 25A; 1 --> 0.125A
+#define ADC_MOTOR_CURRENT_MAX 24 // 50 = 25A; 1 --> 0.5A
+#define ADC_MOTOR_CURRENT_MAX_10B 96 // 200 = 25A; 1 --> 0.125A
 #define ADC_MOTOR_REGEN_CURRENT_MAX 4 	// 1 --> 0.5A
 #endif
 
 #if CONTROLLER_TYPE == CONTROLLER_TYPE_S06S
 #define PWM_DUTY_CYCLE_RAMP_INVERSE_STEP 30
 #elif CONTROLLER_TYPE == CONTROLLER_TYPE_S12S
-//#define PWM_DUTY_CYCLE_RAMP_INVERSE_STEP 500
-#define PWM_DUTY_CYCLE_RAMP_INVERSE_STEP 350
+#define PWM_DUTY_CYCLE_RAMP_UP_INVERSE_STEP 50
+#define PWM_DUTY_CYCLE_RAMP_DOWN_INVERSE_STEP 30
 #endif
 
 // Phase current: max of +-15.5 amps
@@ -65,10 +63,25 @@
 #define ADC_PHASE_B_CURRENT_FACTOR 333 // 0.1 / 0.030A * 0.707 = 3.3
 
 #if (MOTOR_TYPE == MOTOR_TYPE_Q85) || (MOTOR_TYPE == MOTOR_TYPE_Q100)
-//#define MOTOR_ROTOR_DELTA_PHASE_ANGLE_RIGHT 210// best value found (at max speed, minimum current and power supply voltage keeps the same)
-#define MOTOR_ROTOR_DELTA_PHASE_ANGLE_RIGHT 103// best value found (at max speed, minimum current and power supply voltage keeps the same)
+// This value must be found experimenting. Motor should rotate forward and have a good torque,
+// a value to much higher or lower will make the motor not having torque while the motor starting up.
+#define MOTOR_ROTOR_DELTA_PHASE_ANGLE_RIGHT 80
+
+// This value is ERPS speed after which a transition happens from sinewave no interpolation to have
+// interpolation 60 degrees and must be found experimentally but a value of 40 may be good
+#define MOTOR_ROTOR_ERPS_START_INTERPOLATION_60_DEGREES 40
+// This value is needed for correct transition to sinewave interpolation and must be found experimentally
+// but may be something like: MOTOR_ROTOR_DELTA_PHASE_ANGLE_RIGHT + 127(180 degrees) + 32(45 degrees)
+#define MOTOR_ROTOR_PHASE_ANGLE_INTERPOLATION 239
+
+// For some motors with not very well placed mosfets at 120 degrees between each of them. May be easier to keep disable this option
+//#define DO_SINEWAVE_INTERPOLATION_360_DEGREES
+#ifdef DO_SINEWAVE_INTERPOLATION_360_DEGREES
+// This value is ERPS speed after which a transition happens from sinewave 60 degrees to have
+// interpolation 360 degrees and must be found experimentally but a value of 100 may be good
+#define MOTOR_ROTOR_ERPS_START_INTERPOLATION_360_DEGREES 100
+#endif
 #elif MOTOR_TYPE == MOTOR_TYPE_EUC2
-#define MOTOR_ROTOR_DELTA_PHASE_ANGLE_RIGHT 235 // best value found
 #endif
 
 #if MOTOR_TYPE == MOTOR_TYPE_Q85

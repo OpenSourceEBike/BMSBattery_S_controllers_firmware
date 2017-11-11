@@ -339,7 +339,6 @@ uint16_t ui16_value;
 uint8_t ui8_commutation_number = 0;
 
 // functions prototypes
-void pwm_duty_cycle_controller (void);
 void battery_voltage_protection (void);
 uint8_t motor_current_controller (void);
 uint8_t motor_speed_controller (void);
@@ -370,13 +369,11 @@ void hall_sensors_read_and_action (void)
 
       // read here the phase B current: FOC Id current
       ui8_ADC_id_current = ui8_adc_read_phase_B_current ();
-
-      if (ui16_motor_speed_erps > 100)
+      if (ui16_motor_speed_erps > 40)
       {
 	if (ui8_ADC_id_current > 127) { ui8_position_correction_value++; }
 	else if (ui8_ADC_id_current < 125) { ui8_position_correction_value--; }
       }
-      else { ui8_position_correction_value = 127; } // keep using the reset value
 
       if (ui8_motor_commutation_type != SINEWAVE_INTERPOLATION_360_DEGREES)
       {
@@ -397,25 +394,38 @@ void hall_sensors_read_and_action (void)
 
       // update motor commutation state based on motor speed
 #ifdef DO_SINEWAVE_INTERPOLATION_360_DEGREES
-      if ((ui16_motor_speed_erps > 180) &&
-	  (ui8_motor_commutation_type == SINEWAVE_INTERPOLATION_60_DEGREES))
+      if (ui16_motor_speed_erps > MOTOR_ROTOR_ERPS_START_INTERPOLATION_360_DEGREES)
       {
-
-	ui8_motor_commutation_type = SINEWAVE_INTERPOLATION_360_DEGREES;
-	ui8_motor_state = MOTOR_STATE_RUNNING;
+	if (ui8_motor_commutation_type == SINEWAVE_INTERPOLATION_60_DEGREES)
+	{
+	  ui8_motor_commutation_type = SINEWAVE_INTERPOLATION_360_DEGREES;
+	}
       }
-      if ((ui16_motor_speed_erps < 140) &&
-	  (ui8_motor_commutation_type == SINEWAVE_INTERPOLATION_360_DEGREES))
+      else
       {
-	ui8_motor_commutation_type = SINEWAVE_INTERPOLATION_60_DEGREES;
-	ui8_motor_state = MOTOR_STATE_RUNNING;
+	if (ui8_motor_commutation_type == SINEWAVE_INTERPOLATION_360_DEGREES)
+	{
+	  ui8_motor_commutation_type = SINEWAVE_INTERPOLATION_60_DEGREES;
+	}
       }
 #endif
-      if ((ui16_motor_speed_erps > 100) &&
-	  (ui8_motor_commutation_type == BLOCK_COMMUTATION))
+      if (ui16_motor_speed_erps > MOTOR_ROTOR_ERPS_START_INTERPOLATION_60_DEGREES)
       {
-//	ui8_motor_commutation_type = SINEWAVE_INTERPOLATION_60_DEGREES;
-//	ui8_motor_state = MOTOR_STATE_RUNNING;
+	if (ui8_motor_commutation_type == BLOCK_COMMUTATION)
+	{
+	  ui8_motor_commutation_type = SINEWAVE_INTERPOLATION_60_DEGREES;
+	  ui8_motor_state = MOTOR_STATE_RUNNING;
+	  ui8_position_correction_value = MOTOR_ROTOR_PHASE_ANGLE_INTERPOLATION;
+	}
+      }
+      else
+      {
+	if (ui8_motor_commutation_type == SINEWAVE_INTERPOLATION_60_DEGREES)
+	{
+		ui8_motor_commutation_type = BLOCK_COMMUTATION;
+		ui8_motor_state = MOTOR_STATE_RUNNING;
+		ui8_position_correction_value = 127;
+	}
       }
 
       if (ui8_motor_commutation_type != SINEWAVE_INTERPOLATION_360_DEGREES)
@@ -665,11 +675,10 @@ void motor_init (void)
 			    EXTI_SENSITIVITY_FALL_LOW);
   /***************************************************************************************/
 
-//  motor_set_current_max (ADC_MOTOR_CURRENT_MAX);
-  motor_set_current_max (30);
+  motor_set_current_max (ADC_MOTOR_CURRENT_MAX);
   motor_set_regen_current_max (ADC_MOTOR_REGEN_CURRENT_MAX);
-  motor_set_pwm_duty_cycle_ramp_up_inverse_step (45); // each step = 64us
-  motor_set_pwm_duty_cycle_ramp_down_inverse_step (30); // each step = 64us
+  motor_set_pwm_duty_cycle_ramp_up_inverse_step (PWM_DUTY_CYCLE_RAMP_UP_INVERSE_STEP); // each step = 64us
+  motor_set_pwm_duty_cycle_ramp_down_inverse_step (PWM_DUTY_CYCLE_RAMP_DOWN_INVERSE_STEP); // each step = 64us
 }
 
 void motor_set_pwm_duty_cycle_target (uint8_t ui8_value)
@@ -733,21 +742,21 @@ void motor_controller (void)
 
   battery_voltage_protection ();
 
-//  ui8_current_pwm_duty_cycle = ui8_duty_cycle;
-//  ui8_pwm_duty_cycle_a = motor_current_controller ();
-//  ui8_pwm_duty_cycle_b = motor_speed_controller ();
-//
-//  if (p_lcd_configuration_variables->ui8_power_assist_control_mode)
-//  {
-//    ui8_pwm_duty_cycle_c = (uint8_t) (map ((int32_t) ebike_app_get_adc_throttle_value_cruise_control (), ADC_THROTTLE_MIN_VALUE, ADC_THROTTLE_MAX_VALUE, 0, PWM_VALUE_DUTY_CYCLE_MAX));
-//    // apply the value that is lower
-//    motor_set_pwm_duty_cycle_target (ui8_min (ui8_min (ui8_pwm_duty_cycle_a, ui8_pwm_duty_cycle_b), ui8_pwm_duty_cycle_c));
-//  }
-//  else
-//  {
-//    // apply the value that is lower
-//    motor_set_pwm_duty_cycle_target (ui8_min (ui8_pwm_duty_cycle_a, ui8_pwm_duty_cycle_b));
-//  }
+  ui8_current_pwm_duty_cycle = ui8_duty_cycle;
+  ui8_pwm_duty_cycle_a = motor_current_controller ();
+  ui8_pwm_duty_cycle_b = motor_speed_controller ();
+
+  if (p_lcd_configuration_variables->ui8_power_assist_control_mode)
+  {
+    ui8_pwm_duty_cycle_c = (uint8_t) (map ((int32_t) ebike_app_get_adc_throttle_value_cruise_control (), ADC_THROTTLE_MIN_VALUE, ADC_THROTTLE_MAX_VALUE, 0, PWM_VALUE_DUTY_CYCLE_MAX));
+    // apply the value that is lower
+    motor_set_pwm_duty_cycle_target (ui8_min (ui8_min (ui8_pwm_duty_cycle_a, ui8_pwm_duty_cycle_b), ui8_pwm_duty_cycle_c));
+  }
+  else
+  {
+    // apply the value that is lower
+    motor_set_pwm_duty_cycle_target (ui8_min (ui8_pwm_duty_cycle_a, ui8_pwm_duty_cycle_b));
+  }
 }
 
 void motor_controller_set_speed_erps (uint16_t ui16_erps)
