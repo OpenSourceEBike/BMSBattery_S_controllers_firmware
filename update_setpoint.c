@@ -31,6 +31,11 @@ int16_t i16_assistlevel[5]={LEVEL_1, LEVEL_2, LEVEL_3, LEVEL_4, LEVEL_5}; // dif
 uint16_t uint16_current_target=0;
 float float_temp=-1.15;
 int8_t uint_PWM_Enable=0;
+uint16_t ui16_dutycycle_max=0;
+uint16_t ui16_a=0;
+uint16_t ui16_b=0;
+
+
 
 uint16_t update_setpoint (uint16_t speed, uint16_t PAS, uint16_t sumtorque, uint16_t setpoint_old)
 {
@@ -51,16 +56,16 @@ uint16_t update_setpoint (uint16_t speed, uint16_t PAS, uint16_t sumtorque, uint
       printf("you are not pedaling!\n");
 #endif
 
-  }else if(ui16_BatteryCurrent>BATTERY_CURRENT_MAX_VALUE){
+ /* }else if(ui16_BatteryCurrent>BATTERY_CURRENT_MAX_VALUE){
       if (ui32_setpoint>ADC_THROTTLE_MIN_VALUE){
-	  ui32_setpoint=(uint32_t)(setpoint_old-(ui16_BatteryCurrent-BATTERY_CURRENT_MAX_VALUE));
-	  //printf("Battery Current too high!, setpoint %lu, setpoint_old %d\n",ui32_setpoint, setpoint_old);
-      }  //next priority: reduce (old) setpoint if battery current is too high
+	  //ui32_setpoint=(uint32_t)(setpoint_old-(ui16_BatteryCurrent-BATTERY_CURRENT_MAX_VALUE));
+	  printf("Battery Current too high!, setpoint %lu, setpoint_old %d\n",ui32_setpoint, setpoint_old);
+      }  //next priority: reduce (old) setpoint if battery current is too high*/
 
 
   }else if (ui32_SPEED_km_h>limit && setpoint_old>(ui32_SPEED_km_h-limit) && ui8_cheat_state!=4){
       ui32_setpoint=(uint32_t)setpoint_old-(ui32_SPEED_km_h-limit); 	//next priority: reduce (old) setpoint, if you are riding too fast
-      //printf("Speed too high!\n");
+      printf("Speed too high!\n");
 
   }else {								//if none of the overruling boundaries are concerned, calculate new setpoint
 #ifdef TORQUESENSOR
@@ -82,7 +87,7 @@ uint16_t update_setpoint (uint16_t speed, uint16_t PAS, uint16_t sumtorque, uint
 #endif
 
 #if defined(THROTTLE)  || defined(THROTTLE_AND_PAS)
-  if (sumtorque>10 && setpoint_old-10>sumtorque){
+ /* if (sumtorque>10 && setpoint_old-10>sumtorque){
       TIM1_CtrlPWMOutputs(DISABLE);
       uint_PWM_Enable=0;
       //printf("Floating!\n");
@@ -91,13 +96,16 @@ uint16_t update_setpoint (uint16_t speed, uint16_t PAS, uint16_t sumtorque, uint
       TIM1_CtrlPWMOutputs(ENABLE);
       uint_PWM_Enable=1;
       //printf("PWM enabled!\n");
-  }
-  if (sumtorque>setpoint_old){
-  ui32_setpoint=(uint32_t)(setpoint_old+((sumtorque-setpoint_old)>>3));
-  }
-  else if (sumtorque<setpoint_old){
-  ui32_setpoint=(uint32_t)(setpoint_old-((setpoint_old-sumtorque)>>3));
-  }
+  }*/
+  //ui16_a = (255L*(370L/MOTOR_VELOCITY_CONSTANT))/ui8_BatteryVoltage;
+  //ui16_b = ((BATTERY_CURRENT_MAX_VALUE+current_cal_b)*((255*((MOTOR_RESISTANCE*37L)/ui8_BatteryVoltage))/100L))/1000;
+  float_temp=(float)sumtorque*(float)(BATTERY_CURRENT_MAX_VALUE+current_cal_b)/255.0-(float)current_cal_b;
+  ui32_setpoint= PI_control(ui16_BatteryCurrent, (uint16_t)float_temp);
+if (ui32_setpoint<40)ui32_setpoint=0;
+if (ui32_setpoint>255)ui32_setpoint=255;
+
+  //printf("setpoint %lu, ist %d, soll %d\n", ui32_setpoint, ui16_BatteryCurrent, (uint16_t)float_temp);
+  //printf("setpoint %lu, Voltage %d, a %d, b %d, DCmax %d, erps %d\n", ui32_setpoint, ui8_BatteryVoltage, ui16_a, ui16_b, ui16_dutycycle_max, ui16_motor_speed_erps);
 #endif
 
 #ifdef TORQUE_SIMULATION
@@ -128,7 +136,7 @@ uint16_t update_setpoint (uint16_t speed, uint16_t PAS, uint16_t sumtorque, uint
     {
 
       ui32_setpoint=(uint32_t)(setpoint_old + i16_delta);
-      printf("setpoint %lu, Delta %d, current %d, PAS %d, current_target %d\n", ui32_setpoint, i16_delta, ui16_BatteryCurrent, PAS, uint16_current_target);
+      //printf("setpoint %lu, Delta %d, current %d, PAS %d, current_target %d\n", ui32_setpoint, i16_delta, ui16_BatteryCurrent, PAS, uint16_current_target);
     }
   if (ui32_setpoint>SETPOINT_MAX_VALUE){ui32_setpoint=SETPOINT_MAX_VALUE;}
 
@@ -143,4 +151,16 @@ uint16_t update_setpoint (uint16_t speed, uint16_t PAS, uint16_t sumtorque, uint
      }
   //printf("setpoint %lu, Delta %d\n", ui32_setpoint, i16_delta);
   return ui32_setpoint;
+}
+
+uint32_t PI_control (uint16_t ist, uint16_t soll)
+{
+  float float_p;
+  static float float_i;
+  float_p=((float)soll - (float)ist)*0.3;
+  if (float_p>3)float_p=3;
+  if (float_p<-3)float_p=-3;
+  float_i+=((float)soll - (float)ist)*0.2;
+  printf("soll %d, ist %d, P-Anteil %d,I-Anteil %d\n", soll, ist, (int16_t)float_p, (int16_t)float_i);
+  return ((uint32_t)(float_p+float_i));
 }

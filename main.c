@@ -41,6 +41,8 @@ uint8_t ui8_log = 0;
 uint8_t ui8_i= 0; 				//counter for ... next loop
 uint16_t ui16_torque[NUMBER_OF_PAS_MAGS]; 	//array for torque values of one crank revolution
 uint16_t ui16_sum_torque = 0; 			//sum of array elements
+float float_kv = 0;
+float float_R = 0;
 uint8_t ui8_torque_index=0 ; 			//counter for torque array
 uint8_t a = 0; 					//loop counter
 
@@ -107,7 +109,7 @@ int main (void)
 {
 //  static uint32_t ui32_cruise_counter = 0;
 //  static uint8_t ui8_cruise_duty_cycle = 0;
-  static uint16_t ui16_setpoint = ADC_THROTTLE_MIN_VALUE;
+  static uint16_t ui16_setpoint = 0;
   static uint8_t ui8_temp = 0;
   static int16_t i16_temp = 0;
 
@@ -328,8 +330,9 @@ if(ui8_cheat_state==3) //second step, make sure the brake is hold according to d
 
 
 
-      //printf("cheatstate, %d, km/h %lu, Voltage, %d, setpoint, %d, correction value, %d\n", ui8_cheat_state, ui32_SPEED_km_h, ui8_BatteryVoltage, ui16_setpoint, ui8_position_correction_value);
-      //      printf("%d, %d, %d\n", ui8_motor_state, ui16_motor_speed_erps, ui8_position_correction_value);
+      //printf("cheatstate, %d, km/h %lu, Voltage, %d, setpoint %d, erps %d, current %d, correction_value, %d\n", ui8_cheat_state, ui32_SPEED_km_h, ui8_BatteryVoltage, ui16_setpoint, ui16_motor_speed_erps, ui16_BatteryCurrent, ui8_position_correction_value);
+      //printf("%d, %d, %d\n", ui8_BatteryVoltage, ui16_sum_torque, (int16_t)(float_R*1000.0));
+	//printf("kv %d, erps %d, R %d\n", (uint16_t)(float_kv*10.0) , ui16_motor_speed_erps, (uint16_t)(float_R*1000.0));
 
 
       //printf("correction angle %d, Current %d, Voltage %d, sumtorque %d, setpoint %d, km/h %lu\n",ui8_position_correction_value, i16_deziAmps, ui8_BatteryVoltage, ui16_sum_torque, ui16_setpoint, ui32_SPEED_km_h);

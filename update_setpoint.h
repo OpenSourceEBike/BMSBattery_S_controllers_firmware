@@ -16,6 +16,7 @@
 #include "main.h"
 
 uint16_t update_setpoint (uint16_t speed, uint16_t PAS, uint16_t sumtorque, uint16_t setpoint_old );
+uint32_t PI_control (uint16_t ist, uint16_t soll);
 extern uint32_t ui32_SPEED_km_h;
 
 

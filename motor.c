@@ -90,7 +90,10 @@ debug_pin_set ();
       ui16_PWM_cycles_counter = 0;
       ui16_PWM_cycles_counter_total_div_4 = ui16_PWM_cycles_counter_total >> 2;
       ui16_motor_speed_erps = PWM_CYCLES_SECOND / ui16_PWM_cycles_counter_total; // this division takes ~4.2us
-
+      if (ui16_motor_speed_erps ==-1)
+            {
+	  ui16_motor_speed_erps=0;
+            }
       // update motor state based on motor speed
 #if MOTOR_TYPE == MOTOR_TYPE_Q85
       if (ui16_motor_speed_erps > 50)
