@@ -34,11 +34,23 @@ int8_t uint_PWM_Enable=0;
 uint16_t ui16_dutycycle_max=0;
 uint16_t ui16_a=0;
 uint16_t ui16_b=0;
+uint16_t ui16_BatteryCurrent_accumulated = 2496L; //8x current offset
+uint16_t ui16_BatteryCurrent;
+uint8_t ui8_BatteryVoltage;
+uint16_t ui16_counter;
+
+
 
 
 
 uint16_t update_setpoint (uint16_t speed, uint16_t PAS, uint16_t sumtorque, uint16_t setpoint_old)
 {
+
+  ui16_BatteryCurrent_accumulated -= ui16_BatteryCurrent_accumulated>>3;
+  ui16_BatteryCurrent_accumulated += ui16_adc_read_motor_total_current();
+  ui16_BatteryCurrent = ui16_BatteryCurrent_accumulated>>3;
+  ui8_BatteryVoltage = ui8_adc_read_battery_voltage();
+
    ui32_SPEED_km_h=(wheel_circumference*PWM_CYCLES_SECOND*36L)/(10000L*(uint32_t)speed);			//calculate speed in km/h conversion fr	om sec to hour --> *3600, conversion from mm to km --> /1000000, tic frequency 15625 Hz
   if(ui16_SPEED_Counter>40000){ui32_SPEED_km_h=0;}     //if wheel isn't turning, reset speed
   if(ui8_BatteryVoltage<BATTERY_VOLTAGE_MIN_VALUE){
@@ -101,10 +113,10 @@ uint16_t update_setpoint (uint16_t speed, uint16_t PAS, uint16_t sumtorque, uint
   //ui16_b = ((BATTERY_CURRENT_MAX_VALUE+current_cal_b)*((255*((MOTOR_RESISTANCE*37L)/ui8_BatteryVoltage))/100L))/1000;
   float_temp=(float)sumtorque*(float)(BATTERY_CURRENT_MAX_VALUE+current_cal_b)/255.0-(float)current_cal_b;
   ui32_setpoint= PI_control(ui16_BatteryCurrent, (uint16_t)float_temp);
-if (ui32_setpoint<40)ui32_setpoint=0;
-if (ui32_setpoint>255)ui32_setpoint=255;
+  if (ui32_setpoint<40)ui32_setpoint=0;
+  if (ui32_setpoint>255)ui32_setpoint=255;
 
-  //printf("setpoint %lu, ist %d, soll %d\n", ui32_setpoint, ui16_BatteryCurrent, (uint16_t)float_temp);
+  printf("%lu, %d, %d, %d\r\n", ui32_setpoint, sumtorque, ui16_BatteryCurrent, (uint16_t)float_temp);
   //printf("setpoint %lu, Voltage %d, a %d, b %d, DCmax %d, erps %d\n", ui32_setpoint, ui8_BatteryVoltage, ui16_a, ui16_b, ui16_dutycycle_max, ui16_motor_speed_erps);
 #endif
 
@@ -150,17 +162,19 @@ if (ui32_setpoint>255)ui32_setpoint=255;
         //printf("PWM enabled!\n");
      }
   //printf("setpoint %lu, Delta %d\n", ui32_setpoint, i16_delta);
+
   return ui32_setpoint;
+ // return 0;
 }
 
 uint32_t PI_control (uint16_t ist, uint16_t soll)
 {
   float float_p;
   static float float_i;
-  float_p=((float)soll - (float)ist)*0.3;
-  if (float_p>3)float_p=3;
-  if (float_p<-3)float_p=-3;
+  float_p=((float)soll - (float)ist)*0.5;
+  if (float_p>3)float_p=5;
+  if (float_p<-3)float_p=-5;
   float_i+=((float)soll - (float)ist)*0.2;
-  printf("soll %d, ist %d, P-Anteil %d,I-Anteil %d\n", soll, ist, (int16_t)float_p, (int16_t)float_i);
+  //printf("soll %d, ist %d, P-Anteil %d,I-Anteil %d\n", soll, ist, (int16_t)float_p, (int16_t)float_i);
   return ((uint32_t)(float_p+float_i));
 }

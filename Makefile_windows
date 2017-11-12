@@ -36,6 +36,7 @@ EXTRASRCS = \
 	$(SDIR)/stm8s_tim1.c \
 	$(SDIR)/stm8s_tim2.c \
 	$(SDIR)/stm8s_adc1.c \
+	$(SDIR)/stm8s_flash.c \
 	gpio.c \
 	utils.c \
 	cruise_control.c \

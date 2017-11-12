@@ -15,6 +15,7 @@
 #include "pwm.h"
 #include "config.h"
 #include "display_kingmeter.h"
+#include "adc.h"
 
 uint8_t ui8_counter = 0;
 
@@ -42,12 +43,13 @@ int8_t hall_sensors;
 int8_t hall_sensors_last = 0;
 
 uint16_t ui16_ADC_iq_current = 0;
-uint16_t ui16_ADC_iq_current_accumulated = 0;
+uint16_t ui16_ADC_iq_current_accumulated = 4096;
 uint16_t ui16_ADC_iq_current_filtered = 0;
 uint16_t ui16_iq_current_ma = 0;
 
 void TIM1_UPD_OVF_TRG_BRK_IRQHandler(void) __interrupt(TIM1_UPD_OVF_TRG_BRK_IRQHANDLER)
 {
+  adc_trigger ();
   hall_sensors_read_and_action ();
 
   motor_fast_loop ();
@@ -82,7 +84,9 @@ void hall_sensors_read_and_action (void)
       if (ui8_adc_read_throttle_busy == 0)
       {
 debug_pin_set ();
-	ui16_ADC_iq_current = ADC1_GetConversionValue (); // this value is regualted to be zero by FOC in this case without averaging
+	ui16_ADC_iq_current_accumulated-=ui16_ADC_iq_current_accumulated>>3;
+	ui16_ADC_iq_current_accumulated+= ui16_adc_read_phase_B_current ();
+	ui16_ADC_iq_current = ui16_ADC_iq_current_accumulated>>3; // this value is regualted to be zero by FOC in this case without averaging
 
       }
 
