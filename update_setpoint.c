@@ -38,6 +38,7 @@ uint16_t ui16_BatteryCurrent_accumulated = 2496L; //8x current offset
 uint16_t ui16_BatteryCurrent;
 uint8_t ui8_BatteryVoltage;
 uint16_t ui16_counter;
+uint16_t ui16_PAS_accumulated = 64000L;
 
 
 
@@ -121,7 +122,9 @@ uint16_t update_setpoint (uint16_t speed, uint16_t PAS, uint16_t sumtorque, uint
 #endif
 
 #ifdef TORQUE_SIMULATION
-
+  ui16_PAS_accumulated-=ui16_PAS_accumulated>>3;
+  ui16_PAS_accumulated+=PAS;
+  PAS=ui16_PAS_accumulated>>3;
   if (PAS>RAMP_END) //if you are pedaling slower than defined ramp end, current is proportional to cadence
     {
       uint16_current_target= (i16_assistlevel[ui8_assistlevel_global-1]*(BATTERY_CURRENT_MAX_VALUE+current_cal_b)/100);
@@ -136,21 +139,11 @@ uint16_t update_setpoint (uint16_t speed, uint16_t PAS, uint16_t sumtorque, uint
       //printf("current_target %d\n", uint16_current_target);
     }
 
-  i16_delta=(int16_t)(uint16_current_target-ui16_BatteryCurrent)/p_factor; 					//simple p-controller to avoid big steps in setpoint value course
+  ui32_setpoint= PI_control(ui16_BatteryCurrent, uint16_current_target);
+    if (ui32_setpoint<40)ui32_setpoint=0;
+    if (ui32_setpoint>255)ui32_setpoint=255;
 
-
-
- if (i16_delta<max_change*(-1)){i16_delta=max_change*(-1);}
- if (i16_delta>max_change){i16_delta=max_change;}//limit max change of setpoint to avoid motor stopping by fault
-
-
-  if (i16_delta>((int16_t)setpoint_old)*(-1)) //avoid values < 0 for setpoint
-    {
-
-      ui32_setpoint=(uint32_t)(setpoint_old + i16_delta);
-      //printf("setpoint %lu, Delta %d, current %d, PAS %d, current_target %d\n", ui32_setpoint, i16_delta, ui16_BatteryCurrent, PAS, uint16_current_target);
-    }
-  if (ui32_setpoint>SETPOINT_MAX_VALUE){ui32_setpoint=SETPOINT_MAX_VALUE;}
+    printf("%lu, %d, %d, %d\r\n", ui32_setpoint, PAS>>3, ui16_BatteryCurrent, uint16_current_target);
 
 
 #endif
