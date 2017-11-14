@@ -138,7 +138,7 @@
 // *************************************************************************** //
 // BATTERY
 
-#define BATTERY_LI_ION_CELLS_NUMB	ER 7 // 7S = 24V battery pack
+#define BATTERY_LI_ION_CELLS_NUMBER 7 // 7S = 24V battery pack
 //#define BATTERY_LI_ION_CELLS_NUMBER 10 // 10S = 36V battery pack
 //#define BATTERY_LI_ION_CELLS_NUMBER 13 // 13S = 48V battery pack
 

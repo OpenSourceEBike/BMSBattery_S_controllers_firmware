@@ -336,8 +336,6 @@ uint8_t ui8_value_b;
 uint8_t ui8_value_c;
 uint16_t ui16_value;
 
-uint8_t ui8_commutation_number = 0;
-
 // functions prototypes
 void battery_voltage_protection (void);
 uint8_t motor_current_controller (void);
@@ -365,8 +363,6 @@ void hall_sensors_read_and_action (void)
     switch (ui8_hall_sensors)
     {
       case 3:
-      ui8_commutation_number = 1;
-
       // read here the phase B current: FOC Id current
       ui8_ADC_id_current = ui8_adc_read_phase_B_current ();
       if (ui16_motor_speed_erps > 40)
@@ -382,8 +378,6 @@ void hall_sensors_read_and_action (void)
       break;
 
       case 1:
-      ui8_commutation_number = 2;
-
       if (ui8_half_e_rotation_flag == 1)
       {
 	ui8_half_e_rotation_flag = 0;
@@ -435,8 +429,6 @@ void hall_sensors_read_and_action (void)
       break;
 
       case 5:
-      ui8_commutation_number = 3;
-
       if (ui8_motor_commutation_type != SINEWAVE_INTERPOLATION_360_DEGREES)
       {
 	ui8_motor_rotor_absolute_position = ANGLE_300 + MOTOR_ROTOR_DELTA_PHASE_ANGLE_RIGHT;
@@ -444,8 +436,6 @@ void hall_sensors_read_and_action (void)
       break;
 
       case 4:
-      ui8_commutation_number = 4;
-
       if (ui8_motor_commutation_type != SINEWAVE_INTERPOLATION_360_DEGREES)
       {
 	ui8_motor_rotor_absolute_position = ANGLE_1 + MOTOR_ROTOR_DELTA_PHASE_ANGLE_RIGHT;
@@ -453,8 +443,6 @@ void hall_sensors_read_and_action (void)
       break;
 
       case 6:
-      ui8_commutation_number = 5;
-
       ui8_half_e_rotation_flag = 1;
 
       if (ui8_motor_commutation_type != SINEWAVE_INTERPOLATION_360_DEGREES)
@@ -464,8 +452,6 @@ void hall_sensors_read_and_action (void)
       break;
 
       case 2:
-      ui8_commutation_number = 6;
-
       if (ui8_motor_commutation_type != SINEWAVE_INTERPOLATION_360_DEGREES)
       {
 	ui8_motor_rotor_absolute_position = ANGLE_120 + MOTOR_ROTOR_DELTA_PHASE_ANGLE_RIGHT;
