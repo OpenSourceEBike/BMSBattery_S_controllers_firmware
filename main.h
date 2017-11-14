@@ -67,8 +67,8 @@
 // interpolation 60 degrees and must be found experimentally but a value of 40 may be good
 #define MOTOR_ROTOR_ERPS_START_INTERPOLATION_60_DEGREES 40
 // This value is needed for correct transition to sinewave interpolation and must be found experimentally
-// but may be something like: MOTOR_ROTOR_DELTA_PHASE_ANGLE_RIGHT + 127(180 degrees) + 32(45 degrees)
-#define MOTOR_ROTOR_PHASE_ANGLE_INTERPOLATION 239
+// but may be something like: MOTOR_ROTOR_DELTA_PHASE_ANGLE_RIGHT + 32(45 degrees)
+#define MOTOR_ROTOR_PHASE_ANGLE_INTERPOLATION 112
 
 // For some motors with not very well placed mosfets at 120 degrees between each of them. May be easier to keep disable this option
 //#define DO_SINEWAVE_INTERPOLATION_360_DEGREES

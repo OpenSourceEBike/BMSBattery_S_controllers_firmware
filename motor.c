@@ -524,7 +524,7 @@ void motor_fast_loop (void)
   else
 #endif
   {
-    ui8_motor_rotor_position = ui8_motor_rotor_absolute_position;
+    ui8_motor_rotor_position = ui8_motor_rotor_absolute_position + ui8_position_correction_value;
   }
   /****************************************************************************/
 
