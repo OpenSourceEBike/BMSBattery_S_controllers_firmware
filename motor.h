@@ -36,7 +36,7 @@
 #define MOTOR_CONTROLLER_ERROR_91_BATTERY_UNDER_VOLTAGE 0x91
 
 extern uint8_t ui8_motor_commutation_type;
-extern uint8_t ui8_position_correction_value;
+extern uint8_t ui8_angle_correction;
 extern uint8_t ui8_adc_motor_total_current;
 extern uint8_t ui8_motor_total_current_offset;
 extern volatile uint8_t ui8_duty_cycle;

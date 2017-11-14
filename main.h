@@ -61,7 +61,7 @@
 #if (MOTOR_TYPE == MOTOR_TYPE_Q85) || (MOTOR_TYPE == MOTOR_TYPE_Q100)
 // This value must be found experimenting. Motor should rotate forward and have a good torque,
 // a value to much higher or lower will make the motor not having torque while the motor starting up.
-#define MOTOR_ROTOR_DELTA_PHASE_ANGLE_RIGHT 80
+#define MOTOR_ROTOR_OFFSET_ANGLE 80
 
 // This value is ERPS speed after which a transition happens from sinewave no interpolation to have
 // interpolation 60 degrees and must be found experimentally but a value of 40 may be good

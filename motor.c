@@ -288,9 +288,9 @@ uint16_t ui16_PWM_cycles_counter_6 = 0;
 uint16_t ui16_PWM_cycles_counter_total = 0;
 
 uint16_t ui16_motor_speed_erps = 0;
-uint8_t ui8_motor_rotor_position = 0; // in 360/256 degrees
-uint8_t ui8_motor_rotor_absolute_position = 0; // in 360/256 degrees
-uint8_t ui8_position_correction_value = 127; // in 360/256 degrees
+uint8_t ui8_sinewave_table_index = 0;
+uint8_t ui8_motor_rotor_absolute_angle = 0;
+uint8_t ui8_angle_correction = 127;
 uint8_t ui8_interpolation_angle = 0;
 
 uint8_t ui8_motor_commutation_type = BLOCK_COMMUTATION;
@@ -300,7 +300,7 @@ uint8_t ui8_motor_controller_state = MOTOR_CONTROLLER_STATE_OK;
 uint8_t ui8_hall_sensors = 0;
 uint8_t ui8_hall_sensors_last = 0;
 
-uint8_t ui8_ADC_id_current = 0;
+uint8_t ui8_adc_id_current = 0;
 
 uint8_t ui8_adc_motor_current_max;
 uint8_t ui8_adc_motor_regen_current_max;
@@ -309,19 +309,17 @@ uint8_t ui8_adc_motor_total_current;
 uint8_t ui8_motor_total_current_offset;
 uint16_t ui16_motor_total_current_offset_10b;
 
-uint8_t ui8_half_e_rotation_flag = 0;
+uint8_t ui8_half_erps_flag = 0;
 
 uint16_t ui16_target_erps = 0;
 volatile uint16_t ui16_target_erps_max = MOTOR_OVER_SPEED_ERPS;
 uint16_t ui16_target_current = 0;
 
-uint16_t ui16_ADC_battery_voltage_accumulated = BATTERY_VOLTAGE_MED_VALUE;
-uint8_t ui8_ADC_battery_voltage_filtered;
+uint16_t ui16_adc_battery_voltage_accumulated = BATTERY_VOLTAGE_MED_VALUE;
+uint8_t ui8_adc_battery_voltage_filtered;
 
-uint16_t ui16_ADC_iq_current_accumulated = 0;
-uint8_t ui16_ADC_iq_current_filtered;
-uint16_t ui16_ADC_motor_current_accumulated = ADC_MOTOR_CURRENT_MAX_MED_VALUE_10B;
-uint16_t ui16_ADC_motor_current_filtered;
+uint16_t ui16_adc_motor_current_accumulated = ADC_MOTOR_CURRENT_MAX_MED_VALUE_10B;
+uint16_t ui16_adc_motor_current_filtered;
 
 uint8_t ui8_motor_controller_error = MOTOR_CONTROLLER_ERROR_EMPTY;
 
@@ -340,22 +338,26 @@ uint16_t ui16_value;
 void battery_voltage_protection (void);
 uint8_t motor_current_controller (void);
 uint8_t motor_speed_controller (void);
-void hall_sensors_read_and_action (void);
-void motor_fast_loop (void);
-inline void pwm_apply_duty_cycle (void);
 
+// runs every 64us (PWM frequency)
 void TIM1_UPD_OVF_TRG_BRK_IRQHandler(void) __interrupt(TIM1_UPD_OVF_TRG_BRK_IRQHANDLER)
 {
-  adc_trigger (); // starts ADC scan conversion of all channels
-  hall_sensors_read_and_action ();
-  motor_fast_loop ();
-  TIM1_ClearITPendingBit(TIM1_IT_UPDATE);
-}
+  uint8_t ui8_temp;
 
-void hall_sensors_read_and_action (void)
-{
+  /****************************************************************************/
+  // trigger ADC conversion of all channels (scan conversion, buffered)
+  ADC1->CSR &= 0x09; // clear EOC flag first (selected also channel 9)
+  ADC1->CR1 |= ADC1_CR1_ADON; // Start ADC1 conversion
+
+  /****************************************************************************/
+  // read hall sensor signals and:
+  // - find the motor rotor absolute angle
+  // - read FOC Id current and calc FOC (adjust ui8_angle_correction)
+  // - calc motor speed in erps (ui16_motor_speed_erps)
+
   // read hall sensors signal pins and mask other pins
-  ui8_hall_sensors = (GPIO_ReadInputData (HALL_SENSORS__PORT) & (HALL_SENSORS_MASK));
+  ui8_hall_sensors = ((uint8_t) HALL_SENSORS__PORT->IDR) & (HALL_SENSORS_MASK);
+  // make sure we run next code only when there is a change on the hall sensors signal
   if (ui8_hall_sensors != ui8_hall_sensors_last)
   {
     ui8_hall_sensors_last = ui8_hall_sensors;
@@ -364,23 +366,24 @@ void hall_sensors_read_and_action (void)
     {
       case 3:
       // read here the phase B current: FOC Id current
-      ui8_ADC_id_current = ui8_adc_read_phase_B_current ();
+      ui8_adc_id_current = *(uint8_t*)(0x53EA); // ui8_adc_read_phase_B_current ();
+      // minimum speed that to do FOC
       if (ui16_motor_speed_erps > 40)
       {
-	if (ui8_ADC_id_current > 127) { ui8_position_correction_value++; }
-	else if (ui8_ADC_id_current < 125) { ui8_position_correction_value--; }
+	if (ui8_adc_id_current > 127) { ui8_angle_correction++; }
+	else if (ui8_adc_id_current < 125) { ui8_angle_correction--; }
       }
 
       if (ui8_motor_commutation_type != SINEWAVE_INTERPOLATION_360_DEGREES)
       {
-	ui8_motor_rotor_absolute_position = ANGLE_180 + MOTOR_ROTOR_DELTA_PHASE_ANGLE_RIGHT;
+	ui8_motor_rotor_absolute_angle = ANGLE_180 + MOTOR_ROTOR_OFFSET_ANGLE;
       }
       break;
 
       case 1:
-      if (ui8_half_e_rotation_flag == 1)
+      if (ui8_half_erps_flag == 1)
       {
-	ui8_half_e_rotation_flag = 0;
+	ui8_half_erps_flag = 0;
 	ui16_PWM_cycles_counter_total = ui16_PWM_cycles_counter;
 	ui16_PWM_cycles_counter = 0;
 	ui16_motor_speed_erps = PWM_CYCLES_SECOND / ui16_PWM_cycles_counter_total; // this division takes ~4.2us
@@ -409,52 +412,52 @@ void hall_sensors_read_and_action (void)
 	{
 	  ui8_motor_commutation_type = SINEWAVE_INTERPOLATION_60_DEGREES;
 	  ui8_motor_state = MOTOR_STATE_RUNNING;
-	  ui8_position_correction_value = MOTOR_ROTOR_PHASE_ANGLE_INTERPOLATION;
+	  ui8_angle_correction = MOTOR_ROTOR_PHASE_ANGLE_INTERPOLATION;
 	}
       }
       else
       {
 	if (ui8_motor_commutation_type == SINEWAVE_INTERPOLATION_60_DEGREES)
 	{
-		ui8_motor_commutation_type = BLOCK_COMMUTATION;
-		ui8_motor_state = MOTOR_STATE_RUNNING;
-		ui8_position_correction_value = 127;
+	  ui8_motor_commutation_type = BLOCK_COMMUTATION;
+	  ui8_motor_state = MOTOR_STATE_RUNNING;
+	  ui8_angle_correction = 127;
 	}
       }
 
       if (ui8_motor_commutation_type != SINEWAVE_INTERPOLATION_360_DEGREES)
       {
-	ui8_motor_rotor_absolute_position = ANGLE_240 + MOTOR_ROTOR_DELTA_PHASE_ANGLE_RIGHT;
+	ui8_motor_rotor_absolute_angle = ANGLE_240 + MOTOR_ROTOR_OFFSET_ANGLE;
       }
       break;
 
       case 5:
       if (ui8_motor_commutation_type != SINEWAVE_INTERPOLATION_360_DEGREES)
       {
-	ui8_motor_rotor_absolute_position = ANGLE_300 + MOTOR_ROTOR_DELTA_PHASE_ANGLE_RIGHT;
+	ui8_motor_rotor_absolute_angle = ANGLE_300 + MOTOR_ROTOR_OFFSET_ANGLE;
       }
       break;
 
       case 4:
       if (ui8_motor_commutation_type != SINEWAVE_INTERPOLATION_360_DEGREES)
       {
-	ui8_motor_rotor_absolute_position = ANGLE_1 + MOTOR_ROTOR_DELTA_PHASE_ANGLE_RIGHT;
+	ui8_motor_rotor_absolute_angle = ANGLE_1 + MOTOR_ROTOR_OFFSET_ANGLE;
       }
       break;
 
       case 6:
-      ui8_half_e_rotation_flag = 1;
+      ui8_half_erps_flag = 1;
 
       if (ui8_motor_commutation_type != SINEWAVE_INTERPOLATION_360_DEGREES)
       {
-	ui8_motor_rotor_absolute_position = ANGLE_60 + MOTOR_ROTOR_DELTA_PHASE_ANGLE_RIGHT;
+	ui8_motor_rotor_absolute_angle = ANGLE_60 + MOTOR_ROTOR_OFFSET_ANGLE;
       }
       break;
 
       case 2:
       if (ui8_motor_commutation_type != SINEWAVE_INTERPOLATION_360_DEGREES)
       {
-	ui8_motor_rotor_absolute_position = ANGLE_120 + MOTOR_ROTOR_DELTA_PHASE_ANGLE_RIGHT;
+	ui8_motor_rotor_absolute_angle = ANGLE_120 + MOTOR_ROTOR_OFFSET_ANGLE;
       }
       break;
 
@@ -465,74 +468,63 @@ void hall_sensors_read_and_action (void)
 
     ui16_PWM_cycles_counter_6 = 0;
   }
-}
 
-// runs every 64us (PWM frequency)
-void motor_fast_loop (void)
-{
-  uint8_t ui8_temp;
-
-  // count number of fast loops / PWM cycles
+  /****************************************************************************/
+  // count number of fast loops / PWM cycles and reset some states when motor is near zero speed
   if (ui16_PWM_cycles_counter < PWM_CYCLES_COUNTER_MAX)
   {
     ui16_PWM_cycles_counter++;
     ui16_PWM_cycles_counter_6++;
   }
-  else // happens when motor is stopped or almost stopped
+  else // happens when motor is stopped or near zero speed
   {
     ui16_PWM_cycles_counter = 0;
     ui16_PWM_cycles_counter_6 = 0;
     ui16_motor_speed_erps = 0;
     ui16_PWM_cycles_counter_total = 0xffff;
-    ui8_position_correction_value = 127;
+    ui8_angle_correction = 127;
     ui8_motor_commutation_type = BLOCK_COMMUTATION;
     ui8_motor_state = MOTOR_STATE_STOP;
-    ui8_hall_sensors_last = 0; // this way we force execution of hall sensors code
+    ui8_hall_sensors_last = 0; // this way we force execution of hall sensors code next time
   }
 
   /****************************************************************************/
-  // Sinewave interpolation
-
+  // calc interpolation angle and sinewave table index
 #define DO_INTERPOLATION 1 // may be usefull to disable interpolation when debugging
 #if DO_INTERPOLATION == 1
-  // calculate the interpolation angle
-  // interpolation seems a problem when motor starts, so avoid to do it at very low speed
+  // calculate the interpolation angle (and it doesn't work when motor starts and at very low speeds)
   if (ui8_motor_commutation_type == SINEWAVE_INTERPOLATION_60_DEGREES)
   {
     ui8_interpolation_angle = (ui16_PWM_cycles_counter_6 << 8) / ui16_PWM_cycles_counter_total;
-    ui8_motor_rotor_position = ui8_motor_rotor_absolute_position + ui8_position_correction_value + ui8_interpolation_angle;
+    ui8_sinewave_table_index = ui8_motor_rotor_absolute_angle + ui8_angle_correction + ui8_interpolation_angle;
   }
   else if (ui8_motor_commutation_type == SINEWAVE_INTERPOLATION_360_DEGREES)
   {
     ui8_interpolation_angle = (ui16_PWM_cycles_counter << 8) / ui16_PWM_cycles_counter_total;
-    ui8_motor_rotor_position = ui8_motor_rotor_absolute_position + ui8_position_correction_value + ui8_interpolation_angle;
+    ui8_sinewave_table_index = ui8_motor_rotor_absolute_angle + ui8_angle_correction + ui8_interpolation_angle;
   }
   else
 #endif
   {
-    ui8_motor_rotor_position = ui8_motor_rotor_absolute_position + ui8_position_correction_value;
+    ui8_sinewave_table_index = ui8_motor_rotor_absolute_angle + ui8_angle_correction;
   }
-  /****************************************************************************/
 
   /****************************************************************************/
-  // PWM duty_cycle controller
+  // PWM duty_cycle controller:
+  // - limit motor max current
+  // - limit motor max regen current
+  // - ramp up/down PWM duty_cycle value
 
   // verify motor max current limit
-  ui8_adc_motor_total_current = ui8_adc_read_motor_total_current ();
+  ui8_adc_motor_total_current = *(uint8_t*)(0x53F0); // ui8_adc_read_motor_total_current ();
   if (ui8_adc_motor_total_current > ui8_adc_motor_current_max)  // motor max current, reduce duty_cycle
   {
-    if (ui8_duty_cycle > 0)
-    {
-      ui8_duty_cycle--;
-    }
+    if (ui8_duty_cycle > 0) { ui8_duty_cycle--; }
   }
   // verify motor max regen current limit
   else if (ui8_adc_motor_total_current < ui8_adc_motor_regen_current_max)  // motor max current, increase duty_cycle
   {
-    if (ui8_duty_cycle < 255)
-    {
-      ui8_duty_cycle++;
-    }
+    if (ui8_duty_cycle < 255) { ui8_duty_cycle++; }
   }
   else // no motor current limits, adjust duty_cycle to duty_cycle_target, including ramping
   {
@@ -553,13 +545,12 @@ void motor_fast_loop (void)
       }
     }
   }
-  /****************************************************************************/
 
   /****************************************************************************/
-  // PWM apply duty_cycle
+  // calc final PWM duty_cycle values to be applied to TIMER1
 
   // scale and apply _duty_cycle
-  ui8_temp = ui8_svm_table[ui8_motor_rotor_position];
+  ui8_temp = ui8_svm_table [ui8_sinewave_table_index];
   if (ui8_temp > MIDDLE_PWM_VALUE_DUTY_CYCLE_MAX)
   {
     ui16_value = ((uint16_t) (ui8_temp - MIDDLE_PWM_VALUE_DUTY_CYCLE_MAX)) * ui8_duty_cycle;
@@ -574,7 +565,7 @@ void motor_fast_loop (void)
   }
 
   // add 120 degrees and limit
-  ui8_temp = ui8_svm_table[(uint8_t) (ui8_motor_rotor_position + 85 /* 120º */)];
+  ui8_temp = ui8_svm_table [(uint8_t) (ui8_sinewave_table_index + 85 /* 120º */)];
   if (ui8_temp > MIDDLE_PWM_VALUE_DUTY_CYCLE_MAX)
   {
     ui16_value = ((uint16_t) (ui8_temp - MIDDLE_PWM_VALUE_DUTY_CYCLE_MAX)) * ui8_duty_cycle;
@@ -589,7 +580,7 @@ void motor_fast_loop (void)
   }
 
   // subtract 120 degrees and limit
-  ui8_temp = ui8_svm_table[(uint8_t) (ui8_motor_rotor_position + 171 /* 240º */)];
+  ui8_temp = ui8_svm_table [(uint8_t) (ui8_sinewave_table_index + 171 /* 240º */)];
   if (ui8_temp > MIDDLE_PWM_VALUE_DUTY_CYCLE_MAX)
   {
     ui16_value = ((uint16_t) (ui8_temp - MIDDLE_PWM_VALUE_DUTY_CYCLE_MAX)) * ui8_duty_cycle;
@@ -604,16 +595,22 @@ void motor_fast_loop (void)
   }
 
   // set final duty_cycle value
-  TIM1_SetCompare1((uint16_t) (ui8_value_a << 1));
-  TIM1_SetCompare2((uint16_t) (ui8_value_c << 1));
-  TIM1_SetCompare3((uint16_t) (ui8_value_b << 1));
+  // phase A
+  TIM1->CCR1H = (uint8_t) (ui8_value_a >> 7);
+  TIM1->CCR1L = (uint8_t) (ui8_value_a << 1);
+  // phase B
+  TIM1->CCR2H = (uint8_t) (ui8_value_c >> 7);
+  TIM1->CCR2L = (uint8_t) (ui8_value_c << 1);
+  // phase C
+  TIM1->CCR3H = (uint8_t) (ui8_value_b >> 7);
+  TIM1->CCR3L = (uint8_t) (ui8_value_b << 1);
 
-  if (ui8_motor_controller_state == MOTOR_CONTROLLER_STATE_OK)
-  {
-    // enable PWM outputs
-    TIM1_CtrlPWMOutputs(ENABLE);
-  }
-  /****************************************************************************/
+  // enable PWM signals only when MOTOR_CONTROLLER_STATE_OK
+  if (ui8_motor_controller_state == MOTOR_CONTROLLER_STATE_OK) { TIM1->BKR |= TIM1_BKR_MOE; }
+
+
+  // clears the TIM1 interrupt TIM1_IT_UPDATE pending bit
+  TIM1->SR1 = (uint8_t)(~(uint8_t)TIM1_IT_UPDATE);
 }
 
 void motor_disable_PWM (void)
@@ -805,11 +802,11 @@ uint8_t motor_current_controller (void)
   int16_t i16_motor_current;
 
   // low pass filter the current readed value, to avoid possible fast spikes/noise
-  ui16_ADC_motor_current_accumulated -= ui16_ADC_motor_current_accumulated >> 4;
-  ui16_ADC_motor_current_accumulated += ui16_adc_read_motor_total_current ();
-  ui16_ADC_motor_current_filtered = ui16_ADC_motor_current_accumulated >> 4;
+  ui16_adc_motor_current_accumulated -= ui16_adc_motor_current_accumulated >> 4;
+  ui16_adc_motor_current_accumulated += ui16_adc_read_motor_total_current ();
+  ui16_adc_motor_current_filtered = ui16_adc_motor_current_accumulated >> 4;
 
-  i16_motor_current = (int16_t) (ui16_ADC_motor_current_filtered - ui16_motor_total_current_offset_10b);
+  i16_motor_current = (int16_t) (ui16_adc_motor_current_filtered - ui16_motor_total_current_offset_10b);
   // make sure current is not negative, we are here not to control negative/regen current
   if (i16_motor_current < 0)
   {
@@ -834,11 +831,11 @@ uint8_t motor_current_controller (void)
 void battery_voltage_protection (void)
 {
   // low pass filter the voltage readed value, to avoid possible fast spikes/noise
-  ui16_ADC_battery_voltage_accumulated -= ui16_ADC_battery_voltage_accumulated >> 6;
-  ui16_ADC_battery_voltage_accumulated += ((uint16_t) ui8_adc_read_battery_voltage ());
-  ui8_ADC_battery_voltage_filtered = ui16_ADC_battery_voltage_accumulated >> 6;
+  ui16_adc_battery_voltage_accumulated -= ui16_adc_battery_voltage_accumulated >> 6;
+  ui16_adc_battery_voltage_accumulated += ((uint16_t) ui8_adc_read_battery_voltage ());
+  ui8_adc_battery_voltage_filtered = ui16_adc_battery_voltage_accumulated >> 6;
 
-  if (ui8_ADC_battery_voltage_filtered > BATTERY_VOLTAGE_MAX_VALUE)
+  if (ui8_adc_battery_voltage_filtered > BATTERY_VOLTAGE_MAX_VALUE)
   {
 #ifdef BATTERY_OVER_VOLTAGE_PROTECTION
     // motor will stop and battery symbol on LCD will be empty and flashing | same as low level error
@@ -847,7 +844,7 @@ void battery_voltage_protection (void)
     motor_controller_set_error (MOTOR_CONTROLLER_ERROR_91_BATTERY_UNDER_VOLTAGE);
 #endif
   }
-  else if (ui8_ADC_battery_voltage_filtered < BATTERY_VOLTAGE_MIN_VALUE)
+  else if (ui8_adc_battery_voltage_filtered < BATTERY_VOLTAGE_MIN_VALUE)
   {
     // motor will stop and battery symbol on LCD will be empty and flashing
     motor_controller_set_state (MOTOR_CONTROLLER_STATE_UNDER_VOLTAGE);
@@ -858,7 +855,7 @@ void battery_voltage_protection (void)
 
 uint8_t motor_get_ADC_battery_voltage_filtered (void)
 {
-  return ui8_ADC_battery_voltage_filtered;
+  return ui8_adc_battery_voltage_filtered;
 }
 
 void motor_controller_set_error (uint8_t error)
