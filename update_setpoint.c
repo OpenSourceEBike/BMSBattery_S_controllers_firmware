@@ -96,7 +96,7 @@ uint16_t update_setpoint (uint16_t speed, uint16_t PAS, uint16_t sumtorque, uint
       if (ui32_setpoint<40)ui32_setpoint=0;
       if (ui32_setpoint>255)ui32_setpoint=255;
 
-      printf("%lu, %d, %d, %d\r\n", ui32_setpoint, PAS>>3, ui16_BatteryCurrent, (uint16_t) uint32_current_target);
+      printf("%d, %d, %d, %d\r\n", sumtorque/NUMBER_OF_PAS_MAGS, PAS>>3, ui16_BatteryCurrent, (uint16_t) uint32_current_target);
 
 #endif
 
