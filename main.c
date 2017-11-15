@@ -186,7 +186,7 @@ int main (void)
 
         }
 //in case of THROTTLEANDPAS or THORQUE_SIMULATION, process the PAS routine
-#if defined(THROTTLEANDPAS)
+#if defined(THROTTLE_AND_PAS)
 	      if (ui8_PAS_Flag == 1)
 	      	              {
 	      	                ui16_PAS=ui16_PAS_Counter; 		//save recent cadence

@@ -66,7 +66,7 @@ uint16_t update_setpoint (uint16_t speed, uint16_t PAS, uint16_t sumtorque, uint
       TIM1_CtrlPWMOutputs(DISABLE);
             uint_PWM_Enable=0;
       ui32_setpoint=0;			// next priority: Stop motor if not pedaling
-      printf("you are not pedaling!\n");
+      printf("you are not pedaling!\r\n");
 #endif
 
  /*  current control is now done in all ride modes by default.
