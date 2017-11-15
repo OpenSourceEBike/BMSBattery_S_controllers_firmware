@@ -17,8 +17,9 @@
 #define SINEWAVE_INTERPOLATION_360_DEGREES 	3
 
 #define MOTOR_STATE_STOP 	0
-#define MOTOR_STATE_COAST 	1
-#define MOTOR_STATE_RUNNING 	2
+#define MOTOR_STATE_STARTUP 	1
+#define MOTOR_STATE_COOL 	2
+#define MOTOR_STATE_RUNNING 	3
 
 #define MOTOR_CONTROLLER_STATE_OK		1
 #define MOTOR_CONTROLLER_STATE_BRAKE		2
@@ -56,7 +57,7 @@ uint8_t motor_get_current_max (void); // steps of 0.5A each step
 void motor_set_regen_current_max (uint8_t value); // steps of 0.5A each step
 void motor_set_pwm_duty_cycle_ramp_up_inverse_step (uint16_t value); // each step = 64us
 void motor_set_pwm_duty_cycle_ramp_down_inverse_step (uint16_t value); // each step = 64us
-uint16_t motor_get_motor_speed_erps (void);
+uint16_t ui16_motor_get_motor_speed_erps (void);
 uint16_t motor_get_er_PWM_ticks (void); // PWM ticks per electronic rotation
 void motor_controller_set_state (uint8_t state);
 void motor_controller_reset_state (uint8_t state);
