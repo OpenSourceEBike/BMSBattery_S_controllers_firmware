@@ -121,7 +121,7 @@
 #define ADC_THROTTLE_MAX_VALUE 182
 #define ADC_THROTTLE_MIN_VALUE_ERROR 35
 #define ADC_THROTTLE_MAX_VALUE_ERROR 192
-#define CRUISE_CONTROL_MIN_VALUE (ADC_THROTTLE_MIN_VALUE + 25)
+#define CRUISE_CONTROL_MIN_VALUE 20
 
 
 // *************************************************************************** //
