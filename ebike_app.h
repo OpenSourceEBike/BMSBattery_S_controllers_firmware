@@ -26,5 +26,6 @@ void ebike_app_controller (void);
 void ebike_app_cruise_control_stop (void);
 uint8_t ebike_app_get_adc_throttle_value_cruise_control (void);
 struc_lcd_configuration_variables *ebike_app_get_lcd_configuration_variables (void);
+uint8_t ui8_ebike_app_get_motor_speed (void);
 
 #endif /* _EBIKE_APP_H_ */

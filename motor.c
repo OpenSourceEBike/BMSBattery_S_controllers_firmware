@@ -294,7 +294,8 @@ uint8_t ui8_angle_correction = 127;
 uint8_t ui8_interpolation_angle = 0;
 
 uint8_t ui8_motor_commutation_type = BLOCK_COMMUTATION;
-uint8_t ui8_motor_state = MOTOR_STATE_COAST;
+volatile uint8_t ui8_motor_state = MOTOR_STATE_STOP;
+uint8_t ui8_motor_startup_counter;
 uint8_t ui8_motor_controller_state = MOTOR_CONTROLLER_STATE_OK;
 
 uint8_t ui8_hall_sensors = 0;
@@ -419,7 +420,6 @@ void TIM1_UPD_OVF_TRG_BRK_IRQHandler(void) __interrupt(TIM1_UPD_OVF_TRG_BRK_IRQH
 	if (ui8_motor_commutation_type == SINEWAVE_INTERPOLATION_60_DEGREES)
 	{
 	  ui8_motor_commutation_type = BLOCK_COMMUTATION;
-	  ui8_motor_state = MOTOR_STATE_RUNNING;
 	  ui8_angle_correction = 127;
 	}
       }
@@ -695,7 +695,7 @@ void motor_set_pwm_duty_cycle_ramp_down_inverse_step (uint16_t ui16_value)
   ui16_duty_cycle_ramp_down_inverse_step = ui16_value;
 }
 
-uint16_t motor_get_motor_speed_erps (void)
+uint16_t ui16_motor_get_motor_speed_erps (void)
 {
   return ui16_motor_speed_erps;
 }
@@ -721,6 +721,54 @@ void motor_controller (void)
   uint8_t ui8_pwm_duty_cycle_b;
   uint8_t ui8_pwm_duty_cycle_c;
   struc_lcd_configuration_variables *p_lcd_configuration_variables = ebike_app_get_lcd_configuration_variables ();
+
+  switch (ui8_motor_state)
+  {
+    case MOTOR_STATE_STOP:
+    if (ui8_ebike_app_get_motor_speed() < 6) // less than 6km/h
+    {
+      // start the startup phase, use motor max current
+      ui8_motor_startup_counter = 0;
+      ui8_motor_state = MOTOR_STATE_STARTUP;
+      motor_set_current_max (ADC_MOTOR_CURRENT_MAX);
+    }
+    else
+    {
+      ui8_motor_state = MOTOR_STATE_RUNNING;
+    }
+    break;
+
+    // startup phase where the controller max current is used
+    case MOTOR_STATE_STARTUP:
+    if (ui8_motor_startup_counter++ > 25) // 25 * 100ms; 2.5 seconds max time
+    {
+      ui8_motor_state = MOTOR_STATE_COOL;
+      ui8_motor_startup_counter = 0;
+    }
+
+    if (ui8_ebike_app_get_motor_speed() > 5) // 6km/h or higher speed, leave startup
+    {
+      motor_set_current_max (ADC_MOTOR_CURRENT_NOMINAL);
+      ui8_motor_state = MOTOR_STATE_RUNNING;
+    }
+    break;
+
+    // running mode where the controller nominal current is used
+    case MOTOR_STATE_RUNNING:
+    // do nothing
+    break;
+
+    // wait for the power mosfets cool down
+    case MOTOR_STATE_COOL:
+    if (ui8_motor_startup_counter++ > 10) // 1 second timeout
+    {
+      ui8_motor_state = MOTOR_STATE_STOP;
+    }
+    break;
+
+    default:
+    break;
+  }
 
   battery_voltage_protection ();
 
@@ -773,7 +821,7 @@ uint8_t motor_speed_controller (void)
     return 0;
   }
 
-  i16_motor_speed_erps = (int16_t) motor_get_motor_speed_erps ();
+  i16_motor_speed_erps = (int16_t) ui16_motor_get_motor_speed_erps ();
 
   // if MOTOR_OVER_SPEED_ERPS, then limit for this value and not user defined ui16_target_erps
   if (ui16_target_erps > MOTOR_OVER_SPEED_ERPS) { i16_error = MOTOR_OVER_SPEED_ERPS - i16_motor_speed_erps; }
