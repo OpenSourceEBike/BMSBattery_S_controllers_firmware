@@ -31,7 +31,7 @@ volatile struc_lcd_configuration_variables lcd_configuration_variables;
 uint8_t ui8_received_package_flag = 0;
 volatile float f_controller_max_current;
 float f_motor_speed = 0;
-uint8_t ui8_motor_speed = 0;
+uint8_t ui8_wheel_speed = 0;
 float f_wheel_size = 2.0625; // 26'' wheel
 uint8_t ui8_tx_buffer[12];
 uint8_t ui8_i;
@@ -65,7 +65,7 @@ void ebike_app_controller (void)
   ui32_temp1 = ui16_motor_get_motor_speed_erps () * 3600;
   f_motor_speed = ((float) ui32_temp1) * f_wheel_size;
   f_motor_speed /= (float) ui32_temp;
-  ui8_motor_speed = (uint8_t) f_motor_speed;
+  ui8_wheel_speed = (uint8_t) f_motor_speed;
 
   communications_controller ();
   throttle_pas_torque_sensor_controller ();
@@ -121,9 +121,18 @@ void throttle_pas_torque_sensor_controller (void)
   }
 }
 
+// cruise control will save throttle value and use it even if user releases throttle
+// user must keep throttle in the same position for over 8 seconds to start the cruise control
 uint8_t ebike_app_cruise_control (uint8_t ui8_value)
 {
-  // Cruise control
+  // reset cruise control if wheel speed is less than 6km/h
+  if (ui8_ebike_app_get_wheel_speed () < 6)
+  {
+    ui8_cruise_state = 0;
+    ui8_cruise_counter = 0;
+    return ui8_value;
+  }
+
   switch (ui8_cruise_state)
   {
     case 0:
@@ -498,8 +507,8 @@ uint8_t ebike_app_get_adc_throttle_value_cruise_control (void)
   return ui8_adc_throttle_value_cruise_control;
 }
 
-uint8_t ui8_ebike_app_get_motor_speed (void)
+uint8_t ui8_ebike_app_get_wheel_speed (void)
 {
-  return ui8_motor_speed;
+  return ui8_wheel_speed;
 }
 

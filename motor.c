@@ -725,7 +725,7 @@ void motor_controller (void)
   switch (ui8_motor_state)
   {
     case MOTOR_STATE_STOP:
-    if (ui8_ebike_app_get_motor_speed() < 6) // less than 6km/h
+    if (ui8_ebike_app_get_wheel_speed() < 6) // less than 6km/h
     {
       // start the startup phase, use motor max current
       ui8_motor_startup_counter = 0;
@@ -746,7 +746,7 @@ void motor_controller (void)
       ui8_motor_startup_counter = 0;
     }
 
-    if (ui8_ebike_app_get_motor_speed() > 5) // 6km/h or higher speed, leave startup
+    if (ui8_ebike_app_get_wheel_speed() > 5) // 6km/h or higher speed, leave startup
     {
       motor_set_current_max (ADC_MOTOR_CURRENT_NOMINAL);
       ui8_motor_state = MOTOR_STATE_RUNNING;
