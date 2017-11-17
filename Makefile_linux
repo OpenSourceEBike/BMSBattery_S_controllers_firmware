@@ -46,6 +46,7 @@ EXTRASRCS = \
 	timers.c \
 	pwm.c \
 	eeprom.c \
+	PAS.c \
 	motor.c \
 	ebike_app.c \
 

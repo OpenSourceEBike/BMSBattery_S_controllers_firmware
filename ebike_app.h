@@ -22,6 +22,8 @@ typedef struct _lcd_configuration_variables
   uint8_t ui8_controller_max_current;
 } struc_lcd_configuration_variables;
 
+extern uint16_t ui16_pas_timer2_ticks;
+
 void ebike_app_controller (void);
 void ebike_app_cruise_control_stop (void);
 uint8_t ebike_app_get_adc_throttle_value_cruise_control (void);

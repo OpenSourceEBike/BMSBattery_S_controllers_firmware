@@ -24,6 +24,7 @@
 #include "ebike_app.h"
 #include "eeprom.h"
 #include "motor.h"
+#include "PAS.h"
 
 uint16_t ui16_TIM2_counter = 0;
 uint16_t ui16_motor_controller_counter = 0;
@@ -65,6 +66,24 @@ void UART2_IRQHandler(void) __interrupt(UART2_IRQHANDLER);
 /////////////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////////////
 
+// motor overcurrent interrupt
+void EXTI_PORTD_IRQHandler(void) __interrupt(EXTI_PORTD_IRQHANDLER)
+{
+  // find the pin that has caused the interrupt
+  if (!GPIO_ReadInputPin(CURRENT_MOTOR_TOTAL_OVER__PORT,CURRENT_MOTOR_TOTAL_OVER__PIN)) // over current handling
+  {
+    // motor will stop and error symbol on LCD will be shown
+    motor_controller_set_state (MOTOR_CONTROLLER_STATE_OVER_CURRENT);
+    motor_disable_PWM ();
+    motor_controller_set_error (MOTOR_CONTROLLER_ERROR_06_SHORT_CIRCUIT);
+  }
+  else if (!GPIO_ReadInputPin (PAS__PORT, PAS__PIN)) // PAS handling
+  {
+    ui16_pas_timer2_ticks = ((uint16_t) TIM2->CNTRH << 8);
+    ui16_pas_timer2_ticks = (uint16_t) (ui16_pas_timer2_ticks | ((uint16_t) (TIM2->CNTRL)));
+  }
+}
+
 int main (void)
 {
   //set clock at the max 16MHz
@@ -81,6 +100,7 @@ int main (void)
   adc_init ();
   eeprom_init ();
   motor_init ();
+  PAS_init ();
   enableInterrupts ();
 
   while (1)
@@ -92,7 +112,7 @@ int main (void)
     // because of continue; at the end of each if code block that will stop the while (1) loop there,
     // the first if block code will have the higher priority over the others
     ui16_TIM2_counter = TIM2_GetCounter ();
-    if ((ui16_TIM2_counter - ui16_motor_controller_counter) > 100) // every 100ms
+    if ((ui16_TIM2_counter - ui16_motor_controller_counter) > 781) // every 100ms
     {
       ui16_motor_controller_counter = ui16_TIM2_counter;
       motor_controller ();
@@ -100,7 +120,7 @@ int main (void)
     }
 
     ui16_TIM2_counter = TIM2_GetCounter ();
-    if ((ui16_TIM2_counter - ui16_ebike_app_controller_counter) > 100) // every 100ms
+    if ((ui16_TIM2_counter - ui16_ebike_app_controller_counter) > 781) // every 100ms
     {
       ui16_ebike_app_controller_counter = ui16_TIM2_counter;
       ebike_app_controller ();

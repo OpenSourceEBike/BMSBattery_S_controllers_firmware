@@ -48,8 +48,8 @@ void adc_init (void)
   // read and discard few samples of ADC, to make sure the next samples are ok
   for (ui8_i = 0; ui8_i < 4; ui8_i++)
   {
-    ui16_counter = TIM2_GetCounter () + 10;
-    while (TIM2_GetCounter () < ui16_counter) ; // delay
+    ui16_counter = TIM2_GetCounter () + 78;
+    while (TIM2_GetCounter () < ui16_counter) ; // delay ~10ms
     adc_trigger ();
     ui8_motor_total_current_offset = ui8_adc_read_motor_total_current ();
   }
@@ -58,7 +58,7 @@ void adc_init (void)
   ui16_motor_total_current_offset_10b = 0;
   for (ui8_i = 0; ui8_i < 16; ui8_i++)
   {
-    ui16_counter = TIM2_GetCounter () + 10;
+    ui16_counter = TIM2_GetCounter () + 78; // delay ~10ms
     while (TIM2_GetCounter () < ui16_counter) ;
     adc_trigger ();
     ui16_motor_total_current_offset_10b += ui16_adc_read_motor_total_current ();

@@ -48,6 +48,9 @@ uint8_t ui8_state_machine = 0;
 uint8_t ui8_adc_throttle_value;
 uint8_t ui8_adc_throttle_value_cruise_control;
 
+uint16_t ui16_pas_timer2_ticks;
+uint16_t ui16_pas_cadence;
+
 // function prototypes
 void throttle_pas_torque_sensor_controller (void);
 void communications_controller (void);
@@ -66,6 +69,10 @@ void ebike_app_controller (void)
   f_motor_speed = ((float) ui32_temp1) * f_wheel_size;
   f_motor_speed /= (float) ui32_temp;
   ui8_motor_speed = (uint8_t) f_motor_speed;
+
+  // calc PAS cadence
+#define PAS_MAX_CADENCE_RPM = 100
+  ui16_pas_cadence = ui16_pas_timer2_ticks / PAS_MAX_CADENCE_RPM;
 
   communications_controller ();
   throttle_pas_torque_sensor_controller ();

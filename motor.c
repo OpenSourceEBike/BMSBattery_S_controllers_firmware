@@ -705,15 +705,6 @@ uint16_t motor_get_er_PWM_ticks (void)
   return ui16_PWM_cycles_counter_total;
 }
 
-// motor overcurrent interrupt
-void EXTI_PORTD_IRQHandler(void) __interrupt(EXTI_PORTD_IRQHANDLER)
-{
-  // motor will stop and error symbol on LCD will be shown
-  motor_controller_set_state (MOTOR_CONTROLLER_STATE_OVER_CURRENT);
-  motor_disable_PWM ();
-  motor_controller_set_error (MOTOR_CONTROLLER_ERROR_06_SHORT_CIRCUIT);
-}
-
 void motor_controller (void)
 {
   uint8_t ui8_current_pwm_duty_cycle;

@@ -15,7 +15,7 @@ void timer2_init (void)
 
   // TIM2 Peripheral Configuration
   TIM2_DeInit();
-  TIM2_TimeBaseInit(TIM2_PRESCALER_16384, 0xffff); // each incremment at every ~1ms
+  TIM2_TimeBaseInit(TIM2_PRESCALER_2048, 0xffff); // each incremment at every ~128us
   TIM2_Cmd(ENABLE); // TIM2 counter enable
 
   // IMPORTANT: this software delay is needed so timer2 work after this
