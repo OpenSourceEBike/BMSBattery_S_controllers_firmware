@@ -412,7 +412,6 @@ void TIM1_UPD_OVF_TRG_BRK_IRQHandler(void) __interrupt(TIM1_UPD_OVF_TRG_BRK_IRQH
 	{
 	  ui8_motor_commutation_type = SINEWAVE_INTERPOLATION_60_DEGREES;
 	  ui8_motor_state = MOTOR_STATE_RUNNING;
-	  ui8_angle_correction = MOTOR_ROTOR_PHASE_ANGLE_INTERPOLATION;
 	}
       }
       else
