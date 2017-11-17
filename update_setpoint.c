@@ -26,62 +26,56 @@
 
 static uint32_t ui32_setpoint; // local version of setpoint
 uint32_t ui32_SPEED_km_h; //global variable Speed
-static int16_t i16_delta; // difference between setpoint and actual value
 int16_t i16_assistlevel[5]={LEVEL_1, LEVEL_2, LEVEL_3, LEVEL_4, LEVEL_5}; // difference between setpoint and actual value
-uint32_t uint32_current_target=0;
-float float_temp=-1.15;
-int8_t uint_PWM_Enable=0;
-uint16_t ui16_dutycycle_max=0;
-uint16_t ui16_a=0;
-uint16_t ui16_b=0;
-uint16_t ui16_BatteryCurrent_accumulated = 2496L; //8x current offset
-uint16_t ui16_BatteryCurrent;
-uint8_t ui8_BatteryVoltage;
-uint16_t ui16_counter;
-uint16_t ui16_PAS_accumulated = 64000L;
-
-
-
+uint32_t uint32_current_target=0; //target for PI-Control
+float float_temp=0; //for float calculations
+int8_t uint_PWM_Enable=0; //flag for PWM state
+uint16_t ui16_BatteryCurrent_accumulated = 2496L; //8x current offset, for filtering or Battery Current
+uint16_t ui16_BatteryCurrent; //Battery Current read from ADC8
+uint8_t ui8_BatteryVoltage; //Battery Voltage read from ADC
+static uint16_t ui16_PAS_accumulated = 64000L; // for filtering of PAS value
+static uint32_t ui32_erps_accumulated; //for filtering of erps
+uint32_t ui32_erps_filtered; //filtered value of erps
 
 
 uint16_t update_setpoint (uint16_t speed, uint16_t PAS, uint16_t sumtorque, uint16_t setpoint_old)
 {
-
   ui16_BatteryCurrent_accumulated -= ui16_BatteryCurrent_accumulated>>3;
   ui16_BatteryCurrent_accumulated += ui16_adc_read_motor_total_current();
   ui16_BatteryCurrent = ui16_BatteryCurrent_accumulated>>3;
   ui8_BatteryVoltage = ui8_adc_read_battery_voltage();
 
-   ui32_SPEED_km_h=(wheel_circumference*PWM_CYCLES_SECOND*36L)/(10000L*(uint32_t)speed);			//calculate speed in km/h conversion fr	om sec to hour --> *3600, conversion from mm to km --> /1000000, tic frequency 15625 Hz
+  ui32_erps_accumulated-=ui32_erps_accumulated>>3;
+  ui32_erps_accumulated+=ui16_motor_speed_erps;
+  ui32_erps_filtered=ui32_erps_accumulated>>3;
+
+
+  ui32_SPEED_km_h=(wheel_circumference*PWM_CYCLES_SECOND*36L)/(10000L*(uint32_t)speed);			//calculate speed in km/h conversion fr	om sec to hour --> *3600, conversion from mm to km --> /1000000, tic frequency 15625 Hz
   if(ui16_SPEED_Counter>40000){ui32_SPEED_km_h=0;}     //if wheel isn't turning, reset speed
+
+  //check for undervoltage
   if(ui8_BatteryVoltage<BATTERY_VOLTAGE_MIN_VALUE){
       ui32_setpoint=0; 	// highest priority: Stop motor for undervoltage protection
       TIM1_CtrlPWMOutputs(DISABLE);
             uint_PWM_Enable=0;
             ui32_setpoint=0; 	// highest priority: Stop motor for undervoltage protection
       printf("Low voltage! %d\n",ui8_BatteryVoltage);
-
+    }
+  //check if pedals are turning
 #ifndef THROTTLE
-  }else if (ui16_PAS_Counter>timeout){
+  else if (ui16_PAS_Counter>timeout){
       TIM1_CtrlPWMOutputs(DISABLE);
             uint_PWM_Enable=0;
-      ui32_setpoint=0;			// next priority: Stop motor if not pedaling
+            ui32_setpoint= PI_control(ui16_BatteryCurrent, -1*current_cal_b);//Curret target = 0 A, this is to keep the integral part of the PI-control up to date
+                  if (ui32_setpoint<30){ui32_setpoint=0;}
+                  if (ui32_setpoint>255){ui32_setpoint=255;}
       printf("you are not pedaling!\r\n");
+  }
 #endif
 
- /*  current control is now done in all ride modes by default.
-     }else if(ui16_BatteryCurrent>BATTERY_CURRENT_MAX_VALUE){
-      if (ui32_setpoint>ADC_THROTTLE_MIN_VALUE){
-	  //ui32_setpoint=(uint32_t)(setpoint_old-(ui16_BatteryCurrent-BATTERY_CURRENT_MAX_VALUE));
-	  printf("Battery Current too high!, setpoint %lu, setpoint_old %d\n",ui32_setpoint, setpoint_old);
-      }  //next priority: reduce (old) setpoint if battery current is too high*/
+  else {
 
-
-  }else if (ui32_SPEED_km_h>limit && setpoint_old>(ui32_SPEED_km_h-limit) && ui8_cheat_state!=4){
-      ui32_setpoint=(uint32_t)setpoint_old-(ui32_SPEED_km_h-limit); 	//next priority: reduce (old) setpoint, if you are riding too fast
-      printf("Speed too high!\n");
-
-  }else {								//if none of the overruling boundaries are concerned, calculate new setpoint
+      //if none of the overruling boundaries are concerned, calculate new setpoint
 #ifdef TORQUESENSOR
       ui16_PAS_accumulated-=ui16_PAS_accumulated>>3;
       ui16_PAS_accumulated+=PAS;
@@ -92,33 +86,24 @@ uint16_t update_setpoint (uint16_t speed, uint16_t PAS, uint16_t sumtorque, uint
 	  printf("Current target %lu\r\n", uint32_current_target);
 	  uint32_current_target=BATTERY_CURRENT_MAX_VALUE;
       }
+      uint32_current_target = CheckSpeed ((uint16_t) uint32_current_target, (uint16_t) ui32_erps_filtered);
       ui32_setpoint= PI_control(ui16_BatteryCurrent, uint32_current_target);
-      if (ui32_setpoint<40)ui32_setpoint=0;
+      if (ui32_setpoint<30)ui32_setpoint=0;
       if (ui32_setpoint>255)ui32_setpoint=255;
 
-      printf("%d, %d, %d, %d\r\n", sumtorque/NUMBER_OF_PAS_MAGS, PAS>>3, ui16_BatteryCurrent, (uint16_t) uint32_current_target);
+      printf("%lu, %d, %d, %d\r\n", ui32_setpoint, PAS>>3, ui16_BatteryCurrent, (uint16_t) uint32_current_target);
 
 #endif
 
 #if defined(THROTTLE)  || defined(THROTTLE_AND_PAS)
- /* if (sumtorque>10 && setpoint_old-10>sumtorque){
-      TIM1_CtrlPWMOutputs(DISABLE);
-      uint_PWM_Enable=0;
-      //printf("Floating!\n");
-  }
-  else if (!uint_PWM_Enable && sumtorque>setpoint_old){
-      TIM1_CtrlPWMOutputs(ENABLE);
-      uint_PWM_Enable=1;
-      //printf("PWM enabled!\n");
-  }*/
-  //ui16_a = (255L*(370L/MOTOR_VELOCITY_CONSTANT))/ui8_BatteryVoltage;
-  //ui16_b = ((BATTERY_CURRENT_MAX_VALUE+current_cal_b)*((255*((MOTOR_RESISTANCE*37L)/ui8_BatteryVoltage))/100L))/1000;
-  float_temp=(float)sumtorque*(float)(BATTERY_CURRENT_MAX_VALUE+current_cal_b)/255.0-(float)current_cal_b;
-  ui32_setpoint= PI_control(ui16_BatteryCurrent, (uint16_t)float_temp);
-  if (ui32_setpoint<40)ui32_setpoint=0;
+  float_temp=(float)sumtorque*(float)(BATTERY_CURRENT_MAX_VALUE+current_cal_b)/255.0-(float)current_cal_b; //calculate current target
+
+  uint32_current_target = CheckSpeed ((uint16_t)float_temp, (uint16_t) ui32_erps_filtered); //limit speed
+  ui32_setpoint= PI_control(ui16_BatteryCurrent, (uint16_t) uint32_current_target);
+  if (ui32_setpoint<30)ui32_setpoint=0;
   if (ui32_setpoint>255)ui32_setpoint=255;
 
-  printf("%lu, %d, %d, %d\r\n", ui32_setpoint, sumtorque, ui16_BatteryCurrent, (uint16_t)float_temp);
+  printf("%lu, %lu, %d, %d\r\n", ui32_setpoint, ui32_SPEED_km_h, ui16_BatteryCurrent, (uint16_t) uint32_current_target);
   //printf("setpoint %lu, Voltage %d, a %d, b %d, DCmax %d, erps %d\n", ui32_setpoint, ui8_BatteryVoltage, ui16_a, ui16_b, ui16_dutycycle_max, ui16_motor_speed_erps);
 #endif
 
@@ -132,24 +117,24 @@ uint16_t update_setpoint (uint16_t speed, uint16_t PAS, uint16_t sumtorque, uint
       float_temp=((float)RAMP_END)/((float)PAS);
 
       uint32_current_target= ((int16_t)(uint32_current_target)*(int16_t)(float_temp*100))/100-current_cal_b;
-      //printf("PAS %d, delta %d, current target %d\n", PAS, (int16_t)(float_temp*100), uint32_current_target);
+      //printf("PAS %d, delta %d, current target %d\r\n", PAS, (int16_t)(float_temp*100), (int16_t) uint32_current_target);
     }
   else
     {
       uint32_current_target= (i16_assistlevel[ui8_assistlevel_global-1]*(BATTERY_CURRENT_MAX_VALUE+current_cal_b)/100-current_cal_b);
-      //printf("current_target %d\n", uint32_current_target);
+      //printf("current_target %d\r\n", (int16_t)uint32_current_target);
     }
 
+  uint32_current_target = CheckSpeed ((uint16_t) uint32_current_target, (uint16_t) ui32_erps_filtered);
+
   ui32_setpoint= PI_control(ui16_BatteryCurrent, uint32_current_target);
-    if (ui32_setpoint<40)ui32_setpoint=0;
+    if (ui32_setpoint<30)ui32_setpoint=0;
     if (ui32_setpoint>255)ui32_setpoint=255;
 
     printf("%lu, %d, %d, %d\r\n", ui32_setpoint, PAS>>3, ui16_BatteryCurrent, (uint16_t) uint32_current_target);
-
-
 #endif
 
- if (!uint_PWM_Enable)
+ if (!uint_PWM_Enable) //enable PWM if disabled
      {
         TIM1_CtrlPWMOutputs(ENABLE);
         uint_PWM_Enable=1;
@@ -159,16 +144,37 @@ uint16_t update_setpoint (uint16_t speed, uint16_t PAS, uint16_t sumtorque, uint
 
   return ui32_setpoint;
 
-}
+} //end of update setpoint function
+
+
 
 uint32_t PI_control (uint16_t ist, uint16_t soll)
 {
   float float_p;
   static float float_i;
-  float_p=((float)soll - (float)ist)*0.5;
+  float_p=((float)soll - (float)ist)*P_FACTOR;
   if (float_p>3)float_p=5;
   if (float_p<-3)float_p=-5;
-  float_i+=((float)soll - (float)ist)*0.2;
-  //printf("soll %d, ist %d, P-Anteil %d,I-Anteil %d\n", soll, ist, (int16_t)float_p, (int16_t)float_i);
+  float_i+=((float)soll - (float)ist)*I_FACTOR;
+  if (float_i>255)float_i=255;
+  if (float_i<0)float_i=0;
+  //printf("soll %d, ist %d, P-Anteil %d,I-Anteil %d\r\n", soll, ist, (int16_t)float_p, (int16_t)float_i);
   return ((uint32_t)(float_p+float_i));
 }
+
+uint32_t CheckSpeed (uint16_t current_target, uint16_t erps)
+{
+  //ramp down motor power if you are riding too fast and speed liming is active
+  if (erps>(limit)*GEAR_RATIO && ui8_cheat_state!=4){
+
+	if (erps>(limit+2)*GEAR_RATIO){ //if you are riding much too fast, stop motor immediately
+	    current_target=-1*current_cal_b;
+	    printf("Speed much too high!\r\n", erps);
+	}
+	else {
+	    current_target=((current_target+current_cal_b)*((limit+2)*GEAR_RATIO-erps))/(2*8)-current_cal_b; 	//ramp down the motor power within 2 km/h, if you are riding too fast
+	    printf("Speed too high!\r\n");
+	}
+  }
+    return ((uint32_t)current_target);
+  }
