@@ -65,6 +65,9 @@ public class OSEC extends JFrame {
 	private JTextField Cheat_Time_2;
 	private JTextField Cheat_Time_3;
 	private JTextField ramp_end;
+	private JTextField p_factor;
+	private JTextField i_factor;
+	private JTextField GearRatio;
 	
 	
 
@@ -343,6 +346,36 @@ public class OSEC extends JFrame {
 		lblUndervoltageLimit.setBounds(5, 322, 121, 14);
 		contentPane.add(lblUndervoltageLimit);
 		
+		JLabel lblPfactor = new JLabel("Gain P");
+		lblPfactor.setBounds(295, 384, 67, 14);
+		contentPane.add(lblPfactor);
+		
+		p_factor = new JTextField();
+		p_factor.setText("0.5");
+		p_factor.setColumns(10);
+		p_factor.setBounds(382, 381, 86, 20);
+		contentPane.add(p_factor);
+		
+		JLabel lblIfactor = new JLabel("Gain I");
+		lblIfactor.setBounds(295, 415, 67, 14);
+		contentPane.add(lblIfactor);
+		
+		i_factor = new JTextField();
+		i_factor.setText("0.2");
+		i_factor.setColumns(10);
+		i_factor.setBounds(382, 412, 86, 20);
+		contentPane.add(i_factor);
+		
+		JLabel lblGearRatio = new JLabel("Gear Ratio");
+		lblGearRatio.setBounds(5, 446, 131, 14);
+		contentPane.add(lblGearRatio);
+		
+		GearRatio = new JTextField();
+		GearRatio.setText("8");
+		GearRatio.setColumns(10);
+		GearRatio.setBounds(150, 443, 86, 20);
+		contentPane.add(GearRatio);
+				
 		JRadioButton rdbtnThrottle = new JRadioButton("Throttle");
 		Ridingmode.add(rdbtnThrottle);
 		rdbtnThrottle.setBounds(136, 506, 109, 23);
@@ -479,7 +512,12 @@ public class OSEC extends JFrame {
 		            pWriter.println(text_to_save);
 		            text_to_save = "#define RAMP_END " + ramp_end.getText();
 		            pWriter.println(text_to_save);
-		            
+		            text_to_save = "#define P_FACTOR " + p_factor.getText();
+		            pWriter.println(text_to_save); 
+		            text_to_save = "#define I_FACTOR " + i_factor.getText();
+		            pWriter.println(text_to_save); 
+		            text_to_save = "#define GEAR_RATIO " + GearRatio.getText()+"L";
+		            pWriter.println(text_to_save); 		            
 		            
 		    		if (rdbtnTorqueSensor.isSelected()){ 
 			            text_to_save = "#define TORQUESENSOR";
@@ -530,18 +568,6 @@ public class OSEC extends JFrame {
 		btnWriteConfiguration.setBounds(295, 471, 167, 58);
 		contentPane.add(btnWriteConfiguration);
 		
-
 		
-
-		
-
-		
-		
-		
-
-		
-
-		
-
 	}
 }
