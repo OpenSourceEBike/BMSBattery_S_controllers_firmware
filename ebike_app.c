@@ -345,6 +345,7 @@ void communications_set_controller_max_current_factor (float value)
 
 void set_speed_erps_max_to_motor_controller (struc_lcd_configuration_variables *lcd_configuration_variables)
 {
+  float f_wheel_size;
   uint32_t ui32_temp;
   float f_temp;
 
