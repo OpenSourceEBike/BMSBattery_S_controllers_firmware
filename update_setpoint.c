@@ -172,7 +172,7 @@ uint32_t CheckSpeed (uint16_t current_target, uint16_t erps)
 	    printf("Speed much too high!\r\n", erps);
 	}
 	else {
-	    current_target=((current_target+current_cal_b)*((limit+2)*GEAR_RATIO-erps))/(2*8)-current_cal_b; 	//ramp down the motor power within 2 km/h, if you are riding too fast
+	    current_target=((current_target+current_cal_b)*((limit+2)*GEAR_RATIO-erps))/(2*GEAR_RATIO)-current_cal_b; 	//ramp down the motor power within 2 km/h, if you are riding too fast
 	    printf("Speed too high!\r\n");
 	}
   }
