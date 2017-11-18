@@ -30,9 +30,6 @@ uint8_t ui8_cruise_value = 0;
 volatile struc_lcd_configuration_variables lcd_configuration_variables;
 uint8_t ui8_received_package_flag = 0;
 volatile float f_controller_max_current;
-float f_motor_speed = 0;
-uint8_t ui8_motor_speed = 0;
-float f_wheel_size = 2.0625; // 26'' wheel
 uint8_t ui8_tx_buffer[12];
 uint8_t ui8_i;
 uint8_t ui8_crc;
@@ -47,6 +44,7 @@ uint8_t ui8_state_machine = 0;
 
 uint8_t ui8_adc_throttle_value;
 uint8_t ui8_adc_throttle_value_cruise_control;
+uint8_t ui8_throttle_value;
 
 // function prototypes
 void throttle_pas_torque_sensor_controller (void);
@@ -57,16 +55,6 @@ float f_get_controller_max_current (uint8_t ui8_controller_max_current);
 
 void ebike_app_controller (void)
 {
-  uint32_t ui32_temp;
-  uint32_t ui32_temp1;
-
-  // calc motor speed in km/h
-  ui32_temp = lcd_configuration_variables.ui8_motor_characteristic * 1000;
-  ui32_temp1 = ui16_motor_get_motor_speed_erps () * 3600;
-  f_motor_speed = ((float) ui32_temp1) * f_wheel_size;
-  f_motor_speed /= (float) ui32_temp;
-  ui8_motor_speed = (uint8_t) f_motor_speed;
-
   communications_controller ();
   throttle_pas_torque_sensor_controller ();
 }
@@ -89,36 +77,37 @@ void throttle_pas_torque_sensor_controller (void)
     motor_controller_set_error (MOTOR_CONTROLLER_ERROR_01_THROTTLE);
   }
 
+  ui8_throttle_value = (uint8_t) (map ((int32_t) ui8_adc_throttle_value, ADC_THROTTLE_MIN_VALUE, ADC_THROTTLE_MAX_VALUE, 0, 255));
+
 #define DO_CRUISE_CONTROL 1
 #if DO_CRUISE_CONTROL == 1
-  ui8_adc_throttle_value_cruise_control = ebike_app_cruise_control (ui8_adc_throttle_value);
+  ui8_adc_throttle_value_cruise_control = ebike_app_cruise_control (ui8_throttle_value);
 #else
-  ui8_adc_throttle_value_cruise_control = ui8_adc_throttle_value;
+  ui8_adc_throttle_value_cruise_control = ui8_throttle_value;
 #endif
 
-  ui8_temp = (uint8_t) (map ((int32_t) ui8_adc_throttle_value_cruise_control, ADC_THROTTLE_MIN_VALUE, ADC_THROTTLE_MAX_VALUE, 0, 255));
-  motor_set_pwm_duty_cycle_target (ui8_temp);
+    motor_set_pwm_duty_cycle_target (ui8_adc_throttle_value_cruise_control);
 
-  if (lcd_configuration_variables.ui8_power_assist_control_mode)
-  {
-    // setup motor current
-    ui16_temp = (uint16_t) (((float) ADC_MOTOR_CURRENT_MAX_10B) * f_controller_max_current * (((float) lcd_configuration_variables.ui8_assist_level) / 5.0));
-    motor_controller_set_current (ui16_temp);
-
-    // apply max erps speed to the speed controller
-    motor_controller_set_speed_erps (motor_controller_get_speed_erps_max ());
-  }
-  else
-  {
-    // throttle will setup motor current
-    ui16_temp = (uint16_t) (((float) ADC_MOTOR_CURRENT_MAX_10B) * f_controller_max_current * (((float) lcd_configuration_variables.ui8_assist_level) / 5.0));
-    ui16_temp = (uint16_t) (map ((uint32_t) ui8_adc_throttle_value_cruise_control, ADC_THROTTLE_MIN_VALUE, ADC_THROTTLE_MAX_VALUE, 0, (uint32_t) ui16_temp));
-    motor_controller_set_current (ui16_temp);
-
-    // throttle will setup motor speed
-    ui16_temp = map ((uint32_t) ui8_adc_throttle_value_cruise_control, ADC_THROTTLE_MIN_VALUE, ADC_THROTTLE_MAX_VALUE, 0, (uint32_t) motor_controller_get_speed_erps_max ());
-    motor_controller_set_speed_erps (ui16_temp);
-  }
+//  if (lcd_configuration_variables.ui8_power_assist_control_mode)
+//  {
+//    // setup motor current
+//    ui16_temp = (uint16_t) (((float) ADC_MOTOR_CURRENT_MAX_10B) * f_controller_max_current * (((float) lcd_configuration_variables.ui8_assist_level) / 5.0));
+//    motor_controller_set_current (ui16_temp);
+//
+//    // apply max erps speed to the speed controller
+//    motor_controller_set_speed_erps (motor_controller_get_speed_erps_max ());
+//  }
+//  else
+//  {
+//    // throttle will setup motor current
+//    ui16_temp = (uint16_t) (((float) ADC_MOTOR_CURRENT_MAX_10B) * f_controller_max_current * (((float) lcd_configuration_variables.ui8_assist_level) / 5.0));
+//    ui16_temp = (uint16_t) (map ((uint32_t) ui8_adc_throttle_value_cruise_control, ADC_THROTTLE_MIN_VALUE, ADC_THROTTLE_MAX_VALUE, 0, (uint32_t) ui16_temp));
+//    motor_controller_set_current (ui16_temp);
+//
+//    // throttle will setup motor speed
+//    ui16_temp = map ((uint32_t) ui8_adc_throttle_value_cruise_control, ADC_THROTTLE_MIN_VALUE, ADC_THROTTLE_MAX_VALUE, 0, (uint32_t) motor_controller_get_speed_erps_max ());
+//    motor_controller_set_speed_erps (ui16_temp);
+//  }
 }
 
 uint8_t ebike_app_cruise_control (uint8_t ui8_value)
@@ -356,6 +345,7 @@ void communications_set_controller_max_current_factor (float value)
 
 void set_speed_erps_max_to_motor_controller (struc_lcd_configuration_variables *lcd_configuration_variables)
 {
+  float f_wheel_size;
   uint32_t ui32_temp;
   float f_temp;
 
@@ -498,8 +488,9 @@ uint8_t ebike_app_get_adc_throttle_value_cruise_control (void)
   return ui8_adc_throttle_value_cruise_control;
 }
 
-uint8_t ui8_ebike_app_get_motor_speed (void)
+uint8_t ebike_app_is_throttle_released (void)
 {
-  return ui8_motor_speed;
+  return ui8_throttle_value ? 0 : 1;
 }
+
 

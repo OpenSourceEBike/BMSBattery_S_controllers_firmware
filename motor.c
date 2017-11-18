@@ -483,8 +483,9 @@ void TIM1_UPD_OVF_TRG_BRK_IRQHandler(void) __interrupt(TIM1_UPD_OVF_TRG_BRK_IRQH
     ui16_PWM_cycles_counter_total = 0xffff;
     ui8_angle_correction = 127;
     ui8_motor_commutation_type = BLOCK_COMMUTATION;
-    ui8_motor_state = MOTOR_STATE_STOP;
     ui8_hall_sensors_last = 0; // this way we force execution of hall sensors code next time
+    ebike_app_cruise_control_stop ();
+    if (ui8_motor_state == MOTOR_STATE_RUNNING) { ui8_motor_state = MOTOR_STATE_STOP; }
   }
 
   /****************************************************************************/
@@ -605,8 +606,10 @@ void TIM1_UPD_OVF_TRG_BRK_IRQHandler(void) __interrupt(TIM1_UPD_OVF_TRG_BRK_IRQH
   TIM1->CCR3L = (uint8_t) (ui8_value_b << 1);
 
   // enable PWM signals only when MOTOR_CONTROLLER_STATE_OK
-  if (ui8_motor_controller_state == MOTOR_CONTROLLER_STATE_OK) { TIM1->BKR |= TIM1_BKR_MOE; }
-
+  if (ui8_motor_controller_state == MOTOR_CONTROLLER_STATE_OK)
+  {
+    TIM1->BKR |= TIM1_BKR_MOE;
+  }
 
   // clears the TIM1 interrupt TIM1_IT_UPDATE pending bit
   TIM1->SR1 = (uint8_t)(~(uint8_t)TIM1_IT_UPDATE);
@@ -720,73 +723,77 @@ void motor_controller (void)
   uint8_t ui8_pwm_duty_cycle_a;
   uint8_t ui8_pwm_duty_cycle_b;
   uint8_t ui8_pwm_duty_cycle_c;
+  uint16_t ui16_motor_speed_erps;
   struc_lcd_configuration_variables *p_lcd_configuration_variables = ebike_app_get_lcd_configuration_variables ();
 
+  ui16_motor_speed_erps = ui16_motor_get_motor_speed_erps ();
   switch (ui8_motor_state)
   {
     case MOTOR_STATE_STOP:
-    if (ui8_ebike_app_get_motor_speed() < 6) // less than 6km/h
+    if ((ui16_motor_speed_erps < 5) && (!ebike_app_is_throttle_released ()))
     {
-      // start the startup phase, use motor max current
       ui8_motor_startup_counter = 0;
       ui8_motor_state = MOTOR_STATE_STARTUP;
-      motor_set_current_max (ADC_MOTOR_CURRENT_MAX);
     }
-    else
+    else if (ui16_motor_speed_erps > 4)
     {
       ui8_motor_state = MOTOR_STATE_RUNNING;
     }
     break;
 
-    // startup phase where the controller max current is used
     case MOTOR_STATE_STARTUP:
-    if (ui8_motor_startup_counter++ > 25) // 25 * 100ms; 2.5 seconds max time
+    if (ui8_motor_startup_counter++ > 19) // 20 * 100ms; 2.5 seconds max time
     {
+      motor_controller_set_state (MOTOR_CONTROLLER_STATE_MOTOR_BLOCKED);
+      motor_disable_PWM ();
+      ebike_app_cruise_control_stop ();
       ui8_motor_state = MOTOR_STATE_COOL;
       ui8_motor_startup_counter = 0;
     }
 
-    if (ui8_ebike_app_get_motor_speed() > 5) // 6km/h or higher speed, leave startup
+    if (ui16_motor_speed_erps > 4)
     {
-      motor_set_current_max (ADC_MOTOR_CURRENT_NOMINAL);
       ui8_motor_state = MOTOR_STATE_RUNNING;
     }
     break;
 
-    // running mode where the controller nominal current is used
     case MOTOR_STATE_RUNNING:
     // do nothing
     break;
 
-    // wait for the power mosfets cool down
+    // wait for the power mosfets cool down and for user release the throttle
     case MOTOR_STATE_COOL:
     if (ui8_motor_startup_counter++ > 10) // 1 second timeout
     {
-      ui8_motor_state = MOTOR_STATE_STOP;
+      ui8_motor_startup_counter = 11;
+      if (ebike_app_is_throttle_released ())
+      {
+	ui8_duty_cycle = 0;
+	ui8_duty_cycle_target = 0;
+	motor_controller_reset_state (MOTOR_CONTROLLER_STATE_MOTOR_BLOCKED);
+        ui8_motor_state = MOTOR_STATE_STOP;
+      }
     }
-    break;
-
-    default:
     break;
   }
 
   battery_voltage_protection ();
 
-  ui8_current_pwm_duty_cycle = ui8_duty_cycle;
-  ui8_pwm_duty_cycle_a = motor_current_controller ();
-  ui8_pwm_duty_cycle_b = motor_speed_controller ();
-
-  if (p_lcd_configuration_variables->ui8_power_assist_control_mode)
-  {
-    ui8_pwm_duty_cycle_c = (uint8_t) (map ((int32_t) ebike_app_get_adc_throttle_value_cruise_control (), ADC_THROTTLE_MIN_VALUE, ADC_THROTTLE_MAX_VALUE, 0, PWM_VALUE_DUTY_CYCLE_MAX));
-    // apply the value that is lower
-    motor_set_pwm_duty_cycle_target (ui8_min (ui8_min (ui8_pwm_duty_cycle_a, ui8_pwm_duty_cycle_b), ui8_pwm_duty_cycle_c));
-  }
-  else
-  {
-    // apply the value that is lower
-    motor_set_pwm_duty_cycle_target (ui8_min (ui8_pwm_duty_cycle_a, ui8_pwm_duty_cycle_b));
-  }
+//  ui8_current_pwm_duty_cycle = ui8_duty_cycle;
+//  ui8_pwm_duty_cycle_a = motor_current_controller ();
+//  ui8_pwm_duty_cycle_b = motor_speed_controller ();
+//
+//  if (p_lcd_configuration_variables->ui8_power_assist_control_mode)
+//  {
+//    ui8_pwm_duty_cycle_c = (uint8_t) (map ((int32_t) ebike_app_get_adc_throttle_value_cruise_control (), ADC_THROTTLE_MIN_VALUE, ADC_THROTTLE_MAX_VALUE, 0, PWM_VALUE_DUTY_CYCLE_MAX));
+//    // apply the value that is lower
+//    motor_set_pwm_duty_cycle_target (ui8_min (ui8_min (ui8_pwm_duty_cycle_a, ui8_pwm_duty_cycle_b), ui8_pwm_duty_cycle_c));
+//  }
+//  else
+//  {
+//    // apply the value that is lower
+//    motor_set_pwm_duty_cycle_target (ui8_min (ui8_pwm_duty_cycle_a, ui8_pwm_duty_cycle_b));
+//  }
 }
 
 void motor_controller_set_speed_erps (uint16_t ui16_erps)
