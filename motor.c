@@ -21,6 +21,7 @@
 #include "adc.h"
 #include "utils.h"
 #include "uart.h"
+#include "watchdog.h"
 
 #define SVM_TABLE_LEN 256
 
@@ -336,6 +337,8 @@ uint8_t ui8_value_b;
 uint8_t ui8_value_c;
 uint16_t ui16_value;
 
+uint8_t ui8_first_time_run_flag = 1;
+
 // functions prototypes
 void battery_voltage_protection (void);
 uint8_t motor_current_controller (void);
@@ -345,7 +348,7 @@ uint8_t motor_speed_controller (void);
 void TIM1_UPD_OVF_TRG_BRK_IRQHandler(void) __interrupt(TIM1_UPD_OVF_TRG_BRK_IRQHANDLER)
 {
   uint8_t ui8_temp;
-
+debug_pin_set();
   /****************************************************************************/
   // trigger ADC conversion of all channels (scan conversion, buffered)
   ADC1->CSR &= 0x09; // clear EOC flag first (selected also channel 9)
@@ -388,7 +391,7 @@ void TIM1_UPD_OVF_TRG_BRK_IRQHandler(void) __interrupt(TIM1_UPD_OVF_TRG_BRK_IRQH
 	ui8_half_erps_flag = 0;
 	ui16_PWM_cycles_counter_total = ui16_PWM_cycles_counter;
 	ui16_PWM_cycles_counter = 0;
-	ui16_motor_speed_erps = PWM_CYCLES_SECOND / ui16_PWM_cycles_counter_total; // this division takes ~4.2us
+	ui16_motor_speed_erps = PWM_CYCLES_SECOND / ui16_PWM_cycles_counter_total; // this division takes ~0.8us
       }
 
       // update motor commutation state based on motor speed
@@ -610,6 +613,18 @@ void TIM1_UPD_OVF_TRG_BRK_IRQHandler(void) __interrupt(TIM1_UPD_OVF_TRG_BRK_IRQH
   if (ui8_motor_controller_state == MOTOR_CONTROLLER_STATE_OK)
   {
     TIM1->BKR |= TIM1_BKR_MOE;
+  }
+
+  // reload watchdog timer, every PWM cycle to avoid automatic reset of the microcontroller
+  if (ui8_first_time_run_flag)
+  { // from the init of watchdog up to first reset on PWM cycle interrupt,
+    // it can take up to 250ms and so we need to init here inside the PWM cycle
+    ui8_first_time_run_flag = 0;
+    watchdog_init ();
+  }
+  else
+  {
+    IWDG->KR = IWDG_KEY_REFRESH; // reload watch dog timer counter
   }
 
   // clears the TIM1 interrupt TIM1_IT_UPDATE pending bit
