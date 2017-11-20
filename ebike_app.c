@@ -246,7 +246,7 @@ void communications_controller (void)
   // throttle: 2
   ui8_tx_buffer [7] = ui8_moving_indication;
   // B8: 4x controller current
-  ui8_tx_buffer [8] = motor_get_current_max () << 1;
+  ui8_tx_buffer [8] = (uint8_t) (((float) (motor_get_current_max_10b () >> 2)) * 1.7);
   // B9: motor temperature
   ui8_tx_buffer [9] = 0;
   // B10 and B11: 0

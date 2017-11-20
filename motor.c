@@ -306,6 +306,7 @@ uint8_t ui8_hall_sensors_last = 0;
 uint8_t ui8_adc_id_current = 0;
 
 uint8_t ui8_adc_motor_current_max;
+uint8_t ui8_adc_motor_current_max_10b;
 uint8_t ui8_adc_motor_regen_current_max;
 
 uint8_t ui8_adc_motor_total_current;
@@ -321,8 +322,8 @@ uint16_t ui16_target_current = 0;
 uint16_t ui16_adc_battery_voltage_accumulated = BATTERY_VOLTAGE_MED_VALUE;
 uint8_t ui8_adc_battery_voltage_filtered;
 
-uint16_t ui16_adc_motor_current_accumulated = ADC_MOTOR_CURRENT_MAX_MED_VALUE_10B;
-uint16_t ui16_adc_motor_current_filtered;
+uint16_t ui16_adc_motor_current_accumulated_10b = ADC_MOTOR_CURRENT_MAX_MED_VALUE_10B;
+uint16_t ui16_adc_motor_current_filtered_10b;
 
 uint8_t ui8_motor_controller_error = MOTOR_CONTROLLER_ERROR_EMPTY;
 
@@ -694,9 +695,9 @@ void motor_set_current_max (uint8_t ui8_value)
   ui8_adc_motor_current_max = ui8_motor_total_current_offset + ui8_value;
 }
 
-uint8_t motor_get_current_max (void)
+uint8_t motor_get_current_max_10b (void)
 {
-  return ui8_adc_motor_current_max;
+  return ui8_adc_motor_current_max_10b;
 }
 
 void motor_set_regen_current_max (uint8_t ui8_value)
@@ -793,6 +794,12 @@ void motor_controller (void)
     break;
   }
 
+  // low pass filter the current readed value, to avoid possible fast spikes/noise
+  ui16_adc_motor_current_accumulated_10b -= ui16_adc_motor_current_accumulated_10b >> 4;
+  ui16_adc_motor_current_accumulated_10b += ui16_adc_read_motor_total_current_10b ();
+  ui16_adc_motor_current_filtered_10b = ui16_adc_motor_current_accumulated_10b >> 4;
+  ui8_adc_motor_current_max_10b = ui16_adc_motor_current_filtered_10b - ui16_motor_total_current_offset_10b;
+
   battery_voltage_protection ();
 
 //  ui8_current_pwm_duty_cycle = ui8_duty_cycle;
@@ -871,12 +878,7 @@ uint8_t motor_current_controller (void)
   int16_t i16_output;
   int16_t i16_motor_current;
 
-  // low pass filter the current readed value, to avoid possible fast spikes/noise
-  ui16_adc_motor_current_accumulated -= ui16_adc_motor_current_accumulated >> 4;
-  ui16_adc_motor_current_accumulated += ui16_adc_read_motor_total_current ();
-  ui16_adc_motor_current_filtered = ui16_adc_motor_current_accumulated >> 4;
-
-  i16_motor_current = (int16_t) (ui16_adc_motor_current_filtered - ui16_motor_total_current_offset_10b);
+  i16_motor_current = (int16_t) ui8_adc_motor_current_max_10b;
   // make sure current is not negative, we are here not to control negative/regen current
   if (i16_motor_current < 0)
   {

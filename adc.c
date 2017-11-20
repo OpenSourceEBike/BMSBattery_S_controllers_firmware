@@ -61,7 +61,7 @@ void adc_init (void)
     ui16_counter = TIM2_GetCounter () + 10;
     while (TIM2_GetCounter () < ui16_counter) ;
     adc_trigger ();
-    ui16_motor_total_current_offset_10b += ui16_adc_read_motor_total_current ();
+    ui16_motor_total_current_offset_10b += ui16_adc_read_motor_total_current_10b ();
   }
   ui16_motor_total_current_offset_10b >>= 4;
   ui8_motor_total_current_offset = ui16_motor_total_current_offset_10b >> 2;
@@ -110,7 +110,7 @@ uint8_t ui8_adc_read_motor_total_current (void)
   return *(uint8_t*)(0x53F0);
 }
 
-uint16_t ui16_adc_read_motor_total_current (void)
+uint16_t ui16_adc_read_motor_total_current_10b (void)
 {
   uint16_t temph;
   uint8_t templ;
