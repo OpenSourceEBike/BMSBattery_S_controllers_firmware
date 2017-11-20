@@ -29,8 +29,7 @@ void watchdog_init (void)
 //
 //  0.0001 = 2 * (1 / 128000) * 4 * R
 //  R = 1.6 ; rounding to R = 2
-
-  // NOTE: can't be 1 and need to be 4 because tere is a PWM cycle that takes about 220us
-  IWDG_SetReload (4); // 125us; R = 2 means a value of reload register = 1
+//  R = 2 means a value of reload register = 1
+  IWDG_SetReload (2); // 187.5us; for some reason, a value of 1 don't work, only 2
   IWDG_ReloadCounter ();
 }

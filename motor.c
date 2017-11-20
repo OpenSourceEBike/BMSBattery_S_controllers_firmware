@@ -348,7 +348,7 @@ uint8_t motor_speed_controller (void);
 void TIM1_UPD_OVF_TRG_BRK_IRQHandler(void) __interrupt(TIM1_UPD_OVF_TRG_BRK_IRQHANDLER)
 {
   uint8_t ui8_temp;
-debug_pin_set();
+
   /****************************************************************************/
   // trigger ADC conversion of all channels (scan conversion, buffered)
   ADC1->CSR &= 0x09; // clear EOC flag first (selected also channel 9)
@@ -391,9 +391,9 @@ debug_pin_set();
 	ui8_half_erps_flag = 0;
 	ui16_PWM_cycles_counter_total = ui16_PWM_cycles_counter;
 	ui16_PWM_cycles_counter = 0;
-	ui16_motor_speed_erps = PWM_CYCLES_SECOND / ui16_PWM_cycles_counter_total; // this division takes ~0.8us
+	// this division takes 4.4us and without the cast (uint16_t) PWM_CYCLES_SECOND, would take 111us!! Verified on 2017.11.20
+	ui16_motor_speed_erps = ((uint16_t) PWM_CYCLES_SECOND) / ui16_PWM_cycles_counter_total;
       }
-
       // update motor commutation state based on motor speed
 #ifdef DO_SINEWAVE_INTERPOLATION_360_DEGREES
       if (ui16_motor_speed_erps > MOTOR_ROTOR_ERPS_START_INTERPOLATION_360_DEGREES)
@@ -499,7 +499,7 @@ debug_pin_set();
   // calculate the interpolation angle (and it doesn't work when motor starts and at very low speeds)
   if (ui8_motor_commutation_type == SINEWAVE_INTERPOLATION_60_DEGREES)
   {
-    ui8_interpolation_angle = (ui16_PWM_cycles_counter_6 << 8) / ui16_PWM_cycles_counter_total;
+    ui8_interpolation_angle = (ui16_PWM_cycles_counter_6 << 8) / ui16_PWM_cycles_counter_total; // this operations take 4.4us
     ui8_sinewave_table_index = ui8_motor_rotor_absolute_angle + ui8_angle_correction + ui8_interpolation_angle;
   }
   else if (ui8_motor_commutation_type == SINEWAVE_INTERPOLATION_360_DEGREES)
