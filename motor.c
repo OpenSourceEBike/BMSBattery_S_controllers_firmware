@@ -373,7 +373,7 @@ void TIM1_UPD_OVF_TRG_BRK_IRQHandler(void) __interrupt(TIM1_UPD_OVF_TRG_BRK_IRQH
       // read here the phase B current: FOC Id current
       ui8_adc_id_current = *(uint8_t*)(0x53EA); // ui8_adc_read_phase_B_current ();
       // minimum speed that to do FOC
-      if (ui16_motor_speed_erps > 40)
+      if (ui16_motor_speed_erps > MOTOR_ROTOR_ERPS_START_INTERPOLATION_60_DEGREES)
       {
 	if (ui8_adc_id_current > 127) { ui8_angle_correction++; }
 	else if (ui8_adc_id_current < 125) { ui8_angle_correction--; }
