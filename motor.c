@@ -802,21 +802,21 @@ void motor_controller (void)
 
   battery_voltage_protection ();
 
-//  ui8_current_pwm_duty_cycle = ui8_duty_cycle;
-//  ui8_pwm_duty_cycle_a = motor_current_controller ();
-//  ui8_pwm_duty_cycle_b = motor_speed_controller ();
-//
-//  if (p_lcd_configuration_variables->ui8_power_assist_control_mode)
-//  {
-//    ui8_pwm_duty_cycle_c = (uint8_t) (map ((int32_t) ebike_app_get_adc_throttle_value_cruise_control (), ADC_THROTTLE_MIN_VALUE, ADC_THROTTLE_MAX_VALUE, 0, PWM_VALUE_DUTY_CYCLE_MAX));
-//    // apply the value that is lower
-//    motor_set_pwm_duty_cycle_target (ui8_min (ui8_min (ui8_pwm_duty_cycle_a, ui8_pwm_duty_cycle_b), ui8_pwm_duty_cycle_c));
-//  }
-//  else
-//  {
-//    // apply the value that is lower
-//    motor_set_pwm_duty_cycle_target (ui8_min (ui8_pwm_duty_cycle_a, ui8_pwm_duty_cycle_b));
-//  }
+  ui8_current_pwm_duty_cycle = ui8_duty_cycle;
+  ui8_pwm_duty_cycle_a = motor_current_controller ();
+  ui8_pwm_duty_cycle_b = motor_speed_controller ();
+
+  if (p_lcd_configuration_variables->ui8_power_assist_control_mode)
+  {
+    ui8_pwm_duty_cycle_c = (uint8_t) (map ((int32_t) ebike_app_get_adc_throttle_value_cruise_control (), 0, 255, 0, PWM_VALUE_DUTY_CYCLE_MAX));
+    // apply the value that is lower
+    motor_set_pwm_duty_cycle_target (ui8_min (ui8_min (ui8_pwm_duty_cycle_a, ui8_pwm_duty_cycle_b), ui8_pwm_duty_cycle_c));
+  }
+  else
+  {
+    // apply the value that is lower
+    motor_set_pwm_duty_cycle_target (ui8_min (ui8_pwm_duty_cycle_a, ui8_pwm_duty_cycle_b));
+  }
 }
 
 void motor_controller_set_speed_erps (uint16_t ui16_erps)
