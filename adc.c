@@ -11,7 +11,10 @@
 #include "stm8s.h"
 #include "gpio.h"
 #include "stm8s_adc1.h"
+#include "stm8s_tim2.h"
 #include "adc.h"
+
+void adc_trigger (void);
 
 void adc_init (void)
 {
@@ -48,9 +51,10 @@ void adc_init (void)
   // read and discard few samples of ADC, to make sure the next samples are ok
   for (ui8_i = 0; ui8_i < 4; ui8_i++)
   {
-    ui16_counter = TIM2_GetCounter () + 10;
-    while (TIM2_GetCounter () < ui16_counter) ; // delay
+    ui16_counter = TIM2_GetCounter () + 78;
+    while (TIM2_GetCounter () < ui16_counter) ; // delay ~10ms
     adc_trigger ();
+    while (!ADC1_GetFlagStatus (ADC1_FLAG_EOC)) ; // wait for end of conversion
     ui8_motor_total_current_offset = ui8_adc_read_motor_total_current ();
   }
 
@@ -58,20 +62,20 @@ void adc_init (void)
   ui16_motor_total_current_offset_10b = 0;
   for (ui8_i = 0; ui8_i < 16; ui8_i++)
   {
-    ui16_counter = TIM2_GetCounter () + 10;
-    while (TIM2_GetCounter () < ui16_counter) ;
+    ui16_counter = TIM2_GetCounter () + 78; // delay ~10ms
     adc_trigger ();
+    while (!ADC1_GetFlagStatus (ADC1_FLAG_EOC)) ; // wait for end of conversion
     ui16_motor_total_current_offset_10b += ui16_adc_read_motor_total_current_10b ();
   }
   ui16_motor_total_current_offset_10b >>= 4;
   ui8_motor_total_current_offset = ui16_motor_total_current_offset_10b >> 2;
 }
 
-inline void adc_trigger (void)
+void adc_trigger (void)
 {
-  // start ADC all channels, scan conversion (buffered)
+  // trigger ADC conversion of all channels (scan conversion, buffered)
   ADC1->CSR &= 0x09; // clear EOC flag first (selected also channel 9)
-  ADC1_StartConversion ();
+  ADC1->CR1 |= ADC1_CR1_ADON; // Start ADC1 conversion
 }
 
 uint8_t ui8_adc_read_phase_B_current (void)

@@ -12,6 +12,7 @@
 #include <stdio.h>
 #include "stm8s.h"
 #include "stm8s_gpio.h"
+#include "main.h"
 #include "interrupts.h"
 #include "adc.h"
 #include "utils.h"
@@ -49,83 +50,44 @@ uint8_t ui8_state_machine = 0;
 uint8_t ui8_adc_throttle_value;
 uint8_t ui8_adc_throttle_value_cruise_control;
 uint8_t ui8_throttle_value;
-uint8_t ui8_throttle_value_temp;
+uint16_t ui16_throttle_value_accumulated = 0;
+uint16_t ui16_throttle_value_filtered;
+uint8_t ui8_is_throotle_released;
+
+uint16_t ui16_pas_pwm_cycles_ticks = PAS_ABSOLUTE_MIN_CADENCE_PWM_CYCLE_TICKS;
+uint8_t ui8_pas_cadence_rpm = 0;
 
 // function prototypes
-void throttle_pas_torque_sensor_controller (void);
 void communications_controller (void);
 uint8_t ebike_app_cruise_control (uint8_t ui8_value);
 void set_speed_erps_max_to_motor_controller (struc_lcd_configuration_variables *lcd_configuration_variables);
 float f_get_controller_max_current (uint8_t ui8_controller_max_current);
+void calc_motor_speed (void);
+void fixed_gear_control_mode (void);
+void read_throotle (void);
+void read_pas_cadence (void);
 
 void ebike_app_controller (void)
 {
-  static uint32_t ui32_temp;
-  static uint32_t ui32_temp1;
+  // calc motor speed and save the value on global variable ui8_wheel_speed
+  calc_motor_speed ();
 
-  // calc motor speed in km/h
-  ui32_temp = ((uint32_t) (lcd_configuration_variables.ui8_motor_characteristic >> 1)) * 1000;
-  ui32_temp1 = ((uint32_t) ui16_motor_get_motor_speed_erps ()) * 3600;
-  f_motor_speed = ((float) ui32_temp1) * f_wheel_size;
-  f_motor_speed /= (float) ui32_temp;
-  ui8_wheel_speed = (uint8_t) f_motor_speed;
+  // map throttle value from 0 up to 255 to global variable: ui8_throttle_value
+  // setup ui8_is_throotle_released flag
+  read_throotle ();
 
+  // read PAS cadence to global variable: ui8_pas_cadence_rps
+  read_pas_cadence ();
+
+  // send and received information to/from the LCD as also setup the configuration variables
   communications_controller ();
-  throttle_pas_torque_sensor_controller ();
-}
 
-void throttle_pas_torque_sensor_controller (void)
-{
-  uint8_t ui8_temp;
-  uint16_t ui16_temp;
-
-  // only throttle implemented for now
-  ui8_adc_throttle_value = ui8_adc_read_throttle ();
-
-  // verify if throttle is connect or if there is any error
-  // if error: error symbol on LCD will be shown
-  if ((ui8_adc_throttle_value < ADC_THROTTLE_MIN_VALUE_ERROR) ||
-      (ui8_adc_throttle_value > ADC_THROTTLE_MAX_VALUE_ERROR))
-  {
-    motor_controller_set_state (MOTOR_CONTROLLER_STATE_THROTTLE_ERROR);
-    motor_disable_PWM ();
-    motor_controller_set_error (MOTOR_CONTROLLER_ERROR_01_THROTTLE);
-  }
-
-  ui8_throttle_value = (uint8_t) (map (ui8_adc_throttle_value, ADC_THROTTLE_MIN_VALUE, ADC_THROTTLE_MAX_VALUE, 0, 255));
-  ui8_throttle_value_temp = (uint8_t) (map ((((uint16_t) ui8_throttle_value) * ((uint16_t) lcd_configuration_variables.ui8_assist_level)), 0, 255, 0, 255));
-
-//#define DO_CRUISE_CONTROL 1
-#if DO_CRUISE_CONTROL == 1
-  ui8_adc_throttle_value_cruise_control = ebike_app_cruise_control (ui8_throttle_value_temp);
+  // control the motor using specific algorithm
+#if (MOTOR_CONTROL_MODE == MOTOR_CONTROL_MODE_FIXED_GEAR)
+  fixed_gear_control_mode ();
 #else
-  ui8_adc_throttle_value_cruise_control = ui8_throttle_value_temp;
+#error
 #endif
-
-//    motor_set_pwm_duty_cycle_target (ui8_adc_throttle_value_cruise_control);
-
-  if (lcd_configuration_variables.ui8_power_assist_control_mode)
-  {
-    // setup motor current
-//    ui16_temp = (uint16_t) (((float) ADC_MOTOR_CURRENT_MAX_10B) * f_controller_max_current * (((float) lcd_configuration_variables.ui8_assist_level) / 5.0));
-    ui16_temp = (uint16_t) (((float) ADC_MOTOR_CURRENT_MAX_10B) * f_controller_max_current);
-    motor_controller_set_current (ui16_temp);
-
-    // apply max erps speed to the speed controller
-    motor_controller_set_speed_erps (motor_controller_get_speed_erps_max ());
-  }
-  else
-  {
-    // throttle will setup motor current
-//    ui16_temp = (uint16_t) (((float) ADC_MOTOR_CURRENT_MAX_10B) * f_controller_max_current * (((float) lcd_configuration_variables.ui8_assist_level) / 5.0));
-    ui16_temp = (uint16_t) (((float) ADC_MOTOR_CURRENT_MAX_10B) * f_controller_max_current);
-//    ui16_temp = (uint16_t) (map ((uint32_t) ui8_adc_throttle_value_cruise_control, ADC_THROTTLE_MIN_VALUE, ADC_THROTTLE_MAX_VALUE, 0, (uint32_t) ui16_temp));
-    motor_controller_set_current (ui16_temp);
-
-    // throttle will setup motor speed
-    ui16_temp = map ((uint32_t) ui8_adc_throttle_value_cruise_control, 0, 255, 0, (uint32_t) motor_controller_get_speed_erps_max ());
-    motor_controller_set_speed_erps (ui16_temp);
-  }
 }
 
 // cruise control will save throttle value and use it even if user releases throttle
@@ -250,7 +212,7 @@ void communications_controller (void)
   // throttle: 2
   ui8_tx_buffer [7] = ui8_moving_indication;
   // B8: 4x controller current
-  ui8_tx_buffer [8] = (uint8_t) (((float) (motor_get_current_max_10b () >> 2)) * 1.7);
+  ui8_tx_buffer [8] = (uint8_t) (((float) (motor_get_current_max_10b () >> 1)) * 1.43);
   // B9: motor temperature
   ui8_tx_buffer [9] = 0;
   // B10 and B11: 0
@@ -365,11 +327,6 @@ void UART2_IRQHandler(void) __interrupt(UART2_IRQHANDLER)
       break;
     }
   }
-}
-
-void communications_set_controller_max_current_factor (float value)
-{
-  f_controller_max_current = value;
 }
 
 void set_speed_erps_max_to_motor_controller (struc_lcd_configuration_variables *lcd_configuration_variables)
@@ -519,7 +476,7 @@ uint8_t ebike_app_get_adc_throttle_value_cruise_control (void)
 
 uint8_t ebike_app_is_throttle_released (void)
 {
-  return ui8_throttle_value ? 0 : 1;
+  return ui8_is_throotle_released;
 }
 
 uint8_t ui8_ebike_app_get_wheel_speed (void)
@@ -527,3 +484,78 @@ uint8_t ui8_ebike_app_get_wheel_speed (void)
   return ui8_wheel_speed;
 }
 
+void calc_motor_speed (void)
+{
+  uint32_t ui32_temp;
+  uint32_t ui32_temp1;
+
+  // calc motor speed in km/h
+  ui32_temp = ((uint32_t) (lcd_configuration_variables.ui8_motor_characteristic >> 1)) * 1000;
+  ui32_temp1 = ((uint32_t) ui16_motor_get_motor_speed_erps ()) * 3600;
+  f_motor_speed = ((float) ui32_temp1) * f_wheel_size;
+  f_motor_speed /= (float) ui32_temp;
+  ui8_wheel_speed = (uint8_t) f_motor_speed;
+}
+
+void read_pas_cadence (void)
+{
+  // cadence in RPM =  60 / (ui16_pas_timer2_ticks * (PAS_NUMBER_MAGNETS * 2) * 0.000064)
+  if (ui16_pas_pwm_cycles_ticks >= PAS_ABSOLUTE_MIN_CADENCE_PWM_CYCLE_TICKS) { ui8_pas_cadence_rpm = 0; }
+  else { ui8_pas_cadence_rpm = (uint8_t) (60 / (((float) ui16_pas_pwm_cycles_ticks) * ((float) PAS_NUMBER_MAGNETS) * 0.000128)); }
+}
+
+void fixed_gear_control_mode (void)
+{
+  uint16_t ui16_target_max_current_10b;
+  uint16_t ui16_target_current_10b;
+  uint16_t ui16_target_speed_erps;
+  uint16_t ui16_throttle_value_assist_level;
+
+  // calc the motor max current possible, based on controller max current
+  ui16_target_max_current_10b = (uint16_t) (((float) ADC_MOTOR_CURRENT_MAX_10B) * f_controller_max_current);
+  // torque sensor will setup motor target current
+  // map torque sensor signal value to motor target current
+  ui16_throttle_value_assist_level = ui16_throttle_value_filtered * lcd_configuration_variables.ui8_assist_level;
+  ui16_target_current_10b = (uint16_t) (map ((uint32_t) ui16_throttle_value_assist_level, // throotle sensor signal value as input
+			       (uint32_t) 0, // min input value
+			       (uint32_t) 255, // max input value
+			       (uint32_t) 0, // min output motor current value
+			       (uint32_t) ui16_target_max_current_10b));  // max output motor current value
+  motor_controller_set_target_current_10b (ui16_target_current_10b);
+
+  // PAS cadence will setup motor speed
+  // map PAS candence value to motor speed value
+  ui16_target_speed_erps = (uint16_t) (map ((uint32_t) ui8_pas_cadence_rpm, // PAS cadence input value
+		    (uint32_t) 0, // PAS cadence min input value
+		    (uint32_t) PAS_MAX_CADENCE_RPM, // PAS cadence max input value defined by user
+		    (uint32_t) 0, // motor speed min value
+		    (uint32_t) motor_controller_get_target_speed_erps_max ())); // motor speed from max value, defined on the LCD
+  motor_controller_set_target_speed_erps (ui16_target_speed_erps);
+}
+
+void read_throotle (void)
+{
+  // read torque sensor signal
+  ui8_adc_throttle_value = ui8_adc_read_throttle ();
+
+  // verify if torque sensor is connect or if there is any error
+  // if error: error symbol on LCD will be shown
+  if ((ui8_adc_throttle_value < ADC_THROTTLE_MIN_VALUE_ERROR) ||
+      (ui8_adc_throttle_value > ADC_THROTTLE_MAX_VALUE_ERROR))
+  {
+    motor_controller_set_state (MOTOR_CONTROLLER_STATE_THROTTLE_ERROR);
+    motor_disable_PWM ();
+    motor_controller_set_error (MOTOR_CONTROLLER_ERROR_01_THROTTLE);
+  }
+
+  // map throttle value from 0 up to 255
+  ui8_throttle_value = (uint8_t) (map (ui8_adc_throttle_value, ADC_THROTTLE_MIN_VALUE, ADC_THROTTLE_MAX_VALUE, 0, 255));
+
+  // low pass filter the torque sensor to smooth the signal
+  ui16_throttle_value_accumulated -= ui16_throttle_value_accumulated >> 2;
+  ui16_throttle_value_accumulated += ((uint16_t) ui8_throttle_value);
+  ui16_throttle_value_filtered = ui16_throttle_value_accumulated >> 2;
+
+  // setup ui8_is_throotle_released flag
+  ui8_is_throotle_released = (ui8_throttle_value ? 0 : 1);
+}

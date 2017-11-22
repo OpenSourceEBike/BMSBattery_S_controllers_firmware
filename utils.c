@@ -31,3 +31,9 @@ uint8_t ui8_min (uint8_t value_a, uint8_t value_b)
   if (value_a < value_b) return value_a;
   else return value_b;
 }
+
+uint8_t ui8_max (uint8_t value_a, uint8_t value_b)
+{
+  if (value_a > value_b) return value_a;
+  else return value_b;
+}

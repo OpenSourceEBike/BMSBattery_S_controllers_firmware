@@ -45,6 +45,7 @@ extern uint8_t ui8_motor_total_current_offset;
 extern volatile uint8_t ui8_duty_cycle;
 extern uint8_t ui8_duty_cycle_target;
 extern volatile uint8_t ui8_duty_cycle;
+extern uint16_t ui16_pas_counter;
 
 /***************************************************************************************/
 // Motor interface
@@ -66,10 +67,10 @@ void motor_controller_reset_state (uint8_t state);
 uint8_t motor_controller_get_state (void);
 uint8_t motor_controller_state_is_set (uint8_t state);
 uint8_t motor_get_ADC_battery_voltage_filtered (void);
-void motor_controller_set_speed_erps (uint16_t ui16_erps);
+void motor_controller_set_target_speed_erps (uint16_t ui16_erps);
 void motor_controller_set_speed_erps_max (uint16_t ui16_erps);
-uint16_t motor_controller_get_speed_erps_max (void);
-void motor_controller_set_current (uint16_t ui16_current);
+uint16_t motor_controller_get_target_speed_erps_max (void);
+void motor_controller_set_target_current_10b (uint16_t ui16_current);
 void motor_controller_set_error (uint8_t ui8_error);
 void motor_controller_clear_error (void);
 uint8_t motor_controller_get_error (void);

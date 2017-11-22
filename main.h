@@ -16,6 +16,10 @@
 
 #define CONTROLLER_TYPE CONTROLLER_TYPE_S06S
 
+#define MOTOR_CONTROL_MODE_FIXED_GEAR 1
+
+#define MOTOR_CONTROL_MODE MOTOR_CONTROL_MODE_FIXED_GEAR
+
 
 #define MOTOR_TYPE_Q85 1
 #define MOTOR_TYPE_Q100 3
@@ -124,6 +128,14 @@
 #define ADC_THROTTLE_MAX_VALUE_ERROR 192
 #define CRUISE_CONTROL_MIN_VALUE 20
 
+// *************************************************************************** //
+// PAS
+#define PAS_NUMBER_MAGNETS 12
+#define PAS_MAX_CADENCE_RPM 90
+
+// (1/(150RPM/60)) / ((2*PAS_NUMBER_MAGNETS)) / 64us
+#define PAS_ABSOLUTE_MAX_CADENCE_PWM_CYCLE_TICKS  (3125 / PAS_NUMBER_MAGNETS) // max hard limit to 150RPM PAS cadence
+#define PAS_ABSOLUTE_MIN_CADENCE_PWM_CYCLE_TICKS  (78125 / PAS_NUMBER_MAGNETS) // min hard limit to 6RPM PAS cadence
 
 // *************************************************************************** //
 // EEPROM memory variables default values

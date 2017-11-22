@@ -45,13 +45,14 @@ EXTRASRCS = \
 	uart.c \
 	adc.c \
 	brake.c \
+	pas.c \
 	timers.c \
 	pwm.c \
 	eeprom.c \
 	motor.c \
 	ebike_app.c \
 
-HEADERS = watchdog.h adc.h brake.h gpio.h interrupts.h main.h pwm.h timers.h uart.h utils.h motor.h ebike_app.h eeprom.h
+HEADERS = watchdog.h adc.h brake.h gpio.h interrupts.h main.h pwm.h timers.h uart.h utils.h motor.h ebike_app.h eeprom.h pas.h
 
 # The list of .rel files can be derived from the list of their source files
 RELS = $(EXTRASRCS:.c=.rel)
