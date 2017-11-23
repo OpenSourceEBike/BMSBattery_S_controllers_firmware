@@ -213,7 +213,12 @@ void communications_controller (void)
   // throttle: 2
   ui8_tx_buffer [7] = ui8_moving_indication;
   // B8: 4x controller current
-  ui8_tx_buffer [8] = (uint8_t) (((float) (motor_get_current_max_10b () >> 1)) * 1.43);
+  // Vbat = 30V:
+  // - B8 = 255, LCD shows 1912 watts
+  // - B8 = 250, LCD shows 1875 watts
+  // - B8 = 100, LCD shows 750 watts
+  // each unit of B8 = 0.25A
+  ui8_tx_buffer [8] = (uint8_t) (motor_get_current_filtered_10b () << 1);
   // B9: motor temperature
   ui8_tx_buffer [9] = 0;
   // B10 and B11: 0
@@ -519,7 +524,7 @@ void torque_sensor_control_mode (void)
   // - humam power on the crank * (assist level / 2)
   if (lcd_configuration_variables.ui8_power_assist_control_mode)
   { // P3 = 1
-    // scale pedal torque sensor value using assist level from LCD
+    // scale pedal torque sensor value using (assist level / 2) from LCD
     ui16_temp = ((ui16_throttle_value_filtered << 4) * lcd_configuration_variables.ui8_assist_level) >> 5;
 
     ui16_target_current_10b = (uint16_t) (map ((uint32_t) ui16_temp, // pedal torque
@@ -531,7 +536,7 @@ void torque_sensor_control_mode (void)
   }
   else
   { // P3 = 0
-    // scale pedal torque sensor value using assist level from LCD
+    // scale pedal torque sensor value using (assist level / 2) from LCD
     ui16_temp = ((ui16_throttle_value_filtered << 4) * lcd_configuration_variables.ui8_assist_level) >> 5;
     // calc humam power on the crank using as input the pedal torque sensor value and pedal cadence
     ui16_temp = (uint16_t) ((float) ui16_temp * ((float) ((float) ui8_pas_cadence_rpm / ((float) PAS_MAX_CADENCE_RPM))));

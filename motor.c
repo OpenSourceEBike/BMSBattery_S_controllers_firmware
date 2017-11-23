@@ -306,7 +306,7 @@ uint8_t ui8_hall_sensors_last = 0;
 uint8_t ui8_adc_id_current = 0;
 
 uint8_t ui8_adc_motor_current_max;
-uint8_t ui8_adc_motor_current_max_10b;
+uint8_t ui8_motor_current_filtered_10b;
 uint8_t ui8_adc_motor_regen_current_max;
 
 uint8_t ui8_adc_motor_total_current;
@@ -739,9 +739,9 @@ void motor_set_current_max (uint8_t ui8_value)
   ui8_adc_motor_current_max = ui8_motor_total_current_offset + ui8_value;
 }
 
-uint8_t motor_get_current_max_10b (void)
+uint8_t motor_get_current_filtered_10b (void)
 {
-  return ui8_adc_motor_current_max_10b;
+  return ui8_motor_current_filtered_10b;
 }
 
 void motor_set_regen_current_max (uint8_t ui8_value)
@@ -828,7 +828,7 @@ uint8_t motor_current_controller (void)
   int16_t i16_output;
   int16_t i16_motor_current;
 
-  i16_motor_current = (int16_t) ui8_adc_motor_current_max_10b;
+  i16_motor_current = (int16_t) ui8_motor_current_filtered_10b;
   // make sure current is not negative, we are here not to control negative/regen current
   if (i16_motor_current < 0)
   {
@@ -976,7 +976,7 @@ void calc_motor_current_filtered (void)
   ui16_adc_motor_current_accumulated_10b -= ui16_adc_motor_current_accumulated_10b >> 4;
   ui16_adc_motor_current_accumulated_10b += ui16_adc_read_motor_total_current_10b ();
   ui16_adc_motor_current_filtered_10b = ui16_adc_motor_current_accumulated_10b >> 4;
-  ui8_adc_motor_current_max_10b = ui16_adc_motor_current_filtered_10b - ui16_motor_total_current_offset_10b;
+  ui8_motor_current_filtered_10b = ui16_adc_motor_current_filtered_10b - ui16_motor_total_current_offset_10b;
 }
 
 // motor overcurrent interrupt

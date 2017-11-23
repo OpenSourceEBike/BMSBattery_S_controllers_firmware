@@ -56,7 +56,7 @@ void motor_enable_PWM (void);
 void motor_disable_PWM (void);
 void motor_set_pwm_duty_cycle_target (uint8_t value);
 void motor_set_current_max (uint8_t value); // steps of 0.5A each step
-uint8_t motor_get_current_max_10b (void); // steps of 0.5A each step
+uint8_t motor_get_current_filtered_10b (void); // steps of 0.125A each step
 void motor_set_regen_current_max (uint8_t value); // steps of 0.5A each step
 void motor_set_pwm_duty_cycle_ramp_up_inverse_step (uint16_t value); // each step = 64us
 void motor_set_pwm_duty_cycle_ramp_down_inverse_step (uint16_t value); // each step = 64us
