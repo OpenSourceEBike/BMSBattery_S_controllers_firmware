@@ -883,7 +883,7 @@ void do_motor_controller_mode (void)
 #if (MOTOR_CONTROL_MODE == MOTOR_CONTROL_MODE_FIXED_GEAR)
   ui8_pwm_duty_cycle_a = motor_current_controller ();
   ui8_pwm_duty_cycle_b = motor_speed_controller ();
-  motor_set_pwm_duty_cycle_target (ui8_max (ui8_pwm_duty_cycle_a, ui8_pwm_duty_cycle_b)); // apply the value that is higher
+  motor_set_pwm_duty_cycle_target (ui8_min (ui8_pwm_duty_cycle_a, ui8_pwm_duty_cycle_b)); // apply the min value of both
 #else
 #error
 #endif
