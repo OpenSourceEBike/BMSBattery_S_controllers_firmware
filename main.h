@@ -41,7 +41,7 @@
 #define MOTOR_ROTOR_DELTA_PHASE_ANGLE_RIGHT 92 // best value found
 #endif
 
-#define PWM_CYCLES_COUNTER_MAX 625 // bei höheren Werten wird angenommen, der Motor steht.
+#define PWM_CYCLES_COUNTER_MAX 3000 // bei höheren Werten wird angenommen, der Motor steht.
 #define PWM_CYCLES_SECOND 15625L // 1 / 64us(PWM period)
 
 // 2 seconds to get up to max PWM duty cycle value of 255 (127 * 255 * 64us ~= 2 seconds)

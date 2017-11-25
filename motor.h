@@ -29,6 +29,8 @@ extern uint16_t ui16_ADC_iq_current;
 extern uint16_t ui16_iq_current_ma;
 extern uint16_t ui16_ADC_iq_current_filtered;
 extern uint16_t ui16_log;
+extern int8_t int8_t_hall_case[6];
+
 
 void hall_sensor_init (void);
 void hall_sensors_read_and_action (void);

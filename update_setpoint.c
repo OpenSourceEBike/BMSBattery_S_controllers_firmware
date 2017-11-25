@@ -36,7 +36,8 @@ uint8_t ui8_BatteryVoltage; //Battery Voltage read from ADC
 static uint16_t ui16_PAS_accumulated = 64000L; // for filtering of PAS value
 static uint32_t ui32_erps_accumulated; //for filtering of erps
 uint32_t ui32_erps_filtered; //filtered value of erps
-
+uint16_t ui16_erps_limit_lower=((limit)*GEAR_RATIO/wheel_circumference);
+uint16_t ui16_erps_limit_higher=((limit+2)*GEAR_RATIO/wheel_circumference);
 
 uint16_t update_setpoint (uint16_t speed, uint16_t PAS, uint16_t sumtorque, uint16_t setpoint_old)
 {
@@ -103,7 +104,7 @@ uint16_t update_setpoint (uint16_t speed, uint16_t PAS, uint16_t sumtorque, uint
   if (ui32_setpoint<30)ui32_setpoint=0;
   if (ui32_setpoint>255)ui32_setpoint=255;
 
-  printf("%lu, %lu, %d, %d\r\n", ui32_setpoint, ui32_SPEED_km_h, ui16_BatteryCurrent, (uint16_t) uint32_current_target);
+  //printf("%lu, %lu, %d, %d\r\n", ui32_setpoint, ui32_SPEED_km_h, ui16_BatteryCurrent, (uint16_t) uint32_current_target);
   //printf("setpoint %lu, Voltage %d, a %d, b %d, DCmax %d, erps %d\n", ui32_setpoint, ui8_BatteryVoltage, ui16_a, ui16_b, ui16_dutycycle_max, ui16_motor_speed_erps);
 #endif
 
@@ -164,16 +165,17 @@ uint32_t PI_control (uint16_t ist, uint16_t soll)
 
 uint32_t CheckSpeed (uint16_t current_target, uint16_t erps)
 {
+  //printf("Speed %d, %d\r\n", erps,(uint16_t)((limit+2)*GEAR_RATIO));
   //ramp down motor power if you are riding too fast and speed liming is active
-  if (erps>(limit)*GEAR_RATIO && ui8_cheat_state!=4){
+  if (erps>ui16_erps_limit_lower && ui8_cheat_state!=4){
 
-	if (erps>(limit+2)*GEAR_RATIO){ //if you are riding much too fast, stop motor immediately
+	if (erps>ui16_erps_limit_higher){ //if you are riding much too fast, stop motor immediately
 	    current_target=-1*current_cal_b;
-	    printf("Speed much too high!\r\n", erps);
+	   // printf("Speed much too high! %d, %d\r\n", erps,((limit+2)*GEAR_RATIO));
 	}
 	else {
-	    current_target=((current_target+current_cal_b)*((limit+2)*GEAR_RATIO-erps))/(2*GEAR_RATIO)-current_cal_b; 	//ramp down the motor power within 2 km/h, if you are riding too fast
-	    printf("Speed too high!\r\n");
+	    current_target=((current_target+current_cal_b)*(ui16_erps_limit_higher-erps))/(ui16_erps_limit_higher-ui16_erps_limit_lower)-current_cal_b; 	//ramp down the motor power within 2 km/h, if you are riding too fast
+	    //printf("Speed too high!\r\n");
 	}
   }
     return ((uint32_t)current_target);
