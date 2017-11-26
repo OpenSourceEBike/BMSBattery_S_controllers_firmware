@@ -33,11 +33,12 @@ int8_t uint_PWM_Enable=0; //flag for PWM state
 uint16_t ui16_BatteryCurrent_accumulated = 2496L; //8x current offset, for filtering or Battery Current
 uint16_t ui16_BatteryCurrent; //Battery Current read from ADC8
 uint8_t ui8_BatteryVoltage; //Battery Voltage read from ADC
+uint8_t ui8_regen_throttle; //regen throttle read from ADC
 static uint16_t ui16_PAS_accumulated = 64000L; // for filtering of PAS value
 static uint32_t ui32_erps_accumulated; //for filtering of erps
 uint32_t ui32_erps_filtered; //filtered value of erps
-uint16_t ui16_erps_limit_lower=((limit)*GEAR_RATIO/wheel_circumference);
-uint16_t ui16_erps_limit_higher=((limit+2)*GEAR_RATIO/wheel_circumference);
+uint16_t ui16_erps_limit_lower=((limit)*(GEAR_RATIO/wheel_circumference));
+uint16_t ui16_erps_limit_higher=((limit+2)*(GEAR_RATIO/wheel_circumference));
 
 uint16_t update_setpoint (uint16_t speed, uint16_t PAS, uint16_t sumtorque, uint16_t setpoint_old)
 {
@@ -50,18 +51,30 @@ uint16_t update_setpoint (uint16_t speed, uint16_t PAS, uint16_t sumtorque, uint
   ui32_erps_accumulated+=ui16_motor_speed_erps;
   ui32_erps_filtered=ui32_erps_accumulated>>3;
 
+  ui8_regen_throttle = ui8_adc_read_regen_throttle ();
+
 
   ui32_SPEED_km_h=(wheel_circumference*PWM_CYCLES_SECOND*36L)/(10000L*(uint32_t)speed);			//calculate speed in km/h conversion fr	om sec to hour --> *3600, conversion from mm to km --> /1000000, tic frequency 15625 Hz
   if(ui16_SPEED_Counter>40000){ui32_SPEED_km_h=0;}     //if wheel isn't turning, reset speed
 
+  //check if regen is wanted
+  if(ui8_regen_throttle>44){
+  float_temp=(float)ui8_regen_throttle*(float)(REGEN_CURRENT_MAX_VALUE+current_cal_b)/255.0-(float)current_cal_b;
+  ui32_setpoint= PI_control(ui16_BatteryCurrent, (uint16_t) float_temp);
+  if (ui32_setpoint<1)ui32_setpoint=0;
+  if (ui32_setpoint>255)ui32_setpoint=255;
+  printf("%lu, %d, %d, %d\r\n", ui32_setpoint, ui8_regen_throttle, ui16_BatteryCurrent, (uint16_t) float_temp);
+  }
   //check for undervoltage
-  if(ui8_BatteryVoltage<BATTERY_VOLTAGE_MIN_VALUE){
+  else if(ui8_BatteryVoltage<BATTERY_VOLTAGE_MIN_VALUE){
       ui32_setpoint=0; 	// highest priority: Stop motor for undervoltage protection
       TIM1_CtrlPWMOutputs(DISABLE);
             uint_PWM_Enable=0;
             ui32_setpoint=0; 	// highest priority: Stop motor for undervoltage protection
       printf("Low voltage! %d\n",ui8_BatteryVoltage);
     }
+
+
   //check if pedals are turning
 #ifndef THROTTLE
   else if (ui16_PAS_Counter>timeout){
@@ -101,10 +114,10 @@ uint16_t update_setpoint (uint16_t speed, uint16_t PAS, uint16_t sumtorque, uint
 
   uint32_current_target = CheckSpeed ((uint16_t)float_temp, (uint16_t) ui32_erps_filtered); //limit speed
   ui32_setpoint= PI_control(ui16_BatteryCurrent, (uint16_t) uint32_current_target);
-  if (ui32_setpoint<30)ui32_setpoint=0;
+  if (ui32_setpoint<1)ui32_setpoint=0;
   if (ui32_setpoint>255)ui32_setpoint=255;
 
-  //printf("%lu, %lu, %d, %d\r\n", ui32_setpoint, ui32_SPEED_km_h, ui16_BatteryCurrent, (uint16_t) uint32_current_target);
+  printf("%lu, %d, %d, %d\r\n", ui32_setpoint, ui8_regen_throttle, ui16_BatteryCurrent, (uint16_t) uint32_current_target);
   //printf("setpoint %lu, Voltage %d, a %d, b %d, DCmax %d, erps %d\n", ui32_setpoint, ui8_BatteryVoltage, ui16_a, ui16_b, ui16_dutycycle_max, ui16_motor_speed_erps);
 #endif
 
