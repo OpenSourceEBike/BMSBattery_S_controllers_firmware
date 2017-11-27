@@ -305,9 +305,9 @@ uint8_t ui8_hall_sensors_last = 0;
 
 uint8_t ui8_adc_id_current = 0;
 
-uint8_t ui8_adc_motor_current_max;
+uint8_t ui8_adc_target_motor_current_max;
 uint8_t ui8_motor_current_filtered_10b;
-uint8_t ui8_adc_motor_regen_current_max;
+uint8_t ui8_adc_target_motor_regen_current_max;
 
 uint8_t ui8_adc_motor_total_current;
 uint8_t ui8_motor_total_current_offset;
@@ -319,7 +319,7 @@ uint16_t ui16_target_erps = 0;
 volatile uint16_t ui16_target_erps_max = MOTOR_OVER_SPEED_ERPS;
 uint16_t ui16_target_current_10b = 0;
 
-uint16_t ui16_adc_battery_voltage_accumulated = BATTERY_VOLTAGE_MED_VALUE;
+uint16_t ui16_adc_battery_voltage_accumulated = ADC_BATTERY_VOLTAGE_MED_VALUE;
 uint8_t ui8_adc_battery_voltage_filtered;
 
 uint16_t ui16_adc_motor_current_accumulated_10b = ADC_MOTOR_CURRENT_MAX_MED_VALUE_10B;
@@ -356,7 +356,7 @@ void motor_controller (void)
   do_motor_state_machine ();
   calc_motor_current_filtered ();
   do_battery_voltage_protection ();
-  do_motor_controller_mode ();
+//  do_motor_controller_mode ();
 }
 
 // runs every 64us (PWM frequency)
@@ -387,7 +387,7 @@ void TIM1_UPD_OVF_TRG_BRK_IRQHandler(void) __interrupt(TIM1_UPD_OVF_TRG_BRK_IRQH
     {
       case 3:
       // read here the phase B current: FOC Id current
-      ui8_adc_id_current = *(uint8_t*)(0x53EA); // ui8_adc_read_phase_B_current ();
+      ui8_adc_id_current = UI8_ADC_READ_PHASE_B_CURRENT;
       // minimum speed that to do FOC
       if (ui16_motor_speed_erps > MOTOR_ROTOR_ERPS_START_INTERPOLATION_60_DEGREES)
       {
@@ -536,13 +536,21 @@ void TIM1_UPD_OVF_TRG_BRK_IRQHandler(void) __interrupt(TIM1_UPD_OVF_TRG_BRK_IRQH
   // - ramp up/down PWM duty_cycle value
 
   // verify motor max current limit
-  ui8_adc_motor_total_current = *(uint8_t*)(0x53F0); // ui8_adc_read_motor_total_current ();
-  if (ui8_adc_motor_total_current > ui8_adc_motor_current_max)  // motor max current, reduce duty_cycle
+  ui8_adc_motor_total_current = UI8_ADC_MOTOR_TOTAL_CURRENT;
+  if (ui8_adc_motor_total_current > ui8_adc_target_motor_current_max)  // motor max current, reduce duty_cycle
   {
     if (ui8_duty_cycle > 0) { ui8_duty_cycle--; }
   }
+  // verify if there is regen current > 0 (if there is happening regen) and
+  // if battery voltage is over or equal to absolute battery max voltage, and if so
+  // reduce regen current
+  else if ((ui8_adc_motor_total_current < ui8_motor_total_current_offset) &&
+      (UI8_ADC_BATTERY_VOLTAGE >= ADC_BATTERY_VOLTAGE_MAX_VALUE))
+  {
+    if (ui8_duty_cycle < 255) { ui8_duty_cycle++; }
+  }
   // verify motor max regen current limit
-  else if (ui8_adc_motor_total_current < ui8_adc_motor_regen_current_max)  // motor max current, increase duty_cycle
+  else if (ui8_adc_motor_total_current < ui8_adc_target_motor_regen_current_max)
   {
     if (ui8_duty_cycle < 255) { ui8_duty_cycle++; }
   }
@@ -736,7 +744,7 @@ void motor_set_pwm_duty_cycle_target (uint8_t ui8_value)
 
 void motor_set_current_max (uint8_t ui8_value)
 {
-  ui8_adc_motor_current_max = ui8_motor_total_current_offset + ui8_value;
+  ui8_adc_target_motor_current_max = ui8_motor_total_current_offset + ui8_value;
 }
 
 uint8_t motor_get_current_filtered_10b (void)
@@ -746,7 +754,7 @@ uint8_t motor_get_current_filtered_10b (void)
 
 void motor_set_regen_current_max (uint8_t ui8_value)
 {
-  ui8_adc_motor_regen_current_max = ui8_motor_total_current_offset - ui8_value;
+  ui8_adc_target_motor_regen_current_max = ui8_motor_total_current_offset - ui8_value;
 }
 
 void motor_set_pwm_duty_cycle_ramp_up_inverse_step (uint16_t ui16_value)
@@ -857,7 +865,7 @@ void do_battery_voltage_protection (void)
   ui16_adc_battery_voltage_accumulated += ((uint16_t) ui8_adc_read_battery_voltage ());
   ui8_adc_battery_voltage_filtered = ui16_adc_battery_voltage_accumulated >> 6;
 
-  if (ui8_adc_battery_voltage_filtered > BATTERY_VOLTAGE_MAX_VALUE)
+  if (ui8_adc_battery_voltage_filtered > ADC_BATTERY_VOLTAGE_MAX_VALUE)
   {
 #ifdef BATTERY_OVER_VOLTAGE_PROTECTION
     // motor will stop and battery symbol on LCD will be empty and flashing | same as low level error
@@ -866,7 +874,7 @@ void do_battery_voltage_protection (void)
     motor_controller_set_error (MOTOR_CONTROLLER_ERROR_91_BATTERY_UNDER_VOLTAGE);
 #endif
   }
-  else if (ui8_adc_battery_voltage_filtered < BATTERY_VOLTAGE_MIN_VALUE)
+  else if (ui8_adc_battery_voltage_filtered < ADC_BATTERY_VOLTAGE_MIN_VALUE)
   {
     // motor will stop and battery symbol on LCD will be empty and flashing
     motor_controller_set_state (MOTOR_CONTROLLER_STATE_UNDER_VOLTAGE);
@@ -911,6 +919,8 @@ uint8_t motor_controller_get_error (void)
 
 void motor_set_pwm_duty_cycle (uint8_t ui8_value)
 {
+  if (ui8_value > PWM_VALUE_DUTY_CYCLE_MAX) { ui8_value = PWM_VALUE_DUTY_CYCLE_MAX; }
+
   ui8_duty_cycle = ui8_value;
 }
 

@@ -23,14 +23,12 @@ void EXTI_PORTA_IRQHandler(void) __interrupt(EXTI_PORTA_IRQHANDLER)
   if (brake_is_set())
   {
     motor_controller_set_state (MOTOR_CONTROLLER_STATE_BRAKE);
-    motor_disable_PWM ();
+    motor_set_pwm_duty_cycle_target (0);
     ebike_app_cruise_control_stop ();
   }
   else
   {
     motor_controller_reset_state (MOTOR_CONTROLLER_STATE_BRAKE);
-    motor_enable_PWM ();
-    motor_set_pwm_duty_cycle (0);
   }
 }
 
