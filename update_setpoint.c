@@ -21,6 +21,7 @@
 #include "adc.h"
 #include "update_setpoint.h"
 #include "config.h"
+#include "utils.h"
 
 
 
@@ -37,8 +38,10 @@ uint8_t ui8_regen_throttle; //regen throttle read from ADC
 static uint16_t ui16_PAS_accumulated = 64000L; // for filtering of PAS value
 static uint32_t ui32_erps_accumulated; //for filtering of erps
 uint32_t ui32_erps_filtered; //filtered value of erps
-uint16_t ui16_erps_limit_lower=((limit)*(GEAR_RATIO/wheel_circumference));
-uint16_t ui16_erps_limit_higher=((limit+2)*(GEAR_RATIO/wheel_circumference));
+//uint16_t ui16_erps_limit_lower=((limit)*(GEAR_RATIO/wheel_circumference));
+//uint16_t ui16_erps_limit_higher=((limit+2)*(GEAR_RATIO/wheel_circumference));
+uint16_t ui16_erps_limit_lower=(uint16_t)((float)GEAR_RATIO*(float)limit*10000.0/((float)wheel_circumference*36.0));
+uint16_t ui16_erps_limit_higher=(uint16_t)((float)GEAR_RATIO*(float)(limit+2)*10000.0/((float)wheel_circumference*36.0));
 
 uint16_t update_setpoint (uint16_t speed, uint16_t PAS, uint16_t sumtorque, uint16_t setpoint_old)
 {
@@ -51,17 +54,16 @@ uint16_t update_setpoint (uint16_t speed, uint16_t PAS, uint16_t sumtorque, uint
   ui32_erps_accumulated+=ui16_motor_speed_erps;
   ui32_erps_filtered=ui32_erps_accumulated>>3;
 
-  ui8_regen_throttle = ui8_adc_read_regen_throttle ();
-
+  ui8_regen_throttle = map (ui8_adc_read_regen_throttle () , ADC_THROTTLE_MIN_VALUE, ADC_THROTTLE_MAX_VALUE, 0, SETPOINT_MAX_VALUE); //map throttle to limits
 
   ui32_SPEED_km_h=(wheel_circumference*PWM_CYCLES_SECOND*36L)/(10000L*(uint32_t)speed);			//calculate speed in km/h conversion fr	om sec to hour --> *3600, conversion from mm to km --> /1000000, tic frequency 15625 Hz
   if(ui16_SPEED_Counter>40000){ui32_SPEED_km_h=0;}     //if wheel isn't turning, reset speed
 
   //check if regen is wanted
-  if(ui8_regen_throttle>44){
+  if(ui8_regen_throttle>5){
   float_temp=(float)ui8_regen_throttle*(float)(REGEN_CURRENT_MAX_VALUE+current_cal_b)/255.0-(float)current_cal_b;
   ui32_setpoint= PI_control(ui16_BatteryCurrent, (uint16_t) float_temp);
-  if (ui32_setpoint<1)ui32_setpoint=0;
+  if (ui32_setpoint<3)ui32_setpoint=0;
   if (ui32_setpoint>255)ui32_setpoint=255;
   printf("%lu, %d, %d, %d\r\n", ui32_setpoint, ui8_regen_throttle, ui16_BatteryCurrent, (uint16_t) float_temp);
   }
@@ -114,7 +116,7 @@ uint16_t update_setpoint (uint16_t speed, uint16_t PAS, uint16_t sumtorque, uint
 
   uint32_current_target = CheckSpeed ((uint16_t)float_temp, (uint16_t) ui32_erps_filtered); //limit speed
   ui32_setpoint= PI_control(ui16_BatteryCurrent, (uint16_t) uint32_current_target);
-  if (ui32_setpoint<1)ui32_setpoint=0;
+  if (ui32_setpoint<25)ui32_setpoint=0;
   if (ui32_setpoint>255)ui32_setpoint=255;
 
   printf("%lu, %d, %d, %d\r\n", ui32_setpoint, ui8_regen_throttle, ui16_BatteryCurrent, (uint16_t) uint32_current_target);
@@ -178,7 +180,7 @@ uint32_t PI_control (uint16_t ist, uint16_t soll)
 
 uint32_t CheckSpeed (uint16_t current_target, uint16_t erps)
 {
-  //printf("Speed %d, %d\r\n", erps,(uint16_t)((limit+2)*GEAR_RATIO));
+  //printf("Speed %d, %d\r\n", erps, ui16_erps_limit_lower);
   //ramp down motor power if you are riding too fast and speed liming is active
   if (erps>ui16_erps_limit_lower && ui8_cheat_state!=4){
 
