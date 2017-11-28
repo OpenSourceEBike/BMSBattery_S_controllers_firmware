@@ -9,6 +9,7 @@
 #include <stdint.h>
 #include <stdio.h>
 #include <float.h>
+#include "stm8s_iwdg.h"
 #include "stm8s.h"
 #include "stm8s_it.h"
 #include "gpio.h"
@@ -195,3 +196,5 @@ uint32_t CheckSpeed (uint16_t current_target, uint16_t erps)
   }
     return ((uint32_t)current_target);
   }
+
+

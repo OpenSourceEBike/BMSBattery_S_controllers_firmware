@@ -35,5 +35,6 @@ extern int8_t int8_t_hall_case[6];
 void hall_sensor_init (void);
 void hall_sensors_read_and_action (void);
 void motor_fast_loop (void);
+void watchdog_init (void);
 
 #endif /* _MOTOR_H_ */

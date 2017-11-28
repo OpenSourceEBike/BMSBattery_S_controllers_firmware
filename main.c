@@ -134,7 +134,10 @@ int main (void)
 //  ITC_SetSoftwarePriority (ITC_IRQ_TIM1_OVF, ITC_PRIORITYLEVEL_2);
 
   enableInterrupts();
-#if (SVM_TABLE == SVM)
+
+  watchdog_init (); //init watchdog after enabling interrupt to have fast loop running already
+
+  #if (SVM_TABLE == SVM)
   TIM1_SetCompare1(126 << 1);
   TIM1_SetCompare2(126 << 1);
   TIM1_SetCompare3(126 << 1);

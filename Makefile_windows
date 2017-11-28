@@ -30,6 +30,7 @@ ELF_SECTIONS_TO_REMOVE = -R DATA -R INITIALIZED -R SSEG -R .debug_line -R .debug
 EXTRASRCS = \
 	$(SDIR)/stm8s_itc.c \
 	$(SDIR)/stm8s_clk.c \
+	$(SDIR)/stm8s_iwdg.c \
 	$(SDIR)/stm8s_gpio.c \
 	$(SDIR)/stm8s_exti.c \
 	$(SDIR)/stm8s_uart2.c \
