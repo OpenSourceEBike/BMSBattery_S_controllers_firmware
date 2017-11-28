@@ -8,6 +8,7 @@
 
 #include <stdint.h>
 #include <stdio.h>
+#include "stm8s_iwdg.h"
 #include "stm8s_gpio.h"
 #include "stm8s_tim1.h"
 #include "motor.h"
@@ -16,7 +17,7 @@
 #include "config.h"
 #include "display_kingmeter.h"
 #include "adc.h"
-#include "stm8s_iwdg.h"
+
 
 uint8_t ui8_counter = 0;
 uint8_t ui8_half_rotation_flag = 0;

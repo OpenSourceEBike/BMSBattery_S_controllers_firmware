@@ -68,6 +68,7 @@ public class OSEC extends JFrame {
 	private JTextField p_factor;
 	private JTextField i_factor;
 	private JTextField GearRatio;
+	private JTextField txtMaxregencurrent;
 	
 	
 
@@ -146,32 +147,32 @@ public class OSEC extends JFrame {
 		txtSpeedlimit.setColumns(10);
 		
 		lblSupportFactor = new JLabel("Assist factor");
-		lblSupportFactor.setBounds(5, 201, 101, 14);
+		lblSupportFactor.setBounds(295, 230, 88, 14);
 		contentPane.add(lblSupportFactor);
 		
 		txtSupportfactor = new JTextField();
 		txtSupportfactor.setText("64");
-		txtSupportfactor.setBounds(150, 198, 86, 20);
+		txtSupportfactor.setBounds(382, 227, 86, 20);
 		contentPane.add(txtSupportfactor);
 		txtSupportfactor.setColumns(10);
 		
 		lblThrottleMin = new JLabel("Throttle min");
-		lblThrottleMin.setBounds(5, 229, 78, 14);
+		lblThrottleMin.setBounds(5, 201, 78, 14);
 		contentPane.add(lblThrottleMin);
 		
 		txtThrottlemin = new JTextField();
 		txtThrottlemin.setText("43");
-		txtThrottlemin.setBounds(150, 226, 86, 20);
+		txtThrottlemin.setBounds(150, 198, 86, 20);
 		contentPane.add(txtThrottlemin);
 		txtThrottlemin.setColumns(10);
 		
 		lblThrottleMax = new JLabel("Throttle max");
-		lblThrottleMax.setBounds(5, 260, 78, 14);
+		lblThrottleMax.setBounds(5, 232, 78, 14);
 		contentPane.add(lblThrottleMax);
 		
 		txtThrottlemax = new JTextField();
 		txtThrottlemax.setText("182");
-		txtThrottlemax.setBounds(150, 257, 86, 20);
+		txtThrottlemax.setBounds(150, 229, 86, 20);
 		contentPane.add(txtThrottlemax);
 		txtThrottlemax.setColumns(10);
 		
@@ -317,7 +318,7 @@ public class OSEC extends JFrame {
 		contentPane.add(lblOpenSourceFirmware);
 		
 		txtMaxbatterycurrent = new JTextField();
-		txtMaxbatterycurrent.setText("462");
+		txtMaxbatterycurrent.setText("372");
 		txtMaxbatterycurrent.setBounds(150, 288, 86, 20);
 		contentPane.add(txtMaxbatterycurrent);
 		txtMaxbatterycurrent.setColumns(10);
@@ -325,6 +326,16 @@ public class OSEC extends JFrame {
 		JLabel lblBatteryCurrentMax = new JLabel("Battery Current max");
 		lblBatteryCurrentMax.setBounds(5, 291, 131, 14);
 		contentPane.add(lblBatteryCurrentMax);
+		
+		JLabel lblRegenCurrentMax = new JLabel("Regen Current max");
+		lblRegenCurrentMax.setBounds(5, 260, 131, 14);
+		contentPane.add(lblRegenCurrentMax);
+		
+		txtMaxregencurrent = new JTextField();
+		txtMaxregencurrent.setText("282");
+		txtMaxregencurrent.setColumns(10);
+		txtMaxregencurrent.setBounds(150, 257, 86, 20);
+		contentPane.add(txtMaxregencurrent);
 		
 		txtUndervoltage = new JTextField();
 		txtUndervoltage.setText("127");
@@ -371,7 +382,7 @@ public class OSEC extends JFrame {
 		contentPane.add(lblGearRatio);
 		
 		GearRatio = new JTextField();
-		GearRatio.setText("8");
+		GearRatio.setText("64");
 		GearRatio.setColumns(10);
 		GearRatio.setBounds(150, 443, 86, 20);
 		contentPane.add(GearRatio);
@@ -488,6 +499,8 @@ public class OSEC extends JFrame {
 		            pWriter.println(text_to_save); 
 		            text_to_save = "#define BATTERY_CURRENT_MAX_VALUE " + txtMaxbatterycurrent.getText()+"L";
 		            pWriter.println(text_to_save); 
+		            text_to_save = "#define REGEN_CURRENT_MAX_VALUE " + txtMaxregencurrent.getText()+"L";
+		            pWriter.println(text_to_save); 
 		            text_to_save = "#define MOTOR_ROTOR_DELTA_PHASE_ANGLE_RIGHT " + txtMotor_specific_angle.getText();
 		            pWriter.println(text_to_save); 
 		            text_to_save = "#define current_cal_a " + txtBatteryCurcala.getText();
@@ -567,6 +580,8 @@ public class OSEC extends JFrame {
 		btnWriteConfiguration.setForeground(Color.BLUE);
 		btnWriteConfiguration.setBounds(295, 471, 167, 58);
 		contentPane.add(btnWriteConfiguration);
+		
+
 		
 		
 	}

@@ -9,7 +9,6 @@
 #include <stdint.h>
 #include <stdio.h>
 #include <float.h>
-#include "stm8s_iwdg.h"
 #include "stm8s.h"
 #include "stm8s_it.h"
 #include "gpio.h"
