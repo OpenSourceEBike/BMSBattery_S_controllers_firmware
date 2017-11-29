@@ -106,8 +106,8 @@ uint8_t ebike_app_cruise_control (uint8_t ui8_value)
   switch (ui8_cruise_state)
   {
     case 0:
-    if ((ui8_value > CRUISE_CONTROL_MIN_VALUE) &&
-	((ui8_value > (ui8_cruise_value - CRUISE_CONTROL_MIN_VALUE)) || (ui8_value < (ui8_cruise_value + CRUISE_CONTROL_MIN_VALUE))))
+    if ((ui8_value > CRUISE_CONTROL_MIN) &&
+	((ui8_value > (ui8_cruise_value - CRUISE_CONTROL_MIN)) || (ui8_value < (ui8_cruise_value + CRUISE_CONTROL_MIN))))
     {
       ui8_cruise_counter++;
       ui8_cruise_output = ui8_value;
@@ -129,11 +129,11 @@ uint8_t ebike_app_cruise_control (uint8_t ui8_value)
     break;
 
     case 1:
-    if (ui8_value < CRUISE_CONTROL_MIN_VALUE) { ui8_cruise_state = 2; }
+    if (ui8_value < CRUISE_CONTROL_MIN) { ui8_cruise_state = 2; }
     break;
 
     case 2:
-    if (ui8_value > CRUISE_CONTROL_MIN_VALUE)
+    if (ui8_value > CRUISE_CONTROL_MIN)
     {
       ui8_cruise_state = 0;
       ui8_cruise_output = ui8_value;
@@ -563,8 +563,8 @@ void read_throotle (void)
 
   // verify if torque sensor is connect or if there is any error
   // if error: error symbol on LCD will be shown
-  if ((ui8_adc_throttle_value < ADC_THROTTLE_MIN_VALUE_ERROR) ||
-      (ui8_adc_throttle_value > ADC_THROTTLE_MAX_VALUE_ERROR))
+  if ((ui8_adc_throttle_value < ADC_THROTTLE_MIN_ERROR) ||
+      (ui8_adc_throttle_value > ADC_THROTTLE_MAX_ERROR))
   {
     motor_controller_set_state (MOTOR_CONTROLLER_STATE_THROTTLE_ERROR);
     motor_disable_PWM ();

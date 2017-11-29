@@ -21,6 +21,7 @@
 #include "adc.h"
 #include "utils.h"
 #include "uart.h"
+#include "adc.h"
 #include "watchdog.h"
 
 #define SVM_TABLE_LEN 256
@@ -319,10 +320,10 @@ uint16_t ui16_target_erps = 0;
 volatile uint16_t ui16_target_erps_max = MOTOR_OVER_SPEED_ERPS;
 uint16_t ui16_target_current_10b = 0;
 
-uint16_t ui16_adc_battery_voltage_accumulated = ADC_BATTERY_VOLTAGE_MED_VALUE;
+uint16_t ui16_adc_battery_voltage_accumulated = ADC_BATTERY_VOLTAGE_MED;
 uint8_t ui8_adc_battery_voltage_filtered;
 
-uint16_t ui16_adc_motor_current_accumulated_10b = ADC_MOTOR_CURRENT_MAX_MED_VALUE_10B;
+uint16_t ui16_adc_motor_current_accumulated_10b = ADC_MOTOR_CURRENT_MAX_MED_10B;
 uint16_t ui16_adc_motor_current_filtered_10b;
 
 uint8_t ui8_motor_controller_error = MOTOR_CONTROLLER_ERROR_EMPTY;
@@ -387,7 +388,7 @@ void TIM1_UPD_OVF_TRG_BRK_IRQHandler(void) __interrupt(TIM1_UPD_OVF_TRG_BRK_IRQH
     {
       case 3:
       // read here the phase B current: FOC Id current
-      ui8_adc_id_current = UI8_ADC_READ_PHASE_B_CURRENT;
+      ui8_adc_id_current = UI8_ADC_PHASE_B_CURRENT;
       // minimum speed that to do FOC
       if (ui16_motor_speed_erps > MOTOR_ROTOR_ERPS_START_INTERPOLATION_60_DEGREES)
       {
@@ -545,7 +546,7 @@ void TIM1_UPD_OVF_TRG_BRK_IRQHandler(void) __interrupt(TIM1_UPD_OVF_TRG_BRK_IRQH
   // if battery voltage is over or equal to absolute battery max voltage, and if so
   // reduce regen current
   else if ((ui8_adc_motor_total_current < ui8_motor_total_current_offset) &&
-      (UI8_ADC_BATTERY_VOLTAGE >= ADC_BATTERY_VOLTAGE_MAX_VALUE))
+      (UI8_ADC_BATTERY_VOLTAGE >= ADC_BATTERY_VOLTAGE_MAX))
   {
     if (ui8_duty_cycle < 255) { ui8_duty_cycle++; }
   }
@@ -865,7 +866,7 @@ void do_battery_voltage_protection (void)
   ui16_adc_battery_voltage_accumulated += ((uint16_t) ui8_adc_read_battery_voltage ());
   ui8_adc_battery_voltage_filtered = ui16_adc_battery_voltage_accumulated >> 6;
 
-  if (ui8_adc_battery_voltage_filtered > ADC_BATTERY_VOLTAGE_MAX_VALUE)
+  if (ui8_adc_battery_voltage_filtered > ADC_BATTERY_VOLTAGE_MAX)
   {
 #ifdef BATTERY_OVER_VOLTAGE_PROTECTION
     // motor will stop and battery symbol on LCD will be empty and flashing | same as low level error
@@ -874,7 +875,7 @@ void do_battery_voltage_protection (void)
     motor_controller_set_error (MOTOR_CONTROLLER_ERROR_91_BATTERY_UNDER_VOLTAGE);
 #endif
   }
-  else if (ui8_adc_battery_voltage_filtered < ADC_BATTERY_VOLTAGE_MIN_VALUE)
+  else if (ui8_adc_battery_voltage_filtered < ADC_BATTERY_VOLTAGE_MIN)
   {
     // motor will stop and battery symbol on LCD will be empty and flashing
     motor_controller_set_state (MOTOR_CONTROLLER_STATE_UNDER_VOLTAGE);
