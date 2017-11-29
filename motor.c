@@ -732,8 +732,7 @@ void motor_init (void)
   /***************************************************************************************/
 
   motor_set_current_max (ADC_MOTOR_CURRENT_MAX);
-//  motor_set_regen_current_max (ADC_MOTOR_REGEN_CURRENT_MAX);
-  motor_set_regen_current_max (1);
+  motor_set_regen_current_max (0); // disable regen
   motor_set_pwm_duty_cycle_ramp_up_inverse_step (PWM_DUTY_CYCLE_RAMP_UP_INVERSE_STEP); // each step = 64us
   motor_set_pwm_duty_cycle_ramp_down_inverse_step (PWM_DUTY_CYCLE_RAMP_DOWN_INVERSE_STEP); // each step = 64us
 }
