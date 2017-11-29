@@ -162,6 +162,7 @@ uint8_t throttle_is_set (void)
 void communications_controller (void)
 {
   uint8_t ui8_moving_indication = 0;
+  int8_t i8_motor_current_filtered_10b = 0;
 
   /********************************************************************************************/
   // Prepare and send packate to LCD
@@ -218,7 +219,9 @@ void communications_controller (void)
   // - B8 = 250, LCD shows 1875 watts
   // - B8 = 100, LCD shows 750 watts
   // each unit of B8 = 0.25A
-  ui8_tx_buffer [8] = (uint8_t) (motor_get_current_filtered_10b () << 1);
+  i8_motor_current_filtered_10b = motor_get_current_filtered_10b ();
+  if (i8_motor_current_filtered_10b < 0) { i8_motor_current_filtered_10b = 0; } // limit to be only positive value, LCD don't accept regen current value
+  ui8_tx_buffer [8] = (uint8_t) (i8_motor_current_filtered_10b << 1);
   // B9: motor temperature
   ui8_tx_buffer [9] = 0;
   // B10 and B11: 0
@@ -257,8 +260,9 @@ void communications_controller (void)
     }
 
     // see if CRC is ok
-    if (((ui8_crc ^ 9) == ui8_rx_buffer [7]) || // CRC LCD5
-	((ui8_crc ^ 2) == ui8_rx_buffer [7])) 	// CRC LCD3
+    if (((ui8_crc ^ 10) == ui8_rx_buffer [7]) 	|| // some versions of CRC LCD5 (??)
+	((ui8_crc ^ 9) == ui8_rx_buffer [7]) 	|| // CRC LCD5
+	((ui8_crc ^ 2) == ui8_rx_buffer [7])) 	   // CRC LCD3
     {
       lcd_configuration_variables.ui8_assist_level = ui8_rx_buffer [3] & 7;
       lcd_configuration_variables.ui8_motor_characteristic = ui8_rx_buffer [5];
@@ -522,7 +526,8 @@ void torque_sensor_control_mode (void)
 if (!motor_controller_state_is_set (MOTOR_CONTROLLER_STATE_BRAKE))
 {
   ui16_temp = ui8_throttle_value * lcd_configuration_variables.ui8_assist_level;
-  motor_set_pwm_duty_cycle_target (ui8_throttle_value);
+  if (ui16_temp > 255) { ui16_temp = 255; }
+  motor_set_pwm_duty_cycle_target ((uint8_t) ui16_temp);
 }
 
 //  // depending on LCD P3 parameter, the target motor current will be set either to:

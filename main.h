@@ -16,9 +16,16 @@
 #define CONTROLLER_TYPE CONTROLLER_TYPE_S06S
 
 #define MOTOR_TYPE_Q85 1
-#define MOTOR_TYPE_Q100 3
-#define MOTOR_TYPE_EUC2 2
+#define MOTOR_TYPE_Q100 2
+#define MOTOR_TYPE_Q11 3
+#define MOTOR_TYPE_EUC2 4
+
+#define MOTOR_TYPE MOTOR_TYPE_Q11
+
+#if MOTOR_TYPE == MOTOR_TYPE_Q11
+#undef MOTOR_TYPE
 #define MOTOR_TYPE MOTOR_TYPE_Q85
+#endif
 
 #define MOTOR_CONTROL_MODE_TORQUE_SENSOR 1
 #define MOTOR_CONTROL_MODE MOTOR_CONTROL_MODE_FIXED_GEAR
@@ -36,7 +43,9 @@
 #define ADC_MOTOR_CURRENT_MAX_MED_10B 10144 // ADC_MOTOR_CURRENT_MAX_ZERO_VALUE_10B << 5
 #define ADC_MOTOR_CURRENT_MAX 30 // 30 = 15A; 1 --> 0.5A
 #define ADC_MOTOR_CURRENT_MAX_10B 120 // 120 = 15A; 1 --> 0.125A
-#define ADC_MOTOR_REGEN_CURRENT_MAX 30 	// 15A but the brake/regen must be only for a ferw seconds other way will be a problem!!
+//#define ADC_MOTOR_REGEN_CURRENT_MAX 30 	// 15A but the brake/regen must be only for a ferw seconds other way will be a problem!!
+//#define ADC_MOTOR_REGEN_CURRENT_MAX 1 	// 15A but the brake/regen must be only for a ferw seconds other way will be a problem!!
+#define ADC_MOTOR_REGEN_CURRENT_MAX 1 	// 15A but the brake/regen must be only for a ferw seconds other way will be a problem!!
 #elif CONTROLLER_TYPE == CONTROLLER_TYPE_S12S
 #define ADC_MOTOR_CURRENT_MAX_MED_10B 10144 // ADC_MOTOR_CURRENT_MAX_ZERO_VALUE_10B << 5
 #define ADC_MOTOR_CURRENT_MAX 50 // 50 = 25A; 1 --> 0.5A
@@ -45,8 +54,10 @@
 #endif
 
 #if CONTROLLER_TYPE == CONTROLLER_TYPE_S06S
-#define PWM_DUTY_CYCLE_RAMP_UP_INVERSE_STEP 100
-#define PWM_DUTY_CYCLE_RAMP_DOWN_INVERSE_STEP 30
+//#define PWM_DUTY_CYCLE_RAMP_UP_INVERSE_STEP 100
+//#define PWM_DUTY_CYCLE_RAMP_DOWN_INVERSE_STEP 30
+#define PWM_DUTY_CYCLE_RAMP_UP_INVERSE_STEP 25
+#define PWM_DUTY_CYCLE_RAMP_DOWN_INVERSE_STEP 10
 #elif CONTROLLER_TYPE == CONTROLLER_TYPE_S12S
 #define PWM_DUTY_CYCLE_RAMP_UP_INVERSE_STEP 100
 #define PWM_DUTY_CYCLE_RAMP_DOWN_INVERSE_STEP 30
@@ -61,11 +72,11 @@
 #if (MOTOR_TYPE == MOTOR_TYPE_Q85) || (MOTOR_TYPE == MOTOR_TYPE_Q100)
 // This value must be found experimenting. Motor should rotate forward and have a good torque,
 // a value to much higher or lower will make the motor not having torque while the motor starting up.
-#define MOTOR_ROTOR_OFFSET_ANGLE 209
+#define MOTOR_ROTOR_OFFSET_ANGLE 202
 
 // This value is ERPS speed after which a transition happens from sinewave no interpolation to have
 // interpolation 60 degrees and must be found experimentally but a value of 40 may be good
-#define MOTOR_ROTOR_ERPS_START_INTERPOLATION_60_DEGREES 40
+#define MOTOR_ROTOR_ERPS_START_INTERPOLATION_60_DEGREES 15
 
 // For some motors with not very well placed mosfets at 120 degrees between each of them. May be easier to keep disable this option
 //#define DO_SINEWAVE_INTERPOLATION_360_DEGREES
@@ -80,7 +91,6 @@
 #if MOTOR_TYPE == MOTOR_TYPE_Q85
 #define PWM_CYCLES_COUNTER_MAX 3125 // 5 erps minimum speed; 1/5 = 200ms; 200ms/64us = 3125
 #elif MOTOR_TYPE == MOTOR_TYPE_Q100
-//#define PWM_CYCLES_COUNTER_MAX 520 // 30 erps minimum speed; 1/5 = 200ms; 200ms/64us = 3125
 #define PWM_CYCLES_COUNTER_MAX 1041 // 15 erps minimum speed
 #endif
 
@@ -89,9 +99,9 @@
 
 #define SPEED_INVERSE_INTERPOLATION 625 // experimental value; min speed aftwer which interpolation starts
 
-#define PWM_VALUE_DUTY_CYCLE_MAX 245
-#define PWM_VALUE_DUTY_CYCLE_MIN 20
-#define MIDDLE_PWM_VALUE_DUTY_CYCLE_MAX (PWM_VALUE_DUTY_CYCLE_MAX/2)
+#define PWM_DUTY_CYCLE_MAX 254
+#define PWM_DUTY_CYCLE_MIN 20
+#define MIDDLE_PWM_DUTY_CYCLE_MAX (PWM_DUTY_CYCLE_MAX/2)
 
 #define ANGLE_1 0 //(360/256) / 300
 #define ANGLE_60 42
@@ -117,7 +127,8 @@
 
 //TORQUE SENSOR
 #define ADC_THROTTLE_MIN_VALUE 51 // 1V = 51
-#define ADC_THROTTLE_MAX_VALUE 229 // 4.5V = 229
+//#define ADC_THROTTLE_MAX_VALUE 229 // 4.5V = 229
+#define ADC_THROTTLE_MAX_VALUE 183 // 4.5V = 229
 //#define ADC_THROTTLE_MIN_VALUE 45
 //#define ADC_THROTTLE_MAX_VALUE 182
 #define ADC_THROTTLE_MIN_ERROR 35

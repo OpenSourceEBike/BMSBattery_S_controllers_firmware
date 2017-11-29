@@ -93,6 +93,7 @@ int main (void)
   {
 #ifdef DEBUG_UART
 //    printf ("%d, %d, %d, %d\n", ui16_motor_get_motor_speed_erps (), ui8_duty_cycle, ui8_motor_commutation_type, ui8_angle_correction);
+      printf ("%d, %d, %d, %d\n", ui16_motor_get_motor_speed_erps (), ui8_duty_cycle_target, ui8_duty_cycle, i8_motor_current_filtered_10b);
 #endif
 
     // because of continue; at the end of each if code block that will stop the while (1) loop there,
@@ -106,7 +107,7 @@ int main (void)
     }
 
     ui16_TIM2_counter = TIM2_GetCounter ();
-    if ((ui16_TIM2_counter - ui16_motor_controller_counter) > 781) // every 100ms
+    if ((ui16_TIM2_counter - ui16_ebike_app_controller_counter) > 781) // every 150ms
     {
       ui16_ebike_app_controller_counter = ui16_TIM2_counter;
       ebike_app_controller ();
