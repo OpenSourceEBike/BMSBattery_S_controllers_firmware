@@ -293,7 +293,7 @@ uint16_t ui16_PWM_cycles_counter_total = 0;
 uint16_t ui16_motor_speed_erps = 0;
 uint8_t ui8_sinewave_table_index = 0;
 uint8_t ui8_motor_rotor_absolute_angle = 0;
-uint8_t ui8_angle_correction = 127;
+volatile uint8_t ui8_angle_correction = 127;
 uint8_t ui8_interpolation_angle = 0;
 
 uint8_t ui8_motor_commutation_type = BLOCK_COMMUTATION;
@@ -307,7 +307,7 @@ uint8_t ui8_hall_sensors_last = 0;
 uint8_t ui8_adc_id_current = 0;
 
 uint8_t ui8_adc_target_motor_current_max;
-uint8_t ui8_motor_current_filtered_10b;
+int8_t i8_motor_current_filtered_10b;
 uint8_t ui8_adc_target_motor_regen_current_max;
 
 uint8_t ui8_adc_motor_total_current;
@@ -500,6 +500,7 @@ void TIM1_UPD_OVF_TRG_BRK_IRQHandler(void) __interrupt(TIM1_UPD_OVF_TRG_BRK_IRQH
   {
     ui16_PWM_cycles_counter = 0;
     ui16_PWM_cycles_counter_6 = 0;
+    ui8_half_erps_flag = 0;
     ui16_motor_speed_erps = 0;
     ui16_PWM_cycles_counter_total = 0xffff;
     ui8_angle_correction = 127;
@@ -580,47 +581,47 @@ void TIM1_UPD_OVF_TRG_BRK_IRQHandler(void) __interrupt(TIM1_UPD_OVF_TRG_BRK_IRQH
 
   // scale and apply _duty_cycle
   ui8_temp = ui8_svm_table [ui8_sinewave_table_index];
-  if (ui8_temp > MIDDLE_PWM_VALUE_DUTY_CYCLE_MAX)
+  if (ui8_temp > MIDDLE_PWM_DUTY_CYCLE_MAX)
   {
-    ui16_value = ((uint16_t) (ui8_temp - MIDDLE_PWM_VALUE_DUTY_CYCLE_MAX)) * ui8_duty_cycle;
+    ui16_value = ((uint16_t) (ui8_temp - MIDDLE_PWM_DUTY_CYCLE_MAX)) * ui8_duty_cycle;
     ui8_temp = (uint8_t) (ui16_value >> 8);
-    ui8_value_a = MIDDLE_PWM_VALUE_DUTY_CYCLE_MAX + ui8_temp;
+    ui8_value_a = MIDDLE_PWM_DUTY_CYCLE_MAX + ui8_temp;
   }
   else
   {
-    ui16_value = ((uint16_t) (MIDDLE_PWM_VALUE_DUTY_CYCLE_MAX - ui8_temp)) * ui8_duty_cycle;
+    ui16_value = ((uint16_t) (MIDDLE_PWM_DUTY_CYCLE_MAX - ui8_temp)) * ui8_duty_cycle;
     ui8_temp = (uint8_t) (ui16_value >> 8);
-    ui8_value_a = MIDDLE_PWM_VALUE_DUTY_CYCLE_MAX - ui8_temp;
+    ui8_value_a = MIDDLE_PWM_DUTY_CYCLE_MAX - ui8_temp;
   }
 
   // add 120 degrees and limit
   ui8_temp = ui8_svm_table [(uint8_t) (ui8_sinewave_table_index + 85 /* 120º */)];
-  if (ui8_temp > MIDDLE_PWM_VALUE_DUTY_CYCLE_MAX)
+  if (ui8_temp > MIDDLE_PWM_DUTY_CYCLE_MAX)
   {
-    ui16_value = ((uint16_t) (ui8_temp - MIDDLE_PWM_VALUE_DUTY_CYCLE_MAX)) * ui8_duty_cycle;
+    ui16_value = ((uint16_t) (ui8_temp - MIDDLE_PWM_DUTY_CYCLE_MAX)) * ui8_duty_cycle;
     ui8_temp = (uint8_t) (ui16_value >> 8);
-    ui8_value_b = MIDDLE_PWM_VALUE_DUTY_CYCLE_MAX + ui8_temp;
+    ui8_value_b = MIDDLE_PWM_DUTY_CYCLE_MAX + ui8_temp;
   }
   else
   {
-    ui16_value = ((uint16_t) (MIDDLE_PWM_VALUE_DUTY_CYCLE_MAX - ui8_temp)) * ui8_duty_cycle;
+    ui16_value = ((uint16_t) (MIDDLE_PWM_DUTY_CYCLE_MAX - ui8_temp)) * ui8_duty_cycle;
     ui8_temp = (uint8_t) (ui16_value >> 8);
-    ui8_value_b = MIDDLE_PWM_VALUE_DUTY_CYCLE_MAX - ui8_temp;
+    ui8_value_b = MIDDLE_PWM_DUTY_CYCLE_MAX - ui8_temp;
   }
 
   // subtract 120 degrees and limit
   ui8_temp = ui8_svm_table [(uint8_t) (ui8_sinewave_table_index + 171 /* 240º */)];
-  if (ui8_temp > MIDDLE_PWM_VALUE_DUTY_CYCLE_MAX)
+  if (ui8_temp > MIDDLE_PWM_DUTY_CYCLE_MAX)
   {
-    ui16_value = ((uint16_t) (ui8_temp - MIDDLE_PWM_VALUE_DUTY_CYCLE_MAX)) * ui8_duty_cycle;
+    ui16_value = ((uint16_t) (ui8_temp - MIDDLE_PWM_DUTY_CYCLE_MAX)) * ui8_duty_cycle;
     ui8_temp = (uint8_t) (ui16_value >> 8);
-    ui8_value_c = MIDDLE_PWM_VALUE_DUTY_CYCLE_MAX + ui8_temp;
+    ui8_value_c = MIDDLE_PWM_DUTY_CYCLE_MAX + ui8_temp;
   }
   else
   {
-    ui16_value = ((uint16_t) (MIDDLE_PWM_VALUE_DUTY_CYCLE_MAX - ui8_temp)) * ui8_duty_cycle;
+    ui16_value = ((uint16_t) (MIDDLE_PWM_DUTY_CYCLE_MAX - ui8_temp)) * ui8_duty_cycle;
     ui8_temp = (uint8_t) (ui16_value >> 8);
-    ui8_value_c = MIDDLE_PWM_VALUE_DUTY_CYCLE_MAX - ui8_temp;
+    ui8_value_c = MIDDLE_PWM_DUTY_CYCLE_MAX - ui8_temp;
   }
 
   // set final duty_cycle value
@@ -731,14 +732,14 @@ void motor_init (void)
   /***************************************************************************************/
 
   motor_set_current_max (ADC_MOTOR_CURRENT_MAX);
-  motor_set_regen_current_max (ADC_MOTOR_REGEN_CURRENT_MAX);
+  motor_set_regen_current_max (0); // disable regen
   motor_set_pwm_duty_cycle_ramp_up_inverse_step (PWM_DUTY_CYCLE_RAMP_UP_INVERSE_STEP); // each step = 64us
   motor_set_pwm_duty_cycle_ramp_down_inverse_step (PWM_DUTY_CYCLE_RAMP_DOWN_INVERSE_STEP); // each step = 64us
 }
 
 void motor_set_pwm_duty_cycle_target (uint8_t ui8_value)
 {
-  if (ui8_value > PWM_VALUE_DUTY_CYCLE_MAX) { ui8_value = PWM_VALUE_DUTY_CYCLE_MAX; }
+  if (ui8_value > PWM_DUTY_CYCLE_MAX) { ui8_value = PWM_DUTY_CYCLE_MAX; }
 
   ui8_duty_cycle_target = ui8_value;
 }
@@ -748,9 +749,9 @@ void motor_set_current_max (uint8_t ui8_value)
   ui8_adc_target_motor_current_max = ui8_motor_total_current_offset + ui8_value;
 }
 
-uint8_t motor_get_current_filtered_10b (void)
+int8_t motor_get_current_filtered_10b (void)
 {
-  return ui8_motor_current_filtered_10b;
+  return i8_motor_current_filtered_10b;
 }
 
 void motor_set_regen_current_max (uint8_t ui8_value)
@@ -824,7 +825,7 @@ uint8_t motor_speed_controller (void)
   i16_output >>= 5; // divide to 64, as MOTOR_SPEED_CONTROLLER_KP is 64x; avoid using floats
 
   i16_output = ui8_duty_cycle + i16_output;
-  if (i16_output > PWM_VALUE_DUTY_CYCLE_MAX) i16_output = PWM_VALUE_DUTY_CYCLE_MAX;
+  if (i16_output > PWM_DUTY_CYCLE_MAX) i16_output = PWM_DUTY_CYCLE_MAX;
   if (i16_output < 0) i16_output = 0;
 
   return (uint8_t) i16_output;
@@ -837,7 +838,7 @@ uint8_t motor_current_controller (void)
   int16_t i16_output;
   int16_t i16_motor_current;
 
-  i16_motor_current = (int16_t) ui8_motor_current_filtered_10b;
+  i16_motor_current = i8_motor_current_filtered_10b;
   // make sure current is not negative, we are here not to control negative/regen current
   if (i16_motor_current < 0)
   {
@@ -853,7 +854,7 @@ uint8_t motor_current_controller (void)
   i16_output >>= 5; // divide to 64, avoid using floats
 
   i16_output = ui8_duty_cycle + i16_output;
-  if (i16_output > PWM_VALUE_DUTY_CYCLE_MAX) i16_output = PWM_VALUE_DUTY_CYCLE_MAX;
+  if (i16_output > PWM_DUTY_CYCLE_MAX) i16_output = PWM_DUTY_CYCLE_MAX;
   if (i16_output < 0) i16_output = 0;
 
   return (uint8_t) i16_output;
@@ -920,7 +921,7 @@ uint8_t motor_controller_get_error (void)
 
 void motor_set_pwm_duty_cycle (uint8_t ui8_value)
 {
-  if (ui8_value > PWM_VALUE_DUTY_CYCLE_MAX) { ui8_value = PWM_VALUE_DUTY_CYCLE_MAX; }
+  if (ui8_value > PWM_DUTY_CYCLE_MAX) { ui8_value = PWM_DUTY_CYCLE_MAX; }
 
   ui8_duty_cycle = ui8_value;
 }
@@ -987,7 +988,7 @@ void calc_motor_current_filtered (void)
   ui16_adc_motor_current_accumulated_10b -= ui16_adc_motor_current_accumulated_10b >> 4;
   ui16_adc_motor_current_accumulated_10b += ui16_adc_read_motor_total_current_10b ();
   ui16_adc_motor_current_filtered_10b = ui16_adc_motor_current_accumulated_10b >> 4;
-  ui8_motor_current_filtered_10b = ui16_adc_motor_current_filtered_10b - ui16_motor_total_current_offset_10b;
+  i8_motor_current_filtered_10b = ui16_adc_motor_current_filtered_10b - ui16_motor_total_current_offset_10b;
 }
 
 // motor overcurrent interrupt

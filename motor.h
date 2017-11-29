@@ -39,13 +39,15 @@
 #define MOTOR_CONTROLLER_ERROR_91_BATTERY_UNDER_VOLTAGE 0x91
 
 extern uint8_t ui8_motor_commutation_type;
-extern uint8_t ui8_angle_correction;
+extern volatile uint8_t ui8_angle_correction;
 extern uint8_t ui8_adc_motor_total_current;
 extern uint8_t ui8_motor_total_current_offset;
 extern volatile uint8_t ui8_duty_cycle;
 extern uint8_t ui8_duty_cycle_target;
 extern volatile uint8_t ui8_duty_cycle;
 extern uint16_t ui16_pas_counter;
+extern uint16_t ui16_PWM_cycles_counter_total;
+extern int8_t i8_motor_current_filtered_10b;
 
 /***************************************************************************************/
 // Motor interface
@@ -56,7 +58,7 @@ void motor_enable_PWM (void);
 void motor_disable_PWM (void);
 void motor_set_pwm_duty_cycle_target (uint8_t value);
 void motor_set_current_max (uint8_t value); // steps of 0.5A each step
-uint8_t motor_get_current_filtered_10b (void); // steps of 0.125A each step
+int8_t motor_get_current_filtered_10b (void); // steps of 0.125A each step
 void motor_set_regen_current_max (uint8_t value); // steps of 0.5A each step
 void motor_set_pwm_duty_cycle_ramp_up_inverse_step (uint16_t value); // each step = 64us
 void motor_set_pwm_duty_cycle_ramp_down_inverse_step (uint16_t value); // each step = 64us
