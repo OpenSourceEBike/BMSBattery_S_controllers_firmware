@@ -344,6 +344,11 @@ uint8_t ui8_first_time_run_flag = 1;
 uint8_t ui8_pas_state_old;
 uint16_t ui16_pas_counter;
 
+uint8_t ui8_pas2_state;
+uint8_t ui8_pas2_state_old;
+uint8_t ui8_pas2_counter;
+uint8_t ui8_pas2_regen_current = 0;
+
 // functions prototypes
 void do_battery_voltage_protection (void);
 uint8_t motor_current_controller (void);
@@ -679,6 +684,44 @@ void TIM1_UPD_OVF_TRG_BRK_IRQHandler(void) __interrupt(TIM1_UPD_OVF_TRG_BRK_IRQH
   {
     IWDG->KR = IWDG_KEY_REFRESH; // reload watch dog timer counter
   }
+
+  /****************************************************************************/
+  // detect pedal rotating backwards and configure regen current
+
+  // detect PAS2 signal changes
+  if (!(PAS2__PORT->IDR & PAS2__PIN)) { ui8_pas2_state = 0; }
+  else { ui8_pas2_state = 1; }
+  if (ui8_pas2_state != ui8_pas2_state_old) // PAS2 signal did change
+  {
+    ui8_pas2_state_old = ui8_pas2_state;
+
+    if (PAS__PORT->IDR & PAS__PIN)
+    {
+      ui8_pas2_counter++;
+    }
+    else
+    {
+      ui8_pas2_counter = 0;
+      // decrement regen current if higher than zero
+      if (ui8_pas2_regen_current > 0)
+      {
+	ui8_pas2_regen_current--;
+	motor_set_regen_current_max (ui8_pas2_regen_current * ((uint8_t) ADC_MOTOR_REGEN_CURRENT_MAX_STEPS_5));
+      }
+    }
+
+    if (ui8_pas2_counter > 1) // now we are rotating backwards
+    {
+      // increment regen current value but up to the limit of 5
+      if (ui8_pas2_regen_current < 5)
+      {
+	ui8_pas2_regen_current++;
+	motor_set_regen_current_max (ui8_pas2_regen_current * ((uint8_t) ADC_MOTOR_REGEN_CURRENT_MAX_STEPS_5));
+      }
+    }
+  }
+
+
 
   /****************************************************************************/
   // clears the TIM1 interrupt TIM1_IT_UPDATE pending bit

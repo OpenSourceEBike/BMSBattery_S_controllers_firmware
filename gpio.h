@@ -99,6 +99,9 @@
 #define PAS__PIN                  GPIO_PIN_0
 #define PAS__PORT                 GPIOD
 
+#define PAS2__PIN                  GPIO_PIN_7
+#define PAS2__PORT                 GPIOB
+
 #define SPEED__PIN                  GPIO_PIN_5
 #define SPEED__PORT                 GPIOC
 

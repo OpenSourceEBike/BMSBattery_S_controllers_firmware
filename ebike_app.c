@@ -528,6 +528,13 @@ if (!motor_controller_state_is_set (MOTOR_CONTROLLER_STATE_BRAKE))
   ui16_temp = ui8_throttle_value * lcd_configuration_variables.ui8_assist_level;
   if (ui16_temp > 255) { ui16_temp = 255; }
   motor_set_pwm_duty_cycle_target ((uint8_t) ui16_temp);
+
+  if (ui8_throttle_value > 0)
+  {
+    motor_set_regen_current_max (0);
+    ui8_pas2_regen_current = 0;
+    ui8_pas2_counter = 0;
+  }
 }
 
 //  // depending on LCD P3 parameter, the target motor current will be set either to:

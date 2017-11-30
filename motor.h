@@ -48,6 +48,8 @@ extern volatile uint8_t ui8_duty_cycle;
 extern uint16_t ui16_pas_counter;
 extern uint16_t ui16_PWM_cycles_counter_total;
 extern int8_t i8_motor_current_filtered_10b;
+extern uint8_t ui8_pas2_regen_current;
+extern uint8_t ui8_pas2_counter;
 
 /***************************************************************************************/
 // Motor interface

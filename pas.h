@@ -12,5 +12,6 @@
 #include "main.h"
 
 void pas_init (void);
+void pas2_init (void);
 
 #endif /* _PAS_H_ */

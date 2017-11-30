@@ -31,6 +31,8 @@ void EXTI_PORTA_IRQHandler(void) __interrupt(EXTI_PORTA_IRQHANDLER)
   {
     motor_controller_reset_state (MOTOR_CONTROLLER_STATE_BRAKE);
     motor_set_regen_current_max (0); // disable ebrake/regen
+    ui8_pas2_regen_current = 0;
+    ui8_pas2_counter = 0;
   }
 }
 

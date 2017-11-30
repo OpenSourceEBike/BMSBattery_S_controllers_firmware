@@ -87,12 +87,15 @@ int main (void)
   eeprom_init ();
   motor_init ();
   pas_init ();
+pas2_init ();
   enableInterrupts ();
 
   while (1)
   {
 #ifdef DEBUG_UART
-    printf ("%d, %d, %d, %d\n", ui16_motor_get_motor_speed_erps (), ui8_duty_cycle, ui8_motor_commutation_type, ui8_angle_correction);
+//    printf ("%d, %d, %d, %d\n", ui16_motor_get_motor_speed_erps (), ui8_duty_cycle, ui8_motor_commutation_type, ui8_angle_correction);
+
+      printf ("%d, %d, %d, %d\n", ui8_throttle_value, ui8_pas2_regen_current, (PAS__PORT->IDR & PAS__PIN), (PAS2__PORT->IDR & PAS2__PIN));
 #endif
 
     // because of continue; at the end of each if code block that will stop the while (1) loop there,

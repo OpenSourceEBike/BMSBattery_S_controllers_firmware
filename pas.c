@@ -18,3 +18,11 @@ void pas_init (void)
 	    PAS__PIN,
 	    GPIO_MODE_IN_PU_NO_IT); // input pull-up, no external interrupt
 }
+
+void pas2_init (void)
+{
+  //PAS pin as external input pin interrupt
+  GPIO_Init(PAS2__PORT,
+	    PAS2__PIN,
+	    GPIO_MODE_IN_PU_NO_IT); // input pull-up, no external interrupt
+}
