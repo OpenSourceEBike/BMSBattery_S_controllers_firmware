@@ -51,11 +51,14 @@ uint8_t ui8_adc_throttle_value;
 uint8_t ui8_adc_throttle_value_cruise_control;
 uint8_t ui8_throttle_value;
 uint16_t ui16_throttle_value_accumulated = 0;
-uint16_t ui16_throttle_value_filtered;
+uint8_t ui8_throttle_value_filtered;
 uint8_t ui8_is_throotle_released;
 
-uint16_t ui16_pas_pwm_cycles_ticks = PAS_ABSOLUTE_MIN_CADENCE_PWM_CYCLE_TICKS;
+uint16_t volatile ui16_pas_pwm_cycles_ticks = PAS_ABSOLUTE_MIN_CADENCE_PWM_CYCLE_TICKS;
+uint16_t volatile ui16_pas_on_time_counter;
+uint16_t volatile ui16_pas_off_time_counter;
 uint8_t ui8_pas_cadence_rpm = 0;
+uint8_t ui8_pas_direction = 0;
 uint16_t ui16_motor_controller_max_current_10b;
 
 // function prototypes
@@ -64,9 +67,10 @@ uint8_t ebike_app_cruise_control (uint8_t ui8_value);
 void set_speed_erps_max_to_motor_controller (struc_lcd_configuration_variables *lcd_configuration_variables);
 void set_motor_controller_max_current (uint8_t ui8_controller_max_current);
 void calc_motor_speed (void);
-void torque_sensor_control_mode (void);
+void ebike_throotle_type_throotle_pas (void);
+void ebike_throotle_type_torque_sensor (void)
 void read_throotle (void);
-void read_pas_cadence (void);
+void read_pas_cadence_and_direction (void);
 
 void ebike_app_controller (void)
 {
@@ -78,14 +82,16 @@ void ebike_app_controller (void)
   read_throotle ();
 
   // read PAS cadence to global variable: ui8_pas_cadence_rps
-  read_pas_cadence ();
+  read_pas_cadence_and_direction ();
 
   // send and received information to/from the LCD as also setup the configuration variables
   communications_controller ();
 
   // control the motor using specific algorithm
-#if (MOTOR_CONTROL_MODE == MOTOR_CONTROL_MODE_FIXED_GEAR)
-  torque_sensor_control_mode ();
+#if (EBIKE_THROTTLE_TYPE == EBIKE_THROTTLE_TYPE_THROTTLE_PAS)
+  ebike_throotle_type_throotle_pas ();
+#elif (EBIKE_THROTTLE_TYPE == EBIKE_THROTTLE_TYPE_TORQUE_SENSOR)
+  ebike_throotle_type_torque_sensor ();
 #else
 #error
 #endif
@@ -507,58 +513,137 @@ void calc_motor_speed (void)
   ui8_wheel_speed = (uint8_t) f_motor_speed;
 }
 
-void read_pas_cadence (void)
+void read_pas_cadence_and_direction (void)
 {
-  // cadence in RPM =  60 / (ui16_pas_timer2_ticks * (PAS_NUMBER_MAGNETS * 2) * 0.000064)
+  // cadence in RPM =  60 / (ui16_pas_timer2_ticks * PAS_NUMBER_MAGNETS * 0.000064)
   if (ui16_pas_pwm_cycles_ticks >= PAS_ABSOLUTE_MIN_CADENCE_PWM_CYCLE_TICKS) { ui8_pas_cadence_rpm = 0; }
-  else { ui8_pas_cadence_rpm = (uint8_t) (60 / (((float) ui16_pas_pwm_cycles_ticks) * ((float) PAS_NUMBER_MAGNETS) * 0.000128)); }
+  else
+  {
+    ui8_pas_cadence_rpm = (uint8_t) (60 / (((float) ui16_pas_pwm_cycles_ticks) * ((float) PAS_NUMBER_MAGNETS) * 0.000064));
+
+    if (ui8_pas_cadence_rpm > PAS_MAX_CADENCE_RPM) { ui8_pas_cadence_rpm = PAS_MAX_CADENCE_RPM; }
+  }
+
+#if (PAS_DIRECTION == PAS_DIRECTION_RIGHT)
+  if (ui16_pas_on_time_counter > ui16_pas_off_time_counter)
+#else
+  if (ui16_pas_on_time_counter <= ui16_pas_off_time_counter)
+#endif
+  { ui8_pas_direction = 0; }
+  else
+  {
+    ui8_pas_direction = 1;
+    ui8_pas_cadence_rpm = 0; // pedals are rotating backwards so cadence = 0
+  }
 }
 
-void torque_sensor_control_mode (void)
+void ebike_throotle_type_throotle_pas (void)
 {
-  uint16_t ui16_target_current_10b;
-  uint16_t ui16_temp;
+#if (MOTOR_CONTROL_MODE == MOTOR_CONTROL_MODE_PWM_DUTY_CYCLE)
+  uint8_t ui8_temp;
+  float f_temp;
 
   // set target motor speed to the value defined on the LCD
   // (due to motor configurations on the motor controller, this will only put a limit to the max permited speed!)
   motor_controller_set_target_speed_erps (motor_controller_get_target_speed_erps_max ());
 
-if (!motor_controller_state_is_set (MOTOR_CONTROLLER_STATE_BRAKE))
-{
-  ui16_temp = ui8_throttle_value * lcd_configuration_variables.ui8_assist_level;
-  if (ui16_temp > 255) { ui16_temp = 255; }
-  motor_set_pwm_duty_cycle_target ((uint8_t) ui16_temp);
+  f_temp = (float) (((float) ui8_throttle_value_filtered) * ((float) lcd_configuration_variables.ui8_assist_level) * 0.2);
+  ui8_temp = (uint8_t) (map ((uint32_t) f_temp,
+  			 (uint32_t) 0,
+  			 (uint32_t) 255,
+  			 (uint32_t) 0,
+  			 (uint32_t) PWM_DUTY_CYCLE_MAX));
+  ui8_pwm_duty_cycle_duty_cycle_controller = ui8_temp;
+
+#elif (MOTOR_CONTROL_MODE == MOTOR_CONTROL_MODE_CURRENT_SPEED)
+  uint8_t ui8_temp;
+  uint16_t ui16_temp;
+  float f_temp;
+  uint16_t ui16_target_speed_erps;
+
+  // map ui8_pas_cadence_rpm to 0 - 255
+  ui8_temp = (uint8_t) (map ((uint32_t) ui8_pas_cadence_rpm,
+		 (uint32_t) 0,
+		 (uint32_t) PAS_MAX_CADENCE_RPM,
+		 (uint32_t) 0,
+		 (uint32_t) 255));
+
+  ui8_temp = ui8_max (ui8_throttle_value_filtered, ui8_temp); // use the max value from throotle or pas cadence
+
+  // scale with assist level value
+  f_temp = (float) (((float) ui8_temp) * ((float) lcd_configuration_variables.ui8_assist_level) * 0.2);
+
+  // map to motor controller current
+  ui16_temp = (uint16_t) (map ((uint32_t) f_temp,
+		   (uint32_t) 0,
+		   (uint32_t) 255,
+		   (uint32_t) 0,
+		   (uint32_t) ui16_motor_controller_max_current_10b));
+  motor_controller_set_target_current_10b (ui16_temp);
+
+  // if LCD P3 = 0, control also the speed
+  if (lcd_configuration_variables.ui8_power_assist_control_mode)
+  {
+    // set target motor speed to the value defined on the LCD
+    // (due to motor configurations on the motor controller, this will only put a limit to the max permited speed!)
+    motor_controller_set_target_speed_erps (motor_controller_get_target_speed_erps_max ());
+  }
+  else
+  {
+    // PAS cadence will setup motor speed
+    // map PAS candence value to motor speed value
+    ui16_target_speed_erps = (uint16_t) (map ((uint32_t) f_temp,
+		  (uint32_t) 0,
+		  (uint32_t) 255,
+		  (uint32_t) 0, // motor speed min value
+		  (uint32_t) motor_controller_get_target_speed_erps_max ())); // motor speed from max value, defined on the LCD
+    motor_controller_set_target_speed_erps (ui16_target_speed_erps);
+  }
+#endif
 }
 
-//  // depending on LCD P3 parameter, the target motor current will be set either to:
-//  // - pedal torque * (assist level / 2)
-//  // - humam power on the crank * (assist level / 2)
-//  if (lcd_configuration_variables.ui8_power_assist_control_mode)
-//  { // P3 = 1
-//    // scale pedal torque sensor value using (assist level / 2) from LCD
-//    ui16_temp = ((ui16_throttle_value_filtered << 4) * lcd_configuration_variables.ui8_assist_level) >> 5;
-//
-//    ui16_target_current_10b = (uint16_t) (map ((uint32_t) ui16_temp, // pedal torque
-//			 (uint32_t) 0, // min input value
-//			 (uint32_t) 255, // max input value
-//			 (uint32_t) 0, // min output motor current value
-//			 (uint32_t) ui16_motor_controller_max_current_10b));  // max output motor current value
-//    motor_controller_set_target_current_10b (ui16_target_current_10b);
-//  }
-//  else
-//  { // P3 = 0
-//    // scale pedal torque sensor value using (assist level / 2) from LCD
-//    ui16_temp = ((ui16_throttle_value_filtered << 4) * lcd_configuration_variables.ui8_assist_level) >> 5;
-//    // calc humam power on the crank using as input the pedal torque sensor value and pedal cadence
-//    ui16_temp = (uint16_t) ((float) ui16_temp * ((float) ((float) ui8_pas_cadence_rpm / ((float) PAS_MAX_CADENCE_RPM))));
-//
-//    ui16_target_current_10b = (uint16_t) (map ((uint32_t) ui16_temp, // human power value
-//			   (uint32_t) 0, // min input value
-//			   (uint32_t) 255, // max input value
-//			   (uint32_t) 0, // min output motor current value
-//			   (uint32_t) ui16_motor_controller_max_current_10b));  // max output motor current value
-//    motor_controller_set_target_current_10b (ui16_target_current_10b);
-//  }
+void ebike_throotle_type_torque_sensor (void)
+{
+  uint16_t ui16_target_current_10b;
+  uint16_t ui16_temp;
+  uint8_t ui8_temp;
+  float f_temp;
+
+  // scale pedal torque sensor value using (assist level / 2) from LCD
+  f_temp = (float) (((float) ui8_throttle_value_filtered) * ((float) lcd_configuration_variables.ui8_assist_level) * 0.5);
+
+#ifdef EBIKE_THROTTLE_TYPE_TORQUE_SENSOR_NO_HUMAN_POWER
+  // calc humam power on the crank using as input the pedal torque sensor value and pedal cadence
+  ui16_temp = (uint16_t) (f_temp * ((float) ((float) ui8_pas_cadence_rpm / ((float) PAS_MAX_CADENCE_RPM))));
+#else
+  ui16_temp = (uint16_t) f_temp;
+#endif
+
+  ui16_target_current_10b = (uint16_t) (map ((uint32_t) ui16_temp, // human power value
+			   (uint32_t) 0, // min input value
+			   (uint32_t) 255, // max input value
+			   (uint32_t) 0, // min output motor current value
+			   (uint32_t) ui16_motor_controller_max_current_10b));  // max output motor current value
+  motor_controller_set_target_current_10b (ui16_target_current_10b);
+
+  // if LCD P3 = 0, control also the speed
+  if (lcd_configuration_variables.ui8_power_assist_control_mode)
+  {
+    // set target motor speed to the value defined on the LCD
+    // (due to motor configurations on the motor controller, this will only put a limit to the max permited speed!)
+    motor_controller_set_target_speed_erps (motor_controller_get_target_speed_erps_max ());
+  }
+  else
+  {
+    // humam power will setup motor speed
+    // map humam power value to motor speed value
+    ui16_target_speed_erps = (uint16_t) (map ((uint32_t) ui16_temp,
+		  (uint32_t) 0,
+		  (uint32_t) 255,
+		  (uint32_t) 0, // motor speed min value
+		  (uint32_t) motor_controller_get_target_speed_erps_max ())); // motor speed from max value, defined on the LCD
+    motor_controller_set_target_speed_erps (ui16_target_speed_erps);
+  }
 }
 
 void read_throotle (void)
@@ -566,23 +651,13 @@ void read_throotle (void)
   // read torque sensor signal
   ui8_adc_throttle_value = ui8_adc_read_throttle ();
 
-  // verify if torque sensor is connect or if there is any error
-  // if error: error symbol on LCD will be shown
-  if ((ui8_adc_throttle_value < ADC_THROTTLE_MIN_ERROR) ||
-      (ui8_adc_throttle_value > ADC_THROTTLE_MAX_ERROR))
-  {
-    motor_controller_set_state (MOTOR_CONTROLLER_STATE_THROTTLE_ERROR);
-    motor_disable_PWM ();
-    motor_controller_set_error (MOTOR_CONTROLLER_ERROR_01_THROTTLE);
-  }
-
   // map throttle value from 0 up to 255
   ui8_throttle_value = (uint8_t) (map (ui8_adc_throttle_value, ADC_THROTTLE_MIN_VALUE, ADC_THROTTLE_MAX_VALUE, 0, 255));
 
   // low pass filter the torque sensor to smooth the signal
   ui16_throttle_value_accumulated -= ui16_throttle_value_accumulated >> 2;
   ui16_throttle_value_accumulated += ((uint16_t) ui8_throttle_value);
-  ui16_throttle_value_filtered = ui16_throttle_value_accumulated >> 2;
+  ui8_throttle_value_filtered = ui16_throttle_value_accumulated >> 2;
 
   // setup ui8_is_throotle_released flag
   ui8_is_throotle_released = (ui8_throttle_value ? 0 : 1);

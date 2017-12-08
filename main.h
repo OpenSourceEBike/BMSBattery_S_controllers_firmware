@@ -27,8 +27,23 @@
 #define MOTOR_TYPE MOTOR_TYPE_Q85
 #endif
 
-#define MOTOR_CONTROL_MODE_TORQUE_SENSOR 1
-#define MOTOR_CONTROL_MODE MOTOR_CONTROL_MODE_FIXED_GEAR
+// *************************************************************************** //
+// Configure throotle / PAS / torque sensor control
+// Configure PWM duty_cycle control or motor current/torque + wheel speed control
+
+#define EBIKE_THROTTLE_TYPE_THROTTLE_PAS		1
+#define EBIKE_THROTTLE_TYPE_TORQUE_SENSOR		2
+
+// choose between throotle and/or pas or torque sensor
+#define EBIKE_THROTTLE_TYPE	EBIKE_THROTTLE_TYPE_TORQUE_SENSOR
+// next, choose one of the both
+#define EBIKE_THROTTLE_TYPE_THROTTLE_PAS_PWM_DUTY_CYCLE // simple PWM duty_cycle control (is needed for development and debug)
+//#define EBIKE_THROTTLE_TYPE_THROTTLE_PAS_CURRENT_SPEED // control using motor current/torque and wheel speed
+
+// next, if enabled, output of torque sensor algorithm is the human power (torque * cadence) other way will be the same as the torque signal
+//#define EBIKE_THROTTLE_TYPE_TORQUE_SENSOR_HUMAN_POWER // output of torque sensor algorithm is the human power (torque * cadence)
+// *************************************************************************** //
+
 
 // MOTOR_TYPE_EUC2
 // 28V --> 66 ERPs
@@ -139,10 +154,15 @@
 // PAS
 #define PAS_NUMBER_MAGNETS 12
 #define PAS_MAX_CADENCE_RPM 90
+#define PAS_DIRECTION PAS_DIRECTION_RIGHT
 
-// (1/(150RPM/60)) / ((2*PAS_NUMBER_MAGNETS)) / 64us
-#define PAS_ABSOLUTE_MAX_CADENCE_PWM_CYCLE_TICKS  (3125 / PAS_NUMBER_MAGNETS) // max hard limit to 150RPM PAS cadence
-#define PAS_ABSOLUTE_MIN_CADENCE_PWM_CYCLE_TICKS  (78125 / PAS_NUMBER_MAGNETS) // min hard limit to 6RPM PAS cadence
+
+#define PAS_DIRECTION_RIGHT 0
+#define PAS_DIRECTION_LEFT 1
+
+// (1/(150RPM/60)) / (PAS_NUMBER_MAGNETS * 0.000064)
+#define PAS_ABSOLUTE_MAX_CADENCE_PWM_CYCLE_TICKS  (6250 / PAS_NUMBER_MAGNETS) // max hard limit to 150RPM PAS cadence
+#define PAS_ABSOLUTE_MIN_CADENCE_PWM_CYCLE_TICKS  (156250 / PAS_NUMBER_MAGNETS) // min hard limit to 6RPM PAS cadence
 
 // *************************************************************************** //
 // EEPROM memory variables default values

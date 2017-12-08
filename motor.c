@@ -344,6 +344,8 @@ uint8_t ui8_first_time_run_flag = 1;
 uint8_t ui8_pas_state_old;
 uint16_t ui16_pas_counter;
 
+uint8_t ui8_pwm_duty_cycle_duty_cycle_controller;
+
 // functions prototypes
 void do_battery_voltage_protection (void);
 uint8_t motor_current_controller (void);
@@ -357,7 +359,7 @@ void motor_controller (void)
   do_motor_state_machine ();
   calc_motor_current_filtered ();
   do_battery_voltage_protection ();
-//  do_motor_controller_mode ();
+  do_motor_controller_mode ();
 }
 
 // runs every 64us (PWM frequency)
@@ -642,28 +644,49 @@ void TIM1_UPD_OVF_TRG_BRK_IRQHandler(void) __interrupt(TIM1_UPD_OVF_TRG_BRK_IRQH
   }
 
   /****************************************************************************/
-  // calc PAS timming between pulses, in PWM cycles ticks
+  // calc PAS timming between each positive pulses, in PWM cycles ticks
+  // calc PAS on and off timming of each pulse, in PWM cycles ticks
+
   ui16_pas_counter++;
 
   // detect PAS signal changes
-  if ((PAS__PORT->IDR & PAS__PIN) == 0) { ui8_pas_state = 0; }
-  else { ui8_pas_state = 1; }
+  if ((PAS__PORT->IDR & PAS__PIN) == 0)
+  {
+    ui8_pas_state = 0;
+    ui16_pas_off_time_counter++;
+  }
+  else
+  {
+    ui8_pas_state = 1;
+    ui16_pas_on_time_counter++;
+  }
+
   if (ui8_pas_state != ui8_pas_state_old) // PAS signal did change
   {
     ui8_pas_state_old = ui8_pas_state;
 
-    // limit PAS cadence to be less than 150RPM
-    if (ui16_pas_counter < ((uint16_t) PAS_ABSOLUTE_MAX_CADENCE_PWM_CYCLE_TICKS)) { ui16_pas_counter = PAS_ABSOLUTE_MAX_CADENCE_PWM_CYCLE_TICKS; }
+    if (ui8_pas_state == 1) // consider only when PAS signal transition from 0 to 1
+    {
+      // limit PAS cadence to be less than PAS_ABSOLUTE_MAX_CADENCE_PWM_CYCLE_TICKS
+      if (ui16_pas_counter < ((uint16_t) PAS_ABSOLUTE_MAX_CADENCE_PWM_CYCLE_TICKS)) { ui16_pas_counter = PAS_ABSOLUTE_MAX_CADENCE_PWM_CYCLE_TICKS; }
 
-    ui16_pas_pwm_cycles_ticks = ui16_pas_counter;
-    ui16_pas_counter = 0;
+      ui16_pas_pwm_cycles_ticks = ui16_pas_counter;
+      ui16_pas_counter = 0;
+      ui16_pas_off_time_counter = 0;
+    }
+    else
+    {
+      ui16_pas_on_time_counter = 0;
+    }
   }
 
-  // limit PAS cadence to be minimum of 6 RPM
-  if (ui16_pas_counter > ((uint16_t) PAS_ABSOLUTE_MIN_CADENCE_PWM_CYCLE_TICKS))
+  // limit PAS cadence to be minimum of PAS_ABSOLUTE_MAX_CADENCE_PWM_CYCLE_TICKS
+  if (ui16_pas_counter > ((uint16_t) PAS_ABSOLUTE_MAX_CADENCE_PWM_CYCLE_TICKS))
   {
     ui16_pas_counter = PAS_ABSOLUTE_MIN_CADENCE_PWM_CYCLE_TICKS;
     ui16_pas_pwm_cycles_ticks = ui16_pas_counter;
+    ui16_pas_on_time_counter = 0;
+    ui16_pas_off_time_counter = 0;
   }
 
   /****************************************************************************/
@@ -887,15 +910,16 @@ void do_battery_voltage_protection (void)
 
 void do_motor_controller_mode (void)
 {
-  uint8_t ui8_pwm_duty_cycle_a;
-  uint8_t ui8_pwm_duty_cycle_b;
+  uint8_t ui8_pwm_duty_cycle_speed_controller;
+  uint8_t ui8_pwm_duty_cycle_current_controller;
 
-#if (MOTOR_CONTROL_MODE == MOTOR_CONTROL_MODE_FIXED_GEAR)
-  ui8_pwm_duty_cycle_a = motor_current_controller ();
-  ui8_pwm_duty_cycle_b = motor_speed_controller ();
-  motor_set_pwm_duty_cycle_target (ui8_min (ui8_pwm_duty_cycle_a, ui8_pwm_duty_cycle_b)); // apply the min value of both
-#else
-#error
+#if (MOTOR_CONTROL_MODE == MOTOR_CONTROL_MODE_PWM_DUTY_CYCLE)
+  ui8_pwm_duty_cycle_speed_controller = motor_current_controller ();
+  motor_set_pwm_duty_cycle_target (ui8_min (ui8_pwm_duty_cycle_duty_cycle_controller, ui8_pwm_duty_cycle_speed_controller)); // apply the min value of both
+#elif (MOTOR_CONTROL_MODE == MOTOR_CONTROL_MODE_CURRENT) || (MOTOR_CONTROL_MODE == MOTOR_CONTROL_MODE_CURRENT_SPEED)
+  ui8_pwm_duty_cycle_speed_controller = motor_current_controller ();
+  ui8_pwm_duty_cycle_current_controller = motor_speed_controller ();
+  motor_set_pwm_duty_cycle_target (ui8_min (ui8_pwm_duty_cycle_speed_controller, ui8_pwm_duty_cycle_current_controller)); // apply the min value of both
 #endif
 }
 
