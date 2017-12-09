@@ -22,9 +22,9 @@ typedef struct _lcd_configuration_variables
   uint8_t ui8_controller_max_current;
 } struc_lcd_configuration_variables;
 
-extern uint16_t ui16_pas_pwm_cycles_ticks;
-extern uint16_t ui16_pas_on_time_counter;
-extern uint16_t ui16_pas_off_time_counter;
+extern volatile uint16_t ui16_pas_pwm_cycles_ticks;
+extern volatile uint16_t ui16_pas_on_time_counter;
+extern volatile uint16_t ui16_pas_off_time_counter;
 extern uint8_t ui8_throttle_value;
 extern uint8_t ui8_adc_throttle_value;
 

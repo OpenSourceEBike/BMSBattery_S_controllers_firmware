@@ -68,7 +68,7 @@ void set_speed_erps_max_to_motor_controller (struc_lcd_configuration_variables *
 void set_motor_controller_max_current (uint8_t ui8_controller_max_current);
 void calc_motor_speed (void);
 void ebike_throotle_type_throotle_pas (void);
-void ebike_throotle_type_torque_sensor (void)
+void ebike_throotle_type_torque_sensor (void);
 void read_throotle (void);
 void read_pas_cadence_and_direction (void);
 
@@ -539,7 +539,7 @@ void read_pas_cadence_and_direction (void)
 
 void ebike_throotle_type_throotle_pas (void)
 {
-#if (MOTOR_CONTROL_MODE == MOTOR_CONTROL_MODE_PWM_DUTY_CYCLE)
+#if defined (EBIKE_THROTTLE_TYPE_THROTTLE_PAS_PWM_DUTY_CYCLE)
   uint8_t ui8_temp;
   float f_temp;
 
@@ -555,7 +555,7 @@ void ebike_throotle_type_throotle_pas (void)
   			 (uint32_t) PWM_DUTY_CYCLE_MAX));
   ui8_pwm_duty_cycle_duty_cycle_controller = ui8_temp;
 
-#elif (MOTOR_CONTROL_MODE == MOTOR_CONTROL_MODE_CURRENT_SPEED)
+#elif defined (EBIKE_THROTTLE_TYPE_THROTTLE_PAS_CURRENT_SPEED)
   uint8_t ui8_temp;
   uint16_t ui16_temp;
   float f_temp;
@@ -606,13 +606,13 @@ void ebike_throotle_type_torque_sensor (void)
 {
   uint16_t ui16_target_current_10b;
   uint16_t ui16_temp;
-  uint8_t ui8_temp;
   float f_temp;
+  uint16_t ui16_target_speed_erps;
 
   // scale pedal torque sensor value using (assist level / 2) from LCD
   f_temp = (float) (((float) ui8_throttle_value_filtered) * ((float) lcd_configuration_variables.ui8_assist_level) * 0.5);
 
-#ifdef EBIKE_THROTTLE_TYPE_TORQUE_SENSOR_NO_HUMAN_POWER
+#if defined (EBIKE_THROTTLE_TYPE_TORQUE_SENSOR_HUMAN_POWER)
   // calc humam power on the crank using as input the pedal torque sensor value and pedal cadence
   ui16_temp = (uint16_t) (f_temp * ((float) ((float) ui8_pas_cadence_rpm / ((float) PAS_MAX_CADENCE_RPM))));
 #else

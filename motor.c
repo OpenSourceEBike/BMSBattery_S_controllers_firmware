@@ -913,12 +913,12 @@ void do_motor_controller_mode (void)
   uint8_t ui8_pwm_duty_cycle_speed_controller;
   uint8_t ui8_pwm_duty_cycle_current_controller;
 
-#if (MOTOR_CONTROL_MODE == MOTOR_CONTROL_MODE_PWM_DUTY_CYCLE)
-  ui8_pwm_duty_cycle_speed_controller = motor_current_controller ();
+  ui8_pwm_duty_cycle_speed_controller = motor_speed_controller ();
+
+#if defined (EBIKE_THROTTLE_TYPE_THROTTLE_PAS_PWM_DUTY_CYCLE)
   motor_set_pwm_duty_cycle_target (ui8_min (ui8_pwm_duty_cycle_duty_cycle_controller, ui8_pwm_duty_cycle_speed_controller)); // apply the min value of both
-#elif (MOTOR_CONTROL_MODE == MOTOR_CONTROL_MODE_CURRENT) || (MOTOR_CONTROL_MODE == MOTOR_CONTROL_MODE_CURRENT_SPEED)
-  ui8_pwm_duty_cycle_speed_controller = motor_current_controller ();
-  ui8_pwm_duty_cycle_current_controller = motor_speed_controller ();
+#elif defined (EBIKE_THROTTLE_TYPE_THROTTLE_PAS_CURRENT_SPEED)
+  ui8_pwm_duty_cycle_current_controller = motor_current_controller ();
   motor_set_pwm_duty_cycle_target (ui8_min (ui8_pwm_duty_cycle_speed_controller, ui8_pwm_duty_cycle_current_controller)); // apply the min value of both
 #endif
 }

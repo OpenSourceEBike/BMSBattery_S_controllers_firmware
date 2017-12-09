@@ -41,7 +41,7 @@
 //#define EBIKE_THROTTLE_TYPE_THROTTLE_PAS_CURRENT_SPEED // control using motor current/torque and wheel speed
 
 // next, if enabled, output of torque sensor algorithm is the human power (torque * cadence) other way will be the same as the torque signal
-//#define EBIKE_THROTTLE_TYPE_TORQUE_SENSOR_HUMAN_POWER // output of torque sensor algorithm is the human power (torque * cadence)
+#define EBIKE_THROTTLE_TYPE_TORQUE_SENSOR_HUMAN_POWER // output of torque sensor algorithm is the human power (torque * cadence)
 // *************************************************************************** //
 
 
