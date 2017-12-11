@@ -571,7 +571,38 @@ void ebike_throotle_type_throotle_pas (void)
   ui8_temp = ui8_max (ui8_throttle_value_filtered, ui8_temp); // use the max value from throotle or pas cadence
 
   // scale with assist level value
-  f_temp = (float) (((float) ui8_temp) * ((float) lcd_configuration_variables.ui8_assist_level) * 0.2);
+  switch (lcd_configuration_variables.ui8_assist_level)
+  {
+    case 0:
+    f_temp = PAS_ASSIST_LEVEL_0;
+    break;
+
+    case 1:
+    f_temp = PAS_ASSIST_LEVEL_1;
+    break;
+
+    case 2:
+    f_temp = PAS_ASSIST_LEVEL_2;
+    break;
+
+    case 3:
+    f_temp = PAS_ASSIST_LEVEL_3;
+    break;
+
+    case 4:
+    f_temp = PAS_ASSIST_LEVEL_4;
+    break;
+
+    case 5:
+    f_temp = PAS_ASSIST_LEVEL_5;
+    break;
+
+    default:
+    f_temp = PAS_ASSIST_LEVEL_5;
+    break;
+  }
+
+  f_temp = (float) (((float) ui8_temp) * ((float) lcd_configuration_variables.ui8_assist_level) * f_temp);
 
   // map to motor controller current
   ui16_temp = (uint16_t) (map ((uint32_t) f_temp,
@@ -609,8 +640,38 @@ void ebike_throotle_type_torque_sensor (void)
   float f_temp;
   uint16_t ui16_target_speed_erps;
 
-  // scale pedal torque sensor value using (assist level / 2) from LCD
-  f_temp = (float) (((float) ui8_throttle_value_filtered) * ((float) lcd_configuration_variables.ui8_assist_level) * 0.5);
+  switch (lcd_configuration_variables.ui8_assist_level)
+  {
+    case 0:
+    f_temp = PAS_ASSIST_LEVEL_0;
+    break;
+
+    case 1:
+    f_temp = PAS_ASSIST_LEVEL_1;
+    break;
+
+    case 2:
+    f_temp = PAS_ASSIST_LEVEL_2;
+    break;
+
+    case 3:
+    f_temp = PAS_ASSIST_LEVEL_3;
+    break;
+
+    case 4:
+    f_temp = PAS_ASSIST_LEVEL_4;
+    break;
+
+    case 5:
+    f_temp = PAS_ASSIST_LEVEL_5;
+    break;
+
+    default:
+    f_temp = PAS_ASSIST_LEVEL_5;
+    break;
+  }
+
+  f_temp = (float) (((float) ui8_throttle_value_filtered) * (f_temp / 2.0));
 
 #if defined (EBIKE_THROTTLE_TYPE_TORQUE_SENSOR_HUMAN_POWER)
   // calc humam power on the crank using as input the pedal torque sensor value and pedal cadence

@@ -37,8 +37,8 @@
 // choose between throotle and/or pas or torque sensor
 #define EBIKE_THROTTLE_TYPE	EBIKE_THROTTLE_TYPE_TORQUE_SENSOR
 // next, choose one of the both
-#define EBIKE_THROTTLE_TYPE_THROTTLE_PAS_PWM_DUTY_CYCLE // simple PWM duty_cycle control (is needed for development and debug)
-//#define EBIKE_THROTTLE_TYPE_THROTTLE_PAS_CURRENT_SPEED // control using motor current/torque and wheel speed
+//#define EBIKE_THROTTLE_TYPE_THROTTLE_PAS_PWM_DUTY_CYCLE // simple PWM duty_cycle control (is needed for development and debug)
+#define EBIKE_THROTTLE_TYPE_THROTTLE_PAS_CURRENT_SPEED // control using motor current/torque and wheel speed
 
 // next, if enabled, output of torque sensor algorithm is the human power (torque * cadence) other way will be the same as the torque signal
 #define EBIKE_THROTTLE_TYPE_TORQUE_SENSOR_HUMAN_POWER // output of torque sensor algorithm is the human power (torque * cadence)
@@ -155,6 +155,13 @@
 #define PAS_NUMBER_MAGNETS 12
 #define PAS_MAX_CADENCE_RPM 90
 #define PAS_DIRECTION PAS_DIRECTION_RIGHT
+
+#define PAS_ASSIST_LEVEL_0 0.0
+#define PAS_ASSIST_LEVEL_1 0.2
+#define PAS_ASSIST_LEVEL_2 0.4
+#define PAS_ASSIST_LEVEL_3 0.6
+#define PAS_ASSIST_LEVEL_4 0.8
+#define PAS_ASSIST_LEVEL_5 1.0
 
 
 #define PAS_DIRECTION_RIGHT 0
