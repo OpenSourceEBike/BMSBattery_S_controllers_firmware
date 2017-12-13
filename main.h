@@ -13,14 +13,18 @@
 
 #define CONTROLLER_TYPE_S06S 1
 #define CONTROLLER_TYPE_S12S 2
-#define CONTROLLER_TYPE CONTROLLER_TYPE_S12S
+#define CONTROLLER_TYPE CONTROLLER_TYPE_S06S
 
 #define MOTOR_TYPE_Q85 1
 #define MOTOR_TYPE_Q100 2
 #define MOTOR_TYPE_Q11 3
 #define MOTOR_TYPE_EUC2 4
 
-#define MOTOR_TYPE MOTOR_TYPE_Q11
+#define MOTOR_TYPE MOTOR_TYPE_Q85
+
+#if MOTOR_TYPE == MOTOR_TYPE_Q11
+#define MOTOR_TYPE_DIRECT_DRIVE
+#endif
 
 #if MOTOR_TYPE == MOTOR_TYPE_Q11
 #undef MOTOR_TYPE
@@ -31,17 +35,20 @@
 // Configure throotle / PAS / torque sensor control
 // Configure PWM duty_cycle control or motor current/torque + wheel speed control
 
-#define EBIKE_THROTTLE_TYPE_THROTTLE_PAS		1
-#define EBIKE_THROTTLE_TYPE_TORQUE_SENSOR		2
-
 // choose between throotle and/or pas or torque sensor
-#define EBIKE_THROTTLE_TYPE	EBIKE_THROTTLE_TYPE_TORQUE_SENSOR
+#define EBIKE_THROTTLE_TYPE	EBIKE_THROTTLE_TYPE_THROTTLE_PAS
+//#define EBIKE_THROTTLE_TYPE	EBIKE_THROTTLE_TYPE_TORQUE_SENSOR
+
 // next, choose one of the both
 //#define EBIKE_THROTTLE_TYPE_THROTTLE_PAS_PWM_DUTY_CYCLE // simple PWM duty_cycle control (is needed for development and debug)
 #define EBIKE_THROTTLE_TYPE_THROTTLE_PAS_CURRENT_SPEED // control using motor current/torque and wheel speed
 
 // next, if enabled, output of torque sensor algorithm is the human power (torque * cadence) other way will be the same as the torque signal
 #define EBIKE_THROTTLE_TYPE_TORQUE_SENSOR_HUMAN_POWER // output of torque sensor algorithm is the human power (torque * cadence)
+
+
+#define EBIKE_THROTTLE_TYPE_THROTTLE_PAS		1
+#define EBIKE_THROTTLE_TYPE_TORQUE_SENSOR		2
 // *************************************************************************** //
 
 
@@ -152,7 +159,7 @@
 
 // *************************************************************************** //
 // PAS
-#define PAS_NUMBER_MAGNETS 12
+#define PAS_NUMBER_MAGNETS 8
 #define PAS_MAX_CADENCE_RPM 90
 #define PAS_DIRECTION PAS_DIRECTION_RIGHT
 
@@ -184,9 +191,9 @@
 // *************************************************************************** //
 // BATTERY
 
-//#define BATTERY_LI_ION_CELLS_NUMBER 7 // 7S = 24V battery pack
+#define BATTERY_LI_ION_CELLS_NUMBER 7 // 7S = 24V battery pack
 //#define BATTERY_LI_ION_CELLS_NUMBER 10 // 10S = 36V battery pack
-#define BATTERY_LI_ION_CELLS_NUMBER 13 // 13S = 48V battery pack
+//#define BATTERY_LI_ION_CELLS_NUMBER 13 // 13S = 48V battery pack
 
 // ADC Battery voltage
 // 29.8V --> 110 (8bits ADC)

@@ -54,11 +54,10 @@ uint16_t ui16_throttle_value_accumulated = 0;
 uint8_t ui8_throttle_value_filtered;
 uint8_t ui8_is_throotle_released;
 
-uint16_t volatile ui16_pas_pwm_cycles_ticks = PAS_ABSOLUTE_MIN_CADENCE_PWM_CYCLE_TICKS;
-uint16_t volatile ui16_pas_on_time_counter;
-uint16_t volatile ui16_pas_off_time_counter;
+volatile uint16_t ui16_pas_pwm_cycles_ticks = PAS_ABSOLUTE_MIN_CADENCE_PWM_CYCLE_TICKS;
+volatile uint8_t ui8_pas_direction = 0;
 uint8_t ui8_pas_cadence_rpm = 0;
-uint8_t ui8_pas_direction = 0;
+
 uint16_t ui16_motor_controller_max_current_10b;
 
 // function prototypes
@@ -516,25 +515,18 @@ void calc_motor_speed (void)
 void read_pas_cadence_and_direction (void)
 {
   // cadence in RPM =  60 / (ui16_pas_timer2_ticks * PAS_NUMBER_MAGNETS * 0.000064)
-  if (ui16_pas_pwm_cycles_ticks >= PAS_ABSOLUTE_MIN_CADENCE_PWM_CYCLE_TICKS) { ui8_pas_cadence_rpm = 0; }
+  if (ui16_pas_pwm_cycles_ticks >= ((uint16_t) PAS_ABSOLUTE_MIN_CADENCE_PWM_CYCLE_TICKS)) { ui8_pas_cadence_rpm = 0; }
   else
   {
     ui8_pas_cadence_rpm = (uint8_t) (60 / (((float) ui16_pas_pwm_cycles_ticks) * ((float) PAS_NUMBER_MAGNETS) * 0.000064));
 
-    if (ui8_pas_cadence_rpm > PAS_MAX_CADENCE_RPM) { ui8_pas_cadence_rpm = PAS_MAX_CADENCE_RPM; }
+    if (ui8_pas_cadence_rpm > ((uint8_t) PAS_MAX_CADENCE_RPM))
+    {
+      ui8_pas_cadence_rpm = ((uint8_t) PAS_MAX_CADENCE_RPM);
+    }
   }
 
-#if (PAS_DIRECTION == PAS_DIRECTION_RIGHT)
-  if (ui16_pas_on_time_counter > ui16_pas_off_time_counter)
-#else
-  if (ui16_pas_on_time_counter <= ui16_pas_off_time_counter)
-#endif
-  { ui8_pas_direction = 0; }
-  else
-  {
-    ui8_pas_direction = 1;
-    ui8_pas_cadence_rpm = 0; // pedals are rotating backwards so cadence = 0
-  }
+  if (ui8_pas_direction) { ui8_pas_cadence_rpm = 0; }
 }
 
 void ebike_throotle_type_throotle_pas (void)
@@ -547,7 +539,14 @@ void ebike_throotle_type_throotle_pas (void)
   // (due to motor configurations on the motor controller, this will only put a limit to the max permited speed!)
   motor_controller_set_target_speed_erps (motor_controller_get_target_speed_erps_max ());
 
-  f_temp = (float) (((float) ui8_throttle_value_filtered) * ((float) lcd_configuration_variables.ui8_assist_level) * 0.2);
+  // map ui8_pas_cadence_rpm to 0 - 255
+  ui8_temp = (uint8_t) (map ((uint32_t) ui8_pas_cadence_rpm,
+		 (uint32_t) 0,
+		 (uint32_t) PAS_MAX_CADENCE_RPM,
+		 (uint32_t) 0,
+		 (uint32_t) 255));
+
+  f_temp = (float) (((float) ui8_temp) * ((float) lcd_configuration_variables.ui8_assist_level) * 0.2);
   ui8_temp = (uint8_t) (map ((uint32_t) f_temp,
   			 (uint32_t) 0,
   			 (uint32_t) 255,

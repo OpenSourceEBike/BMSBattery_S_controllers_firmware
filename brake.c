@@ -26,6 +26,11 @@ void EXTI_PORTA_IRQHandler(void) __interrupt(EXTI_PORTA_IRQHANDLER)
     motor_set_regen_current_max (ADC_MOTOR_REGEN_CURRENT_MAX); // enable strong ebrake/regen at 15 amps
     motor_set_pwm_duty_cycle_target (0);
     ebike_app_cruise_control_stop ();
+
+#if !defined (MOTOR_TYPE_DIRECT_DRIVE)
+    TIM1->BKR &= ~TIM1_BKR_MOE; // disable PWM signal only if motor is not direct drive
+    motor_set_pwm_duty_cycle (0);
+#endif
   }
   else
   {

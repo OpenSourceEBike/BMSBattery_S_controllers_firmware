@@ -341,8 +341,11 @@ uint16_t ui16_value;
 
 uint8_t ui8_first_time_run_flag = 1;
 
+uint8_t ui8_pas_state;
 uint8_t ui8_pas_state_old;
 uint16_t ui16_pas_counter;
+uint16_t ui16_pas_on_time_counter;
+uint16_t ui16_pas_off_time_counter;
 
 uint8_t ui8_pwm_duty_cycle_duty_cycle_controller;
 
@@ -366,7 +369,6 @@ void motor_controller (void)
 void TIM1_UPD_OVF_TRG_BRK_IRQHandler(void) __interrupt(TIM1_UPD_OVF_TRG_BRK_IRQHANDLER)
 {
   uint8_t ui8_temp;
-  uint8_t ui8_pas_state;
 
   /****************************************************************************/
   // trigger ADC conversion of all channels (scan conversion, buffered)
@@ -543,7 +545,10 @@ void TIM1_UPD_OVF_TRG_BRK_IRQHandler(void) __interrupt(TIM1_UPD_OVF_TRG_BRK_IRQH
   ui8_adc_motor_total_current = UI8_ADC_MOTOR_TOTAL_CURRENT;
   if (ui8_adc_motor_total_current > ui8_adc_target_motor_current_max)  // motor max current, reduce duty_cycle
   {
-    if (ui8_duty_cycle > 0) { ui8_duty_cycle--; }
+    if (ui8_duty_cycle > 0)
+    {
+      ui8_duty_cycle--;
+    }
   }
   // verify if there is regen current > 0 (if there is happening regen) and
   // if battery voltage is over or equal to absolute battery max voltage, and if so
@@ -551,12 +556,18 @@ void TIM1_UPD_OVF_TRG_BRK_IRQHandler(void) __interrupt(TIM1_UPD_OVF_TRG_BRK_IRQH
   else if ((ui8_adc_motor_total_current < ui8_motor_total_current_offset) &&
       (UI8_ADC_BATTERY_VOLTAGE >= ADC_BATTERY_VOLTAGE_MAX))
   {
-    if (ui8_duty_cycle < 255) { ui8_duty_cycle++; }
+    if (ui8_duty_cycle < 255)
+    {
+      ui8_duty_cycle++;
+    }
   }
   // verify motor max regen current limit
   else if (ui8_adc_motor_total_current < ui8_adc_target_motor_regen_current_max)
   {
-    if (ui8_duty_cycle < 255) { ui8_duty_cycle++; }
+    if (ui8_duty_cycle < 255)
+    {
+      ui8_duty_cycle++;
+    }
   }
   else // no motor current limits, adjust duty_cycle to duty_cycle_target, including ramping
   {
@@ -672,21 +683,30 @@ void TIM1_UPD_OVF_TRG_BRK_IRQHandler(void) __interrupt(TIM1_UPD_OVF_TRG_BRK_IRQH
 
       ui16_pas_pwm_cycles_ticks = ui16_pas_counter;
       ui16_pas_counter = 0;
-      ui16_pas_off_time_counter = 0;
     }
     else
     {
+#if (PAS_DIRECTION == PAS_DIRECTION_RIGHT)
+      if (ui16_pas_on_time_counter > ui16_pas_off_time_counter)
+#else
+      if (ui16_pas_on_time_counter <= ui16_pas_off_time_counter)
+#endif
+      { ui8_pas_direction = 1; }
+      else { ui8_pas_direction = 0; }
+
+      ui16_pas_off_time_counter = 0;
       ui16_pas_on_time_counter = 0;
     }
   }
 
-  // limit PAS cadence to be minimum of PAS_ABSOLUTE_MAX_CADENCE_PWM_CYCLE_TICKS
-  if (ui16_pas_counter > ((uint16_t) PAS_ABSOLUTE_MAX_CADENCE_PWM_CYCLE_TICKS))
+  // limit PAS cadence to be minimum of PAS_ABSOLUTE_MIN_CADENCE_PWM_CYCLE_TICKS
+  if (ui16_pas_counter > ((uint16_t) PAS_ABSOLUTE_MIN_CADENCE_PWM_CYCLE_TICKS))
   {
-    ui16_pas_counter = PAS_ABSOLUTE_MIN_CADENCE_PWM_CYCLE_TICKS;
-    ui16_pas_pwm_cycles_ticks = ui16_pas_counter;
+    ui16_pas_pwm_cycles_ticks = PAS_ABSOLUTE_MIN_CADENCE_PWM_CYCLE_TICKS;
+    ui16_pas_counter = 0;
     ui16_pas_on_time_counter = 0;
     ui16_pas_off_time_counter = 0;
+    ui8_pas_direction = 1;
   }
 
   /****************************************************************************/
@@ -755,7 +775,7 @@ void motor_init (void)
   /***************************************************************************************/
 
   motor_set_current_max (ADC_MOTOR_CURRENT_MAX);
-  motor_set_regen_current_max (0); // disable regen
+  motor_set_regen_current_max (4);
   motor_set_pwm_duty_cycle_ramp_up_inverse_step (PWM_DUTY_CYCLE_RAMP_UP_INVERSE_STEP); // each step = 64us
   motor_set_pwm_duty_cycle_ramp_down_inverse_step (PWM_DUTY_CYCLE_RAMP_DOWN_INVERSE_STEP); // each step = 64us
 }
@@ -917,9 +937,10 @@ void do_motor_controller_mode (void)
 
 #if defined (EBIKE_THROTTLE_TYPE_THROTTLE_PAS_PWM_DUTY_CYCLE)
   motor_set_pwm_duty_cycle_target (ui8_min (ui8_pwm_duty_cycle_duty_cycle_controller, ui8_pwm_duty_cycle_speed_controller)); // apply the min value of both
+
 #elif defined (EBIKE_THROTTLE_TYPE_THROTTLE_PAS_CURRENT_SPEED)
   ui8_pwm_duty_cycle_current_controller = motor_current_controller ();
-  motor_set_pwm_duty_cycle_target (ui8_min (ui8_pwm_duty_cycle_speed_controller, ui8_pwm_duty_cycle_current_controller)); // apply the min value of both
+  motor_set_pwm_duty_cycle_target (ui8_min (ui8_pwm_duty_cycle_current_controller, ui8_pwm_duty_cycle_speed_controller)); // apply the min value of both
 #endif
 }
 
