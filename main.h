@@ -94,7 +94,16 @@
 #if (MOTOR_TYPE == MOTOR_TYPE_Q85) || (MOTOR_TYPE == MOTOR_TYPE_Q100)
 // This value must be found experimenting. Motor should rotate forward and have a good torque,
 // a value to much higher or lower will make the motor not having torque while the motor starting up.
+// This value can be tested with motor blocked, at startup, to found a value where is does have the best torque at startup
+// A value of MOTOR_ROTOR_OFFSET_ANGLE = 202 was found to be a good one for BMSBattery Q85 motor with S06S controller
 #define MOTOR_ROTOR_OFFSET_ANGLE 202
+
+// This value at 127 is the default but a value a bit higher or lower my improve the controller efficiency
+// This value can be tested with motor running at medium speed, where it is already running with sinewave interpolation (not at startup)
+// A way to test: put the motor with the same mechanical load (like on a bike training roller) and with a constant speed
+// changing this value will make the motor to need more or less current to mantain the same speed -- adjust to use the least current possible
+// A value of FOC_READ_ID_CURRENT_ANGLE_ADJUST = 137 was found to be a good one for BMSBattery Q85 motor with S06S controller
+#define FOC_READ_ID_CURRENT_ANGLE_ADJUST 137
 
 // This value is ERPS speed after which a transition happens from sinewave no interpolation to have
 // interpolation 60 degrees and must be found experimentally but a value of 40 may be good
@@ -125,13 +134,16 @@
 #define PWM_DUTY_CYCLE_MIN 20
 #define MIDDLE_PWM_DUTY_CYCLE_MAX (PWM_DUTY_CYCLE_MAX/2)
 
-#define ANGLE_1 0 //(360/256) / 300
-#define ANGLE_60 42
-#define ANGLE_120 85
-#define ANGLE_180 127
-#define ANGLE_240 170
-#define ANGLE_300 212
-#define ANGLE_360 255
+#define ANGLE_1 	(0 + MOTOR_ROTOR_OFFSET_ANGLE)
+#define ANGLE_60 	(42 + MOTOR_ROTOR_OFFSET_ANGLE)
+#define ANGLE_120 	(85 + MOTOR_ROTOR_OFFSET_ANGLE)
+#define ANGLE_180 	(127 + MOTOR_ROTOR_OFFSET_ANGLE)
+#define ANGLE_240 	(170 + MOTOR_ROTOR_OFFSET_ANGLE)
+#define ANGLE_300 	(212 + MOTOR_ROTOR_OFFSET_ANGLE)
+#define ANGLE_360 	(255 + MOTOR_ROTOR_OFFSET_ANGLE)
+
+// angle offset to make the FOC read Id current at 127 as default, just to be easier for the user when customizing
+#define FOC_READ_ID_CURRENT_OFFSET (127 - ((uint8_t) ANGLE_180))
 
 #define MOTOR_OVER_SPEED_ERPS 520 // motor max speed, protection max value | 30 points for the sinewave at max speed
 

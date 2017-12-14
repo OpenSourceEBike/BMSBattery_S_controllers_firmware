@@ -292,7 +292,9 @@ uint16_t ui16_PWM_cycles_counter_total = 0;
 
 uint16_t ui16_motor_speed_erps = 0;
 uint8_t ui8_sinewave_table_index = 0;
-uint8_t ui8_motor_rotor_absolute_angle = 0;
+uint8_t ui8_motor_rotor_absolute_angle;
+uint8_t ui8_motor_rotor_angle;
+uint8_t ui8_flag_foc_read_id_current = 0;
 volatile uint8_t ui8_angle_correction = 127;
 uint8_t ui8_interpolation_angle = 0;
 
@@ -374,6 +376,7 @@ void TIM1_UPD_OVF_TRG_BRK_IRQHandler(void) __interrupt(TIM1_UPD_OVF_TRG_BRK_IRQH
   // trigger ADC conversion of all channels (scan conversion, buffered)
   ADC1->CSR &= 0x09; // clear EOC flag first (selected also channel 9)
   ADC1->CR1 |= ADC1_CR1_ADON; // Start ADC1 conversion
+  /****************************************************************************/
 
   /****************************************************************************/
   // read hall sensor signals and:
@@ -391,18 +394,9 @@ void TIM1_UPD_OVF_TRG_BRK_IRQHandler(void) __interrupt(TIM1_UPD_OVF_TRG_BRK_IRQH
     switch (ui8_hall_sensors)
     {
       case 3:
-      // read here the phase B current: FOC Id current
-      ui8_adc_id_current = UI8_ADC_PHASE_B_CURRENT;
-      // minimum speed that to do FOC
-      if (ui16_motor_speed_erps > MOTOR_ROTOR_ERPS_START_INTERPOLATION_60_DEGREES)
-      {
-	if (ui8_adc_id_current > 127) { ui8_angle_correction++; }
-	else if (ui8_adc_id_current < 125) { ui8_angle_correction--; }
-      }
-
       if (ui8_motor_commutation_type != SINEWAVE_INTERPOLATION_360_DEGREES)
       {
-	ui8_motor_rotor_absolute_angle = ANGLE_180 + MOTOR_ROTOR_OFFSET_ANGLE;
+	ui8_motor_rotor_absolute_angle = (uint8_t) ANGLE_180;
       }
       break;
 
@@ -451,37 +445,38 @@ void TIM1_UPD_OVF_TRG_BRK_IRQHandler(void) __interrupt(TIM1_UPD_OVF_TRG_BRK_IRQH
 
       if (ui8_motor_commutation_type != SINEWAVE_INTERPOLATION_360_DEGREES)
       {
-	ui8_motor_rotor_absolute_angle = ANGLE_240 + MOTOR_ROTOR_OFFSET_ANGLE;
+	ui8_motor_rotor_absolute_angle = (uint8_t) ANGLE_240;
       }
       break;
 
       case 5:
       if (ui8_motor_commutation_type != SINEWAVE_INTERPOLATION_360_DEGREES)
       {
-	ui8_motor_rotor_absolute_angle = ANGLE_300 + MOTOR_ROTOR_OFFSET_ANGLE;
+	ui8_motor_rotor_absolute_angle = (uint8_t) ANGLE_300;
       }
       break;
 
       case 4:
       if (ui8_motor_commutation_type != SINEWAVE_INTERPOLATION_360_DEGREES)
       {
-	ui8_motor_rotor_absolute_angle = ANGLE_1 + MOTOR_ROTOR_OFFSET_ANGLE;
+	ui8_motor_rotor_absolute_angle = (uint8_t) ANGLE_1;
       }
       break;
 
       case 6:
       ui8_half_erps_flag = 1;
+      ui8_flag_foc_read_id_current = 1;
 
       if (ui8_motor_commutation_type != SINEWAVE_INTERPOLATION_360_DEGREES)
       {
-	ui8_motor_rotor_absolute_angle = ANGLE_60 + MOTOR_ROTOR_OFFSET_ANGLE;
+	ui8_motor_rotor_absolute_angle = (uint8_t) ANGLE_60;
       }
       break;
 
       case 2:
       if (ui8_motor_commutation_type != SINEWAVE_INTERPOLATION_360_DEGREES)
       {
-	ui8_motor_rotor_absolute_angle = ANGLE_120 + MOTOR_ROTOR_OFFSET_ANGLE;
+	ui8_motor_rotor_absolute_angle = (uint8_t) ANGLE_120;
       }
       break;
 
@@ -492,6 +487,7 @@ void TIM1_UPD_OVF_TRG_BRK_IRQHandler(void) __interrupt(TIM1_UPD_OVF_TRG_BRK_IRQH
 
     ui16_PWM_cycles_counter_6 = 0;
   }
+  /****************************************************************************/
 
   /****************************************************************************/
   // count number of fast loops / PWM cycles and reset some states when motor is near zero speed
@@ -513,27 +509,49 @@ void TIM1_UPD_OVF_TRG_BRK_IRQHandler(void) __interrupt(TIM1_UPD_OVF_TRG_BRK_IRQH
     ebike_app_cruise_control_stop ();
     if (ui8_motor_state == MOTOR_STATE_RUNNING) { ui8_motor_state = MOTOR_STATE_STOP; }
   }
+  /****************************************************************************/
 
   /****************************************************************************/
-  // calc interpolation angle and sinewave table index
+  // - calc interpolation angle and sinewave table index
+  // - read FOC Id current and ajust ui8_angle_correction
 #define DO_INTERPOLATION 1 // may be usefull to disable interpolation when debugging
 #if DO_INTERPOLATION == 1
   // calculate the interpolation angle (and it doesn't work when motor starts and at very low speeds)
   if (ui8_motor_commutation_type == SINEWAVE_INTERPOLATION_60_DEGREES)
   {
     ui8_interpolation_angle = (ui16_PWM_cycles_counter_6 << 8) / ui16_PWM_cycles_counter_total; // this operations take 4.4us
-    ui8_sinewave_table_index = ui8_motor_rotor_absolute_angle + ui8_angle_correction + ui8_interpolation_angle;
+    ui8_motor_rotor_angle = ui8_motor_rotor_absolute_angle + ui8_interpolation_angle;
+    ui8_sinewave_table_index = ui8_motor_rotor_angle + ui8_angle_correction;
   }
   else if (ui8_motor_commutation_type == SINEWAVE_INTERPOLATION_360_DEGREES)
   {
     ui8_interpolation_angle = (ui16_PWM_cycles_counter << 8) / ui16_PWM_cycles_counter_total;
-    ui8_sinewave_table_index = ui8_motor_rotor_absolute_angle + ui8_angle_correction + ui8_interpolation_angle;
+    ui8_motor_rotor_angle = ui8_motor_rotor_absolute_angle + ui8_interpolation_angle;
+    ui8_sinewave_table_index = ui8_motor_rotor_angle + ui8_angle_correction;
   }
   else
 #endif
   {
     ui8_sinewave_table_index = ui8_motor_rotor_absolute_angle + ui8_angle_correction;
   }
+
+  ui8_motor_rotor_angle += ((uint8_t) FOC_READ_ID_CURRENT_OFFSET);
+  // make sure we just execute one time per ERPS, so use the flag ui8_flag_foc_read_id_current
+  if ((ui8_motor_rotor_angle >= ((uint8_t) FOC_READ_ID_CURRENT_ANGLE_ADJUST)) && (ui8_flag_foc_read_id_current))
+  {
+    ui8_flag_foc_read_id_current = 0;
+
+    // minimum speed to do FOC
+    if (ui16_motor_speed_erps > MOTOR_ROTOR_ERPS_START_INTERPOLATION_60_DEGREES)
+    {
+      // read here the phase B current: FOC Id current
+      ui8_adc_id_current = UI8_ADC_PHASE_B_CURRENT;
+
+      if (ui8_adc_id_current > 127) { ui8_angle_correction++; }
+      else if (ui8_adc_id_current < 125) { ui8_angle_correction--; }
+    }
+  }
+  /****************************************************************************/
 
   /****************************************************************************/
   // PWM duty_cycle controller:
@@ -588,6 +606,7 @@ void TIM1_UPD_OVF_TRG_BRK_IRQHandler(void) __interrupt(TIM1_UPD_OVF_TRG_BRK_IRQH
       }
     }
   }
+  /****************************************************************************/
 
   /****************************************************************************/
   // calc final PWM duty_cycle values to be applied to TIMER1
@@ -653,11 +672,11 @@ void TIM1_UPD_OVF_TRG_BRK_IRQHandler(void) __interrupt(TIM1_UPD_OVF_TRG_BRK_IRQH
   {
     TIM1->BKR |= TIM1_BKR_MOE;
   }
+  /****************************************************************************/
 
   /****************************************************************************/
   // calc PAS timming between each positive pulses, in PWM cycles ticks
   // calc PAS on and off timming of each pulse, in PWM cycles ticks
-
   ui16_pas_counter++;
 
   // detect PAS signal changes
@@ -708,10 +727,10 @@ void TIM1_UPD_OVF_TRG_BRK_IRQHandler(void) __interrupt(TIM1_UPD_OVF_TRG_BRK_IRQH
     ui16_pas_off_time_counter = 0;
     ui8_pas_direction = 1;
   }
+  /****************************************************************************/
 
   /****************************************************************************/
   // reload watchdog timer, every PWM cycle to avoid automatic reset of the microcontroller
-
   if (ui8_first_time_run_flag)
   { // from the init of watchdog up to first reset on PWM cycle interrupt,
     // it can take up to 250ms and so we need to init here inside the PWM cycle
@@ -722,11 +741,12 @@ void TIM1_UPD_OVF_TRG_BRK_IRQHandler(void) __interrupt(TIM1_UPD_OVF_TRG_BRK_IRQH
   {
     IWDG->KR = IWDG_KEY_REFRESH; // reload watch dog timer counter
   }
+  /****************************************************************************/
 
   /****************************************************************************/
   // clears the TIM1 interrupt TIM1_IT_UPDATE pending bit
-
   TIM1->SR1 = (uint8_t)(~(uint8_t)TIM1_IT_UPDATE);
+  /****************************************************************************/
 }
 
 void motor_disable_PWM (void)
