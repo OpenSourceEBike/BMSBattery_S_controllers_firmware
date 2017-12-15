@@ -26,6 +26,7 @@
 #include "eeprom.h"
 #include "motor.h"
 #include "pas.h"
+#include "wheel_speed_sensor.h"
 
 uint16_t ui16_TIM2_counter = 0;
 uint16_t ui16_motor_controller_counter = 0;
@@ -87,6 +88,7 @@ int main (void)
   eeprom_init ();
   motor_init ();
   pas_init ();
+  wheel_speed_sensor_init ();
   enableInterrupts ();
 
   while (1)

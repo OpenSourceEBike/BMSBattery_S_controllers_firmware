@@ -11,10 +11,10 @@
 #include "stm8s_it.h"
 #include "gpio.h"
 
-void pas_init (void)
+void wheel_speed_sensor_init (void)
 {
-  //PAS pin as external input pin
-  GPIO_Init(PAS__PORT,
-	    PAS__PIN,
+  //whell speed sensor pin as input
+  GPIO_Init(WHEEL_SPEED_SENSOR__PORT,
+	    WHEEL_SPEED_SENSOR__PIN,
 	    GPIO_MODE_IN_PU_NO_IT); // input pull-up, no external interrupt
 }

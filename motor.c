@@ -349,6 +349,10 @@ uint16_t ui16_pas_counter;
 uint16_t ui16_pas_on_time_counter;
 uint16_t ui16_pas_off_time_counter;
 
+uint8_t ui8_wheel_speed_sensor_state;
+uint8_t ui8_wheel_speed_sensor_state_old;
+uint16_t ui16_wheel_speed_sensor_counter;
+
 uint8_t ui8_pwm_duty_cycle_duty_cycle_controller;
 
 // functions prototypes
@@ -718,14 +722,41 @@ void TIM1_UPD_OVF_TRG_BRK_IRQHandler(void) __interrupt(TIM1_UPD_OVF_TRG_BRK_IRQH
     }
   }
 
-  // limit PAS cadence to be minimum of PAS_ABSOLUTE_MIN_CADENCE_PWM_CYCLE_TICKS
+  // limit min PAS cadence
   if (ui16_pas_counter > ((uint16_t) PAS_ABSOLUTE_MIN_CADENCE_PWM_CYCLE_TICKS))
   {
-    ui16_pas_pwm_cycles_ticks = PAS_ABSOLUTE_MIN_CADENCE_PWM_CYCLE_TICKS;
+    ui16_pas_pwm_cycles_ticks = (uint16_t) PAS_ABSOLUTE_MIN_CADENCE_PWM_CYCLE_TICKS;
     ui16_pas_counter = 0;
     ui16_pas_on_time_counter = 0;
     ui16_pas_off_time_counter = 0;
     ui8_pas_direction = 1;
+  }
+  /****************************************************************************/
+
+  /****************************************************************************/
+  // calc wheel speed sensor timming between each positive pulses, in PWM cycles ticks
+  ui16_wheel_speed_sensor_counter++;
+
+  // detect wheel speed sensor signal changes
+  if ((WHEEL_SPEED_SENSOR__PORT->IDR & WHEEL_SPEED_SENSOR__PIN) == 0) { ui8_wheel_speed_sensor_state = 0; }
+  else { ui8_wheel_speed_sensor_state = 1; }
+
+  if (ui8_wheel_speed_sensor_state != ui8_wheel_speed_sensor_state_old) // wheel speed sensor signal did change
+  {
+    ui8_wheel_speed_sensor_state_old = ui8_wheel_speed_sensor_state;
+
+    if (ui8_wheel_speed_sensor_state == 1) // consider only when wheel speed sensor signal transition from 0 to 1
+    {
+      ui16_wheel_speed_sensor_pwm_cycles_ticks = ui16_wheel_speed_sensor_counter;
+      ui16_wheel_speed_sensor_counter = 0;
+    }
+  }
+
+  // limit min wheel speed
+  if (ui16_wheel_speed_sensor_counter > ((uint16_t) WHEEL_SPEED_SENSOR_MIN_PWM_CYCLE_TICKS))
+  {
+    ui16_wheel_speed_sensor_pwm_cycles_ticks = (uint16_t) WHEEL_SPEED_SENSOR_MIN_PWM_CYCLE_TICKS;
+    ui16_wheel_speed_sensor_counter = 0;
   }
   /****************************************************************************/
 

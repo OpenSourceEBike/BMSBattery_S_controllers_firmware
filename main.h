@@ -189,6 +189,13 @@
 // (1/(150RPM/60)) / (PAS_NUMBER_MAGNETS * 0.000064)
 #define PAS_ABSOLUTE_MAX_CADENCE_PWM_CYCLE_TICKS  (6250 / PAS_NUMBER_MAGNETS) // max hard limit to 150RPM PAS cadence
 #define PAS_ABSOLUTE_MIN_CADENCE_PWM_CYCLE_TICKS  (156250 / PAS_NUMBER_MAGNETS) // min hard limit to 6RPM PAS cadence
+// *************************************************************************** //
+
+// *************************************************************************** //
+// Wheel speed sensor
+#define WHEEL_SPEED_SENSOR_MAX_PWM_CYCLE_TICKS  135 // something like 200m/h with a 6'' wheel
+#define WHEEL_SPEED_SENSOR_MIN_PWM_CYCLE_TICKS  64000 // just a bit less than 2^16 (uint16_t)
+// *************************************************************************** //
 
 // *************************************************************************** //
 // EEPROM memory variables default values

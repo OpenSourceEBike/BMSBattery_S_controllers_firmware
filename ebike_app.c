@@ -32,9 +32,8 @@ uint8_t ui8_cruise_value = 0;
 volatile struc_lcd_configuration_variables lcd_configuration_variables;
 uint8_t ui8_received_package_flag = 0;
 volatile float f_controller_max_current;
-float f_motor_speed = 0;
-uint8_t ui8_wheel_speed = 0;
-float f_wheel_size = 2.0625; // 26'' wheel
+float f_wheel_speed;
+float f_wheel_perimeter = 2.0625; // 26'' wheel
 uint8_t ui8_tx_buffer[12];
 uint8_t ui8_i;
 uint8_t ui8_crc;
@@ -54,9 +53,11 @@ uint16_t ui16_throttle_value_accumulated = 0;
 uint8_t ui8_throttle_value_filtered;
 uint8_t ui8_is_throotle_released;
 
-volatile uint16_t ui16_pas_pwm_cycles_ticks = PAS_ABSOLUTE_MIN_CADENCE_PWM_CYCLE_TICKS;
+volatile uint16_t ui16_pas_pwm_cycles_ticks = (uint16_t) PAS_ABSOLUTE_MIN_CADENCE_PWM_CYCLE_TICKS;
 volatile uint8_t ui8_pas_direction = 0;
 uint8_t ui8_pas_cadence_rpm = 0;
+
+volatile uint16_t ui16_wheel_speed_sensor_pwm_cycles_ticks = (uint16_t) WHEEL_SPEED_SENSOR_MAX_PWM_CYCLE_TICKS;
 
 uint16_t ui16_motor_controller_max_current_10b;
 
@@ -65,7 +66,7 @@ void communications_controller (void);
 uint8_t ebike_app_cruise_control (uint8_t ui8_value);
 void set_speed_erps_max_to_motor_controller (struc_lcd_configuration_variables *lcd_configuration_variables);
 void set_motor_controller_max_current (uint8_t ui8_controller_max_current);
-void calc_motor_speed (void);
+void calc_wheel_speed (void);
 void ebike_throotle_type_throotle_pas (void);
 void ebike_throotle_type_torque_sensor (void);
 void read_throotle (void);
@@ -73,8 +74,8 @@ void read_pas_cadence_and_direction (void);
 
 void ebike_app_controller (void)
 {
-  // calc motor speed and save the value on global variable ui8_wheel_speed
-  calc_motor_speed ();
+  // calc wheel speed and save the value on global variable ui8_wheel_speed
+  calc_wheel_speed ();
 
   // map throttle value from 0 up to 255 to global variable: ui8_throttle_value
   // setup ui8_is_throotle_released flag
@@ -168,13 +169,15 @@ void communications_controller (void)
 {
   uint8_t ui8_moving_indication = 0;
   int8_t i8_motor_current_filtered_10b = 0;
+  float f_temp;
 
   /********************************************************************************************/
   // Prepare and send packate to LCD
   //
 
   // calc wheel period in ms
-  ui16_wheel_period_ms = (motor_get_er_PWM_ticks () * (lcd_configuration_variables.ui8_motor_characteristic >> 1)) / MOTOR_PWM_TICKS_PER_MS;
+  if (f_wheel_speed < 1) { ui16_wheel_period_ms = 36000.0 * f_wheel_perimeter; } // this is needed to get LCD showing 0 km/h
+  else { ui16_wheel_period_ms = (3600.0 * f_wheel_perimeter) / f_wheel_speed; }
 
   // calc battery pack state of charge (SOC)
   ui16_battery_volts = motor_get_ADC_battery_voltage_filtered () * ADC_BATTERY_VOLTAGE_K;
@@ -346,77 +349,76 @@ void UART2_IRQHandler(void) __interrupt(UART2_IRQHANDLER)
 
 void set_speed_erps_max_to_motor_controller (struc_lcd_configuration_variables *lcd_configuration_variables)
 {
-  float f_wheel_size;
   uint32_t ui32_temp;
   float f_temp;
 
   switch (lcd_configuration_variables->ui8_wheel_size)
   {
     case 0x12: // 6''
-    f_wheel_size = 0.46875;
+    f_wheel_perimeter = 0.46875;
     break;
 
     case 0x0a: // 8''
-    f_wheel_size = 0.62847;
+    f_wheel_perimeter = 0.62847;
     break;
 
     case 0x0e: // 10''
-    f_wheel_size = 0.78819;
+    f_wheel_perimeter = 0.78819;
     break;
 
     case 0x02: // 12''
-    f_wheel_size = 0.94791;
+    f_wheel_perimeter = 0.94791;
     break;
 
     case 0x06: // 14''
-    f_wheel_size = 1.10764;
+    f_wheel_perimeter = 1.10764;
     break;
 
     case 0x00: // 16''
-    f_wheel_size = 1.26736;
+    f_wheel_perimeter = 1.26736;
     break;
 
     case 0x04: // 18''
-    f_wheel_size = 1.42708;
+    f_wheel_perimeter = 1.42708;
     break;
 
     case 0x08: // 20''
-    f_wheel_size = 1.57639;
+    f_wheel_perimeter = 1.57639;
     break;
 
     case 0x0c: // 22''
-    f_wheel_size = 1.74305;
+    f_wheel_perimeter = 1.74305;
     break;
 
     case 0x10: // 24''
-    f_wheel_size = 1.89583;
+    f_wheel_perimeter = 1.89583;
     break;
 
     case 0x14: // 26''
-    f_wheel_size = 2.0625;
+    f_wheel_perimeter = 2.0625;
     break;
 
     case 0x18: // 700c
-    f_wheel_size = 2.17361;
+    f_wheel_perimeter = 2.17361;
     break;
 
     case 0x1c: // 28''
-    f_wheel_size = 2.19444;
+    f_wheel_perimeter = 2.19444;
     break;
 
     case 0x1e: // 29''
-    f_wheel_size = 2.25;
+    f_wheel_perimeter = 2.25;
     break;
 
     default: // 26''
-    f_wheel_size = 2.0625;
+    f_wheel_perimeter = 2.0625;
     break;
   }
 
   // (ui8_max_speed * 1000 * (ui8_motor_characteristic / 2)) / (3600 * f_wheel_size)
   ui32_temp = ((uint32_t) lcd_configuration_variables->ui8_max_speed) * 1000; // in meters/hour
   ui32_temp *= ((uint32_t) (lcd_configuration_variables->ui8_motor_characteristic >> 1));
-  f_temp = 3600.0 * f_wheel_size;
+  f_temp = 3600.0 * f_wheel_perimeter;
   f_temp = ((float) ui32_temp) / f_temp;
   motor_controller_set_speed_erps_max ((uint16_t) f_temp);
 }
@@ -496,20 +498,36 @@ uint8_t ebike_app_is_throttle_released (void)
 
 uint8_t ui8_ebike_app_get_wheel_speed (void)
 {
-  return ui8_wheel_speed;
+  return f_wheel_speed;
 }
 
-void calc_motor_speed (void)
+void calc_wheel_speed (void)
 {
   uint32_t ui32_temp;
   uint32_t ui32_temp1;
+  float f_temp;
+  float f_wheel_speed_motor_erps;
+  float f_wheel_speed_sensor;
 
-  // calc motor speed in km/h
+  // calc wheel speed in km/h, from motor hall sensors signals
   ui32_temp = ((uint32_t) (lcd_configuration_variables.ui8_motor_characteristic >> 1)) * 1000;
   ui32_temp1 = ((uint32_t) ui16_motor_get_motor_speed_erps ()) * 3600;
-  f_motor_speed = ((float) ui32_temp1) * f_wheel_size;
-  f_motor_speed /= (float) ui32_temp;
-  ui8_wheel_speed = (uint8_t) f_motor_speed;
+  f_wheel_speed_motor_erps = ((float) ui32_temp1) * f_wheel_perimeter;
+  f_wheel_speed_motor_erps /= (float) ui32_temp;
+
+  // calc wheel speed in km/h, from external wheel speed sensor
+  f_wheel_speed_sensor = 0;
+  if (ui16_wheel_speed_sensor_pwm_cycles_ticks < WHEEL_SPEED_SENSOR_MIN_PWM_CYCLE_TICKS)
+  {
+    f_wheel_speed_sensor = ((float) PWM_CYCLES_SECOND) / ((float) ui16_wheel_speed_sensor_pwm_cycles_ticks); // rps
+    f_wheel_speed_sensor *= f_wheel_perimeter; // meters per second
+    f_wheel_speed_sensor *= 3.6; // kms per hour
+  }
+
+  // prefer to use the wheel speed calculated from external wheel speed sensor
+  // if the sensor is not connected, the ui8_wheel_speed_sensor will be zero
+  if (f_wheel_speed_sensor < 1) { f_wheel_speed = f_wheel_speed_motor_erps; }
+  else { f_wheel_speed = f_wheel_speed_sensor; }
 }
 
 void read_pas_cadence_and_direction (void)

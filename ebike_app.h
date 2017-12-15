@@ -25,6 +25,8 @@ typedef struct _lcd_configuration_variables
 extern volatile uint16_t ui16_pas_pwm_cycles_ticks;
 extern volatile uint8_t ui8_pas_direction;
 
+extern volatile uint16_t ui16_wheel_speed_sensor_pwm_cycles_ticks;
+
 extern uint8_t ui8_throttle_value;
 extern uint8_t ui8_adc_throttle_value;
 
