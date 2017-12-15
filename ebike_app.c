@@ -58,6 +58,7 @@ volatile uint8_t ui8_pas_direction = 0;
 uint8_t ui8_pas_cadence_rpm = 0;
 
 volatile uint16_t ui16_wheel_speed_sensor_pwm_cycles_ticks = (uint16_t) WHEEL_SPEED_SENSOR_MAX_PWM_CYCLE_TICKS;
+volatile uint8_t ui8_wheel_speed_sensor_is_disconnected;
 
 uint16_t ui16_motor_controller_max_current_10b;
 
@@ -169,7 +170,6 @@ void communications_controller (void)
 {
   uint8_t ui8_moving_indication = 0;
   int8_t i8_motor_current_filtered_10b = 0;
-  float f_temp;
 
   /********************************************************************************************/
   // Prepare and send packate to LCD
@@ -505,29 +505,22 @@ void calc_wheel_speed (void)
 {
   uint32_t ui32_temp;
   uint32_t ui32_temp1;
-  float f_temp;
-  float f_wheel_speed_motor_erps;
-  float f_wheel_speed_sensor;
 
-  // calc wheel speed in km/h, from motor hall sensors signals
-  ui32_temp = ((uint32_t) (lcd_configuration_variables.ui8_motor_characteristic >> 1)) * 1000;
-  ui32_temp1 = ((uint32_t) ui16_motor_get_motor_speed_erps ()) * 3600;
-  f_wheel_speed_motor_erps = ((float) ui32_temp1) * f_wheel_perimeter;
-  f_wheel_speed_motor_erps /= (float) ui32_temp;
-
-  // calc wheel speed in km/h, from external wheel speed sensor
-  f_wheel_speed_sensor = 0;
-  if (ui16_wheel_speed_sensor_pwm_cycles_ticks < WHEEL_SPEED_SENSOR_MIN_PWM_CYCLE_TICKS)
+  if (ui8_wheel_speed_sensor_is_disconnected)
   {
-    f_wheel_speed_sensor = ((float) PWM_CYCLES_SECOND) / ((float) ui16_wheel_speed_sensor_pwm_cycles_ticks); // rps
-    f_wheel_speed_sensor *= f_wheel_perimeter; // meters per second
-    f_wheel_speed_sensor *= 3.6; // kms per hour
+    // calc wheel speed in km/h, from motor hall sensors signals
+    ui32_temp = ((uint32_t) (lcd_configuration_variables.ui8_motor_characteristic >> 1)) * 1000;
+    ui32_temp1 = ((uint32_t) ui16_motor_get_motor_speed_erps ()) * 3600;
+    f_wheel_speed = ((float) ui32_temp1) * f_wheel_perimeter;
+    f_wheel_speed /= (float) ui32_temp;
   }
-
-  // prefer to use the wheel speed calculated from external wheel speed sensor
-  // if the sensor is not connected, the ui8_wheel_speed_sensor will be zero
-  if (f_wheel_speed_sensor < 1) { f_wheel_speed = f_wheel_speed_motor_erps; }
-  else { f_wheel_speed = f_wheel_speed_sensor; }
+  else
+  {
+    // calc wheel speed in km/h, from external wheel speed sensor
+    f_wheel_speed = ((float) PWM_CYCLES_SECOND) / ((float) ui16_wheel_speed_sensor_pwm_cycles_ticks); // rps
+    f_wheel_speed *= f_wheel_perimeter; // meters per second
+    f_wheel_speed *= 3.6; // kms per hour
+  }
 }
 
 void read_pas_cadence_and_direction (void)

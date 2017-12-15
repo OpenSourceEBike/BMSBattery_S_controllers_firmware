@@ -749,6 +749,7 @@ void TIM1_UPD_OVF_TRG_BRK_IRQHandler(void) __interrupt(TIM1_UPD_OVF_TRG_BRK_IRQH
     {
       ui16_wheel_speed_sensor_pwm_cycles_ticks = ui16_wheel_speed_sensor_counter;
       ui16_wheel_speed_sensor_counter = 0;
+      ui8_wheel_speed_sensor_is_disconnected = 0;
     }
   }
 
@@ -757,6 +758,7 @@ void TIM1_UPD_OVF_TRG_BRK_IRQHandler(void) __interrupt(TIM1_UPD_OVF_TRG_BRK_IRQH
   {
     ui16_wheel_speed_sensor_pwm_cycles_ticks = (uint16_t) WHEEL_SPEED_SENSOR_MIN_PWM_CYCLE_TICKS;
     ui16_wheel_speed_sensor_counter = 0;
+    ui8_wheel_speed_sensor_is_disconnected = 1;
   }
   /****************************************************************************/
 
