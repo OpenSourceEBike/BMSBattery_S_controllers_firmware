@@ -52,22 +52,11 @@
 // *************************************************************************** //
 
 
-// MOTOR_TYPE_EUC2
-// 28V --> 66 ERPs
-// 0.424 for each ERPs
-#if (MOTOR_TYPE == MOTOR_TYPE_Q85) || (MOTOR_TYPE == MOTOR_TYPE_Q100)
-#define MOTOR_KVOLTS_PER_ERPS 73 //Q85 motor
-#elif MOTOR_TYPE == MOTOR_TYPE_EUC2
-#define MOTOR_KVOLTS_PER_ERPS 107 //0.424 << 8 EUC2 motor
-#endif
-
 #if CONTROLLER_TYPE == CONTROLLER_TYPE_S06S
 #define ADC_MOTOR_CURRENT_MAX_MED_10B 10144 // ADC_MOTOR_CURRENT_MAX_ZERO_VALUE_10B << 5
 #define ADC_MOTOR_CURRENT_MAX 30 // 30 = 15A; 1 --> 0.5A
 #define ADC_MOTOR_CURRENT_MAX_10B 120 // 120 = 15A; 1 --> 0.125A
-//#define ADC_MOTOR_REGEN_CURRENT_MAX 30 	// 15A but the brake/regen must be only for a ferw seconds other way will be a problem!!
-//#define ADC_MOTOR_REGEN_CURRENT_MAX 1 	// 15A but the brake/regen must be only for a ferw seconds other way will be a problem!!
-#define ADC_MOTOR_REGEN_CURRENT_MAX 1 	// 15A but the brake/regen must be only for a ferw seconds other way will be a problem!!
+#define ADC_MOTOR_REGEN_CURRENT_MAX 30 	// 15A but the brake/regen must be only for a ferw seconds other way will be a problem!!
 #elif CONTROLLER_TYPE == CONTROLLER_TYPE_S12S
 #define ADC_MOTOR_CURRENT_MAX_MED_10B 10144 // ADC_MOTOR_CURRENT_MAX_ZERO_VALUE_10B << 5
 #define ADC_MOTOR_CURRENT_MAX 50 // 50 = 25A; 1 --> 0.5A
@@ -76,8 +65,6 @@
 #endif
 
 #if CONTROLLER_TYPE == CONTROLLER_TYPE_S06S
-//#define PWM_DUTY_CYCLE_RAMP_UP_INVERSE_STEP 100
-//#define PWM_DUTY_CYCLE_RAMP_DOWN_INVERSE_STEP 30
 #define PWM_DUTY_CYCLE_RAMP_UP_INVERSE_STEP 25
 #define PWM_DUTY_CYCLE_RAMP_DOWN_INVERSE_STEP 10
 #elif CONTROLLER_TYPE == CONTROLLER_TYPE_S12S
