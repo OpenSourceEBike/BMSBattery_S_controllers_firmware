@@ -345,7 +345,7 @@ uint8_t ui8_first_time_run_flag = 1;
 
 uint8_t ui8_pas_state;
 uint8_t ui8_pas_state_old;
-uint16_t ui16_pas_counter;
+uint16_t ui16_pas_counter = (uint16_t) PAS_ABSOLUTE_MIN_CADENCE_PWM_CYCLE_TICKS;
 uint16_t ui16_pas_on_time_counter;
 uint16_t ui16_pas_off_time_counter;
 
