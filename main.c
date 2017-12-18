@@ -98,8 +98,11 @@ void TIM1_UPD_OVF_TRG_BRK_IRQHandler(void) __interrupt(TIM1_UPD_OVF_TRG_BRK_IRQH
 // Timer2/slow control loop
 void TIM2_UPD_OVF_TRG_BRK_IRQHandler(void) __interrupt(TIM2_UPD_OVF_TRG_BRK_IRQHANDLER);
 
+
+#if (DISPLAY_TYPE & DISPLAY_TYPE_KINGMETER)
 // UART2 receivce handler
 void UART2_IRQHandler(void) __interrupt(UART2_IRQHANDLER);
+#endif
 
 /////////////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////////////
@@ -162,16 +165,15 @@ int main (void)
     uint16_t ui32_temp = 0;
     uint8_t j = 0;//Schleifenzähler
     static float f_temp = 0;
-
+#if (DISPLAY_TYPE & DISPLAY_TYPE_KINGMETER)
     // Update display after message received occurrence
     if (ui8_msg_received)
         {
 	ui8_msg_received=0;
 	//printf("%d\n", ui16_SPEED);
 	display_update(); //Display aktualisieren aus Code vom Forumscontroller
-
-
         }
+#endif
 
 
     // Update speed after speed interrupt occurrence

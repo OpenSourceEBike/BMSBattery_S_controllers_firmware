@@ -22,6 +22,7 @@
 #include "update_setpoint.h"
 #include "config.h"
 #include "utils.h"
+#include "brake.h"
 
 
 
@@ -69,19 +70,24 @@ uint16_t update_setpoint (uint16_t speed, uint16_t PAS, uint16_t sumtorque, uint
   }
   //check for undervoltage
   else if(ui8_BatteryVoltage<BATTERY_VOLTAGE_MIN_VALUE){
-      ui32_setpoint=0; 	// highest priority: Stop motor for undervoltage protection
+
       TIM1_CtrlPWMOutputs(DISABLE);
-            uint_PWM_Enable=0;
-            ui32_setpoint=0; 	// highest priority: Stop motor for undervoltage protection
+      uint_PWM_Enable=0; // highest priority: Stop motor for undervoltage protection
+      ui32_setpoint=0;
       printf("Low voltage! %d\n",ui8_BatteryVoltage);
     }
 
+  //check if rider is braking
+  else if (brake_is_set()){
+            ui32_setpoint= PI_control(ui16_BatteryCurrent, -1*current_cal_b);//Curret target = 0 A, this is to keep the integral part of the PI-control up to date
+                  if (ui32_setpoint<30){ui32_setpoint=0;}
+                  if (ui32_setpoint>255){ui32_setpoint=255;}
+      printf("you are braking!\r\n");
+  }
 
   //check if pedals are turning
 #ifndef THROTTLE
   else if (ui16_PAS_Counter>timeout){
-      TIM1_CtrlPWMOutputs(DISABLE);
-            uint_PWM_Enable=0;
             ui32_setpoint= PI_control(ui16_BatteryCurrent, -1*current_cal_b);//Curret target = 0 A, this is to keep the integral part of the PI-control up to date
                   if (ui32_setpoint<30){ui32_setpoint=0;}
                   if (ui32_setpoint>255){ui32_setpoint=255;}
@@ -99,7 +105,7 @@ uint16_t update_setpoint (uint16_t speed, uint16_t PAS, uint16_t sumtorque, uint
       uint32_current_target=((i16_assistlevel[ui8_assistlevel_global-1]*fummelfaktor*sumtorque))/(((uint32_t)PAS)<<6)-current_cal_b; 						//calculate setpoint
       //printf("vor: spd %d, pas %d, sumtor %d, setpoint %lu\n", speed, PAS, sumtorque, ui32_setpoint);
       if (uint32_current_target>BATTERY_CURRENT_MAX_VALUE){
-	  printf("Current target %lu\r\n", uint32_current_target);
+	  //printf("Current target %lu\r\n", uint32_current_target);
 	  uint32_current_target=BATTERY_CURRENT_MAX_VALUE;
       }
       uint32_current_target = CheckSpeed ((uint16_t) uint32_current_target, (uint16_t) ui32_erps_filtered);

@@ -20,7 +20,7 @@
 #define REGEN_CURRENT_MAX_VALUE 282L
 #define MOTOR_ROTOR_DELTA_PHASE_ANGLE_RIGHT 214
 #define current_cal_a 10
-#define current_cal_b -312L
+#define current_cal_b -311L
 #define LEVEL_1 20
 #define LEVEL_2 40
 #define LEVEL_3 60

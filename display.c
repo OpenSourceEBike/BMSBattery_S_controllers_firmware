@@ -220,10 +220,6 @@ void display_init()
     Bafang_Init(&BF, displaySerial);
 #endif
 
-
-#if ((DISPLAY_TYPE == DISPLAY_TYPE_BMS) || (DISPLAY_TYPE == DISPLAY_TYPE_BMS3))
-    displaySerial->begin(9600);
-#endif
 }
 
 

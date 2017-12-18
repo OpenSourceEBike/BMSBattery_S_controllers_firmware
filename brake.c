@@ -22,14 +22,14 @@ void EXTI_PORTA_IRQHandler(void) __interrupt(EXTI_PORTA_IRQHANDLER)
 {
   if (brake_is_set())
   {
-    brake_coast_enable ();
-    stop_cruise_control ();
+    //brake_coast_enable ();
+    //stop_cruise_control ();
   }
   else
   {
-    brake_coast_disable ();
-    pwm_set_duty_cycle (0);
-    stop_cruise_control ();
+    //brake_coast_disable ();
+    //pwm_set_duty_cycle (0);
+    //stop_cruise_control ();
   }
 }
 
