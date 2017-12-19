@@ -584,31 +584,31 @@ void ebike_throotle_type_throotle_pas (void)
   switch (lcd_configuration_variables.ui8_assist_level)
   {
     case 0:
-    f_temp = PAS_ASSIST_LEVEL_0;
+    f_temp = ASSIST_LEVEL_0;
     break;
 
     case 1:
-    f_temp = PAS_ASSIST_LEVEL_1;
+    f_temp = ASSIST_LEVEL_1;
     break;
 
     case 2:
-    f_temp = PAS_ASSIST_LEVEL_2;
+    f_temp = ASSIST_LEVEL_2;
     break;
 
     case 3:
-    f_temp = PAS_ASSIST_LEVEL_3;
+    f_temp = ASSIST_LEVEL_3;
     break;
 
     case 4:
-    f_temp = PAS_ASSIST_LEVEL_4;
+    f_temp = ASSIST_LEVEL_4;
     break;
 
     case 5:
-    f_temp = PAS_ASSIST_LEVEL_5;
+    f_temp = ASSIST_LEVEL_5;
     break;
 
     default:
-    f_temp = PAS_ASSIST_LEVEL_5;
+    f_temp = ASSIST_LEVEL_5;
     break;
   }
 
@@ -653,31 +653,31 @@ void ebike_throotle_type_torque_sensor (void)
   switch (lcd_configuration_variables.ui8_assist_level)
   {
     case 0:
-    f_temp = PAS_ASSIST_LEVEL_0;
+    f_temp = ASSIST_LEVEL_0;
     break;
 
     case 1:
-    f_temp = PAS_ASSIST_LEVEL_1;
+    f_temp = ASSIST_LEVEL_1;
     break;
 
     case 2:
-    f_temp = PAS_ASSIST_LEVEL_2;
+    f_temp = ASSIST_LEVEL_2;
     break;
 
     case 3:
-    f_temp = PAS_ASSIST_LEVEL_3;
+    f_temp = ASSIST_LEVEL_3;
     break;
 
     case 4:
-    f_temp = PAS_ASSIST_LEVEL_4;
+    f_temp = ASSIST_LEVEL_4;
     break;
 
     case 5:
-    f_temp = PAS_ASSIST_LEVEL_5;
+    f_temp = ASSIST_LEVEL_5;
     break;
 
     default:
-    f_temp = PAS_ASSIST_LEVEL_5;
+    f_temp = ASSIST_LEVEL_5;
     break;
   }
 
