@@ -537,7 +537,7 @@ public class OSEC extends JFrame {
 			            pWriter.println(text_to_save); 		                
 		    		}
 		    		if (rdbtnThrottlePas.isSelected()){ 
-			            text_to_save = "#define THROTTLEANDPAS";
+			            text_to_save = "#define THROTTLE_AND_PAS";
 			            pWriter.println(text_to_save); 		                
 		    		}
 		    		if (rdbtnThrottle.isSelected()){ 
