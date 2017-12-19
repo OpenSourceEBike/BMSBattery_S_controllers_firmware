@@ -6,7 +6,8 @@ You have to edit the path to your STVP installation,in the .bat files, if not in
 
 HOW TO BUILD
 
-Windows: ???
+Windows: 
+See here https://www.pedelecforum.de/wiki/doku.php?id=elektrotechnik:open_source_firmware_fuer_sxxs_ktxx_-controller
 
 Linux:
 1. clean the previous built files: $ make -f Makefile_linux clean
