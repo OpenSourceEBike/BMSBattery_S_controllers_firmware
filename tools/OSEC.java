@@ -532,7 +532,7 @@ public class OSEC extends JFrame {
 		            pWriter.println(text_to_save); 
 		            text_to_save = "#define ADC_MOTOR_REGEN_CURRENT_MAX " + txtMaxregencurrent.getText();
 		            pWriter.println(text_to_save); 
-		            text_to_save = "#define MOTOR_ROTOR_OFFSET_ANGLE " + txtMotor_specific_angle.getText();
+		            text_to_save = "#define FOC_READ_ID_CURRENT_ANGLE_ADJUST " + txtMotor_specific_angle.getText();
 		            pWriter.println(text_to_save); 
 
 		            text_to_save = "#define ASSIST_LEVEL_0  " + Assist_Level_1.getText();
