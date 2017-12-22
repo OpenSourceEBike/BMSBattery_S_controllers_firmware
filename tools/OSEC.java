@@ -30,7 +30,7 @@ import javax.swing.ButtonGroup;
 import javax.swing.JList;
 
 public class OSEC extends JFrame {
-
+	private static String OS = System.getProperty("os.name").toLowerCase();
 	private JPanel contentPane;
 	private JTextField txtMaxCadence;
 	private JTextField txtNumberOfPas;
@@ -484,12 +484,14 @@ public class OSEC extends JFrame {
 				      
 				      if(n == JOptionPane.YES_OPTION)
 				      {
+				    	  if (OS.indexOf("win")>=0) {
 				    	  try {
 								Process process = Runtime.getRuntime().exec("cmd /c start WriteOptionBytes");
 							} catch (IOException e1) {
 								txtNumberOfPas.setText("Error");
 								e1.printStackTrace();
 							}
+				    	  }
 				      }
 				      else
 				      {
@@ -637,12 +639,14 @@ public class OSEC extends JFrame {
 		                pWriter.close(); 
 		            } 
 			}
+		        if (OS.indexOf("win")>=0) {
 		        try {
 					Process process = Runtime.getRuntime().exec("cmd /c start Start_Compiling");
 				} catch (IOException e1) {
 					txtNumberOfPas.setText("Error");
 					e1.printStackTrace();
 				}
+		        }
 			}
 		});
 		btnWriteConfiguration.setFont(new Font("Tahoma", Font.BOLD, 12));
