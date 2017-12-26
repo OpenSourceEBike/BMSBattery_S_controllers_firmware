@@ -1,22 +1,16 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 
 <Form version="1.3" maxVersion="1.5" type="org.netbeans.modules.form.forminfo.JFrameFormInfo">
-  <NonVisualComponents>
-    <Component class="javax.swing.ButtonGroup" name="buttonGroup1">
-    </Component>
-  </NonVisualComponents>
   <Properties>
     <Property name="defaultCloseOperation" type="int" value="3"/>
-    <Property name="title" type="java.lang.String" value="Flexible OpenSource EBike firmware: Configuration tool"/>
+    <Property name="title" type="java.lang.String" value="Configuration tool"/>
     <Property name="bounds" type="java.awt.Rectangle" editor="org.netbeans.beaninfo.editors.RectangleEditor">
-      <Rectangle value="[0, 0, 500, 500]"/>
+      <Rectangle value="[0, 0, 469, 800]"/>
     </Property>
     <Property name="minimumSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-      <Dimension value="[500, 800]"/>
+      <Dimension value="[469, 800]"/>
     </Property>
-    <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-      <Dimension value="[500, 800]"/>
-    </Property>
+    <Property name="resizable" type="boolean" value="false"/>
   </Properties>
   <SyntheticProperties>
     <SyntheticProperty name="formSizePolicy" type="int" value="1"/>
@@ -37,404 +31,717 @@
   <Layout>
     <DimensionLayout dim="0">
       <Group type="103" groupAlignment="0" attributes="0">
-          <Group type="102" alignment="0" attributes="0">
-              <EmptySpace min="-2" pref="30" max="-2" attributes="0"/>
-              <Group type="103" groupAlignment="0" attributes="0">
-                  <Group type="102" attributes="0">
-                      <Group type="103" groupAlignment="0" attributes="0">
-                          <Component id="jLabel2" min="-2" max="-2" attributes="0"/>
-                          <Component id="LABEL_pas_number_of_magnets1" alignment="0" min="-2" max="-2" attributes="0"/>
-                          <Component id="pas_number_of_magnets1" alignment="0" min="-2" pref="60" max="-2" attributes="0"/>
-                      </Group>
-                      <EmptySpace min="-2" pref="127" max="-2" attributes="0"/>
-                      <Component id="jSeparator1" max="32767" attributes="0"/>
-                  </Group>
-                  <Group type="102" attributes="0">
-                      <Group type="103" groupAlignment="0" attributes="0">
-                          <Component id="jSeparator3" min="-2" pref="445" max="-2" attributes="0"/>
-                          <Component id="LABEL_pas_number_of_magnets5" alignment="0" min="-2" max="-2" attributes="0"/>
-                          <Component id="pas_number_of_magnets5" alignment="0" min="-2" pref="60" max="-2" attributes="0"/>
-                          <Component id="LABEL_pas_number_of_magnets6" alignment="0" min="-2" max="-2" attributes="0"/>
-                          <Component id="pas_number_of_magnets6" alignment="0" min="-2" pref="60" max="-2" attributes="0"/>
-                          <Component id="LABEL_pas_number_of_magnets3" alignment="0" min="-2" max="-2" attributes="0"/>
-                          <Component id="pas_number_of_magnets3" alignment="0" min="-2" pref="60" max="-2" attributes="0"/>
-                          <Component id="LABEL_pas_number_of_magnets4" alignment="0" min="-2" max="-2" attributes="0"/>
-                          <Component id="pas_number_of_magnets4" alignment="0" min="-2" pref="60" max="-2" attributes="0"/>
-                          <Component id="LABEL_pas_number_of_magnets2" alignment="0" min="-2" max="-2" attributes="0"/>
-                          <Component id="pas_number_of_magnets2" alignment="0" min="-2" pref="60" max="-2" attributes="0"/>
-                          <Component id="jSeparator2" min="-2" pref="445" max="-2" attributes="0"/>
-                          <Component id="LABEL_throotle_control_algorithm_output" min="-2" pref="610" max="-2" attributes="0"/>
-                          <Component id="jLabel1" min="-2" max="-2" attributes="0"/>
-                          <Component id="throotle_control_algorithm_output" alignment="0" min="-2" pref="400" max="-2" attributes="0"/>
-                          <Component id="LABEL_throotle_type" alignment="0" min="-2" pref="610" max="-2" attributes="0"/>
-                          <Component id="LABEL_torque_sensor_control_algorithm_output" alignment="0" min="-2" pref="610" max="-2" attributes="0"/>
-                          <Component id="throotle_type" alignment="0" min="-2" pref="400" max="-2" attributes="0"/>
-                          <Component id="LABEL_pas_number_of_magnets" alignment="0" min="-2" max="-2" attributes="0"/>
-                          <Component id="pas_number_of_magnets" alignment="0" min="-2" pref="60" max="-2" attributes="0"/>
-                          <Component id="pedal_max_cadence_in_rpm" alignment="0" min="-2" pref="60" max="-2" attributes="0"/>
-                          <Component id="LABEL_pedal_max_cadence_in_rpm" min="-2" max="-2" attributes="0"/>
-                          <Component id="LABEL_pas_rotation_direction" alignment="0" min="-2" pref="610" max="-2" attributes="0"/>
-                          <Component id="pas_rotation_direction" alignment="0" min="-2" pref="400" max="-2" attributes="0"/>
-                          <Component id="torque_sensor_control_algorithm_output" alignment="0" min="-2" pref="400" max="-2" attributes="0"/>
-                      </Group>
-                      <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
-                  </Group>
-              </Group>
-          </Group>
+          <Component id="jScrollPane1" alignment="0" pref="469" max="32767" attributes="0"/>
       </Group>
     </DimensionLayout>
     <DimensionLayout dim="1">
       <Group type="103" groupAlignment="0" attributes="0">
-          <Group type="102" alignment="1" attributes="0">
-              <EmptySpace min="-2" pref="30" max="-2" attributes="0"/>
-              <Component id="jLabel1" min="-2" max="-2" attributes="0"/>
-              <EmptySpace min="-2" pref="20" max="-2" attributes="0"/>
-              <Component id="LABEL_throotle_type" min="-2" max="-2" attributes="0"/>
-              <EmptySpace min="-2" pref="6" max="-2" attributes="0"/>
-              <Component id="throotle_type" min="-2" max="-2" attributes="0"/>
-              <EmptySpace min="-2" pref="15" max="-2" attributes="0"/>
-              <Component id="LABEL_throotle_control_algorithm_output" min="-2" max="-2" attributes="0"/>
-              <EmptySpace min="-2" pref="6" max="-2" attributes="0"/>
-              <Component id="throotle_control_algorithm_output" min="-2" max="-2" attributes="0"/>
-              <EmptySpace min="-2" pref="15" max="-2" attributes="0"/>
-              <Component id="LABEL_torque_sensor_control_algorithm_output" min="-2" max="-2" attributes="0"/>
-              <EmptySpace min="-2" pref="6" max="-2" attributes="0"/>
-              <Component id="torque_sensor_control_algorithm_output" min="-2" max="-2" attributes="0"/>
-              <EmptySpace min="-2" pref="15" max="-2" attributes="0"/>
-              <Component id="LABEL_pas_number_of_magnets" min="-2" max="-2" attributes="0"/>
-              <EmptySpace min="-2" pref="6" max="-2" attributes="0"/>
-              <Component id="pas_number_of_magnets" min="-2" max="-2" attributes="0"/>
-              <EmptySpace min="-2" pref="15" max="-2" attributes="0"/>
-              <Component id="LABEL_pedal_max_cadence_in_rpm" min="-2" max="-2" attributes="0"/>
-              <EmptySpace min="-2" pref="6" max="-2" attributes="0"/>
-              <Component id="pedal_max_cadence_in_rpm" min="-2" max="-2" attributes="0"/>
-              <EmptySpace min="-2" pref="15" max="-2" attributes="0"/>
-              <Component id="LABEL_pas_rotation_direction" min="-2" max="-2" attributes="0"/>
-              <EmptySpace min="-2" max="-2" attributes="0"/>
-              <Component id="pas_rotation_direction" min="-2" max="-2" attributes="0"/>
-              <EmptySpace min="-2" pref="15" max="-2" attributes="0"/>
-              <Component id="jSeparator2" min="-2" pref="8" max="-2" attributes="0"/>
-              <EmptySpace min="-2" pref="15" max="-2" attributes="0"/>
-              <Component id="jLabel2" min="-2" max="-2" attributes="0"/>
-              <EmptySpace min="-2" pref="20" max="-2" attributes="0"/>
-              <Component id="LABEL_pas_number_of_magnets1" min="-2" max="-2" attributes="0"/>
-              <EmptySpace min="-2" pref="6" max="-2" attributes="0"/>
-              <Component id="pas_number_of_magnets1" min="-2" max="-2" attributes="0"/>
-              <EmptySpace min="-2" pref="15" max="-2" attributes="0"/>
-              <Component id="jSeparator1" min="-2" pref="0" max="-2" attributes="0"/>
-              <EmptySpace min="0" pref="0" max="-2" attributes="0"/>
-              <Component id="LABEL_pas_number_of_magnets2" min="-2" max="-2" attributes="0"/>
-              <EmptySpace min="-2" pref="6" max="-2" attributes="0"/>
-              <Component id="pas_number_of_magnets2" min="-2" max="-2" attributes="0"/>
-              <EmptySpace min="-2" pref="15" max="-2" attributes="0"/>
-              <Component id="LABEL_pas_number_of_magnets3" min="-2" max="-2" attributes="0"/>
-              <EmptySpace min="-2" pref="6" max="-2" attributes="0"/>
-              <Component id="pas_number_of_magnets3" min="-2" max="-2" attributes="0"/>
-              <EmptySpace min="15" pref="15" max="-2" attributes="0"/>
-              <Component id="LABEL_pas_number_of_magnets4" min="-2" max="-2" attributes="0"/>
-              <EmptySpace min="-2" pref="6" max="-2" attributes="0"/>
-              <Component id="pas_number_of_magnets4" min="-2" max="-2" attributes="0"/>
-              <EmptySpace min="-2" pref="15" max="-2" attributes="0"/>
-              <Component id="LABEL_pas_number_of_magnets5" min="-2" max="-2" attributes="0"/>
-              <EmptySpace min="-2" pref="6" max="-2" attributes="0"/>
-              <Component id="pas_number_of_magnets5" min="-2" max="-2" attributes="0"/>
-              <EmptySpace min="15" pref="15" max="-2" attributes="0"/>
-              <Component id="LABEL_pas_number_of_magnets6" min="-2" max="-2" attributes="0"/>
-              <EmptySpace min="-2" pref="6" max="-2" attributes="0"/>
-              <Component id="pas_number_of_magnets6" min="-2" max="-2" attributes="0"/>
-              <EmptySpace min="-2" pref="15" max="-2" attributes="0"/>
-              <Component id="jSeparator3" min="-2" max="-2" attributes="0"/>
-              <EmptySpace pref="61" max="32767" attributes="0"/>
-          </Group>
+          <Component id="jScrollPane1" min="-2" max="-2" attributes="0"/>
       </Group>
     </DimensionLayout>
   </Layout>
   <SubComponents>
-    <Component class="javax.swing.JSeparator" name="jSeparator1">
-    </Component>
-    <Component class="javax.swing.JLabel" name="jLabel1">
+    <Container class="javax.swing.JScrollPane" name="jScrollPane1">
       <Properties>
-        <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
-          <Font name="Ubuntu" size="24" style="1"/>
+        <Property name="horizontalScrollBar" type="javax.swing.JScrollBar" editor="org.netbeans.modules.form.ComponentChooserEditor">
+          <ComponentRef name="null"/>
         </Property>
-        <Property name="text" type="java.lang.String" value="Throotle type"/>
+        <Property name="minimumSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+          <Dimension value="[469, 800]"/>
+        </Property>
+        <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+          <Dimension value="[500, 800]"/>
+        </Property>
+        <Property name="requestFocusEnabled" type="boolean" value="false"/>
       </Properties>
-    </Component>
-    <Component class="javax.swing.JComboBox" name="throotle_type">
-      <Properties>
-        <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
-          <Font name="Ubuntu" size="18" style="0"/>
-        </Property>
-        <Property name="model" type="javax.swing.ComboBoxModel" editor="org.netbeans.modules.form.editors2.ComboBoxModelEditor">
-          <StringArray count="2">
-            <StringItem index="0" value="throootle and/or PAS"/>
-            <StringItem index="1" value="torque sensor"/>
-          </StringArray>
-        </Property>
-      </Properties>
-      <Events>
-        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="throotle_typeActionPerformed"/>
-      </Events>
-      <AuxValues>
-        <AuxValue name="JavaCodeGenerator_TypeParameters" type="java.lang.String" value="&lt;String&gt;"/>
-      </AuxValues>
-    </Component>
-    <Component class="javax.swing.JLabel" name="LABEL_throotle_control_algorithm_output">
-      <Properties>
-        <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
-          <Font name="Ubuntu" size="18" style="0"/>
-        </Property>
-        <Property name="text" type="java.lang.String" value="Throotle control algorithm output"/>
-      </Properties>
-    </Component>
-    <Component class="javax.swing.JComboBox" name="throotle_control_algorithm_output">
-      <Properties>
-        <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
-          <Font name="Ubuntu" size="18" style="0"/>
-        </Property>
-        <Property name="model" type="javax.swing.ComboBoxModel" editor="org.netbeans.modules.form.editors2.ComboBoxModelEditor">
-          <StringArray count="2">
-            <StringItem index="0" value="direct PWM duty-cycle"/>
-            <StringItem index="1" value="motor current and/or speed"/>
-          </StringArray>
-        </Property>
-      </Properties>
-      <Events>
-        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="throotle_control_algorithm_outputActionPerformed"/>
-      </Events>
-      <AuxValues>
-        <AuxValue name="JavaCodeGenerator_TypeParameters" type="java.lang.String" value="&lt;String&gt;"/>
-      </AuxValues>
-    </Component>
-    <Component class="javax.swing.JLabel" name="LABEL_throotle_type">
-      <Properties>
-        <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
-          <Font name="Ubuntu" size="18" style="0"/>
-        </Property>
-        <Property name="text" type="java.lang.String" value="Choose throotle type"/>
-      </Properties>
-    </Component>
-    <Component class="javax.swing.JLabel" name="LABEL_torque_sensor_control_algorithm_output">
-      <Properties>
-        <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
-          <Font name="Ubuntu" size="18" style="0"/>
-        </Property>
-        <Property name="text" type="java.lang.String" value="Torque sensor control algorithm output"/>
-      </Properties>
-      <AuxValues>
-        <AuxValue name="JavaCodeGenerator_InitCodePost" type="java.lang.String" value="LABEL_torque_sensor_control_algorithm_output.setVisible(false);"/>
-      </AuxValues>
-    </Component>
-    <Component class="javax.swing.JComboBox" name="torque_sensor_control_algorithm_output">
-      <Properties>
-        <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
-          <Font name="Ubuntu" size="18" style="0"/>
-        </Property>
-        <Property name="model" type="javax.swing.ComboBoxModel" editor="org.netbeans.modules.form.editors2.ComboBoxModelEditor">
-          <StringArray count="2">
-            <StringItem index="0" value="direct torque value"/>
-            <StringItem index="1" value="human power (troque * cadence)"/>
-          </StringArray>
-        </Property>
-      </Properties>
-      <Events>
-        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="torque_sensor_control_algorithm_outputActionPerformed"/>
-      </Events>
-      <AuxValues>
-        <AuxValue name="JavaCodeGenerator_InitCodePost" type="java.lang.String" value="torque_sensor_control_algorithm_output.setVisible(false);"/>
-        <AuxValue name="JavaCodeGenerator_TypeParameters" type="java.lang.String" value="&lt;String&gt;"/>
-      </AuxValues>
-    </Component>
-    <Component class="javax.swing.JTextField" name="pas_number_of_magnets">
-      <Properties>
-        <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
-          <Font name="Ubuntu" size="18" style="0"/>
-        </Property>
-        <Property name="text" type="java.lang.String" value="5"/>
-      </Properties>
-      <Events>
-        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="pas_number_of_magnetsActionPerformed"/>
-      </Events>
-    </Component>
-    <Component class="javax.swing.JLabel" name="LABEL_pas_number_of_magnets">
-      <Properties>
-        <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
-          <Font name="Ubuntu" size="18" style="0"/>
-        </Property>
-        <Property name="text" type="java.lang.String" value="PAS number of magnets"/>
-      </Properties>
-    </Component>
-    <Component class="javax.swing.JLabel" name="LABEL_pedal_max_cadence_in_rpm">
-      <Properties>
-        <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
-          <Font name="Ubuntu" size="18" style="0"/>
-        </Property>
-        <Property name="text" type="java.lang.String" value="Pedal max cadence in RPM"/>
-      </Properties>
-    </Component>
-    <Component class="javax.swing.JTextField" name="pedal_max_cadence_in_rpm">
-      <Properties>
-        <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
-          <Font name="Ubuntu" size="18" style="0"/>
-        </Property>
-        <Property name="text" type="java.lang.String" value="80"/>
-      </Properties>
-      <Events>
-        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="pedal_max_cadence_in_rpmActionPerformed"/>
-      </Events>
-    </Component>
-    <Component class="javax.swing.JLabel" name="LABEL_pas_rotation_direction">
-      <Properties>
-        <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
-          <Font name="Ubuntu" size="18" style="0"/>
-        </Property>
-        <Property name="text" type="java.lang.String" value="PAS rotation direction"/>
-      </Properties>
-    </Component>
-    <Component class="javax.swing.JComboBox" name="pas_rotation_direction">
-      <Properties>
-        <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
-          <Font name="Ubuntu" size="18" style="0"/>
-        </Property>
-        <Property name="model" type="javax.swing.ComboBoxModel" editor="org.netbeans.modules.form.editors2.ComboBoxModelEditor">
-          <StringArray count="2">
-            <StringItem index="0" value="left"/>
-            <StringItem index="1" value="right"/>
-          </StringArray>
-        </Property>
-      </Properties>
-      <Events>
-        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="pas_rotation_directionActionPerformed"/>
-      </Events>
-      <AuxValues>
-        <AuxValue name="JavaCodeGenerator_TypeParameters" type="java.lang.String" value="&lt;String&gt;"/>
-      </AuxValues>
-    </Component>
-    <Component class="javax.swing.JSeparator" name="jSeparator2">
-    </Component>
-    <Component class="javax.swing.JLabel" name="jLabel2">
-      <Properties>
-        <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
-          <Font name="Ubuntu" size="24" style="1"/>
-        </Property>
-        <Property name="text" type="java.lang.String" value="LCD"/>
-      </Properties>
-    </Component>
-    <Component class="javax.swing.JLabel" name="LABEL_pas_number_of_magnets1">
-      <Properties>
-        <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
-          <Font name="Ubuntu" size="18" style="0"/>
-        </Property>
-        <Property name="text" type="java.lang.String" value="Assist level 0"/>
-      </Properties>
-    </Component>
-    <Component class="javax.swing.JTextField" name="pas_number_of_magnets1">
-      <Properties>
-        <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
-          <Font name="Ubuntu" size="18" style="0"/>
-        </Property>
-        <Property name="text" type="java.lang.String" value="0.0"/>
-      </Properties>
-      <Events>
-        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="pas_number_of_magnets1ActionPerformed"/>
-      </Events>
-    </Component>
-    <Component class="javax.swing.JLabel" name="LABEL_pas_number_of_magnets2">
-      <Properties>
-        <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
-          <Font name="Ubuntu" size="18" style="0"/>
-        </Property>
-        <Property name="text" type="java.lang.String" value="Assist level 1"/>
-      </Properties>
-    </Component>
-    <Component class="javax.swing.JTextField" name="pas_number_of_magnets2">
-      <Properties>
-        <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
-          <Font name="Ubuntu" size="18" style="0"/>
-        </Property>
-        <Property name="text" type="java.lang.String" value="0.2"/>
-      </Properties>
-      <Events>
-        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="pas_number_of_magnets2ActionPerformed"/>
-      </Events>
-    </Component>
-    <Component class="javax.swing.JLabel" name="LABEL_pas_number_of_magnets3">
-      <Properties>
-        <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
-          <Font name="Ubuntu" size="18" style="0"/>
-        </Property>
-        <Property name="text" type="java.lang.String" value="Assist level 2"/>
-      </Properties>
-    </Component>
-    <Component class="javax.swing.JTextField" name="pas_number_of_magnets3">
-      <Properties>
-        <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
-          <Font name="Ubuntu" size="18" style="0"/>
-        </Property>
-        <Property name="text" type="java.lang.String" value="0.4"/>
-      </Properties>
-      <Events>
-        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="pas_number_of_magnets3ActionPerformed"/>
-      </Events>
-    </Component>
-    <Component class="javax.swing.JLabel" name="LABEL_pas_number_of_magnets4">
-      <Properties>
-        <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
-          <Font name="Ubuntu" size="18" style="0"/>
-        </Property>
-        <Property name="text" type="java.lang.String" value="Assist level 3"/>
-      </Properties>
-    </Component>
-    <Component class="javax.swing.JTextField" name="pas_number_of_magnets4">
-      <Properties>
-        <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
-          <Font name="Ubuntu" size="18" style="0"/>
-        </Property>
-        <Property name="text" type="java.lang.String" value="0.6"/>
-      </Properties>
-      <Events>
-        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="pas_number_of_magnets4ActionPerformed"/>
-      </Events>
-    </Component>
-    <Component class="javax.swing.JLabel" name="LABEL_pas_number_of_magnets5">
-      <Properties>
-        <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
-          <Font name="Ubuntu" size="18" style="0"/>
-        </Property>
-        <Property name="text" type="java.lang.String" value="Assist level 4"/>
-      </Properties>
-    </Component>
-    <Component class="javax.swing.JTextField" name="pas_number_of_magnets5">
-      <Properties>
-        <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
-          <Font name="Ubuntu" size="18" style="0"/>
-        </Property>
-        <Property name="text" type="java.lang.String" value="0.8"/>
-      </Properties>
-      <Events>
-        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="pas_number_of_magnets5ActionPerformed"/>
-      </Events>
-    </Component>
-    <Component class="javax.swing.JLabel" name="LABEL_pas_number_of_magnets6">
-      <Properties>
-        <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
-          <Font name="Ubuntu" size="18" style="0"/>
-        </Property>
-        <Property name="text" type="java.lang.String" value="Assist level 3"/>
-      </Properties>
-    </Component>
-    <Component class="javax.swing.JTextField" name="pas_number_of_magnets6">
-      <Properties>
-        <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
-          <Font name="Ubuntu" size="18" style="0"/>
-        </Property>
-        <Property name="text" type="java.lang.String" value="0.6"/>
-      </Properties>
-      <Events>
-        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="pas_number_of_magnets6ActionPerformed"/>
-      </Events>
-    </Component>
-    <Component class="javax.swing.JSeparator" name="jSeparator3">
-    </Component>
+
+      <Layout class="org.netbeans.modules.form.compat2.layouts.support.JScrollPaneSupportLayout"/>
+      <SubComponents>
+        <Container class="javax.swing.JPanel" name="jPanel1">
+          <Properties>
+            <Property name="minimumSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+              <Dimension value="[469, 1970]"/>
+            </Property>
+            <Property name="name" type="java.lang.String" value="" noResource="true"/>
+            <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+              <Dimension value="[469, 1970]"/>
+            </Property>
+            <Property name="requestFocusEnabled" type="boolean" value="false"/>
+          </Properties>
+
+          <Layout>
+            <DimensionLayout dim="0">
+              <Group type="103" groupAlignment="0" attributes="0">
+                  <Group type="102" attributes="0">
+                      <Group type="103" groupAlignment="0" attributes="0">
+                          <Group type="102" alignment="0" attributes="0">
+                              <EmptySpace min="-2" pref="25" max="-2" attributes="0"/>
+                              <Group type="103" groupAlignment="0" max="-2" attributes="0">
+                                  <Component id="jSeparator4" max="32767" attributes="0"/>
+                                  <Component id="LABEL_foc_read_id_current_angle_adjust" max="32767" attributes="0"/>
+                                  <Component id="pwm_duty_cycle_ramp_down_step" alignment="0" min="-2" pref="60" max="-2" attributes="0"/>
+                                  <Component id="LABEL_pwm_duty_cycle_ramp_down_step" alignment="0" pref="400" max="32767" attributes="0"/>
+                                  <Component id="pwm_duty_cycle_ramp_up_step" alignment="0" min="-2" pref="60" max="-2" attributes="0"/>
+                                  <Component id="LABEL_pwm_duty_cycle_ramp_up_step" alignment="0" pref="400" max="32767" attributes="0"/>
+                                  <Component id="motor_max_regen_current" alignment="0" min="-2" pref="60" max="-2" attributes="0"/>
+                                  <Component id="LABEL_motor_max_regen_current" alignment="0" pref="400" max="32767" attributes="0"/>
+                                  <Component id="motor_max_current" min="-2" pref="60" max="-2" attributes="0"/>
+                                  <Component id="jLabel6" alignment="0" min="-2" max="-2" attributes="0"/>
+                                  <Component id="motor_start_interpolation_60_degrees" alignment="0" min="-2" pref="60" max="-2" attributes="0"/>
+                                  <Component id="foc_read_id_current_angle_adjust" alignment="0" min="-2" pref="60" max="-2" attributes="0"/>
+                                  <Component id="motor_rotor_offset_angle" min="-2" pref="60" max="-2" attributes="0"/>
+                                  <Component id="jLabel4" alignment="0" min="-2" max="-2" attributes="0"/>
+                                  <Component id="jLabel3" alignment="0" min="-2" max="-2" attributes="0"/>
+                                  <Component id="lion_cells_number" alignment="0" max="32767" attributes="0"/>
+                                  <Component id="jLabel1" alignment="0" min="-2" max="-2" attributes="0"/>
+                                  <Component id="throttle_control_algorithm_output" alignment="0" pref="400" max="32767" attributes="0"/>
+                                  <Component id="pas_number_of_magnets" alignment="0" min="-2" pref="60" max="-2" attributes="0"/>
+                                  <Component id="pedal_max_cadence_in_rpm" alignment="0" min="-2" pref="60" max="-2" attributes="0"/>
+                                  <Component id="jLabel2" min="-2" max="-2" attributes="0"/>
+                                  <Component id="pas_number_of_magnets1" alignment="0" min="-2" pref="60" max="-2" attributes="0"/>
+                                  <Component id="pas_number_of_magnets2" alignment="0" min="-2" pref="60" max="-2" attributes="0"/>
+                                  <Component id="pas_number_of_magnets5" alignment="0" min="-2" pref="60" max="-2" attributes="0"/>
+                                  <Component id="pas_number_of_magnets6" alignment="0" min="-2" pref="60" max="-2" attributes="0"/>
+                                  <Component id="pas_number_of_magnets3" alignment="0" min="-2" pref="60" max="-2" attributes="0"/>
+                                  <Component id="pas_number_of_magnets4" alignment="0" min="-2" pref="60" max="-2" attributes="0"/>
+                                  <Component id="LABEL_throttle_control_algorithm_output" alignment="0" max="32767" attributes="0"/>
+                                  <Component id="LABEL_throttle_type" alignment="0" max="32767" attributes="0"/>
+                                  <Component id="throotle_type" alignment="0" pref="400" max="32767" attributes="0"/>
+                                  <Component id="LABEL_pedal_max_cadence_in_rpm" alignment="0" max="32767" attributes="0"/>
+                                  <Component id="LABEL_pas_number_of_magnets" alignment="0" max="32767" attributes="0"/>
+                                  <Component id="LABEL_torque_sensor_control_algorithm_output" alignment="0" max="32767" attributes="0"/>
+                                  <Component id="torque_sensor_control_algorithm_output" alignment="0" pref="400" max="32767" attributes="0"/>
+                                  <Component id="LABEL_motor_max_current" alignment="0" max="32767" attributes="0"/>
+                                  <Component id="LABEL_lion_cells_number" alignment="0" max="32767" attributes="0"/>
+                                  <Component id="LABEL_motor_start_interpolation_60_degrees" alignment="0" max="32767" attributes="0"/>
+                                  <Component id="LABEL_motor_rotor_offset_angle" alignment="0" max="32767" attributes="0"/>
+                                  <Component id="jSeparator2" alignment="0" max="32767" attributes="0"/>
+                                  <Component id="LABEL_pas_rotation_direction" alignment="0" max="32767" attributes="0"/>
+                                  <Component id="jSeparator3" alignment="0" max="32767" attributes="0"/>
+                                  <Component id="LABEL_pas_number_of_magnets6" alignment="0" max="32767" attributes="0"/>
+                                  <Component id="LABEL_pas_number_of_magnets5" alignment="0" max="32767" attributes="0"/>
+                                  <Component id="LABEL_pas_number_of_magnets4" alignment="0" max="32767" attributes="0"/>
+                                  <Component id="LABEL_pas_number_of_magnets3" alignment="0" max="32767" attributes="0"/>
+                                  <Component id="LABEL_pas_number_of_magnets2" alignment="0" max="32767" attributes="0"/>
+                                  <Component id="LABEL_pas_number_of_magnets1" alignment="0" max="32767" attributes="0"/>
+                                  <Component id="jSeparator6" alignment="0" max="32767" attributes="0"/>
+                                  <Component id="pas_rotation_direction" alignment="0" max="32767" attributes="0"/>
+                                  <Component id="jSeparator7" alignment="0" max="32767" attributes="0"/>
+                              </Group>
+                          </Group>
+                          <Group type="102" alignment="0" attributes="0">
+                              <EmptySpace min="-2" pref="51" max="-2" attributes="0"/>
+                              <Component id="jButton2" min="-2" max="-2" attributes="0"/>
+                              <EmptySpace min="-2" pref="50" max="-2" attributes="0"/>
+                              <Component id="write_option_bytes" min="-2" max="-2" attributes="0"/>
+                          </Group>
+                      </Group>
+                      <EmptySpace min="25" pref="44" max="32767" attributes="0"/>
+                  </Group>
+              </Group>
+            </DimensionLayout>
+            <DimensionLayout dim="1">
+              <Group type="103" groupAlignment="0" attributes="0">
+                  <Group type="102" alignment="0" attributes="0">
+                      <EmptySpace min="-2" max="-2" attributes="0"/>
+                      <Component id="jLabel1" min="-2" max="-2" attributes="0"/>
+                      <EmptySpace min="-2" pref="20" max="-2" attributes="0"/>
+                      <Component id="LABEL_throttle_type" min="-2" max="-2" attributes="0"/>
+                      <EmptySpace min="-2" pref="6" max="-2" attributes="0"/>
+                      <Component id="throotle_type" min="-2" max="-2" attributes="0"/>
+                      <EmptySpace min="-2" pref="15" max="-2" attributes="0"/>
+                      <Component id="LABEL_throttle_control_algorithm_output" min="-2" max="-2" attributes="0"/>
+                      <EmptySpace min="-2" pref="6" max="-2" attributes="0"/>
+                      <Component id="throttle_control_algorithm_output" min="-2" max="-2" attributes="0"/>
+                      <EmptySpace min="-2" pref="15" max="-2" attributes="0"/>
+                      <Component id="LABEL_torque_sensor_control_algorithm_output" min="-2" max="-2" attributes="0"/>
+                      <EmptySpace min="-2" pref="6" max="-2" attributes="0"/>
+                      <Component id="torque_sensor_control_algorithm_output" min="-2" max="-2" attributes="0"/>
+                      <EmptySpace min="-2" pref="15" max="-2" attributes="0"/>
+                      <Component id="LABEL_pas_number_of_magnets" min="-2" max="-2" attributes="0"/>
+                      <EmptySpace min="-2" pref="6" max="-2" attributes="0"/>
+                      <Component id="pas_number_of_magnets" min="-2" max="-2" attributes="0"/>
+                      <EmptySpace min="-2" pref="15" max="-2" attributes="0"/>
+                      <Component id="LABEL_pedal_max_cadence_in_rpm" min="-2" max="-2" attributes="0"/>
+                      <EmptySpace min="-2" pref="6" max="-2" attributes="0"/>
+                      <Component id="pedal_max_cadence_in_rpm" min="-2" max="-2" attributes="0"/>
+                      <EmptySpace min="-2" pref="15" max="-2" attributes="0"/>
+                      <Component id="LABEL_pas_rotation_direction" min="-2" max="-2" attributes="0"/>
+                      <EmptySpace min="-2" max="-2" attributes="0"/>
+                      <Component id="pas_rotation_direction" min="-2" max="-2" attributes="0"/>
+                      <EmptySpace min="-2" pref="15" max="-2" attributes="0"/>
+                      <Component id="jSeparator2" min="-2" pref="8" max="-2" attributes="0"/>
+                      <EmptySpace min="-2" pref="20" max="-2" attributes="0"/>
+                      <Component id="jLabel2" min="-2" max="-2" attributes="0"/>
+                      <EmptySpace min="-2" pref="20" max="-2" attributes="0"/>
+                      <Component id="LABEL_pas_number_of_magnets1" min="-2" max="-2" attributes="0"/>
+                      <EmptySpace min="-2" pref="6" max="-2" attributes="0"/>
+                      <Component id="pas_number_of_magnets1" min="-2" max="-2" attributes="0"/>
+                      <EmptySpace min="15" pref="15" max="-2" attributes="0"/>
+                      <Component id="LABEL_pas_number_of_magnets2" min="-2" max="-2" attributes="0"/>
+                      <EmptySpace min="-2" pref="6" max="-2" attributes="0"/>
+                      <Component id="pas_number_of_magnets2" min="-2" max="-2" attributes="0"/>
+                      <EmptySpace min="-2" pref="15" max="-2" attributes="0"/>
+                      <Component id="LABEL_pas_number_of_magnets3" min="-2" max="-2" attributes="0"/>
+                      <EmptySpace min="-2" pref="6" max="-2" attributes="0"/>
+                      <Component id="pas_number_of_magnets3" min="-2" max="-2" attributes="0"/>
+                      <EmptySpace min="-2" pref="15" max="-2" attributes="0"/>
+                      <Component id="LABEL_pas_number_of_magnets4" min="-2" max="-2" attributes="0"/>
+                      <EmptySpace min="-2" pref="6" max="-2" attributes="0"/>
+                      <Component id="pas_number_of_magnets4" min="-2" max="-2" attributes="0"/>
+                      <EmptySpace min="-2" pref="15" max="-2" attributes="0"/>
+                      <Component id="LABEL_pas_number_of_magnets5" min="-2" max="-2" attributes="0"/>
+                      <EmptySpace min="-2" pref="6" max="-2" attributes="0"/>
+                      <Component id="pas_number_of_magnets5" min="-2" max="-2" attributes="0"/>
+                      <EmptySpace min="15" pref="15" max="-2" attributes="0"/>
+                      <Component id="LABEL_pas_number_of_magnets6" min="-2" max="-2" attributes="0"/>
+                      <EmptySpace min="-2" pref="6" max="-2" attributes="0"/>
+                      <Component id="pas_number_of_magnets6" min="-2" max="-2" attributes="0"/>
+                      <EmptySpace min="-2" pref="15" max="-2" attributes="0"/>
+                      <Component id="jSeparator3" min="-2" pref="8" max="-2" attributes="0"/>
+                      <EmptySpace min="-2" pref="20" max="-2" attributes="0"/>
+                      <Component id="jLabel3" min="-2" max="-2" attributes="0"/>
+                      <EmptySpace min="-2" pref="20" max="-2" attributes="0"/>
+                      <Component id="LABEL_lion_cells_number" min="-2" max="-2" attributes="0"/>
+                      <EmptySpace max="-2" attributes="0"/>
+                      <Component id="lion_cells_number" min="-2" max="-2" attributes="0"/>
+                      <EmptySpace min="-2" pref="17" max="-2" attributes="0"/>
+                      <Component id="jSeparator4" min="-2" max="-2" attributes="0"/>
+                      <EmptySpace min="-2" pref="20" max="-2" attributes="0"/>
+                      <Component id="jLabel4" min="-2" max="-2" attributes="0"/>
+                      <EmptySpace min="-2" pref="20" max="-2" attributes="0"/>
+                      <Component id="LABEL_motor_rotor_offset_angle" min="-2" max="-2" attributes="0"/>
+                      <EmptySpace min="-2" pref="6" max="-2" attributes="0"/>
+                      <Component id="motor_rotor_offset_angle" min="-2" max="-2" attributes="0"/>
+                      <EmptySpace min="-2" pref="15" max="-2" attributes="0"/>
+                      <Component id="LABEL_foc_read_id_current_angle_adjust" min="-2" max="-2" attributes="0"/>
+                      <EmptySpace min="-2" pref="6" max="-2" attributes="0"/>
+                      <Component id="foc_read_id_current_angle_adjust" min="-2" max="-2" attributes="0"/>
+                      <EmptySpace min="-2" pref="15" max="-2" attributes="0"/>
+                      <Component id="LABEL_motor_start_interpolation_60_degrees" min="-2" max="-2" attributes="0"/>
+                      <EmptySpace min="-2" pref="6" max="-2" attributes="0"/>
+                      <Component id="motor_start_interpolation_60_degrees" min="-2" max="-2" attributes="0"/>
+                      <EmptySpace min="-2" pref="15" max="-2" attributes="0"/>
+                      <Component id="jSeparator6" min="-2" pref="8" max="-2" attributes="0"/>
+                      <EmptySpace min="-2" pref="20" max="-2" attributes="0"/>
+                      <Component id="jLabel6" min="-2" max="-2" attributes="0"/>
+                      <EmptySpace min="-2" pref="20" max="-2" attributes="0"/>
+                      <Component id="LABEL_motor_max_current" min="-2" max="-2" attributes="0"/>
+                      <EmptySpace min="-2" pref="6" max="-2" attributes="0"/>
+                      <Component id="motor_max_current" min="-2" max="-2" attributes="0"/>
+                      <EmptySpace min="-2" pref="15" max="-2" attributes="0"/>
+                      <Component id="LABEL_motor_max_regen_current" min="-2" max="-2" attributes="0"/>
+                      <EmptySpace min="-2" pref="6" max="-2" attributes="0"/>
+                      <Component id="motor_max_regen_current" min="-2" max="-2" attributes="0"/>
+                      <EmptySpace min="-2" pref="15" max="-2" attributes="0"/>
+                      <Component id="LABEL_pwm_duty_cycle_ramp_up_step" min="-2" max="-2" attributes="0"/>
+                      <EmptySpace min="-2" pref="6" max="-2" attributes="0"/>
+                      <Component id="pwm_duty_cycle_ramp_up_step" min="-2" max="-2" attributes="0"/>
+                      <EmptySpace min="-2" pref="15" max="-2" attributes="0"/>
+                      <Component id="LABEL_pwm_duty_cycle_ramp_down_step" min="-2" max="-2" attributes="0"/>
+                      <EmptySpace min="-2" pref="6" max="-2" attributes="0"/>
+                      <Component id="pwm_duty_cycle_ramp_down_step" min="-2" max="-2" attributes="0"/>
+                      <EmptySpace min="-2" pref="15" max="-2" attributes="0"/>
+                      <Component id="jSeparator7" min="-2" pref="8" max="-2" attributes="0"/>
+                      <EmptySpace min="-2" pref="40" max="-2" attributes="0"/>
+                      <Group type="103" groupAlignment="3" attributes="0">
+                          <Component id="write_option_bytes" alignment="3" min="-2" max="-2" attributes="0"/>
+                          <Component id="jButton2" alignment="3" min="-2" max="-2" attributes="0"/>
+                      </Group>
+                      <EmptySpace pref="69" max="32767" attributes="0"/>
+                  </Group>
+              </Group>
+            </DimensionLayout>
+          </Layout>
+          <SubComponents>
+            <Component class="javax.swing.JLabel" name="LABEL_throttle_type">
+              <Properties>
+                <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
+                  <Font name="Ubuntu" size="18" style="0"/>
+                </Property>
+                <Property name="text" type="java.lang.String" value="Throttle type"/>
+              </Properties>
+            </Component>
+            <Component class="javax.swing.JLabel" name="jLabel1">
+              <Properties>
+                <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
+                  <Font name="Ubuntu" size="24" style="1"/>
+                </Property>
+                <Property name="text" type="java.lang.String" value="Throttle type"/>
+              </Properties>
+            </Component>
+            <Component class="javax.swing.JComboBox" name="throotle_type">
+              <Properties>
+                <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
+                  <Font name="Ubuntu" size="18" style="0"/>
+                </Property>
+                <Property name="model" type="javax.swing.ComboBoxModel" editor="org.netbeans.modules.form.editors2.ComboBoxModelEditor">
+                  <StringArray count="2">
+                    <StringItem index="0" value="throttle and/or PAS"/>
+                    <StringItem index="1" value="torque sensor"/>
+                  </StringArray>
+                </Property>
+              </Properties>
+              <Events>
+                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="throotle_typeActionPerformed"/>
+              </Events>
+              <AuxValues>
+                <AuxValue name="JavaCodeGenerator_TypeParameters" type="java.lang.String" value="&lt;String&gt;"/>
+              </AuxValues>
+            </Component>
+            <Component class="javax.swing.JTextField" name="pas_number_of_magnets">
+              <Properties>
+                <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
+                  <Font name="Ubuntu" size="18" style="0"/>
+                </Property>
+                <Property name="text" type="java.lang.String" value="5"/>
+              </Properties>
+              <Events>
+                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="pas_number_of_magnetsActionPerformed"/>
+              </Events>
+            </Component>
+            <Component class="javax.swing.JLabel" name="LABEL_pas_number_of_magnets">
+              <Properties>
+                <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
+                  <Font name="Ubuntu" size="18" style="0"/>
+                </Property>
+                <Property name="text" type="java.lang.String" value="PAS number of magnets"/>
+              </Properties>
+            </Component>
+            <Component class="javax.swing.JComboBox" name="torque_sensor_control_algorithm_output">
+              <Properties>
+                <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
+                  <Font name="Ubuntu" size="18" style="0"/>
+                </Property>
+                <Property name="model" type="javax.swing.ComboBoxModel" editor="org.netbeans.modules.form.editors2.ComboBoxModelEditor">
+                  <StringArray count="2">
+                    <StringItem index="0" value="direct torque value"/>
+                    <StringItem index="1" value="human power (troque * cadence)"/>
+                  </StringArray>
+                </Property>
+              </Properties>
+              <Events>
+                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="torque_sensor_control_algorithm_outputActionPerformed"/>
+              </Events>
+              <AuxValues>
+                <AuxValue name="JavaCodeGenerator_InitCodePost" type="java.lang.String" value="torque_sensor_control_algorithm_output.setVisible(false);"/>
+                <AuxValue name="JavaCodeGenerator_TypeParameters" type="java.lang.String" value="&lt;String&gt;"/>
+              </AuxValues>
+            </Component>
+            <Component class="javax.swing.JLabel" name="LABEL_torque_sensor_control_algorithm_output">
+              <Properties>
+                <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
+                  <Font name="Ubuntu" size="18" style="0"/>
+                </Property>
+                <Property name="text" type="java.lang.String" value="Torque sensor control algorithm output"/>
+              </Properties>
+              <AuxValues>
+                <AuxValue name="JavaCodeGenerator_InitCodePost" type="java.lang.String" value="LABEL_torque_sensor_control_algorithm_output.setVisible(false);"/>
+              </AuxValues>
+            </Component>
+            <Component class="javax.swing.JComboBox" name="throttle_control_algorithm_output">
+              <Properties>
+                <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
+                  <Font name="Ubuntu" size="18" style="0"/>
+                </Property>
+                <Property name="model" type="javax.swing.ComboBoxModel" editor="org.netbeans.modules.form.editors2.ComboBoxModelEditor">
+                  <StringArray count="2">
+                    <StringItem index="0" value="direct PWM duty-cycle"/>
+                    <StringItem index="1" value="motor current and/or speed"/>
+                  </StringArray>
+                </Property>
+              </Properties>
+              <Events>
+                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="throttle_control_algorithm_outputActionPerformed"/>
+              </Events>
+              <AuxValues>
+                <AuxValue name="JavaCodeGenerator_TypeParameters" type="java.lang.String" value="&lt;String&gt;"/>
+              </AuxValues>
+            </Component>
+            <Component class="javax.swing.JLabel" name="LABEL_throttle_control_algorithm_output">
+              <Properties>
+                <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
+                  <Font name="Ubuntu" size="18" style="0"/>
+                </Property>
+                <Property name="text" type="java.lang.String" value="Throttle control algorithm output"/>
+              </Properties>
+            </Component>
+            <Component class="javax.swing.JLabel" name="LABEL_pedal_max_cadence_in_rpm">
+              <Properties>
+                <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
+                  <Font name="Ubuntu" size="18" style="0"/>
+                </Property>
+                <Property name="text" type="java.lang.String" value="Pedal max cadence in RPM"/>
+              </Properties>
+            </Component>
+            <Component class="javax.swing.JTextField" name="pedal_max_cadence_in_rpm">
+              <Properties>
+                <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
+                  <Font name="Ubuntu" size="18" style="0"/>
+                </Property>
+                <Property name="text" type="java.lang.String" value="80"/>
+              </Properties>
+              <Events>
+                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="pedal_max_cadence_in_rpmActionPerformed"/>
+              </Events>
+            </Component>
+            <Component class="javax.swing.JLabel" name="LABEL_pas_rotation_direction">
+              <Properties>
+                <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
+                  <Font name="Ubuntu" size="18" style="0"/>
+                </Property>
+                <Property name="text" type="java.lang.String" value="PAS rotation direction"/>
+              </Properties>
+            </Component>
+            <Component class="javax.swing.JComboBox" name="pas_rotation_direction">
+              <Properties>
+                <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
+                  <Font name="Ubuntu" size="18" style="0"/>
+                </Property>
+                <Property name="model" type="javax.swing.ComboBoxModel" editor="org.netbeans.modules.form.editors2.ComboBoxModelEditor">
+                  <StringArray count="2">
+                    <StringItem index="0" value="left"/>
+                    <StringItem index="1" value="right"/>
+                  </StringArray>
+                </Property>
+              </Properties>
+              <Events>
+                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="pas_rotation_directionActionPerformed"/>
+              </Events>
+              <AuxValues>
+                <AuxValue name="JavaCodeGenerator_TypeParameters" type="java.lang.String" value="&lt;String&gt;"/>
+              </AuxValues>
+            </Component>
+            <Component class="javax.swing.JSeparator" name="jSeparator2">
+            </Component>
+            <Component class="javax.swing.JLabel" name="jLabel2">
+              <Properties>
+                <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
+                  <Font name="Ubuntu" size="24" style="1"/>
+                </Property>
+                <Property name="text" type="java.lang.String" value="LCD"/>
+              </Properties>
+            </Component>
+            <Component class="javax.swing.JLabel" name="LABEL_pas_number_of_magnets1">
+              <Properties>
+                <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
+                  <Font name="Ubuntu" size="18" style="0"/>
+                </Property>
+                <Property name="text" type="java.lang.String" value="Assist level 0"/>
+              </Properties>
+            </Component>
+            <Component class="javax.swing.JTextField" name="pas_number_of_magnets1">
+              <Properties>
+                <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
+                  <Font name="Ubuntu" size="18" style="0"/>
+                </Property>
+                <Property name="text" type="java.lang.String" value="0.0"/>
+              </Properties>
+              <Events>
+                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="pas_number_of_magnets1ActionPerformed"/>
+              </Events>
+            </Component>
+            <Component class="javax.swing.JLabel" name="LABEL_pas_number_of_magnets2">
+              <Properties>
+                <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
+                  <Font name="Ubuntu" size="18" style="0"/>
+                </Property>
+                <Property name="text" type="java.lang.String" value="Assist level 1"/>
+              </Properties>
+            </Component>
+            <Component class="javax.swing.JTextField" name="pas_number_of_magnets2">
+              <Properties>
+                <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
+                  <Font name="Ubuntu" size="18" style="0"/>
+                </Property>
+                <Property name="text" type="java.lang.String" value="0.2"/>
+              </Properties>
+              <Events>
+                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="pas_number_of_magnets2ActionPerformed"/>
+              </Events>
+            </Component>
+            <Component class="javax.swing.JLabel" name="LABEL_pas_number_of_magnets3">
+              <Properties>
+                <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
+                  <Font name="Ubuntu" size="18" style="0"/>
+                </Property>
+                <Property name="text" type="java.lang.String" value="Assist level 2"/>
+              </Properties>
+            </Component>
+            <Component class="javax.swing.JTextField" name="pas_number_of_magnets3">
+              <Properties>
+                <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
+                  <Font name="Ubuntu" size="18" style="0"/>
+                </Property>
+                <Property name="text" type="java.lang.String" value="0.4"/>
+              </Properties>
+              <Events>
+                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="pas_number_of_magnets3ActionPerformed"/>
+              </Events>
+            </Component>
+            <Component class="javax.swing.JLabel" name="LABEL_pas_number_of_magnets4">
+              <Properties>
+                <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
+                  <Font name="Ubuntu" size="18" style="0"/>
+                </Property>
+                <Property name="text" type="java.lang.String" value="Assist level 3"/>
+              </Properties>
+            </Component>
+            <Component class="javax.swing.JTextField" name="pas_number_of_magnets4">
+              <Properties>
+                <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
+                  <Font name="Ubuntu" size="18" style="0"/>
+                </Property>
+                <Property name="text" type="java.lang.String" value="0.6"/>
+              </Properties>
+              <Events>
+                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="pas_number_of_magnets4ActionPerformed"/>
+              </Events>
+            </Component>
+            <Component class="javax.swing.JLabel" name="LABEL_pas_number_of_magnets5">
+              <Properties>
+                <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
+                  <Font name="Ubuntu" size="18" style="0"/>
+                </Property>
+                <Property name="text" type="java.lang.String" value="Assist level 4"/>
+              </Properties>
+            </Component>
+            <Component class="javax.swing.JTextField" name="pas_number_of_magnets5">
+              <Properties>
+                <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
+                  <Font name="Ubuntu" size="18" style="0"/>
+                </Property>
+                <Property name="text" type="java.lang.String" value="0.8"/>
+              </Properties>
+              <Events>
+                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="pas_number_of_magnets5ActionPerformed"/>
+              </Events>
+            </Component>
+            <Component class="javax.swing.JLabel" name="LABEL_pas_number_of_magnets6">
+              <Properties>
+                <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
+                  <Font name="Ubuntu" size="18" style="0"/>
+                </Property>
+                <Property name="text" type="java.lang.String" value="Assist level 5"/>
+              </Properties>
+            </Component>
+            <Component class="javax.swing.JTextField" name="pas_number_of_magnets6">
+              <Properties>
+                <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
+                  <Font name="Ubuntu" size="18" style="0"/>
+                </Property>
+                <Property name="text" type="java.lang.String" value="1.0"/>
+              </Properties>
+              <Events>
+                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="pas_number_of_magnets6ActionPerformed"/>
+              </Events>
+            </Component>
+            <Component class="javax.swing.JSeparator" name="jSeparator3">
+            </Component>
+            <Component class="javax.swing.JLabel" name="jLabel3">
+              <Properties>
+                <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
+                  <Font name="Ubuntu" size="24" style="1"/>
+                </Property>
+                <Property name="text" type="java.lang.String" value="Battery"/>
+              </Properties>
+            </Component>
+            <Component class="javax.swing.JLabel" name="LABEL_lion_cells_number">
+              <Properties>
+                <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
+                  <Font name="Ubuntu" size="18" style="0"/>
+                </Property>
+                <Property name="text" type="java.lang.String" value="Battery voltage / Li-ion cells number"/>
+              </Properties>
+            </Component>
+            <Component class="javax.swing.JComboBox" name="lion_cells_number">
+              <Properties>
+                <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
+                  <Font name="Ubuntu" size="18" style="0"/>
+                </Property>
+                <Property name="model" type="javax.swing.ComboBoxModel" editor="org.netbeans.modules.form.editors2.ComboBoxModelEditor">
+                  <StringArray count="3">
+                    <StringItem index="0" value="7 (24V)"/>
+                    <StringItem index="1" value="10 (36V)"/>
+                    <StringItem index="2" value="13 (48V)"/>
+                  </StringArray>
+                </Property>
+              </Properties>
+              <Events>
+                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="lion_cells_numberActionPerformed"/>
+              </Events>
+              <AuxValues>
+                <AuxValue name="JavaCodeGenerator_TypeParameters" type="java.lang.String" value="&lt;String&gt;"/>
+              </AuxValues>
+            </Component>
+            <Component class="javax.swing.JSeparator" name="jSeparator4">
+            </Component>
+            <Component class="javax.swing.JLabel" name="jLabel4">
+              <Properties>
+                <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
+                  <Font name="Ubuntu" size="24" style="1"/>
+                </Property>
+                <Property name="text" type="java.lang.String" value="Motor"/>
+              </Properties>
+            </Component>
+            <Component class="javax.swing.JLabel" name="LABEL_motor_rotor_offset_angle">
+              <Properties>
+                <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
+                  <Font name="Ubuntu" size="18" style="0"/>
+                </Property>
+                <Property name="text" type="java.lang.String" value="Motor rotor offset angle"/>
+              </Properties>
+            </Component>
+            <Component class="javax.swing.JTextField" name="motor_rotor_offset_angle">
+              <Properties>
+                <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
+                  <Font name="Ubuntu" size="18" style="0"/>
+                </Property>
+                <Property name="text" type="java.lang.String" value="202"/>
+              </Properties>
+              <Events>
+                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="motor_rotor_offset_angleActionPerformed"/>
+              </Events>
+            </Component>
+            <Component class="javax.swing.JLabel" name="LABEL_foc_read_id_current_angle_adjust">
+              <Properties>
+                <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
+                  <Font name="Ubuntu" size="18" style="0"/>
+                </Property>
+                <Property name="text" type="java.lang.String" value="FOC read ID current angle adjust"/>
+              </Properties>
+            </Component>
+            <Component class="javax.swing.JTextField" name="foc_read_id_current_angle_adjust">
+              <Properties>
+                <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
+                  <Font name="Ubuntu" size="18" style="0"/>
+                </Property>
+                <Property name="text" type="java.lang.String" value="137"/>
+              </Properties>
+              <Events>
+                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="foc_read_id_current_angle_adjustActionPerformed"/>
+              </Events>
+            </Component>
+            <Component class="javax.swing.JLabel" name="LABEL_motor_start_interpolation_60_degrees">
+              <Properties>
+                <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
+                  <Font name="Ubuntu" size="18" style="0"/>
+                </Property>
+                <Property name="text" type="java.lang.String" value="Motor start interpolation 60 degrees (eRPS)"/>
+              </Properties>
+            </Component>
+            <Component class="javax.swing.JTextField" name="motor_start_interpolation_60_degrees">
+              <Properties>
+                <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
+                  <Font name="Ubuntu" size="18" style="0"/>
+                </Property>
+                <Property name="text" type="java.lang.String" value="40"/>
+              </Properties>
+              <Events>
+                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="motor_start_interpolation_60_degreesActionPerformed"/>
+              </Events>
+            </Component>
+            <Component class="javax.swing.JSeparator" name="jSeparator6">
+            </Component>
+            <Component class="javax.swing.JLabel" name="jLabel6">
+              <Properties>
+                <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
+                  <Font name="Ubuntu" size="24" style="1"/>
+                </Property>
+                <Property name="text" type="java.lang.String" value="Motor controller"/>
+              </Properties>
+            </Component>
+            <Component class="javax.swing.JLabel" name="LABEL_motor_max_current">
+              <Properties>
+                <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
+                  <Font name="Ubuntu" size="18" style="0"/>
+                </Property>
+                <Property name="text" type="java.lang.String" value="Motor max current (amps)"/>
+              </Properties>
+            </Component>
+            <Component class="javax.swing.JTextField" name="motor_max_current">
+              <Properties>
+                <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
+                  <Font name="Ubuntu" size="18" style="0"/>
+                </Property>
+                <Property name="text" type="java.lang.String" value="15"/>
+              </Properties>
+              <Events>
+                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="motor_max_currentActionPerformed"/>
+              </Events>
+            </Component>
+            <Component class="javax.swing.JLabel" name="LABEL_motor_max_regen_current">
+              <Properties>
+                <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
+                  <Font name="Ubuntu" size="18" style="0"/>
+                </Property>
+                <Property name="text" type="java.lang.String" value="Motor max regeneration/ebrake current  (amps)"/>
+              </Properties>
+            </Component>
+            <Component class="javax.swing.JTextField" name="motor_max_regen_current">
+              <Properties>
+                <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
+                  <Font name="Ubuntu" size="18" style="0"/>
+                </Property>
+                <Property name="text" type="java.lang.String" value="7"/>
+              </Properties>
+              <Events>
+                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="motor_max_regen_currentActionPerformed"/>
+              </Events>
+            </Component>
+            <Component class="javax.swing.JLabel" name="LABEL_pwm_duty_cycle_ramp_up_step">
+              <Properties>
+                <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
+                  <Font name="Ubuntu" size="18" style="0"/>
+                </Property>
+                <Property name="text" type="java.lang.String" value="PWM duty-cycle ramp up step"/>
+              </Properties>
+            </Component>
+            <Component class="javax.swing.JTextField" name="pwm_duty_cycle_ramp_up_step">
+              <Properties>
+                <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
+                  <Font name="Ubuntu" size="18" style="0"/>
+                </Property>
+                <Property name="text" type="java.lang.String" value="25"/>
+              </Properties>
+              <Events>
+                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="pwm_duty_cycle_ramp_up_stepActionPerformed"/>
+              </Events>
+            </Component>
+            <Component class="javax.swing.JLabel" name="LABEL_pwm_duty_cycle_ramp_down_step">
+              <Properties>
+                <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
+                  <Font name="Ubuntu" size="18" style="0"/>
+                </Property>
+                <Property name="text" type="java.lang.String" value="PWM duty-cycle ramp down step"/>
+              </Properties>
+            </Component>
+            <Component class="javax.swing.JTextField" name="pwm_duty_cycle_ramp_down_step">
+              <Properties>
+                <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
+                  <Font name="Ubuntu" size="18" style="0"/>
+                </Property>
+                <Property name="text" type="java.lang.String" value="25"/>
+              </Properties>
+              <Events>
+                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="pwm_duty_cycle_ramp_down_stepActionPerformed"/>
+              </Events>
+            </Component>
+            <Component class="javax.swing.JButton" name="write_option_bytes">
+              <Properties>
+                <Property name="text" type="java.lang.String" value="Write configuration"/>
+              </Properties>
+            </Component>
+            <Component class="javax.swing.JSeparator" name="jSeparator7">
+            </Component>
+            <Component class="javax.swing.JButton" name="jButton2">
+              <Properties>
+                <Property name="text" type="java.lang.String" value="Write option bytes"/>
+              </Properties>
+            </Component>
+          </SubComponents>
+        </Container>
+      </SubComponents>
+    </Container>
   </SubComponents>
 </Form>

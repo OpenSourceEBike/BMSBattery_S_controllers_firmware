@@ -30,6 +30,11 @@
 
 package Flexible_OpenSource_EBike_firmware_configuration_tool;
 
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.swing.UIManager;
+import javax.swing.UnsupportedLookAndFeelException;
+
 public class Configuration_tool extends javax.swing.JFrame {
     
     /**
@@ -47,17 +52,17 @@ public class Configuration_tool extends javax.swing.JFrame {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        buttonGroup1 = new javax.swing.ButtonGroup();
-        jSeparator1 = new javax.swing.JSeparator();
+        jScrollPane1 = new javax.swing.JScrollPane();
+        jPanel1 = new javax.swing.JPanel();
+        LABEL_throttle_type = new javax.swing.JLabel();
         jLabel1 = new javax.swing.JLabel();
         throotle_type = new javax.swing.JComboBox<>();
-        LABEL_throotle_control_algorithm_output = new javax.swing.JLabel();
-        throotle_control_algorithm_output = new javax.swing.JComboBox<>();
-        LABEL_throotle_type = new javax.swing.JLabel();
-        LABEL_torque_sensor_control_algorithm_output = new javax.swing.JLabel();
-        torque_sensor_control_algorithm_output = new javax.swing.JComboBox<>();
         pas_number_of_magnets = new javax.swing.JTextField();
         LABEL_pas_number_of_magnets = new javax.swing.JLabel();
+        torque_sensor_control_algorithm_output = new javax.swing.JComboBox<>();
+        LABEL_torque_sensor_control_algorithm_output = new javax.swing.JLabel();
+        throttle_control_algorithm_output = new javax.swing.JComboBox<>();
+        LABEL_throttle_control_algorithm_output = new javax.swing.JLabel();
         LABEL_pedal_max_cadence_in_rpm = new javax.swing.JLabel();
         pedal_max_cadence_in_rpm = new javax.swing.JTextField();
         LABEL_pas_rotation_direction = new javax.swing.JLabel();
@@ -77,48 +82,59 @@ public class Configuration_tool extends javax.swing.JFrame {
         LABEL_pas_number_of_magnets6 = new javax.swing.JLabel();
         pas_number_of_magnets6 = new javax.swing.JTextField();
         jSeparator3 = new javax.swing.JSeparator();
+        jLabel3 = new javax.swing.JLabel();
+        LABEL_lion_cells_number = new javax.swing.JLabel();
+        lion_cells_number = new javax.swing.JComboBox<>();
+        jSeparator4 = new javax.swing.JSeparator();
+        jLabel4 = new javax.swing.JLabel();
+        LABEL_motor_rotor_offset_angle = new javax.swing.JLabel();
+        motor_rotor_offset_angle = new javax.swing.JTextField();
+        LABEL_foc_read_id_current_angle_adjust = new javax.swing.JLabel();
+        foc_read_id_current_angle_adjust = new javax.swing.JTextField();
+        LABEL_motor_start_interpolation_60_degrees = new javax.swing.JLabel();
+        motor_start_interpolation_60_degrees = new javax.swing.JTextField();
+        jSeparator6 = new javax.swing.JSeparator();
+        jLabel6 = new javax.swing.JLabel();
+        LABEL_motor_max_current = new javax.swing.JLabel();
+        motor_max_current = new javax.swing.JTextField();
+        LABEL_motor_max_regen_current = new javax.swing.JLabel();
+        motor_max_regen_current = new javax.swing.JTextField();
+        LABEL_pwm_duty_cycle_ramp_up_step = new javax.swing.JLabel();
+        pwm_duty_cycle_ramp_up_step = new javax.swing.JTextField();
+        LABEL_pwm_duty_cycle_ramp_down_step = new javax.swing.JLabel();
+        pwm_duty_cycle_ramp_down_step = new javax.swing.JTextField();
+        write_option_bytes = new javax.swing.JButton();
+        jSeparator7 = new javax.swing.JSeparator();
+        jButton2 = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
-        setTitle("Flexible OpenSource EBike firmware: Configuration tool");
-        setBounds(new java.awt.Rectangle(0, 0, 500, 500));
-        setMinimumSize(new java.awt.Dimension(500, 800));
-        setPreferredSize(new java.awt.Dimension(500, 800));
+        setTitle("Configuration tool");
+        setBounds(new java.awt.Rectangle(0, 0, 469, 800));
+        setMinimumSize(new java.awt.Dimension(469, 800));
+        setPreferredSize(new java.awt.Dimension(469, 800));
+        setResizable(false);
+
+        jScrollPane1.setHorizontalScrollBar(null);
+        jScrollPane1.setMinimumSize(new java.awt.Dimension(469, 800));
+        jScrollPane1.setPreferredSize(new java.awt.Dimension(500, 800));
+        jScrollPane1.setRequestFocusEnabled(false);
+
+        jPanel1.setMinimumSize(new java.awt.Dimension(469, 1970));
+        jPanel1.setName(""); // NOI18N
+        jPanel1.setPreferredSize(new java.awt.Dimension(469, 1970));
+        jPanel1.setRequestFocusEnabled(false);
+
+        LABEL_throttle_type.setFont(new java.awt.Font("Ubuntu", 0, 18)); // NOI18N
+        LABEL_throttle_type.setText("Throttle type");
 
         jLabel1.setFont(new java.awt.Font("Ubuntu", 1, 24)); // NOI18N
-        jLabel1.setText("Throotle type");
+        jLabel1.setText("Throttle type");
 
         throotle_type.setFont(new java.awt.Font("Ubuntu", 0, 18)); // NOI18N
-        throotle_type.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "throootle and/or PAS", "torque sensor" }));
+        throotle_type.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "throttle and/or PAS", "torque sensor" }));
         throotle_type.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 throotle_typeActionPerformed(evt);
-            }
-        });
-
-        LABEL_throotle_control_algorithm_output.setFont(new java.awt.Font("Ubuntu", 0, 18)); // NOI18N
-        LABEL_throotle_control_algorithm_output.setText("Throotle control algorithm output");
-
-        throotle_control_algorithm_output.setFont(new java.awt.Font("Ubuntu", 0, 18)); // NOI18N
-        throotle_control_algorithm_output.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "direct PWM duty-cycle", "motor current and/or speed" }));
-        throotle_control_algorithm_output.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                throotle_control_algorithm_outputActionPerformed(evt);
-            }
-        });
-
-        LABEL_throotle_type.setFont(new java.awt.Font("Ubuntu", 0, 18)); // NOI18N
-        LABEL_throotle_type.setText("Choose throotle type");
-
-        LABEL_torque_sensor_control_algorithm_output.setFont(new java.awt.Font("Ubuntu", 0, 18)); // NOI18N
-        LABEL_torque_sensor_control_algorithm_output.setText("Torque sensor control algorithm output");
-        LABEL_torque_sensor_control_algorithm_output.setVisible(false);
-
-        torque_sensor_control_algorithm_output.setFont(new java.awt.Font("Ubuntu", 0, 18)); // NOI18N
-        torque_sensor_control_algorithm_output.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "direct torque value", "human power (troque * cadence)" }));
-        torque_sensor_control_algorithm_output.setVisible(false);
-        torque_sensor_control_algorithm_output.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                torque_sensor_control_algorithm_outputActionPerformed(evt);
             }
         });
 
@@ -132,6 +148,30 @@ public class Configuration_tool extends javax.swing.JFrame {
 
         LABEL_pas_number_of_magnets.setFont(new java.awt.Font("Ubuntu", 0, 18)); // NOI18N
         LABEL_pas_number_of_magnets.setText("PAS number of magnets");
+
+        torque_sensor_control_algorithm_output.setFont(new java.awt.Font("Ubuntu", 0, 18)); // NOI18N
+        torque_sensor_control_algorithm_output.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "direct torque value", "human power (troque * cadence)" }));
+        torque_sensor_control_algorithm_output.setVisible(false);
+        torque_sensor_control_algorithm_output.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                torque_sensor_control_algorithm_outputActionPerformed(evt);
+            }
+        });
+
+        LABEL_torque_sensor_control_algorithm_output.setFont(new java.awt.Font("Ubuntu", 0, 18)); // NOI18N
+        LABEL_torque_sensor_control_algorithm_output.setText("Torque sensor control algorithm output");
+        LABEL_torque_sensor_control_algorithm_output.setVisible(false);
+
+        throttle_control_algorithm_output.setFont(new java.awt.Font("Ubuntu", 0, 18)); // NOI18N
+        throttle_control_algorithm_output.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "direct PWM duty-cycle", "motor current and/or speed" }));
+        throttle_control_algorithm_output.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                throttle_control_algorithm_outputActionPerformed(evt);
+            }
+        });
+
+        LABEL_throttle_control_algorithm_output.setFont(new java.awt.Font("Ubuntu", 0, 18)); // NOI18N
+        LABEL_throttle_control_algorithm_output.setText("Throttle control algorithm output");
 
         LABEL_pedal_max_cadence_in_rpm.setFont(new java.awt.Font("Ubuntu", 0, 18)); // NOI18N
         LABEL_pedal_max_cadence_in_rpm.setText("Pedal max cadence in RPM");
@@ -214,72 +254,196 @@ public class Configuration_tool extends javax.swing.JFrame {
         });
 
         LABEL_pas_number_of_magnets6.setFont(new java.awt.Font("Ubuntu", 0, 18)); // NOI18N
-        LABEL_pas_number_of_magnets6.setText("Assist level 3");
+        LABEL_pas_number_of_magnets6.setText("Assist level 5");
 
         pas_number_of_magnets6.setFont(new java.awt.Font("Ubuntu", 0, 18)); // NOI18N
-        pas_number_of_magnets6.setText("0.6");
+        pas_number_of_magnets6.setText("1.0");
         pas_number_of_magnets6.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 pas_number_of_magnets6ActionPerformed(evt);
             }
         });
 
-        org.jdesktop.layout.GroupLayout layout = new org.jdesktop.layout.GroupLayout(getContentPane());
-        getContentPane().setLayout(layout);
-        layout.setHorizontalGroup(
-            layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(layout.createSequentialGroup()
-                .add(30, 30, 30)
-                .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                    .add(layout.createSequentialGroup()
-                        .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                            .add(jLabel2)
-                            .add(LABEL_pas_number_of_magnets1)
-                            .add(pas_number_of_magnets1, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 60, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
-                        .add(127, 127, 127)
-                        .add(jSeparator1))
-                    .add(layout.createSequentialGroup()
-                        .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                            .add(jSeparator3, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 445, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                            .add(LABEL_pas_number_of_magnets5)
-                            .add(pas_number_of_magnets5, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 60, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                            .add(LABEL_pas_number_of_magnets6)
-                            .add(pas_number_of_magnets6, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 60, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                            .add(LABEL_pas_number_of_magnets3)
-                            .add(pas_number_of_magnets3, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 60, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                            .add(LABEL_pas_number_of_magnets4)
-                            .add(pas_number_of_magnets4, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 60, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                            .add(LABEL_pas_number_of_magnets2)
-                            .add(pas_number_of_magnets2, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 60, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                            .add(jSeparator2, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 445, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                            .add(LABEL_throotle_control_algorithm_output, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 610, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+        jLabel3.setFont(new java.awt.Font("Ubuntu", 1, 24)); // NOI18N
+        jLabel3.setText("Battery");
+
+        LABEL_lion_cells_number.setFont(new java.awt.Font("Ubuntu", 0, 18)); // NOI18N
+        LABEL_lion_cells_number.setText("Battery voltage / Li-ion cells number");
+
+        lion_cells_number.setFont(new java.awt.Font("Ubuntu", 0, 18)); // NOI18N
+        lion_cells_number.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "7 (24V)", "10 (36V)", "13 (48V)" }));
+        lion_cells_number.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                lion_cells_numberActionPerformed(evt);
+            }
+        });
+
+        jLabel4.setFont(new java.awt.Font("Ubuntu", 1, 24)); // NOI18N
+        jLabel4.setText("Motor");
+
+        LABEL_motor_rotor_offset_angle.setFont(new java.awt.Font("Ubuntu", 0, 18)); // NOI18N
+        LABEL_motor_rotor_offset_angle.setText("Motor rotor offset angle");
+
+        motor_rotor_offset_angle.setFont(new java.awt.Font("Ubuntu", 0, 18)); // NOI18N
+        motor_rotor_offset_angle.setText("202");
+        motor_rotor_offset_angle.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                motor_rotor_offset_angleActionPerformed(evt);
+            }
+        });
+
+        LABEL_foc_read_id_current_angle_adjust.setFont(new java.awt.Font("Ubuntu", 0, 18)); // NOI18N
+        LABEL_foc_read_id_current_angle_adjust.setText("FOC read ID current angle adjust");
+
+        foc_read_id_current_angle_adjust.setFont(new java.awt.Font("Ubuntu", 0, 18)); // NOI18N
+        foc_read_id_current_angle_adjust.setText("137");
+        foc_read_id_current_angle_adjust.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                foc_read_id_current_angle_adjustActionPerformed(evt);
+            }
+        });
+
+        LABEL_motor_start_interpolation_60_degrees.setFont(new java.awt.Font("Ubuntu", 0, 18)); // NOI18N
+        LABEL_motor_start_interpolation_60_degrees.setText("Motor start interpolation 60 degrees (eRPS)");
+
+        motor_start_interpolation_60_degrees.setFont(new java.awt.Font("Ubuntu", 0, 18)); // NOI18N
+        motor_start_interpolation_60_degrees.setText("40");
+        motor_start_interpolation_60_degrees.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                motor_start_interpolation_60_degreesActionPerformed(evt);
+            }
+        });
+
+        jLabel6.setFont(new java.awt.Font("Ubuntu", 1, 24)); // NOI18N
+        jLabel6.setText("Motor controller");
+
+        LABEL_motor_max_current.setFont(new java.awt.Font("Ubuntu", 0, 18)); // NOI18N
+        LABEL_motor_max_current.setText("Motor max current (amps)");
+
+        motor_max_current.setFont(new java.awt.Font("Ubuntu", 0, 18)); // NOI18N
+        motor_max_current.setText("15");
+        motor_max_current.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                motor_max_currentActionPerformed(evt);
+            }
+        });
+
+        LABEL_motor_max_regen_current.setFont(new java.awt.Font("Ubuntu", 0, 18)); // NOI18N
+        LABEL_motor_max_regen_current.setText("Motor max regeneration/ebrake current  (amps)");
+
+        motor_max_regen_current.setFont(new java.awt.Font("Ubuntu", 0, 18)); // NOI18N
+        motor_max_regen_current.setText("7");
+        motor_max_regen_current.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                motor_max_regen_currentActionPerformed(evt);
+            }
+        });
+
+        LABEL_pwm_duty_cycle_ramp_up_step.setFont(new java.awt.Font("Ubuntu", 0, 18)); // NOI18N
+        LABEL_pwm_duty_cycle_ramp_up_step.setText("PWM duty-cycle ramp up step");
+
+        pwm_duty_cycle_ramp_up_step.setFont(new java.awt.Font("Ubuntu", 0, 18)); // NOI18N
+        pwm_duty_cycle_ramp_up_step.setText("25");
+        pwm_duty_cycle_ramp_up_step.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                pwm_duty_cycle_ramp_up_stepActionPerformed(evt);
+            }
+        });
+
+        LABEL_pwm_duty_cycle_ramp_down_step.setFont(new java.awt.Font("Ubuntu", 0, 18)); // NOI18N
+        LABEL_pwm_duty_cycle_ramp_down_step.setText("PWM duty-cycle ramp down step");
+
+        pwm_duty_cycle_ramp_down_step.setFont(new java.awt.Font("Ubuntu", 0, 18)); // NOI18N
+        pwm_duty_cycle_ramp_down_step.setText("25");
+        pwm_duty_cycle_ramp_down_step.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                pwm_duty_cycle_ramp_down_stepActionPerformed(evt);
+            }
+        });
+
+        write_option_bytes.setText("Write configuration");
+
+        jButton2.setText("Write option bytes");
+
+        org.jdesktop.layout.GroupLayout jPanel1Layout = new org.jdesktop.layout.GroupLayout(jPanel1);
+        jPanel1.setLayout(jPanel1Layout);
+        jPanel1Layout.setHorizontalGroup(
+            jPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+            .add(jPanel1Layout.createSequentialGroup()
+                .add(jPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+                    .add(jPanel1Layout.createSequentialGroup()
+                        .add(25, 25, 25)
+                        .add(jPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING, false)
+                            .add(jSeparator4)
+                            .add(LABEL_foc_read_id_current_angle_adjust, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .add(pwm_duty_cycle_ramp_down_step, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 60, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                            .add(LABEL_pwm_duty_cycle_ramp_down_step, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 400, Short.MAX_VALUE)
+                            .add(pwm_duty_cycle_ramp_up_step, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 60, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                            .add(LABEL_pwm_duty_cycle_ramp_up_step, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 400, Short.MAX_VALUE)
+                            .add(motor_max_regen_current, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 60, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                            .add(LABEL_motor_max_regen_current, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 400, Short.MAX_VALUE)
+                            .add(motor_max_current, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 60, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                            .add(jLabel6)
+                            .add(motor_start_interpolation_60_degrees, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 60, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                            .add(foc_read_id_current_angle_adjust, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 60, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                            .add(motor_rotor_offset_angle, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 60, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                            .add(jLabel4)
+                            .add(jLabel3)
+                            .add(lion_cells_number, 0, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                             .add(jLabel1)
-                            .add(throotle_control_algorithm_output, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 400, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                            .add(LABEL_throotle_type, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 610, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                            .add(LABEL_torque_sensor_control_algorithm_output, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 610, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                            .add(throotle_type, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 400, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                            .add(LABEL_pas_number_of_magnets)
+                            .add(throttle_control_algorithm_output, 0, 400, Short.MAX_VALUE)
                             .add(pas_number_of_magnets, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 60, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                             .add(pedal_max_cadence_in_rpm, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 60, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                            .add(LABEL_pedal_max_cadence_in_rpm)
-                            .add(LABEL_pas_rotation_direction, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 610, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                            .add(pas_rotation_direction, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 400, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                            .add(torque_sensor_control_algorithm_output, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 400, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
-                        .add(0, 0, Short.MAX_VALUE))))
+                            .add(jLabel2)
+                            .add(pas_number_of_magnets1, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 60, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                            .add(pas_number_of_magnets2, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 60, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                            .add(pas_number_of_magnets5, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 60, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                            .add(pas_number_of_magnets6, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 60, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                            .add(pas_number_of_magnets3, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 60, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                            .add(pas_number_of_magnets4, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 60, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                            .add(LABEL_throttle_control_algorithm_output, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .add(LABEL_throttle_type, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .add(throotle_type, 0, 400, Short.MAX_VALUE)
+                            .add(LABEL_pedal_max_cadence_in_rpm, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .add(LABEL_pas_number_of_magnets, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .add(LABEL_torque_sensor_control_algorithm_output, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .add(torque_sensor_control_algorithm_output, 0, 400, Short.MAX_VALUE)
+                            .add(LABEL_motor_max_current, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .add(LABEL_lion_cells_number, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .add(LABEL_motor_start_interpolation_60_degrees, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .add(LABEL_motor_rotor_offset_angle, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .add(jSeparator2)
+                            .add(LABEL_pas_rotation_direction, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .add(jSeparator3)
+                            .add(LABEL_pas_number_of_magnets6, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .add(LABEL_pas_number_of_magnets5, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .add(LABEL_pas_number_of_magnets4, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .add(LABEL_pas_number_of_magnets3, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .add(LABEL_pas_number_of_magnets2, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .add(LABEL_pas_number_of_magnets1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .add(jSeparator6)
+                            .add(pas_rotation_direction, 0, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .add(jSeparator7)))
+                    .add(jPanel1Layout.createSequentialGroup()
+                        .add(51, 51, 51)
+                        .add(jButton2)
+                        .add(50, 50, 50)
+                        .add(write_option_bytes)))
+                .add(25, 44, Short.MAX_VALUE))
         );
-        layout.setVerticalGroup(
-            layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(org.jdesktop.layout.GroupLayout.TRAILING, layout.createSequentialGroup()
-                .add(30, 30, 30)
+        jPanel1Layout.setVerticalGroup(
+            jPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+            .add(jPanel1Layout.createSequentialGroup()
+                .addContainerGap()
                 .add(jLabel1)
                 .add(20, 20, 20)
-                .add(LABEL_throotle_type)
+                .add(LABEL_throttle_type)
                 .add(6, 6, 6)
                 .add(throotle_type, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                 .add(15, 15, 15)
-                .add(LABEL_throotle_control_algorithm_output)
+                .add(LABEL_throttle_control_algorithm_output)
                 .add(6, 6, 6)
-                .add(throotle_control_algorithm_output, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                .add(throttle_control_algorithm_output, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                 .add(15, 15, 15)
                 .add(LABEL_torque_sensor_control_algorithm_output)
                 .add(6, 6, 6)
@@ -298,15 +462,13 @@ public class Configuration_tool extends javax.swing.JFrame {
                 .add(pas_rotation_direction, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                 .add(15, 15, 15)
                 .add(jSeparator2, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 8, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                .add(15, 15, 15)
+                .add(20, 20, 20)
                 .add(jLabel2)
                 .add(20, 20, 20)
                 .add(LABEL_pas_number_of_magnets1)
                 .add(6, 6, 6)
                 .add(pas_number_of_magnets1, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                 .add(15, 15, 15)
-                .add(jSeparator1, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 0, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                .add(0, 0, 0)
                 .add(LABEL_pas_number_of_magnets2)
                 .add(6, 6, 6)
                 .add(pas_number_of_magnets2, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
@@ -327,17 +489,78 @@ public class Configuration_tool extends javax.swing.JFrame {
                 .add(6, 6, 6)
                 .add(pas_number_of_magnets6, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                 .add(15, 15, 15)
-                .add(jSeparator3, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(61, Short.MAX_VALUE))
+                .add(jSeparator3, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 8, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                .add(20, 20, 20)
+                .add(jLabel3)
+                .add(20, 20, 20)
+                .add(LABEL_lion_cells_number)
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                .add(lion_cells_number, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                .add(17, 17, 17)
+                .add(jSeparator4, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                .add(20, 20, 20)
+                .add(jLabel4)
+                .add(20, 20, 20)
+                .add(LABEL_motor_rotor_offset_angle)
+                .add(6, 6, 6)
+                .add(motor_rotor_offset_angle, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                .add(15, 15, 15)
+                .add(LABEL_foc_read_id_current_angle_adjust)
+                .add(6, 6, 6)
+                .add(foc_read_id_current_angle_adjust, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                .add(15, 15, 15)
+                .add(LABEL_motor_start_interpolation_60_degrees)
+                .add(6, 6, 6)
+                .add(motor_start_interpolation_60_degrees, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                .add(15, 15, 15)
+                .add(jSeparator6, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 8, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                .add(20, 20, 20)
+                .add(jLabel6)
+                .add(20, 20, 20)
+                .add(LABEL_motor_max_current)
+                .add(6, 6, 6)
+                .add(motor_max_current, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                .add(15, 15, 15)
+                .add(LABEL_motor_max_regen_current)
+                .add(6, 6, 6)
+                .add(motor_max_regen_current, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                .add(15, 15, 15)
+                .add(LABEL_pwm_duty_cycle_ramp_up_step)
+                .add(6, 6, 6)
+                .add(pwm_duty_cycle_ramp_up_step, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                .add(15, 15, 15)
+                .add(LABEL_pwm_duty_cycle_ramp_down_step)
+                .add(6, 6, 6)
+                .add(pwm_duty_cycle_ramp_down_step, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                .add(15, 15, 15)
+                .add(jSeparator7, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 8, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                .add(40, 40, 40)
+                .add(jPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
+                    .add(write_option_bytes)
+                    .add(jButton2))
+                .addContainerGap(69, Short.MAX_VALUE))
+        );
+
+        jScrollPane1.setViewportView(jPanel1);
+
+        org.jdesktop.layout.GroupLayout layout = new org.jdesktop.layout.GroupLayout(getContentPane());
+        getContentPane().setLayout(layout);
+        layout.setHorizontalGroup(
+            layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+            .add(jScrollPane1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 469, Short.MAX_VALUE)
+        );
+        layout.setVerticalGroup(
+            layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+            .add(jScrollPane1, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
         );
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
     private void throotle_typeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_throotle_typeActionPerformed
-       if ("throootle and/or PAS".equals(throotle_type.getSelectedItem())){
-            LABEL_throotle_control_algorithm_output.setVisible(true);
-            throotle_control_algorithm_output.setVisible(true);
+       if ("throttle and/or PAS".equals(throotle_type.getSelectedItem())){
+            LABEL_throttle_control_algorithm_output.setVisible(true);
+            throttle_control_algorithm_output.setVisible(true);
             LABEL_pas_number_of_magnets.setVisible(true);
             pas_number_of_magnets.setVisible(true);
             LABEL_pedal_max_cadence_in_rpm.setVisible(true);
@@ -351,8 +574,8 @@ public class Configuration_tool extends javax.swing.JFrame {
             LABEL_torque_sensor_control_algorithm_output.setVisible(true);
             torque_sensor_control_algorithm_output.setVisible(true);   
            
-            LABEL_throotle_control_algorithm_output.setVisible(false);
-            throotle_control_algorithm_output.setVisible(false);
+            LABEL_throttle_control_algorithm_output.setVisible(false);
+            throttle_control_algorithm_output.setVisible(false);
             LABEL_pas_number_of_magnets.setVisible(false);
             pas_number_of_magnets.setVisible(false);
             LABEL_pedal_max_cadence_in_rpm.setVisible(false);
@@ -362,9 +585,9 @@ public class Configuration_tool extends javax.swing.JFrame {
        }
     }//GEN-LAST:event_throotle_typeActionPerformed
 
-    private void throotle_control_algorithm_outputActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_throotle_control_algorithm_outputActionPerformed
+    private void throttle_control_algorithm_outputActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_throttle_control_algorithm_outputActionPerformed
         // TODO add your handling code here:
-    }//GEN-LAST:event_throotle_control_algorithm_outputActionPerformed
+    }//GEN-LAST:event_throttle_control_algorithm_outputActionPerformed
 
     private void torque_sensor_control_algorithm_outputActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_torque_sensor_control_algorithm_outputActionPerformed
         // TODO add your handling code here:
@@ -405,34 +628,75 @@ public class Configuration_tool extends javax.swing.JFrame {
     private void pas_number_of_magnets6ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_pas_number_of_magnets6ActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_pas_number_of_magnets6ActionPerformed
+
+    private void lion_cells_numberActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_lion_cells_numberActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_lion_cells_numberActionPerformed
+
+    private void motor_rotor_offset_angleActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_motor_rotor_offset_angleActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_motor_rotor_offset_angleActionPerformed
+
+    private void foc_read_id_current_angle_adjustActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_foc_read_id_current_angle_adjustActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_foc_read_id_current_angle_adjustActionPerformed
+
+    private void motor_start_interpolation_60_degreesActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_motor_start_interpolation_60_degreesActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_motor_start_interpolation_60_degreesActionPerformed
+
+    private void motor_max_currentActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_motor_max_currentActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_motor_max_currentActionPerformed
+
+    private void motor_max_regen_currentActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_motor_max_regen_currentActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_motor_max_regen_currentActionPerformed
+
+    private void pwm_duty_cycle_ramp_up_stepActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_pwm_duty_cycle_ramp_up_stepActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_pwm_duty_cycle_ramp_up_stepActionPerformed
+
+    private void pwm_duty_cycle_ramp_down_stepActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_pwm_duty_cycle_ramp_down_stepActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_pwm_duty_cycle_ramp_down_stepActionPerformed
     
     /**
      * @param args the command line arguments
      */
-    public static void main(String args[]) {
-        /* Set the Nimbus look and feel */
-        //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
-        /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
-         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
-         */
+    public static void main(String args[]) throws ClassNotFoundException, InstantiationException {
+            /* Set the Nimbus look and feel */
+            //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
+            /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
+            * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html
+            */
+//        try {
+//            javax.swing.UIManager.LookAndFeelInfo[] installedLookAndFeels=javax.swing.UIManager.getInstalledLookAndFeels();
+//            for (int idx=0; idx<installedLookAndFeels.length; idx++)
+//                if ("Nimbus".equals(installedLookAndFeels[idx].getName())) {
+//                    javax.swing.UIManager.setLookAndFeel(installedLookAndFeels[idx].getClassName());
+//                    break;
+//                }
+//            
+//        } catch (ClassNotFoundException ex) {
+//            java.util.logging.Logger.getLogger(Configuration_tool.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+//        } catch (InstantiationException ex) {
+//            java.util.logging.Logger.getLogger(Configuration_tool.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+//        } catch (IllegalAccessException ex) {
+//            java.util.logging.Logger.getLogger(Configuration_tool.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+//        } catch (javax.swing.UnsupportedLookAndFeelException ex) {
+//            java.util.logging.Logger.getLogger(Configuration_tool.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+//        }
+//</editor-fold>
+//</editor-fold>
+
         try {
-            javax.swing.UIManager.LookAndFeelInfo[] installedLookAndFeels=javax.swing.UIManager.getInstalledLookAndFeels();
-            for (int idx=0; idx<installedLookAndFeels.length; idx++)
-                if ("Nimbus".equals(installedLookAndFeels[idx].getName())) {
-                    javax.swing.UIManager.setLookAndFeel(installedLookAndFeels[idx].getClassName());
-                    break;
-                }
-        } catch (ClassNotFoundException ex) {
-            java.util.logging.Logger.getLogger(Configuration_tool.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (InstantiationException ex) {
-            java.util.logging.Logger.getLogger(Configuration_tool.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
         } catch (IllegalAccessException ex) {
-            java.util.logging.Logger.getLogger(Configuration_tool.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (javax.swing.UnsupportedLookAndFeelException ex) {
-            java.util.logging.Logger.getLogger(Configuration_tool.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            Logger.getLogger(Configuration_tool.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (UnsupportedLookAndFeelException ex) {
+            Logger.getLogger(Configuration_tool.class.getName()).log(Level.SEVERE, null, ex);
         }
-        //</editor-fold>
-        //</editor-fold>
 
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
@@ -443,6 +707,12 @@ public class Configuration_tool extends javax.swing.JFrame {
     }
     
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JLabel LABEL_foc_read_id_current_angle_adjust;
+    private javax.swing.JLabel LABEL_lion_cells_number;
+    private javax.swing.JLabel LABEL_motor_max_current;
+    private javax.swing.JLabel LABEL_motor_max_regen_current;
+    private javax.swing.JLabel LABEL_motor_rotor_offset_angle;
+    private javax.swing.JLabel LABEL_motor_start_interpolation_60_degrees;
     private javax.swing.JLabel LABEL_pas_number_of_magnets;
     private javax.swing.JLabel LABEL_pas_number_of_magnets1;
     private javax.swing.JLabel LABEL_pas_number_of_magnets2;
@@ -452,15 +722,30 @@ public class Configuration_tool extends javax.swing.JFrame {
     private javax.swing.JLabel LABEL_pas_number_of_magnets6;
     private javax.swing.JLabel LABEL_pas_rotation_direction;
     private javax.swing.JLabel LABEL_pedal_max_cadence_in_rpm;
-    private javax.swing.JLabel LABEL_throotle_control_algorithm_output;
-    private javax.swing.JLabel LABEL_throotle_type;
+    private javax.swing.JLabel LABEL_pwm_duty_cycle_ramp_down_step;
+    private javax.swing.JLabel LABEL_pwm_duty_cycle_ramp_up_step;
+    private javax.swing.JLabel LABEL_throttle_control_algorithm_output;
+    private javax.swing.JLabel LABEL_throttle_type;
     private javax.swing.JLabel LABEL_torque_sensor_control_algorithm_output;
-    private javax.swing.ButtonGroup buttonGroup1;
+    private javax.swing.JTextField foc_read_id_current_angle_adjust;
+    private javax.swing.JButton jButton2;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
-    private javax.swing.JSeparator jSeparator1;
+    private javax.swing.JLabel jLabel3;
+    private javax.swing.JLabel jLabel4;
+    private javax.swing.JLabel jLabel6;
+    private javax.swing.JPanel jPanel1;
+    private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JSeparator jSeparator2;
     private javax.swing.JSeparator jSeparator3;
+    private javax.swing.JSeparator jSeparator4;
+    private javax.swing.JSeparator jSeparator6;
+    private javax.swing.JSeparator jSeparator7;
+    private javax.swing.JComboBox<String> lion_cells_number;
+    private javax.swing.JTextField motor_max_current;
+    private javax.swing.JTextField motor_max_regen_current;
+    private javax.swing.JTextField motor_rotor_offset_angle;
+    private javax.swing.JTextField motor_start_interpolation_60_degrees;
     private javax.swing.JTextField pas_number_of_magnets;
     private javax.swing.JTextField pas_number_of_magnets1;
     private javax.swing.JTextField pas_number_of_magnets2;
@@ -470,9 +755,12 @@ public class Configuration_tool extends javax.swing.JFrame {
     private javax.swing.JTextField pas_number_of_magnets6;
     private javax.swing.JComboBox<String> pas_rotation_direction;
     private javax.swing.JTextField pedal_max_cadence_in_rpm;
-    private javax.swing.JComboBox<String> throotle_control_algorithm_output;
+    private javax.swing.JTextField pwm_duty_cycle_ramp_down_step;
+    private javax.swing.JTextField pwm_duty_cycle_ramp_up_step;
     private javax.swing.JComboBox<String> throotle_type;
+    private javax.swing.JComboBox<String> throttle_control_algorithm_output;
     private javax.swing.JComboBox<String> torque_sensor_control_algorithm_output;
+    private javax.swing.JButton write_option_bytes;
     // End of variables declaration//GEN-END:variables
     
 }
