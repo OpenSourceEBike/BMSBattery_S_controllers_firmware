@@ -50,91 +50,177 @@ public class Configuration_tool extends javax.swing.JFrame {
         buttonGroup1 = new javax.swing.ButtonGroup();
         jSeparator1 = new javax.swing.JSeparator();
         jLabel1 = new javax.swing.JLabel();
-        jComboBox1 = new javax.swing.JComboBox<>();
-        jLabel2 = new javax.swing.JLabel();
-        jComboBox2 = new javax.swing.JComboBox<>();
-        jLabel3 = new javax.swing.JLabel();
-        jLabel4 = new javax.swing.JLabel();
-        jComboBox3 = new javax.swing.JComboBox<>();
-        jTextField1 = new javax.swing.JTextField();
-        jLabel5 = new javax.swing.JLabel();
-        jLabel6 = new javax.swing.JLabel();
-        jTextField2 = new javax.swing.JTextField();
-        jLabel7 = new javax.swing.JLabel();
-        jComboBox4 = new javax.swing.JComboBox<>();
+        throotle_type = new javax.swing.JComboBox<>();
+        LABEL_throotle_control_algorithm_output = new javax.swing.JLabel();
+        throotle_control_algorithm_output = new javax.swing.JComboBox<>();
+        LABEL_throotle_type = new javax.swing.JLabel();
+        LABEL_torque_sensor_control_algorithm_output = new javax.swing.JLabel();
+        torque_sensor_control_algorithm_output = new javax.swing.JComboBox<>();
+        pas_number_of_magnets = new javax.swing.JTextField();
+        LABEL_pas_number_of_magnets = new javax.swing.JLabel();
+        LABEL_pedal_max_cadence_in_rpm = new javax.swing.JLabel();
+        pedal_max_cadence_in_rpm = new javax.swing.JTextField();
+        LABEL_pas_rotation_direction = new javax.swing.JLabel();
+        pas_rotation_direction = new javax.swing.JComboBox<>();
         jSeparator2 = new javax.swing.JSeparator();
+        jLabel2 = new javax.swing.JLabel();
+        LABEL_pas_number_of_magnets1 = new javax.swing.JLabel();
+        pas_number_of_magnets1 = new javax.swing.JTextField();
+        LABEL_pas_number_of_magnets2 = new javax.swing.JLabel();
+        pas_number_of_magnets2 = new javax.swing.JTextField();
+        LABEL_pas_number_of_magnets3 = new javax.swing.JLabel();
+        pas_number_of_magnets3 = new javax.swing.JTextField();
+        LABEL_pas_number_of_magnets4 = new javax.swing.JLabel();
+        pas_number_of_magnets4 = new javax.swing.JTextField();
+        LABEL_pas_number_of_magnets5 = new javax.swing.JLabel();
+        pas_number_of_magnets5 = new javax.swing.JTextField();
+        LABEL_pas_number_of_magnets6 = new javax.swing.JLabel();
+        pas_number_of_magnets6 = new javax.swing.JTextField();
+        jSeparator3 = new javax.swing.JSeparator();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("Flexible OpenSource EBike firmware: Configuration tool");
-        setBounds(new java.awt.Rectangle(0, 0, 1024, 600));
-        setMinimumSize(new java.awt.Dimension(800, 600));
+        setBounds(new java.awt.Rectangle(0, 0, 500, 500));
+        setMinimumSize(new java.awt.Dimension(500, 800));
+        setPreferredSize(new java.awt.Dimension(500, 800));
 
-        jLabel1.setFont(new java.awt.Font("Ubuntu", 1, 36)); // NOI18N
+        jLabel1.setFont(new java.awt.Font("Ubuntu", 1, 24)); // NOI18N
         jLabel1.setText("Throotle type");
 
-        jComboBox1.setFont(new java.awt.Font("Ubuntu", 0, 24)); // NOI18N
-        jComboBox1.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "throootle and/or PAS", "torque sensor"}));
-        jComboBox1.addActionListener(new java.awt.event.ActionListener() {
+        throotle_type.setFont(new java.awt.Font("Ubuntu", 0, 18)); // NOI18N
+        throotle_type.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "throootle and/or PAS", "torque sensor" }));
+        throotle_type.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jComboBox1ActionPerformed(evt);
+                throotle_typeActionPerformed(evt);
             }
         });
 
-        jLabel2.setFont(new java.awt.Font("Ubuntu", 0, 24)); // NOI18N
-        jLabel2.setText("Throotle control algorithm output");
+        LABEL_throotle_control_algorithm_output.setFont(new java.awt.Font("Ubuntu", 0, 18)); // NOI18N
+        LABEL_throotle_control_algorithm_output.setText("Throotle control algorithm output");
 
-        jComboBox2.setFont(new java.awt.Font("Ubuntu", 0, 24)); // NOI18N
-        jComboBox2.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "direct PWM duty-cycle", "motor current and/or speed"}));
-        jComboBox2.addActionListener(new java.awt.event.ActionListener() {
+        throotle_control_algorithm_output.setFont(new java.awt.Font("Ubuntu", 0, 18)); // NOI18N
+        throotle_control_algorithm_output.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "direct PWM duty-cycle", "motor current and/or speed" }));
+        throotle_control_algorithm_output.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jComboBox2ActionPerformed(evt);
+                throotle_control_algorithm_outputActionPerformed(evt);
             }
         });
 
-        jLabel3.setFont(new java.awt.Font("Ubuntu", 0, 24)); // NOI18N
-        jLabel3.setText("Choose throotle type");
+        LABEL_throotle_type.setFont(new java.awt.Font("Ubuntu", 0, 18)); // NOI18N
+        LABEL_throotle_type.setText("Choose throotle type");
 
-        jLabel4.setFont(new java.awt.Font("Ubuntu", 0, 24)); // NOI18N
-        jLabel4.setText("Torque sensor control algorithm output");
+        LABEL_torque_sensor_control_algorithm_output.setFont(new java.awt.Font("Ubuntu", 0, 18)); // NOI18N
+        LABEL_torque_sensor_control_algorithm_output.setText("Torque sensor control algorithm output");
+        LABEL_torque_sensor_control_algorithm_output.setVisible(false);
 
-        jComboBox3.setFont(new java.awt.Font("Ubuntu", 0, 24)); // NOI18N
-        jComboBox3.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "direct torque value", "human power (troque * cadence)"}));
-        jComboBox3.addActionListener(new java.awt.event.ActionListener() {
+        torque_sensor_control_algorithm_output.setFont(new java.awt.Font("Ubuntu", 0, 18)); // NOI18N
+        torque_sensor_control_algorithm_output.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "direct torque value", "human power (troque * cadence)" }));
+        torque_sensor_control_algorithm_output.setVisible(false);
+        torque_sensor_control_algorithm_output.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jComboBox3ActionPerformed(evt);
+                torque_sensor_control_algorithm_outputActionPerformed(evt);
             }
         });
 
-        jTextField1.setFont(new java.awt.Font("Ubuntu", 0, 24)); // NOI18N
-        jTextField1.setText("5");
-        jTextField1.addActionListener(new java.awt.event.ActionListener() {
+        pas_number_of_magnets.setFont(new java.awt.Font("Ubuntu", 0, 18)); // NOI18N
+        pas_number_of_magnets.setText("5");
+        pas_number_of_magnets.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jTextField1ActionPerformed(evt);
+                pas_number_of_magnetsActionPerformed(evt);
             }
         });
 
-        jLabel5.setFont(new java.awt.Font("Ubuntu", 0, 24)); // NOI18N
-        jLabel5.setText("PAS number of magnets");
+        LABEL_pas_number_of_magnets.setFont(new java.awt.Font("Ubuntu", 0, 18)); // NOI18N
+        LABEL_pas_number_of_magnets.setText("PAS number of magnets");
 
-        jLabel6.setFont(new java.awt.Font("Ubuntu", 0, 24)); // NOI18N
-        jLabel6.setText("Max cadence in RPM");
+        LABEL_pedal_max_cadence_in_rpm.setFont(new java.awt.Font("Ubuntu", 0, 18)); // NOI18N
+        LABEL_pedal_max_cadence_in_rpm.setText("Pedal max cadence in RPM");
 
-        jTextField2.setFont(new java.awt.Font("Ubuntu", 0, 24)); // NOI18N
-        jTextField2.setText("80");
-        jTextField2.addActionListener(new java.awt.event.ActionListener() {
+        pedal_max_cadence_in_rpm.setFont(new java.awt.Font("Ubuntu", 0, 18)); // NOI18N
+        pedal_max_cadence_in_rpm.setText("80");
+        pedal_max_cadence_in_rpm.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jTextField2ActionPerformed(evt);
+                pedal_max_cadence_in_rpmActionPerformed(evt);
             }
         });
 
-        jLabel7.setFont(new java.awt.Font("Ubuntu", 0, 24)); // NOI18N
-        jLabel7.setText("PAS rotation direction");
+        LABEL_pas_rotation_direction.setFont(new java.awt.Font("Ubuntu", 0, 18)); // NOI18N
+        LABEL_pas_rotation_direction.setText("PAS rotation direction");
 
-        jComboBox4.setFont(new java.awt.Font("Ubuntu", 0, 24)); // NOI18N
-        jComboBox4.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "left", "right"}));
-        jComboBox4.addActionListener(new java.awt.event.ActionListener() {
+        pas_rotation_direction.setFont(new java.awt.Font("Ubuntu", 0, 18)); // NOI18N
+        pas_rotation_direction.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "left", "right" }));
+        pas_rotation_direction.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jComboBox4ActionPerformed(evt);
+                pas_rotation_directionActionPerformed(evt);
+            }
+        });
+
+        jLabel2.setFont(new java.awt.Font("Ubuntu", 1, 24)); // NOI18N
+        jLabel2.setText("LCD");
+
+        LABEL_pas_number_of_magnets1.setFont(new java.awt.Font("Ubuntu", 0, 18)); // NOI18N
+        LABEL_pas_number_of_magnets1.setText("Assist level 0");
+
+        pas_number_of_magnets1.setFont(new java.awt.Font("Ubuntu", 0, 18)); // NOI18N
+        pas_number_of_magnets1.setText("0.0");
+        pas_number_of_magnets1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                pas_number_of_magnets1ActionPerformed(evt);
+            }
+        });
+
+        LABEL_pas_number_of_magnets2.setFont(new java.awt.Font("Ubuntu", 0, 18)); // NOI18N
+        LABEL_pas_number_of_magnets2.setText("Assist level 1");
+
+        pas_number_of_magnets2.setFont(new java.awt.Font("Ubuntu", 0, 18)); // NOI18N
+        pas_number_of_magnets2.setText("0.2");
+        pas_number_of_magnets2.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                pas_number_of_magnets2ActionPerformed(evt);
+            }
+        });
+
+        LABEL_pas_number_of_magnets3.setFont(new java.awt.Font("Ubuntu", 0, 18)); // NOI18N
+        LABEL_pas_number_of_magnets3.setText("Assist level 2");
+
+        pas_number_of_magnets3.setFont(new java.awt.Font("Ubuntu", 0, 18)); // NOI18N
+        pas_number_of_magnets3.setText("0.4");
+        pas_number_of_magnets3.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                pas_number_of_magnets3ActionPerformed(evt);
+            }
+        });
+
+        LABEL_pas_number_of_magnets4.setFont(new java.awt.Font("Ubuntu", 0, 18)); // NOI18N
+        LABEL_pas_number_of_magnets4.setText("Assist level 3");
+
+        pas_number_of_magnets4.setFont(new java.awt.Font("Ubuntu", 0, 18)); // NOI18N
+        pas_number_of_magnets4.setText("0.6");
+        pas_number_of_magnets4.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                pas_number_of_magnets4ActionPerformed(evt);
+            }
+        });
+
+        LABEL_pas_number_of_magnets5.setFont(new java.awt.Font("Ubuntu", 0, 18)); // NOI18N
+        LABEL_pas_number_of_magnets5.setText("Assist level 4");
+
+        pas_number_of_magnets5.setFont(new java.awt.Font("Ubuntu", 0, 18)); // NOI18N
+        pas_number_of_magnets5.setText("0.8");
+        pas_number_of_magnets5.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                pas_number_of_magnets5ActionPerformed(evt);
+            }
+        });
+
+        LABEL_pas_number_of_magnets6.setFont(new java.awt.Font("Ubuntu", 0, 18)); // NOI18N
+        LABEL_pas_number_of_magnets6.setText("Assist level 3");
+
+        pas_number_of_magnets6.setFont(new java.awt.Font("Ubuntu", 0, 18)); // NOI18N
+        pas_number_of_magnets6.setText("0.6");
+        pas_number_of_magnets6.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                pas_number_of_magnets6ActionPerformed(evt);
             }
         });
 
@@ -142,30 +228,44 @@ public class Configuration_tool extends javax.swing.JFrame {
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(org.jdesktop.layout.GroupLayout.TRAILING, layout.createSequentialGroup()
+            .add(layout.createSequentialGroup()
                 .add(30, 30, 30)
-                .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.TRAILING)
-                    .add(org.jdesktop.layout.GroupLayout.LEADING, layout.createSequentialGroup()
-                        .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                            .add(jLabel2, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 610, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                            .add(jLabel1)
-                            .add(jComboBox2, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 500, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                            .add(jLabel3, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 610, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                            .add(jLabel4, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 610, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                            .add(jComboBox3, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 500, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                            .add(jComboBox1, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 500, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                            .add(jLabel5)
-                            .add(jTextField1, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 60, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                            .add(jTextField2, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 60, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                            .add(jLabel6)
-                            .add(jLabel7, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 610, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                            .add(jComboBox4, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 500, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
-                        .add(0, 236, Short.MAX_VALUE))
+                .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
                     .add(layout.createSequentialGroup()
-                        .add(435, 435, 435)
+                        .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+                            .add(jLabel2)
+                            .add(LABEL_pas_number_of_magnets1)
+                            .add(pas_number_of_magnets1, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 60, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
+                        .add(127, 127, 127)
                         .add(jSeparator1))
-                    .add(jSeparator2))
-                .addContainerGap())
+                    .add(layout.createSequentialGroup()
+                        .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+                            .add(jSeparator3, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 445, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                            .add(LABEL_pas_number_of_magnets5)
+                            .add(pas_number_of_magnets5, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 60, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                            .add(LABEL_pas_number_of_magnets6)
+                            .add(pas_number_of_magnets6, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 60, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                            .add(LABEL_pas_number_of_magnets3)
+                            .add(pas_number_of_magnets3, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 60, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                            .add(LABEL_pas_number_of_magnets4)
+                            .add(pas_number_of_magnets4, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 60, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                            .add(LABEL_pas_number_of_magnets2)
+                            .add(pas_number_of_magnets2, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 60, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                            .add(jSeparator2, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 445, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                            .add(LABEL_throotle_control_algorithm_output, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 610, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                            .add(jLabel1)
+                            .add(throotle_control_algorithm_output, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 400, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                            .add(LABEL_throotle_type, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 610, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                            .add(LABEL_torque_sensor_control_algorithm_output, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 610, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                            .add(throotle_type, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 400, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                            .add(LABEL_pas_number_of_magnets)
+                            .add(pas_number_of_magnets, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 60, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                            .add(pedal_max_cadence_in_rpm, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 60, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                            .add(LABEL_pedal_max_cadence_in_rpm)
+                            .add(LABEL_pas_rotation_direction, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 610, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                            .add(pas_rotation_direction, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 400, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                            .add(torque_sensor_control_algorithm_output, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 400, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
+                        .add(0, 0, Short.MAX_VALUE))))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
@@ -173,62 +273,138 @@ public class Configuration_tool extends javax.swing.JFrame {
                 .add(30, 30, 30)
                 .add(jLabel1)
                 .add(20, 20, 20)
-                .add(jLabel3)
+                .add(LABEL_throotle_type)
+                .add(6, 6, 6)
+                .add(throotle_type, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                .add(15, 15, 15)
+                .add(LABEL_throotle_control_algorithm_output)
+                .add(6, 6, 6)
+                .add(throotle_control_algorithm_output, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                .add(15, 15, 15)
+                .add(LABEL_torque_sensor_control_algorithm_output)
+                .add(6, 6, 6)
+                .add(torque_sensor_control_algorithm_output, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                .add(15, 15, 15)
+                .add(LABEL_pas_number_of_magnets)
+                .add(6, 6, 6)
+                .add(pas_number_of_magnets, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                .add(15, 15, 15)
+                .add(LABEL_pedal_max_cadence_in_rpm)
+                .add(6, 6, 6)
+                .add(pedal_max_cadence_in_rpm, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                .add(15, 15, 15)
+                .add(LABEL_pas_rotation_direction)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(jComboBox1, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                .add(20, 20, 20)
+                .add(pas_rotation_direction, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                .add(15, 15, 15)
+                .add(jSeparator2, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 8, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                .add(15, 15, 15)
                 .add(jLabel2)
-                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(jComboBox2, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                 .add(20, 20, 20)
-                .add(jLabel4)
-                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(jComboBox3, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                .add(20, 20, 20)
-                .add(jLabel5)
-                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(jTextField1, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                .add(20, 20, 20)
-                .add(jLabel6)
-                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(jTextField2, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                .add(20, 20, 20)
-                .add(jLabel7)
-                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(jComboBox4, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                .add(20, 20, 20)
-                .add(jSeparator2, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 19, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                .add(LABEL_pas_number_of_magnets1)
+                .add(6, 6, 6)
+                .add(pas_number_of_magnets1, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                .add(15, 15, 15)
                 .add(jSeparator1, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 0, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(199, Short.MAX_VALUE))
+                .add(0, 0, 0)
+                .add(LABEL_pas_number_of_magnets2)
+                .add(6, 6, 6)
+                .add(pas_number_of_magnets2, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                .add(15, 15, 15)
+                .add(LABEL_pas_number_of_magnets3)
+                .add(6, 6, 6)
+                .add(pas_number_of_magnets3, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                .add(15, 15, 15)
+                .add(LABEL_pas_number_of_magnets4)
+                .add(6, 6, 6)
+                .add(pas_number_of_magnets4, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                .add(15, 15, 15)
+                .add(LABEL_pas_number_of_magnets5)
+                .add(6, 6, 6)
+                .add(pas_number_of_magnets5, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                .add(15, 15, 15)
+                .add(LABEL_pas_number_of_magnets6)
+                .add(6, 6, 6)
+                .add(pas_number_of_magnets6, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                .add(15, 15, 15)
+                .add(jSeparator3, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(61, Short.MAX_VALUE))
         );
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
-    private void jComboBox1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jComboBox1ActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_jComboBox1ActionPerformed
+    private void throotle_typeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_throotle_typeActionPerformed
+       if ("throootle and/or PAS".equals(throotle_type.getSelectedItem())){
+            LABEL_throotle_control_algorithm_output.setVisible(true);
+            throotle_control_algorithm_output.setVisible(true);
+            LABEL_pas_number_of_magnets.setVisible(true);
+            pas_number_of_magnets.setVisible(true);
+            LABEL_pedal_max_cadence_in_rpm.setVisible(true);
+            pedal_max_cadence_in_rpm.setVisible(true);
+            LABEL_pas_rotation_direction.setVisible(true);
+            pas_rotation_direction.setVisible(true);
+   
+            LABEL_torque_sensor_control_algorithm_output.setVisible(false);
+            torque_sensor_control_algorithm_output.setVisible(false);       
+       } else if ("torque sensor".equals(throotle_type.getSelectedItem())) {
+            LABEL_torque_sensor_control_algorithm_output.setVisible(true);
+            torque_sensor_control_algorithm_output.setVisible(true);   
+           
+            LABEL_throotle_control_algorithm_output.setVisible(false);
+            throotle_control_algorithm_output.setVisible(false);
+            LABEL_pas_number_of_magnets.setVisible(false);
+            pas_number_of_magnets.setVisible(false);
+            LABEL_pedal_max_cadence_in_rpm.setVisible(false);
+            pedal_max_cadence_in_rpm.setVisible(false);
+            LABEL_pas_rotation_direction.setVisible(false);
+            pas_rotation_direction.setVisible(false);
+       }
+    }//GEN-LAST:event_throotle_typeActionPerformed
 
-    private void jComboBox2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jComboBox2ActionPerformed
+    private void throotle_control_algorithm_outputActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_throotle_control_algorithm_outputActionPerformed
         // TODO add your handling code here:
-    }//GEN-LAST:event_jComboBox2ActionPerformed
+    }//GEN-LAST:event_throotle_control_algorithm_outputActionPerformed
 
-    private void jComboBox3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jComboBox3ActionPerformed
+    private void torque_sensor_control_algorithm_outputActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_torque_sensor_control_algorithm_outputActionPerformed
         // TODO add your handling code here:
-    }//GEN-LAST:event_jComboBox3ActionPerformed
+    }//GEN-LAST:event_torque_sensor_control_algorithm_outputActionPerformed
 
-    private void jTextField1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jTextField1ActionPerformed
+    private void pas_number_of_magnetsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_pas_number_of_magnetsActionPerformed
         // TODO add your handling code here:
-    }//GEN-LAST:event_jTextField1ActionPerformed
+    }//GEN-LAST:event_pas_number_of_magnetsActionPerformed
 
-    private void jTextField2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jTextField2ActionPerformed
+    private void pedal_max_cadence_in_rpmActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_pedal_max_cadence_in_rpmActionPerformed
         // TODO add your handling code here:
-    }//GEN-LAST:event_jTextField2ActionPerformed
+    }//GEN-LAST:event_pedal_max_cadence_in_rpmActionPerformed
 
-    private void jComboBox4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jComboBox4ActionPerformed
+    private void pas_rotation_directionActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_pas_rotation_directionActionPerformed
         // TODO add your handling code here:
-    }//GEN-LAST:event_jComboBox4ActionPerformed
+    }//GEN-LAST:event_pas_rotation_directionActionPerformed
+
+    private void pas_number_of_magnets1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_pas_number_of_magnets1ActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_pas_number_of_magnets1ActionPerformed
+
+    private void pas_number_of_magnets2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_pas_number_of_magnets2ActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_pas_number_of_magnets2ActionPerformed
+
+    private void pas_number_of_magnets3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_pas_number_of_magnets3ActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_pas_number_of_magnets3ActionPerformed
+
+    private void pas_number_of_magnets4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_pas_number_of_magnets4ActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_pas_number_of_magnets4ActionPerformed
+
+    private void pas_number_of_magnets5ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_pas_number_of_magnets5ActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_pas_number_of_magnets5ActionPerformed
+
+    private void pas_number_of_magnets6ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_pas_number_of_magnets6ActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_pas_number_of_magnets6ActionPerformed
     
     /**
      * @param args the command line arguments
@@ -267,22 +443,36 @@ public class Configuration_tool extends javax.swing.JFrame {
     }
     
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JLabel LABEL_pas_number_of_magnets;
+    private javax.swing.JLabel LABEL_pas_number_of_magnets1;
+    private javax.swing.JLabel LABEL_pas_number_of_magnets2;
+    private javax.swing.JLabel LABEL_pas_number_of_magnets3;
+    private javax.swing.JLabel LABEL_pas_number_of_magnets4;
+    private javax.swing.JLabel LABEL_pas_number_of_magnets5;
+    private javax.swing.JLabel LABEL_pas_number_of_magnets6;
+    private javax.swing.JLabel LABEL_pas_rotation_direction;
+    private javax.swing.JLabel LABEL_pedal_max_cadence_in_rpm;
+    private javax.swing.JLabel LABEL_throotle_control_algorithm_output;
+    private javax.swing.JLabel LABEL_throotle_type;
+    private javax.swing.JLabel LABEL_torque_sensor_control_algorithm_output;
     private javax.swing.ButtonGroup buttonGroup1;
-    private javax.swing.JComboBox<String> jComboBox1;
-    private javax.swing.JComboBox<String> jComboBox2;
-    private javax.swing.JComboBox<String> jComboBox3;
-    private javax.swing.JComboBox<String> jComboBox4;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
-    private javax.swing.JLabel jLabel3;
-    private javax.swing.JLabel jLabel4;
-    private javax.swing.JLabel jLabel5;
-    private javax.swing.JLabel jLabel6;
-    private javax.swing.JLabel jLabel7;
     private javax.swing.JSeparator jSeparator1;
     private javax.swing.JSeparator jSeparator2;
-    private javax.swing.JTextField jTextField1;
-    private javax.swing.JTextField jTextField2;
+    private javax.swing.JSeparator jSeparator3;
+    private javax.swing.JTextField pas_number_of_magnets;
+    private javax.swing.JTextField pas_number_of_magnets1;
+    private javax.swing.JTextField pas_number_of_magnets2;
+    private javax.swing.JTextField pas_number_of_magnets3;
+    private javax.swing.JTextField pas_number_of_magnets4;
+    private javax.swing.JTextField pas_number_of_magnets5;
+    private javax.swing.JTextField pas_number_of_magnets6;
+    private javax.swing.JComboBox<String> pas_rotation_direction;
+    private javax.swing.JTextField pedal_max_cadence_in_rpm;
+    private javax.swing.JComboBox<String> throotle_control_algorithm_output;
+    private javax.swing.JComboBox<String> throotle_type;
+    private javax.swing.JComboBox<String> torque_sensor_control_algorithm_output;
     // End of variables declaration//GEN-END:variables
     
 }
