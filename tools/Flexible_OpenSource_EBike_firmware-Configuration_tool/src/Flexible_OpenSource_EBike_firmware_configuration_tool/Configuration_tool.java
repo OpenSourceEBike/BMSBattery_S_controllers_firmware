@@ -109,19 +109,18 @@ public class Configuration_tool extends javax.swing.JFrame {
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("Configuration tool");
-        setBounds(new java.awt.Rectangle(0, 0, 469, 800));
-        setMinimumSize(new java.awt.Dimension(469, 800));
-        setPreferredSize(new java.awt.Dimension(469, 800));
-        setResizable(false);
+        setBounds(new java.awt.Rectangle(0, 0, 465, 800));
+        setMinimumSize(new java.awt.Dimension(465, 800));
+        setSize(new java.awt.Dimension(465, 810));
 
         jScrollPane1.setHorizontalScrollBar(null);
-        jScrollPane1.setMinimumSize(new java.awt.Dimension(469, 800));
-        jScrollPane1.setPreferredSize(new java.awt.Dimension(500, 800));
+        jScrollPane1.setMinimumSize(new java.awt.Dimension(465, 800));
+        jScrollPane1.setPreferredSize(new java.awt.Dimension(465, 810));
         jScrollPane1.setRequestFocusEnabled(false);
 
-        jPanel1.setMinimumSize(new java.awt.Dimension(469, 1970));
+        jPanel1.setMinimumSize(new java.awt.Dimension(465, 2000));
         jPanel1.setName(""); // NOI18N
-        jPanel1.setPreferredSize(new java.awt.Dimension(469, 1970));
+        jPanel1.setPreferredSize(new java.awt.Dimension(465, 2010));
         jPanel1.setRequestFocusEnabled(false);
 
         LABEL_throttle_type.setFont(new java.awt.Font("Ubuntu", 0, 18)); // NOI18N
@@ -271,7 +270,7 @@ public class Configuration_tool extends javax.swing.JFrame {
         LABEL_lion_cells_number.setText("Battery voltage / Li-ion cells number");
 
         lion_cells_number.setFont(new java.awt.Font("Ubuntu", 0, 18)); // NOI18N
-        lion_cells_number.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "7 (24V)", "10 (36V)", "13 (48V)" }));
+        lion_cells_number.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "24V (7s)", "36V (10s)", "48V (13s)" }));
         lion_cells_number.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 lion_cells_numberActionPerformed(evt);
@@ -361,9 +360,16 @@ public class Configuration_tool extends javax.swing.JFrame {
             }
         });
 
+        write_option_bytes.setFont(new java.awt.Font("Ubuntu", 1, 18)); // NOI18N
         write_option_bytes.setText("Write configuration");
 
+        jButton2.setFont(new java.awt.Font("Ubuntu", 1, 18)); // NOI18N
         jButton2.setText("Write option bytes");
+        jButton2.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton2ActionPerformed(evt);
+            }
+        });
 
         org.jdesktop.layout.GroupLayout jPanel1Layout = new org.jdesktop.layout.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
@@ -425,11 +431,11 @@ public class Configuration_tool extends javax.swing.JFrame {
                             .add(pas_rotation_direction, 0, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                             .add(jSeparator7)))
                     .add(jPanel1Layout.createSequentialGroup()
-                        .add(51, 51, 51)
-                        .add(jButton2)
-                        .add(50, 50, 50)
-                        .add(write_option_bytes)))
-                .add(25, 44, Short.MAX_VALUE))
+                        .add(75, 75, 75)
+                        .add(jPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING, false)
+                            .add(jButton2, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .add(write_option_bytes, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 300, Short.MAX_VALUE))))
+                .add(35, 35, 35))
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
@@ -534,11 +540,11 @@ public class Configuration_tool extends javax.swing.JFrame {
                 .add(pwm_duty_cycle_ramp_down_step, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                 .add(15, 15, 15)
                 .add(jSeparator7, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 8, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                .add(40, 40, 40)
-                .add(jPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
-                    .add(write_option_bytes)
-                    .add(jButton2))
-                .addContainerGap(69, Short.MAX_VALUE))
+                .add(35, 35, 35)
+                .add(jButton2, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 60, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                .add(25, 25, 25)
+                .add(write_option_bytes, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 60, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
         jScrollPane1.setViewportView(jPanel1);
@@ -547,11 +553,11 @@ public class Configuration_tool extends javax.swing.JFrame {
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(jScrollPane1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 469, Short.MAX_VALUE)
+            .add(jScrollPane1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(jScrollPane1, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+            .add(jScrollPane1, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 783, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
         );
 
         pack();
@@ -660,6 +666,10 @@ public class Configuration_tool extends javax.swing.JFrame {
     private void pwm_duty_cycle_ramp_down_stepActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_pwm_duty_cycle_ramp_down_stepActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_pwm_duty_cycle_ramp_down_stepActionPerformed
+
+    private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_jButton2ActionPerformed
     
     /**
      * @param args the command line arguments
