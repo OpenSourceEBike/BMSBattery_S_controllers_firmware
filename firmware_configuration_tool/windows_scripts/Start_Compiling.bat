@@ -1,6 +1,6 @@
 PATH = %PATH%;C:\Program Files (x86)\STMicroelectronics\st_toolset\stvp
 
-cd ..\..
+cd ..
 firmware_configuration_tool\windows_scripts\make -f Makefile_windows clean
 firmware_configuration_tool\windows_scripts\make -f Makefile_windows
 
