@@ -689,10 +689,10 @@ public class Configuration_tool extends javax.swing.JFrame {
         {
             try {
                 if (OS.isWindows()) {
-                    Runtime.getRuntime().exec("cmd /c start WriteOptionBytes");
+                    Runtime.getRuntime().exec("cmd /c start windows_scripts\\WriteOptionBytes");
                 }
                 else if (OS.isUnix()) {
-                    
+                    Runtime.getRuntime().exec("sh linux_scripts/write_option_bytes.sh");
                 }
             } catch (IOException e1) {
                 showMessageDialog(null, "ERROR: ButtonWriteOptionBytes");
@@ -708,7 +708,12 @@ public class Configuration_tool extends javax.swing.JFrame {
     private void ButtonWriteConfigurationActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_ButtonWriteConfigurationActionPerformed
         PrintWriter pWriter = null; 
         try {
-            pWriter = new PrintWriter(new BufferedWriter(new FileWriter("config.h"))); 
+            if (OS.isWindows()) {
+                pWriter = new PrintWriter(new BufferedWriter(new FileWriter("..\\config.h"))); // on Windows, slashs are different from Linux
+            }
+            else if (OS.isUnix()) {
+                pWriter = new PrintWriter(new BufferedWriter(new FileWriter("../config.h")));
+            }
             pWriter.println("/*\r\n" + 
                         " * config.h\r\n" + 
                         " *\r\n" + 
@@ -719,7 +724,6 @@ public class Configuration_tool extends javax.swing.JFrame {
                         "\r\n" + 
                         "#ifndef CONFIG_H_\r\n" + 
                         "#define CONFIG_H_\r\n"); 
-            
             
             String TextToSave = null;
                     
@@ -821,10 +825,10 @@ public class Configuration_tool extends javax.swing.JFrame {
         
         try {
             if (OS.isWindows()) {
-                Process process = Runtime.getRuntime().exec("cmd /c start Start_Compiling");
+                Process process = Runtime.getRuntime().exec("cmd /c start windows_scripts\\Start_Compiling");
             }
             else if (OS.isUnix()) {
-                
+                Runtime.getRuntime().exec("sh linux_scripts/build_and_flash.sh");
             }
         } catch (IOException e1) {
             showMessageDialog(null, "ERROR: ButtonWriteConfiguration");
