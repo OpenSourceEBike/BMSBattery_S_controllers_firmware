@@ -13,21 +13,25 @@
 
 //#define DEBUG_UART
 
-#define CONTROLLER_TYPE_S06S 1
-#define CONTROLLER_TYPE_S12S 2
-
 #define MOTOR_TYPE_Q85 1
 #define MOTOR_TYPE_Q100 2
 #define MOTOR_TYPE_Q11 3
 
-#if MOTOR_TYPE == MOTOR_TYPE_Q11
-#define MOTOR_TYPE_DIRECT_DRIVE
-#endif
+// Choose your motor type
+//
+// the following motors were tested, if you have a different motor, try to choose MOTOR_TYPE_Q85
+#define MOTOR_TYPE MOTOR_TYPE_Q85 // geared motor
+//#define MOTOR_TYPE MOTOR_TYPE_Q100 // geared motor
+//#define MOTOR_TYPE MOTOR_TYPE_Q11 // direct drive motor
 
-#if MOTOR_TYPE == MOTOR_TYPE_Q11
-#undef MOTOR_TYPE
-#define MOTOR_TYPE MOTOR_TYPE_Q85
-#endif
+
+#define CONTROLLER_TYPE_S06S 1
+#define CONTROLLER_TYPE_S12S 2
+
+// Choose your controller type
+//
+#define CONTROLLER_TYPE CONTROLLER_TYPE_S06S
+//#define CONTROLLER_TYPE CONTROLLER_TYPE_S12S
 
 // *************************************************************************** //
 // Throotle and PAS

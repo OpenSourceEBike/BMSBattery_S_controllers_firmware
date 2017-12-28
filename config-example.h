@@ -72,11 +72,6 @@
 // *************************************************************************** //
 // MOTOR CONTROLLER
 
-// Choose your controller type
-//
-#define CONTROLLER_TYPE CONTROLLER_TYPE_S06S
-//#define CONTROLLER_TYPE CONTROLLER_TYPE_S12S
-
 // Choose your controller max current and max regen current
 //
 // S06S controller holds 15 amps as max current
@@ -92,13 +87,6 @@
 
 // *************************************************************************** //
 // MOTOR
-
-// Choose your motor type
-//
-// the following motors were tested, if you have a different motor, try to choose MOTOR_TYPE_Q85
-#define MOTOR_TYPE MOTOR_TYPE_Q85 // geared motor
-//#define MOTOR_TYPE MOTOR_TYPE_Q100 // geared motor
-//#define MOTOR_TYPE MOTOR_TYPE_Q11 // direct drive motor
 
 // Choose some parameters for your motor (if you don't know, just keep the following original values because they should work ok)
 //
