@@ -28,7 +28,7 @@ ELF_SECTIONS_TO_REMOVE = -R DATA -R INITIALIZED -R SSEG -R .debug_line -R .debug
 
 # These are the sources that must be compiled to .rel files:
 EXTRASRCS = \
-	$(SDIR)/stm8s_itc.c \
+		$(SDIR)/stm8s_itc.c \
 	$(SDIR)/stm8s_clk.c \
 	$(SDIR)/stm8s_iwdg.c \
 	$(SDIR)/stm8s_gpio.c \
@@ -45,13 +45,14 @@ EXTRASRCS = \
 	adc.c \
 	brake.c \
 	pas.c \
+	wheel_speed_sensor.c \
 	timers.c \
 	pwm.c \
 	eeprom.c \
 	motor.c \
 	ebike_app.c \
 
-HEADERS = watchdog.h adc.h brake.h gpio.h interrupts.h main.h pwm.h timers.h uart.h utils.h motor.h ebike_app.h eeprom.h pas.h
+HEADERS = watchdog.h adc.h brake.h gpio.h interrupts.h main.h config.h pwm.h timers.h uart.h utils.h motor.h ebike_app.h eeprom.h pas.h wheel_speed_sensor.h
 
 # The list of .rel files can be derived from the list of their source files
 RELS = $(EXTRASRCS:.c=.rel)
