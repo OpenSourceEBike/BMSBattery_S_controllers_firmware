@@ -71,10 +71,6 @@ public class OSEC extends JFrame {
 	private JLabel lblControllerType;
 	private JRadioButton rdbtn6Fet;
 	private JRadioButton rdbtn12Fet;
-	private JLabel lblMotorType;
-	private JRadioButton rdbtnQ85;
-	private JRadioButton rdbtnQ100;
-	private JRadioButton rdbtnQ11;
 	private JTextField textInterpolationstart;
 	
 	
@@ -419,27 +415,6 @@ public class OSEC extends JFrame {
 		rdbtn12Fet.setBounds(186, 427, 86, 23);
 		contentPane.add(rdbtn12Fet);
 		
-		lblMotorType = new JLabel("Motor Type");
-		lblMotorType.setFont(new Font("Tahoma", Font.BOLD, 12));
-		lblMotorType.setBounds(105, 384, 131, 14);
-		contentPane.add(lblMotorType);
-		
-		rdbtnQ85 = new JRadioButton("Q85");
-		Motor_type.add(rdbtnQ85);
-		rdbtnQ85.setBounds(105, 405, 53, 23);
-		contentPane.add(rdbtnQ85);
-		
-		rdbtnQ100 = new JRadioButton("Q100");
-		Motor_type.add(rdbtnQ100);
-		rdbtnQ100.setBounds(105, 429, 66, 23);
-		contentPane.add(rdbtnQ100);
-		
-		rdbtnQ11 = new JRadioButton("Q11");
-		Motor_type.add(rdbtnQ11);
-		rdbtnQ11.setSelected(true);
-		rdbtnQ11.setBounds(105, 457, 61, 23);
-		contentPane.add(rdbtnQ11);
-		
 		JLabel lblInterpolationstart60 = new JLabel("60\u00B0 Interpolation Start");
 		lblInterpolationstart60.setBounds(5, 325, 141, 14);
 		contentPane.add(lblInterpolationstart60);
@@ -616,18 +591,7 @@ public class OSEC extends JFrame {
 			            text_to_save = "#define DO_SINEWAVE_INTERPOLATION_360_DEGREES";
 			            pWriter.println(text_to_save); 
 		    		}
-		    		if (rdbtnQ85.isSelected()){ 
-			            text_to_save = "#define MOTOR_TYPE MOTOR_TYPE_Q85";
-			            pWriter.println(text_to_save); 
-		    		}
-		    		if (rdbtnQ100.isSelected()){ 
-			            text_to_save = "#define MOTOR_TYPE MOTOR_TYPE_Q100";
-			            pWriter.println(text_to_save); 
-		    		}
-		    		if (rdbtnQ11.isSelected()){ 
-			            text_to_save = "#define MOTOR_TYPE MOTOR_TYPE_Q11";
-			            pWriter.println(text_to_save); 
-		    		}
+
 		            pWriter.println("\r\n#endif /* CONFIG_H_ */"); 
 		            
 		            
