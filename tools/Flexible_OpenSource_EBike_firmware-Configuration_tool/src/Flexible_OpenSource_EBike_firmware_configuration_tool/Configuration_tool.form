@@ -38,7 +38,7 @@
     </DimensionLayout>
     <DimensionLayout dim="1">
       <Group type="103" groupAlignment="0" attributes="0">
-          <Component id="jScrollPane1" min="-2" pref="783" max="-2" attributes="0"/>
+          <Component id="jScrollPane1" min="-2" max="-2" attributes="0"/>
       </Group>
     </DimensionLayout>
   </Layout>
@@ -100,12 +100,12 @@
                                   <Component id="pas_number_of_magnets" alignment="0" min="-2" pref="60" max="-2" attributes="0"/>
                                   <Component id="pedal_max_cadence_in_rpm" alignment="0" min="-2" pref="60" max="-2" attributes="0"/>
                                   <Component id="jLabel2" min="-2" max="-2" attributes="0"/>
-                                  <Component id="pas_number_of_magnets1" alignment="0" min="-2" pref="60" max="-2" attributes="0"/>
-                                  <Component id="pas_number_of_magnets2" alignment="0" min="-2" pref="60" max="-2" attributes="0"/>
-                                  <Component id="pas_number_of_magnets5" alignment="0" min="-2" pref="60" max="-2" attributes="0"/>
-                                  <Component id="pas_number_of_magnets6" alignment="0" min="-2" pref="60" max="-2" attributes="0"/>
-                                  <Component id="pas_number_of_magnets3" alignment="0" min="-2" pref="60" max="-2" attributes="0"/>
-                                  <Component id="pas_number_of_magnets4" alignment="0" min="-2" pref="60" max="-2" attributes="0"/>
+                                  <Component id="LCD_assist_level_0" alignment="0" min="-2" pref="60" max="-2" attributes="0"/>
+                                  <Component id="LCD_assist_level_1" alignment="0" min="-2" pref="60" max="-2" attributes="0"/>
+                                  <Component id="LCD_assist_level_4" alignment="0" min="-2" pref="60" max="-2" attributes="0"/>
+                                  <Component id="LCD_assist_level_5" alignment="0" min="-2" pref="60" max="-2" attributes="0"/>
+                                  <Component id="LCD_assist_level_2" alignment="0" min="-2" pref="60" max="-2" attributes="0"/>
+                                  <Component id="LCD_assist_level_3" alignment="0" min="-2" pref="60" max="-2" attributes="0"/>
                                   <Component id="LABEL_throttle_control_algorithm_output" alignment="0" max="32767" attributes="0"/>
                                   <Component id="LABEL_throttle_type" alignment="0" max="32767" attributes="0"/>
                                   <Component id="throotle_type" alignment="0" pref="400" max="32767" attributes="0"/>
@@ -120,12 +120,12 @@
                                   <Component id="jSeparator2" alignment="0" max="32767" attributes="0"/>
                                   <Component id="LABEL_pas_rotation_direction" alignment="0" max="32767" attributes="0"/>
                                   <Component id="jSeparator3" alignment="0" max="32767" attributes="0"/>
-                                  <Component id="LABEL_pas_number_of_magnets6" alignment="0" max="32767" attributes="0"/>
-                                  <Component id="LABEL_pas_number_of_magnets5" alignment="0" max="32767" attributes="0"/>
-                                  <Component id="LABEL_pas_number_of_magnets4" alignment="0" max="32767" attributes="0"/>
-                                  <Component id="LABEL_pas_number_of_magnets3" alignment="0" max="32767" attributes="0"/>
-                                  <Component id="LABEL_pas_number_of_magnets2" alignment="0" max="32767" attributes="0"/>
-                                  <Component id="LABEL_pas_number_of_magnets1" alignment="0" max="32767" attributes="0"/>
+                                  <Component id="LABEL_LCD_assist_level_5" alignment="0" max="32767" attributes="0"/>
+                                  <Component id="LABEL_LCD_assist_level_4" alignment="0" max="32767" attributes="0"/>
+                                  <Component id="LABEL_LCD_assist_level_3" alignment="0" max="32767" attributes="0"/>
+                                  <Component id="LABEL_LCD_assist_level_2" alignment="0" max="32767" attributes="0"/>
+                                  <Component id="LABEL_LCD_assist_level_1" alignment="0" max="32767" attributes="0"/>
+                                  <Component id="LABEL_LCD_assist_level_0" alignment="0" max="32767" attributes="0"/>
                                   <Component id="jSeparator6" alignment="0" max="32767" attributes="0"/>
                                   <Component id="pas_rotation_direction" alignment="0" max="32767" attributes="0"/>
                                   <Component id="jSeparator7" alignment="0" max="32767" attributes="0"/>
@@ -134,8 +134,8 @@
                           <Group type="102" alignment="0" attributes="0">
                               <EmptySpace min="-2" pref="75" max="-2" attributes="0"/>
                               <Group type="103" groupAlignment="0" max="-2" attributes="0">
-                                  <Component id="jButton2" max="32767" attributes="0"/>
-                                  <Component id="write_option_bytes" pref="300" max="32767" attributes="0"/>
+                                  <Component id="ButtonWriteOptionBytes" max="32767" attributes="0"/>
+                                  <Component id="ButtonWriteConfiguration" pref="300" max="32767" attributes="0"/>
                               </Group>
                           </Group>
                       </Group>
@@ -177,29 +177,29 @@
                       <EmptySpace min="-2" pref="20" max="-2" attributes="0"/>
                       <Component id="jLabel2" min="-2" max="-2" attributes="0"/>
                       <EmptySpace min="-2" pref="20" max="-2" attributes="0"/>
-                      <Component id="LABEL_pas_number_of_magnets1" min="-2" max="-2" attributes="0"/>
+                      <Component id="LABEL_LCD_assist_level_0" min="-2" max="-2" attributes="0"/>
                       <EmptySpace min="-2" pref="6" max="-2" attributes="0"/>
-                      <Component id="pas_number_of_magnets1" min="-2" max="-2" attributes="0"/>
+                      <Component id="LCD_assist_level_0" min="-2" max="-2" attributes="0"/>
                       <EmptySpace min="15" pref="15" max="-2" attributes="0"/>
-                      <Component id="LABEL_pas_number_of_magnets2" min="-2" max="-2" attributes="0"/>
+                      <Component id="LABEL_LCD_assist_level_1" min="-2" max="-2" attributes="0"/>
                       <EmptySpace min="-2" pref="6" max="-2" attributes="0"/>
-                      <Component id="pas_number_of_magnets2" min="-2" max="-2" attributes="0"/>
+                      <Component id="LCD_assist_level_1" min="-2" max="-2" attributes="0"/>
                       <EmptySpace min="-2" pref="15" max="-2" attributes="0"/>
-                      <Component id="LABEL_pas_number_of_magnets3" min="-2" max="-2" attributes="0"/>
+                      <Component id="LABEL_LCD_assist_level_2" min="-2" max="-2" attributes="0"/>
                       <EmptySpace min="-2" pref="6" max="-2" attributes="0"/>
-                      <Component id="pas_number_of_magnets3" min="-2" max="-2" attributes="0"/>
+                      <Component id="LCD_assist_level_2" min="-2" max="-2" attributes="0"/>
                       <EmptySpace min="-2" pref="15" max="-2" attributes="0"/>
-                      <Component id="LABEL_pas_number_of_magnets4" min="-2" max="-2" attributes="0"/>
+                      <Component id="LABEL_LCD_assist_level_3" min="-2" max="-2" attributes="0"/>
                       <EmptySpace min="-2" pref="6" max="-2" attributes="0"/>
-                      <Component id="pas_number_of_magnets4" min="-2" max="-2" attributes="0"/>
+                      <Component id="LCD_assist_level_3" min="-2" max="-2" attributes="0"/>
                       <EmptySpace min="-2" pref="15" max="-2" attributes="0"/>
-                      <Component id="LABEL_pas_number_of_magnets5" min="-2" max="-2" attributes="0"/>
+                      <Component id="LABEL_LCD_assist_level_4" min="-2" max="-2" attributes="0"/>
                       <EmptySpace min="-2" pref="6" max="-2" attributes="0"/>
-                      <Component id="pas_number_of_magnets5" min="-2" max="-2" attributes="0"/>
+                      <Component id="LCD_assist_level_4" min="-2" max="-2" attributes="0"/>
                       <EmptySpace min="15" pref="15" max="-2" attributes="0"/>
-                      <Component id="LABEL_pas_number_of_magnets6" min="-2" max="-2" attributes="0"/>
+                      <Component id="LABEL_LCD_assist_level_5" min="-2" max="-2" attributes="0"/>
                       <EmptySpace min="-2" pref="6" max="-2" attributes="0"/>
-                      <Component id="pas_number_of_magnets6" min="-2" max="-2" attributes="0"/>
+                      <Component id="LCD_assist_level_5" min="-2" max="-2" attributes="0"/>
                       <EmptySpace min="-2" pref="15" max="-2" attributes="0"/>
                       <Component id="jSeparator3" min="-2" pref="8" max="-2" attributes="0"/>
                       <EmptySpace min="-2" pref="20" max="-2" attributes="0"/>
@@ -247,9 +247,9 @@
                       <EmptySpace min="-2" pref="15" max="-2" attributes="0"/>
                       <Component id="jSeparator7" min="-2" pref="8" max="-2" attributes="0"/>
                       <EmptySpace min="-2" pref="35" max="-2" attributes="0"/>
-                      <Component id="jButton2" min="-2" pref="60" max="-2" attributes="0"/>
+                      <Component id="ButtonWriteOptionBytes" min="-2" pref="60" max="-2" attributes="0"/>
                       <EmptySpace min="-2" pref="25" max="-2" attributes="0"/>
-                      <Component id="write_option_bytes" min="-2" pref="60" max="-2" attributes="0"/>
+                      <Component id="ButtonWriteConfiguration" min="-2" pref="60" max="-2" attributes="0"/>
                       <EmptySpace max="32767" attributes="0"/>
                   </Group>
               </Group>
@@ -318,7 +318,7 @@
                 <Property name="model" type="javax.swing.ComboBoxModel" editor="org.netbeans.modules.form.editors2.ComboBoxModelEditor">
                   <StringArray count="2">
                     <StringItem index="0" value="direct torque value"/>
-                    <StringItem index="1" value="human power (troque * cadence)"/>
+                    <StringItem index="1" value="human power (torque * cadence)"/>
                   </StringArray>
                 </Property>
               </Properties>
@@ -424,7 +424,7 @@
                 <Property name="text" type="java.lang.String" value="LCD"/>
               </Properties>
             </Component>
-            <Component class="javax.swing.JLabel" name="LABEL_pas_number_of_magnets1">
+            <Component class="javax.swing.JLabel" name="LABEL_LCD_assist_level_0">
               <Properties>
                 <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
                   <Font name="Ubuntu" size="18" style="0"/>
@@ -432,7 +432,7 @@
                 <Property name="text" type="java.lang.String" value="Assist level 0"/>
               </Properties>
             </Component>
-            <Component class="javax.swing.JTextField" name="pas_number_of_magnets1">
+            <Component class="javax.swing.JTextField" name="LCD_assist_level_0">
               <Properties>
                 <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
                   <Font name="Ubuntu" size="18" style="0"/>
@@ -440,10 +440,10 @@
                 <Property name="text" type="java.lang.String" value="0.0"/>
               </Properties>
               <Events>
-                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="pas_number_of_magnets1ActionPerformed"/>
+                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="LCD_assist_level_0ActionPerformed"/>
               </Events>
             </Component>
-            <Component class="javax.swing.JLabel" name="LABEL_pas_number_of_magnets2">
+            <Component class="javax.swing.JLabel" name="LABEL_LCD_assist_level_1">
               <Properties>
                 <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
                   <Font name="Ubuntu" size="18" style="0"/>
@@ -451,7 +451,7 @@
                 <Property name="text" type="java.lang.String" value="Assist level 1"/>
               </Properties>
             </Component>
-            <Component class="javax.swing.JTextField" name="pas_number_of_magnets2">
+            <Component class="javax.swing.JTextField" name="LCD_assist_level_1">
               <Properties>
                 <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
                   <Font name="Ubuntu" size="18" style="0"/>
@@ -459,10 +459,10 @@
                 <Property name="text" type="java.lang.String" value="0.2"/>
               </Properties>
               <Events>
-                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="pas_number_of_magnets2ActionPerformed"/>
+                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="LCD_assist_level_1ActionPerformed"/>
               </Events>
             </Component>
-            <Component class="javax.swing.JLabel" name="LABEL_pas_number_of_magnets3">
+            <Component class="javax.swing.JLabel" name="LABEL_LCD_assist_level_2">
               <Properties>
                 <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
                   <Font name="Ubuntu" size="18" style="0"/>
@@ -470,7 +470,7 @@
                 <Property name="text" type="java.lang.String" value="Assist level 2"/>
               </Properties>
             </Component>
-            <Component class="javax.swing.JTextField" name="pas_number_of_magnets3">
+            <Component class="javax.swing.JTextField" name="LCD_assist_level_2">
               <Properties>
                 <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
                   <Font name="Ubuntu" size="18" style="0"/>
@@ -478,10 +478,10 @@
                 <Property name="text" type="java.lang.String" value="0.4"/>
               </Properties>
               <Events>
-                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="pas_number_of_magnets3ActionPerformed"/>
+                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="LCD_assist_level_2ActionPerformed"/>
               </Events>
             </Component>
-            <Component class="javax.swing.JLabel" name="LABEL_pas_number_of_magnets4">
+            <Component class="javax.swing.JLabel" name="LABEL_LCD_assist_level_3">
               <Properties>
                 <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
                   <Font name="Ubuntu" size="18" style="0"/>
@@ -489,7 +489,7 @@
                 <Property name="text" type="java.lang.String" value="Assist level 3"/>
               </Properties>
             </Component>
-            <Component class="javax.swing.JTextField" name="pas_number_of_magnets4">
+            <Component class="javax.swing.JTextField" name="LCD_assist_level_3">
               <Properties>
                 <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
                   <Font name="Ubuntu" size="18" style="0"/>
@@ -497,10 +497,10 @@
                 <Property name="text" type="java.lang.String" value="0.6"/>
               </Properties>
               <Events>
-                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="pas_number_of_magnets4ActionPerformed"/>
+                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="LCD_assist_level_3ActionPerformed"/>
               </Events>
             </Component>
-            <Component class="javax.swing.JLabel" name="LABEL_pas_number_of_magnets5">
+            <Component class="javax.swing.JLabel" name="LABEL_LCD_assist_level_4">
               <Properties>
                 <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
                   <Font name="Ubuntu" size="18" style="0"/>
@@ -508,7 +508,7 @@
                 <Property name="text" type="java.lang.String" value="Assist level 4"/>
               </Properties>
             </Component>
-            <Component class="javax.swing.JTextField" name="pas_number_of_magnets5">
+            <Component class="javax.swing.JTextField" name="LCD_assist_level_4">
               <Properties>
                 <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
                   <Font name="Ubuntu" size="18" style="0"/>
@@ -516,10 +516,10 @@
                 <Property name="text" type="java.lang.String" value="0.8"/>
               </Properties>
               <Events>
-                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="pas_number_of_magnets5ActionPerformed"/>
+                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="LCD_assist_level_4ActionPerformed"/>
               </Events>
             </Component>
-            <Component class="javax.swing.JLabel" name="LABEL_pas_number_of_magnets6">
+            <Component class="javax.swing.JLabel" name="LABEL_LCD_assist_level_5">
               <Properties>
                 <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
                   <Font name="Ubuntu" size="18" style="0"/>
@@ -527,7 +527,7 @@
                 <Property name="text" type="java.lang.String" value="Assist level 5"/>
               </Properties>
             </Component>
-            <Component class="javax.swing.JTextField" name="pas_number_of_magnets6">
+            <Component class="javax.swing.JTextField" name="LCD_assist_level_5">
               <Properties>
                 <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
                   <Font name="Ubuntu" size="18" style="0"/>
@@ -535,7 +535,7 @@
                 <Property name="text" type="java.lang.String" value="1.0"/>
               </Properties>
               <Events>
-                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="pas_number_of_magnets6ActionPerformed"/>
+                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="LCD_assist_level_5ActionPerformed"/>
               </Events>
             </Component>
             <Component class="javax.swing.JSeparator" name="jSeparator3">
@@ -729,17 +729,20 @@
                 <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="pwm_duty_cycle_ramp_down_stepActionPerformed"/>
               </Events>
             </Component>
-            <Component class="javax.swing.JButton" name="write_option_bytes">
+            <Component class="javax.swing.JButton" name="ButtonWriteConfiguration">
               <Properties>
                 <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
                   <Font name="Ubuntu" size="18" style="1"/>
                 </Property>
                 <Property name="text" type="java.lang.String" value="Write configuration"/>
               </Properties>
+              <Events>
+                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="ButtonWriteConfigurationActionPerformed"/>
+              </Events>
             </Component>
             <Component class="javax.swing.JSeparator" name="jSeparator7">
             </Component>
-            <Component class="javax.swing.JButton" name="jButton2">
+            <Component class="javax.swing.JButton" name="ButtonWriteOptionBytes">
               <Properties>
                 <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
                   <Font name="Ubuntu" size="18" style="1"/>
@@ -747,7 +750,7 @@
                 <Property name="text" type="java.lang.String" value="Write option bytes"/>
               </Properties>
               <Events>
-                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jButton2ActionPerformed"/>
+                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="ButtonWriteOptionBytesActionPerformed"/>
               </Events>
             </Component>
           </SubComponents>
