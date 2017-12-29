@@ -550,7 +550,39 @@ void ebike_throotle_type_throotle_pas (void)
   // (due to motor configurations on the motor controller, this will only put a limit to the max permited speed!)
   motor_controller_set_target_speed_erps (motor_controller_get_target_speed_erps_max ());
 
-  f_temp = (float) (((float) ui8_throttle_value_filtered) * ((float) lcd_configuration_variables.ui8_assist_level) * 0.2);
+  // scale with assist level value
+  switch (lcd_configuration_variables.ui8_assist_level)
+  {
+    case 0:
+    f_temp = ASSIST_LEVEL_0;
+    break;
+
+    case 1:
+    f_temp = ASSIST_LEVEL_1;
+    break;
+
+    case 2:
+    f_temp = ASSIST_LEVEL_2;
+    break;
+
+    case 3:
+    f_temp = ASSIST_LEVEL_3;
+    break;
+
+    case 4:
+    f_temp = ASSIST_LEVEL_4;
+    break;
+
+    case 5:
+    f_temp = ASSIST_LEVEL_5;
+    break;
+
+    default:
+    f_temp = ASSIST_LEVEL_5;
+    break;
+  }
+
+  f_temp = (float) (((float) ui8_throttle_value_filtered) * f_temp);
   ui8_temp = (uint8_t) (map ((uint32_t) f_temp,
   			 (uint32_t) 0,
   			 (uint32_t) 255,
@@ -605,7 +637,7 @@ void ebike_throotle_type_throotle_pas (void)
     break;
   }
 
-  f_temp = (float) (((float) ui8_temp) * ((float) lcd_configuration_variables.ui8_assist_level) * f_temp);
+  f_temp = (float) (((float) ui8_temp) * f_temp);
 
   // map to motor controller current
   ui16_temp = (uint16_t) (map ((uint32_t) f_temp,
@@ -674,7 +706,7 @@ void ebike_throotle_type_torque_sensor (void)
     break;
   }
 
-  f_temp = (float) (((float) ui8_throttle_value_filtered) * (f_temp / 2.0));
+  f_temp = (float) (((float) (ui8_throttle_value_filtered >> 1)) * f_temp);
 
 #if defined (EBIKE_THROTTLE_TYPE_TORQUE_SENSOR_HUMAN_POWER)
   // calc humam power on the crank using as input the pedal torque sensor value and pedal cadence
