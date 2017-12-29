@@ -550,14 +550,7 @@ void ebike_throotle_type_throotle_pas (void)
   // (due to motor configurations on the motor controller, this will only put a limit to the max permited speed!)
   motor_controller_set_target_speed_erps (motor_controller_get_target_speed_erps_max ());
 
-  // map ui8_pas_cadence_rpm to 0 - 255
-  ui8_temp = (uint8_t) (map ((uint32_t) ui8_pas_cadence_rpm,
-		 (uint32_t) 0,
-		 (uint32_t) PAS_MAX_CADENCE_RPM,
-		 (uint32_t) 0,
-		 (uint32_t) 255));
-
-  f_temp = (float) (((float) ui8_temp) * ((float) lcd_configuration_variables.ui8_assist_level) * 0.2);
+  f_temp = (float) (((float) ui8_throttle_value_filtered) * ((float) lcd_configuration_variables.ui8_assist_level) * 0.2);
   ui8_temp = (uint8_t) (map ((uint32_t) f_temp,
   			 (uint32_t) 0,
   			 (uint32_t) 255,
