@@ -30,6 +30,7 @@
 
 package Flexible_OpenSource_EBike_firmware_configuration_tool;
 
+import java.io.BufferedReader;
 import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -40,6 +41,7 @@ import javax.swing.UnsupportedLookAndFeelException;
 import java.io.PrintWriter;
 import java.io.BufferedWriter; 
 import java.io.FileWriter;
+import java.io.InputStreamReader;
 
 public class Configuration_tool extends javax.swing.JFrame {
     
@@ -692,7 +694,25 @@ public class Configuration_tool extends javax.swing.JFrame {
                     Runtime.getRuntime().exec("cmd /c start windows_scripts\\WriteOptionBytes");
                 }
                 else if (OS.isUnix()) {
-                    Runtime.getRuntime().exec("sh linux_scripts/write_option_bytes.sh");
+                Process process = Runtime.getRuntime().exec("sh linux_scripts/write_option_bytes.sh");
+                    
+                try {
+                    process.waitFor();
+                } catch (InterruptedException ex) {
+                    Logger.getLogger(Configuration_tool.class.getName()).log(Level.SEVERE, null, ex);
+                }
+                
+//                // for debug: next code will output the feedback and exit number of the process
+//                StringBuffer output = new StringBuffer();
+//                BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
+//                String line = "";                       
+//                while ((line = reader.readLine())!= null) {
+//                        output.append(line + "\n");
+//                }
+//                System.out.println("### " + output);
+//                System.out.println ("exit: " + process.exitValue());
+                
+                process.destroy();
                 }
             } catch (IOException e1) {
                 showMessageDialog(null, "ERROR: ButtonWriteOptionBytes");
@@ -828,7 +848,24 @@ public class Configuration_tool extends javax.swing.JFrame {
                 Process process = Runtime.getRuntime().exec("cmd /c start windows_scripts\\Start_Compiling");
             }
             else if (OS.isUnix()) {
-                Runtime.getRuntime().exec("sh linux_scripts/build_and_flash.sh");
+                Process process = Runtime.getRuntime().exec("sh linux_scripts/build_and_flash.sh");
+                try {
+                    process.waitFor();
+                } catch (InterruptedException ex) {
+                    Logger.getLogger(Configuration_tool.class.getName()).log(Level.SEVERE, null, ex);
+                }
+                
+//                // for debug: next code will output the feedback and exit number of the process
+//                StringBuffer output = new StringBuffer();
+//                BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
+//                String line = "";                       
+//                while ((line = reader.readLine())!= null) {
+//                        output.append(line + "\n");
+//                }
+//                System.out.println("### " + output);
+//                System.out.println ("exit: " + process.exitValue());
+
+                process.destroy();
             }
         } catch (IOException e1) {
             showMessageDialog(null, "ERROR: ButtonWriteConfiguration");

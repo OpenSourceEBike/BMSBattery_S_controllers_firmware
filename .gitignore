@@ -11,3 +11,5 @@
 *.rst
 *.sym
 Debug
+tools/Flexible_OpenSource_EBike_firmware-Configuration_tool/dist
+tools/Flexible_OpenSource_EBike_firmware-Configuration_tool/build
