@@ -1,0 +1,2898 @@
+                                      1 ;--------------------------------------------------------
+                                      2 ; File Created by SDCC : free open source ANSI-C Compiler
+                                      3 ; Version 3.6.0 #9615 (Linux)
+                                      4 ;--------------------------------------------------------
+                                      5 	.module stm8s_flash
+                                      6 	.optsdcc -mstm8
+                                      7 	
+                                      8 ;--------------------------------------------------------
+                                      9 ; Public variables in this module
+                                     10 ;--------------------------------------------------------
+                                     11 	.globl _FLASH_Unlock
+                                     12 	.globl _FLASH_Lock
+                                     13 	.globl _FLASH_DeInit
+                                     14 	.globl _FLASH_ITConfig
+                                     15 	.globl _FLASH_EraseByte
+                                     16 	.globl _FLASH_ProgramByte
+                                     17 	.globl _FLASH_ReadByte
+                                     18 	.globl _FLASH_ProgramWord
+                                     19 	.globl _FLASH_ProgramOptionByte
+                                     20 	.globl _FLASH_EraseOptionByte
+                                     21 	.globl _FLASH_ReadOptionByte
+                                     22 	.globl _FLASH_SetLowPowerMode
+                                     23 	.globl _FLASH_SetProgrammingTime
+                                     24 	.globl _FLASH_GetLowPowerMode
+                                     25 	.globl _FLASH_GetProgrammingTime
+                                     26 	.globl _FLASH_GetBootSize
+                                     27 	.globl _FLASH_GetFlagStatus
+                                     28 	.globl _FLASH_WaitForLastOperation
+                                     29 	.globl _FLASH_EraseBlock
+                                     30 	.globl _FLASH_ProgramBlock
+                                     31 ;--------------------------------------------------------
+                                     32 ; ram data
+                                     33 ;--------------------------------------------------------
+                                     34 	.area DATA
+                                     35 ;--------------------------------------------------------
+                                     36 ; ram data
+                                     37 ;--------------------------------------------------------
+                                     38 	.area INITIALIZED
+                                     39 ;--------------------------------------------------------
+                                     40 ; absolute external ram data
+                                     41 ;--------------------------------------------------------
+                                     42 	.area DABS (ABS)
+                                     43 ;--------------------------------------------------------
+                                     44 ; global & static initialisations
+                                     45 ;--------------------------------------------------------
+                                     46 	.area HOME
+                                     47 	.area GSINIT
+                                     48 	.area GSFINAL
+                                     49 	.area GSINIT
+                                     50 ;--------------------------------------------------------
+                                     51 ; Home
+                                     52 ;--------------------------------------------------------
+                                     53 	.area HOME
+                                     54 	.area HOME
+                                     55 ;--------------------------------------------------------
+                                     56 ; code
+                                     57 ;--------------------------------------------------------
+                                     58 	.area CODE
+                           000000    59 	Sstm8s_flash$FLASH_Unlock$0 ==.
+                                     60 ;	StdPeriphLib/src/stm8s_flash.c: 87: void FLASH_Unlock(FLASH_MemType_TypeDef FLASH_MemType)
+                                     61 ;	-----------------------------------------
+                                     62 ;	 function FLASH_Unlock
+                                     63 ;	-----------------------------------------
+      000000                         64 _FLASH_Unlock:
+      000000 3Bu00u01         [ 1]   65 	push	_fp_+1
+      000003 3Bu00u00         [ 1]   66 	push	_fp_
+      000006 90 96            [ 1]   67 	ldw	y, sp
+      000008 90 CFu00u00      [ 2]   68 	ldw	_fp_, y
+                           00000C    69 	Sstm8s_flash$FLASH_Unlock$1 ==.
+                           00000C    70 	Sstm8s_flash$FLASH_Unlock$2 ==.
+                                     71 ;	StdPeriphLib/src/stm8s_flash.c: 93: if(FLASH_MemType == FLASH_MEMTYPE_PROG)
+      00000C 7B 05            [ 1]   72 	ld	a, (0x05, sp)
+      00000E A1 FD            [ 1]   73 	cp	a, #0xfd
+      000010 26 0A            [ 1]   74 	jrne	00102$
+                           000012    75 	Sstm8s_flash$FLASH_Unlock$3 ==.
+                                     76 ;	StdPeriphLib/src/stm8s_flash.c: 95: FLASH->PUKR = FLASH_RASS_KEY1;
+      000012 35 56 50 62      [ 1]   77 	mov	0x5062+0, #0x56
+                           000016    78 	Sstm8s_flash$FLASH_Unlock$4 ==.
+                                     79 ;	StdPeriphLib/src/stm8s_flash.c: 96: FLASH->PUKR = FLASH_RASS_KEY2;
+      000016 35 AE 50 62      [ 1]   80 	mov	0x5062+0, #0xae
+      00001A 20 08            [ 2]   81 	jra	00104$
+      00001C                         82 00102$:
+                           00001C    83 	Sstm8s_flash$FLASH_Unlock$5 ==.
+                                     84 ;	StdPeriphLib/src/stm8s_flash.c: 101: FLASH->DUKR = FLASH_RASS_KEY2; /* Warning: keys are reversed on data memory !!! */
+      00001C 35 AE 50 64      [ 1]   85 	mov	0x5064+0, #0xae
+                           000020    86 	Sstm8s_flash$FLASH_Unlock$6 ==.
+                                     87 ;	StdPeriphLib/src/stm8s_flash.c: 102: FLASH->DUKR = FLASH_RASS_KEY1;
+      000020 35 56 50 64      [ 1]   88 	mov	0x5064+0, #0x56
+      000024                         89 00104$:
+                           000024    90 	Sstm8s_flash$FLASH_Unlock$7 ==.
+                                     91 ;	StdPeriphLib/src/stm8s_flash.c: 104: }
+                           000024    92 	Sstm8s_flash$FLASH_Unlock$8 ==.
+                           000024    93 	XG$FLASH_Unlock$0$0 ==.
+      000024 32u00u00         [ 1]   94 	pop	_fp_
+      000027 32u00u01         [ 1]   95 	pop	_fp_+1
+      00002A 81               [ 4]   96 	ret
+                           00002B    97 	Sstm8s_flash$FLASH_Unlock$9 ==.
+                           00002B    98 	Sstm8s_flash$FLASH_Lock$10 ==.
+                                     99 ;	StdPeriphLib/src/stm8s_flash.c: 112: void FLASH_Lock(FLASH_MemType_TypeDef FLASH_MemType)
+                                    100 ;	-----------------------------------------
+                                    101 ;	 function FLASH_Lock
+                                    102 ;	-----------------------------------------
+      00002B                        103 _FLASH_Lock:
+      00002B 3Bu00u01         [ 1]  104 	push	_fp_+1
+      00002E 3Bu00u00         [ 1]  105 	push	_fp_
+      000031 90 96            [ 1]  106 	ldw	y, sp
+      000033 90 CFu00u00      [ 2]  107 	ldw	_fp_, y
+                           000037   108 	Sstm8s_flash$FLASH_Lock$11 ==.
+                           000037   109 	Sstm8s_flash$FLASH_Lock$12 ==.
+                                    110 ;	StdPeriphLib/src/stm8s_flash.c: 118: FLASH->IAPSR &= (uint8_t)FLASH_MemType;
+      000037 AE 50 5F         [ 2]  111 	ldw	x, #0x505f
+      00003A F6               [ 1]  112 	ld	a, (x)
+      00003B 14 05            [ 1]  113 	and	a, (0x05, sp)
+      00003D AE 50 5F         [ 2]  114 	ldw	x, #0x505f
+      000040 F7               [ 1]  115 	ld	(x), a
+                           000041   116 	Sstm8s_flash$FLASH_Lock$13 ==.
+                                    117 ;	StdPeriphLib/src/stm8s_flash.c: 119: }
+                           000041   118 	Sstm8s_flash$FLASH_Lock$14 ==.
+                           000041   119 	XG$FLASH_Lock$0$0 ==.
+      000041 32u00u00         [ 1]  120 	pop	_fp_
+      000044 32u00u01         [ 1]  121 	pop	_fp_+1
+      000047 81               [ 4]  122 	ret
+                           000048   123 	Sstm8s_flash$FLASH_Lock$15 ==.
+                           000048   124 	Sstm8s_flash$FLASH_DeInit$16 ==.
+                                    125 ;	StdPeriphLib/src/stm8s_flash.c: 126: void FLASH_DeInit(void)
+                                    126 ;	-----------------------------------------
+                                    127 ;	 function FLASH_DeInit
+                                    128 ;	-----------------------------------------
+      000048                        129 _FLASH_DeInit:
+      000048 3Bu00u01         [ 1]  130 	push	_fp_+1
+      00004B 3Bu00u00         [ 1]  131 	push	_fp_
+      00004E 90 96            [ 1]  132 	ldw	y, sp
+      000050 90 CFu00u00      [ 2]  133 	ldw	_fp_, y
+                           000054   134 	Sstm8s_flash$FLASH_DeInit$17 ==.
+                           000054   135 	Sstm8s_flash$FLASH_DeInit$18 ==.
+                                    136 ;	StdPeriphLib/src/stm8s_flash.c: 128: FLASH->CR1 = FLASH_CR1_RESET_VALUE;
+      000054 35 00 50 5A      [ 1]  137 	mov	0x505a+0, #0x00
+                           000058   138 	Sstm8s_flash$FLASH_DeInit$19 ==.
+                                    139 ;	StdPeriphLib/src/stm8s_flash.c: 129: FLASH->CR2 = FLASH_CR2_RESET_VALUE;
+      000058 35 00 50 5B      [ 1]  140 	mov	0x505b+0, #0x00
+                           00005C   141 	Sstm8s_flash$FLASH_DeInit$20 ==.
+                                    142 ;	StdPeriphLib/src/stm8s_flash.c: 130: FLASH->NCR2 = FLASH_NCR2_RESET_VALUE;
+      00005C 35 FF 50 5C      [ 1]  143 	mov	0x505c+0, #0xff
+                           000060   144 	Sstm8s_flash$FLASH_DeInit$21 ==.
+                                    145 ;	StdPeriphLib/src/stm8s_flash.c: 131: FLASH->IAPSR &= (uint8_t)(~FLASH_IAPSR_DUL);
+      000060 AE 50 5F         [ 2]  146 	ldw	x, #0x505f
+      000063 F6               [ 1]  147 	ld	a, (x)
+      000064 A4 F7            [ 1]  148 	and	a, #0xf7
+      000066 F7               [ 1]  149 	ld	(x), a
+                           000067   150 	Sstm8s_flash$FLASH_DeInit$22 ==.
+                                    151 ;	StdPeriphLib/src/stm8s_flash.c: 132: FLASH->IAPSR &= (uint8_t)(~FLASH_IAPSR_PUL);
+      000067 AE 50 5F         [ 2]  152 	ldw	x, #0x505f
+      00006A F6               [ 1]  153 	ld	a, (x)
+      00006B A4 FD            [ 1]  154 	and	a, #0xfd
+      00006D F7               [ 1]  155 	ld	(x), a
+                           00006E   156 	Sstm8s_flash$FLASH_DeInit$23 ==.
+                                    157 ;	StdPeriphLib/src/stm8s_flash.c: 133: (void) FLASH->IAPSR; /* Reading of this register causes the clearing of status flags */
+      00006E AE 50 5F         [ 2]  158 	ldw	x, #0x505f
+      000071 F6               [ 1]  159 	ld	a, (x)
+                           000072   160 	Sstm8s_flash$FLASH_DeInit$24 ==.
+                                    161 ;	StdPeriphLib/src/stm8s_flash.c: 134: }
+                           000072   162 	Sstm8s_flash$FLASH_DeInit$25 ==.
+                           000072   163 	XG$FLASH_DeInit$0$0 ==.
+      000072 32u00u00         [ 1]  164 	pop	_fp_
+      000075 32u00u01         [ 1]  165 	pop	_fp_+1
+      000078 81               [ 4]  166 	ret
+                           000079   167 	Sstm8s_flash$FLASH_DeInit$26 ==.
+                           000079   168 	Sstm8s_flash$FLASH_ITConfig$27 ==.
+                                    169 ;	StdPeriphLib/src/stm8s_flash.c: 142: void FLASH_ITConfig(FunctionalState NewState)
+                                    170 ;	-----------------------------------------
+                                    171 ;	 function FLASH_ITConfig
+                                    172 ;	-----------------------------------------
+      000079                        173 _FLASH_ITConfig:
+      000079 3Bu00u01         [ 1]  174 	push	_fp_+1
+      00007C 3Bu00u00         [ 1]  175 	push	_fp_
+      00007F 90 96            [ 1]  176 	ldw	y, sp
+      000081 90 CFu00u00      [ 2]  177 	ldw	_fp_, y
+                           000085   178 	Sstm8s_flash$FLASH_ITConfig$28 ==.
+                           000085   179 	Sstm8s_flash$FLASH_ITConfig$29 ==.
+                                    180 ;	StdPeriphLib/src/stm8s_flash.c: 147: if(NewState != DISABLE)
+      000085 0D 05            [ 1]  181 	tnz	(0x05, sp)
+      000087 27 09            [ 1]  182 	jreq	00102$
+                           000089   183 	Sstm8s_flash$FLASH_ITConfig$30 ==.
+                                    184 ;	StdPeriphLib/src/stm8s_flash.c: 149: FLASH->CR1 |= FLASH_CR1_IE; /* Enables the interrupt sources */
+      000089 AE 50 5A         [ 2]  185 	ldw	x, #0x505a
+      00008C F6               [ 1]  186 	ld	a, (x)
+      00008D AA 02            [ 1]  187 	or	a, #0x02
+      00008F F7               [ 1]  188 	ld	(x), a
+      000090 20 07            [ 2]  189 	jra	00104$
+      000092                        190 00102$:
+                           000092   191 	Sstm8s_flash$FLASH_ITConfig$31 ==.
+                                    192 ;	StdPeriphLib/src/stm8s_flash.c: 153: FLASH->CR1 &= (uint8_t)(~FLASH_CR1_IE); /* Disables the interrupt sources */
+      000092 AE 50 5A         [ 2]  193 	ldw	x, #0x505a
+      000095 F6               [ 1]  194 	ld	a, (x)
+      000096 A4 FD            [ 1]  195 	and	a, #0xfd
+      000098 F7               [ 1]  196 	ld	(x), a
+      000099                        197 00104$:
+                           000099   198 	Sstm8s_flash$FLASH_ITConfig$32 ==.
+                                    199 ;	StdPeriphLib/src/stm8s_flash.c: 155: }
+                           000099   200 	Sstm8s_flash$FLASH_ITConfig$33 ==.
+                           000099   201 	XG$FLASH_ITConfig$0$0 ==.
+      000099 32u00u00         [ 1]  202 	pop	_fp_
+      00009C 32u00u01         [ 1]  203 	pop	_fp_+1
+      00009F 81               [ 4]  204 	ret
+                           0000A0   205 	Sstm8s_flash$FLASH_ITConfig$34 ==.
+                           0000A0   206 	Sstm8s_flash$FLASH_EraseByte$35 ==.
+                                    207 ;	StdPeriphLib/src/stm8s_flash.c: 164: void FLASH_EraseByte(uint32_t Address)
+                                    208 ;	-----------------------------------------
+                                    209 ;	 function FLASH_EraseByte
+                                    210 ;	-----------------------------------------
+      0000A0                        211 _FLASH_EraseByte:
+      0000A0 3Bu00u01         [ 1]  212 	push	_fp_+1
+      0000A3 3Bu00u00         [ 1]  213 	push	_fp_
+      0000A6 90 96            [ 1]  214 	ldw	y, sp
+      0000A8 90 CFu00u00      [ 2]  215 	ldw	_fp_, y
+                           0000AC   216 	Sstm8s_flash$FLASH_EraseByte$36 ==.
+                           0000AC   217 	Sstm8s_flash$FLASH_EraseByte$37 ==.
+                                    218 ;	StdPeriphLib/src/stm8s_flash.c: 170: *(PointerAttr uint8_t*) (MemoryAddressCast)Address = FLASH_CLEAR_BYTE;
+      0000AC 1E 07            [ 2]  219 	ldw	x, (0x07, sp)
+      0000AE 7F               [ 1]  220 	clr	(x)
+                           0000AF   221 	Sstm8s_flash$FLASH_EraseByte$38 ==.
+                                    222 ;	StdPeriphLib/src/stm8s_flash.c: 171: }
+                           0000AF   223 	Sstm8s_flash$FLASH_EraseByte$39 ==.
+                           0000AF   224 	XG$FLASH_EraseByte$0$0 ==.
+      0000AF 32u00u00         [ 1]  225 	pop	_fp_
+      0000B2 32u00u01         [ 1]  226 	pop	_fp_+1
+      0000B5 81               [ 4]  227 	ret
+                           0000B6   228 	Sstm8s_flash$FLASH_EraseByte$40 ==.
+                           0000B6   229 	Sstm8s_flash$FLASH_ProgramByte$41 ==.
+                                    230 ;	StdPeriphLib/src/stm8s_flash.c: 181: void FLASH_ProgramByte(uint32_t Address, uint8_t Data)
+                                    231 ;	-----------------------------------------
+                                    232 ;	 function FLASH_ProgramByte
+                                    233 ;	-----------------------------------------
+      0000B6                        234 _FLASH_ProgramByte:
+      0000B6 3Bu00u01         [ 1]  235 	push	_fp_+1
+      0000B9 3Bu00u00         [ 1]  236 	push	_fp_
+      0000BC 90 96            [ 1]  237 	ldw	y, sp
+      0000BE 90 CFu00u00      [ 2]  238 	ldw	_fp_, y
+                           0000C2   239 	Sstm8s_flash$FLASH_ProgramByte$42 ==.
+                           0000C2   240 	Sstm8s_flash$FLASH_ProgramByte$43 ==.
+                                    241 ;	StdPeriphLib/src/stm8s_flash.c: 185: *(PointerAttr uint8_t*) (MemoryAddressCast)Address = Data;
+      0000C2 1E 07            [ 2]  242 	ldw	x, (0x07, sp)
+      0000C4 7B 09            [ 1]  243 	ld	a, (0x09, sp)
+      0000C6 F7               [ 1]  244 	ld	(x), a
+                           0000C7   245 	Sstm8s_flash$FLASH_ProgramByte$44 ==.
+                                    246 ;	StdPeriphLib/src/stm8s_flash.c: 186: }
+                           0000C7   247 	Sstm8s_flash$FLASH_ProgramByte$45 ==.
+                           0000C7   248 	XG$FLASH_ProgramByte$0$0 ==.
+      0000C7 32u00u00         [ 1]  249 	pop	_fp_
+      0000CA 32u00u01         [ 1]  250 	pop	_fp_+1
+      0000CD 81               [ 4]  251 	ret
+                           0000CE   252 	Sstm8s_flash$FLASH_ProgramByte$46 ==.
+                           0000CE   253 	Sstm8s_flash$FLASH_ReadByte$47 ==.
+                                    254 ;	StdPeriphLib/src/stm8s_flash.c: 195: uint8_t FLASH_ReadByte(uint32_t Address)
+                                    255 ;	-----------------------------------------
+                                    256 ;	 function FLASH_ReadByte
+                                    257 ;	-----------------------------------------
+      0000CE                        258 _FLASH_ReadByte:
+      0000CE 3Bu00u01         [ 1]  259 	push	_fp_+1
+      0000D1 3Bu00u00         [ 1]  260 	push	_fp_
+      0000D4 90 96            [ 1]  261 	ldw	y, sp
+      0000D6 90 CFu00u00      [ 2]  262 	ldw	_fp_, y
+                           0000DA   263 	Sstm8s_flash$FLASH_ReadByte$48 ==.
+                           0000DA   264 	Sstm8s_flash$FLASH_ReadByte$49 ==.
+                                    265 ;	StdPeriphLib/src/stm8s_flash.c: 201: return(*(PointerAttr uint8_t *) (MemoryAddressCast)Address);
+      0000DA 1E 07            [ 2]  266 	ldw	x, (0x07, sp)
+      0000DC F6               [ 1]  267 	ld	a, (x)
+                           0000DD   268 	Sstm8s_flash$FLASH_ReadByte$50 ==.
+                                    269 ;	StdPeriphLib/src/stm8s_flash.c: 202: }
+                           0000DD   270 	Sstm8s_flash$FLASH_ReadByte$51 ==.
+                           0000DD   271 	XG$FLASH_ReadByte$0$0 ==.
+      0000DD 32u00u00         [ 1]  272 	pop	_fp_
+      0000E0 32u00u01         [ 1]  273 	pop	_fp_+1
+      0000E3 81               [ 4]  274 	ret
+                           0000E4   275 	Sstm8s_flash$FLASH_ReadByte$52 ==.
+                           0000E4   276 	Sstm8s_flash$FLASH_ProgramWord$53 ==.
+                                    277 ;	StdPeriphLib/src/stm8s_flash.c: 212: void FLASH_ProgramWord(uint32_t Address, uint32_t Data)
+                                    278 ;	-----------------------------------------
+                                    279 ;	 function FLASH_ProgramWord
+                                    280 ;	-----------------------------------------
+      0000E4                        281 _FLASH_ProgramWord:
+      0000E4 3Bu00u01         [ 1]  282 	push	_fp_+1
+      0000E7 3Bu00u00         [ 1]  283 	push	_fp_
+      0000EA 90 96            [ 1]  284 	ldw	y, sp
+      0000EC 90 CFu00u00      [ 2]  285 	ldw	_fp_, y
+                           0000F0   286 	Sstm8s_flash$FLASH_ProgramWord$54 ==.
+      0000F0 52 04            [ 2]  287 	sub	sp, #4
+                           0000F2   288 	Sstm8s_flash$FLASH_ProgramWord$55 ==.
+                                    289 ;	StdPeriphLib/src/stm8s_flash.c: 218: FLASH->CR2 |= FLASH_CR2_WPRG;
+      0000F2 AE 50 5B         [ 2]  290 	ldw	x, #0x505b
+      0000F5 F6               [ 1]  291 	ld	a, (x)
+      0000F6 AA 40            [ 1]  292 	or	a, #0x40
+      0000F8 F7               [ 1]  293 	ld	(x), a
+                           0000F9   294 	Sstm8s_flash$FLASH_ProgramWord$56 ==.
+                                    295 ;	StdPeriphLib/src/stm8s_flash.c: 219: FLASH->NCR2 &= (uint8_t)(~FLASH_NCR2_NWPRG);
+      0000F9 AE 50 5C         [ 2]  296 	ldw	x, #0x505c
+      0000FC F6               [ 1]  297 	ld	a, (x)
+      0000FD A4 BF            [ 1]  298 	and	a, #0xbf
+      0000FF F7               [ 1]  299 	ld	(x), a
+                           000100   300 	Sstm8s_flash$FLASH_ProgramWord$57 ==.
+                                    301 ;	StdPeriphLib/src/stm8s_flash.c: 222: *((PointerAttr uint8_t*)(MemoryAddressCast)Address)       = *((uint8_t*)(&Data));
+      000100 1E 0B            [ 2]  302 	ldw	x, (0x0b, sp)
+      000102 1F 03            [ 2]  303 	ldw	(0x03, sp), x
+      000104 96               [ 1]  304 	ldw	x, sp
+      000105 1C 00 0D         [ 2]  305 	addw	x, #13
+      000108 1F 01            [ 2]  306 	ldw	(0x01, sp), x
+      00010A 1E 01            [ 2]  307 	ldw	x, (0x01, sp)
+      00010C F6               [ 1]  308 	ld	a, (x)
+      00010D 1E 03            [ 2]  309 	ldw	x, (0x03, sp)
+      00010F F7               [ 1]  310 	ld	(x), a
+                           000110   311 	Sstm8s_flash$FLASH_ProgramWord$58 ==.
+                                    312 ;	StdPeriphLib/src/stm8s_flash.c: 224: *(((PointerAttr uint8_t*)(MemoryAddressCast)Address) + 1) = *((uint8_t*)(&Data)+1);
+      000110 1E 03            [ 2]  313 	ldw	x, (0x03, sp)
+      000112 5C               [ 2]  314 	incw	x
+      000113 16 01            [ 2]  315 	ldw	y, (0x01, sp)
+      000115 90 E6 01         [ 1]  316 	ld	a, (0x1, y)
+      000118 F7               [ 1]  317 	ld	(x), a
+                           000119   318 	Sstm8s_flash$FLASH_ProgramWord$59 ==.
+                                    319 ;	StdPeriphLib/src/stm8s_flash.c: 226: *(((PointerAttr uint8_t*)(MemoryAddressCast)Address) + 2) = *((uint8_t*)(&Data)+2);
+      000119 1E 03            [ 2]  320 	ldw	x, (0x03, sp)
+      00011B 5C               [ 2]  321 	incw	x
+      00011C 5C               [ 2]  322 	incw	x
+      00011D 16 01            [ 2]  323 	ldw	y, (0x01, sp)
+      00011F 90 E6 02         [ 1]  324 	ld	a, (0x2, y)
+      000122 F7               [ 1]  325 	ld	(x), a
+                           000123   326 	Sstm8s_flash$FLASH_ProgramWord$60 ==.
+                                    327 ;	StdPeriphLib/src/stm8s_flash.c: 228: *(((PointerAttr uint8_t*)(MemoryAddressCast)Address) + 3) = *((uint8_t*)(&Data)+3);
+      000123 1E 03            [ 2]  328 	ldw	x, (0x03, sp)
+      000125 1C 00 03         [ 2]  329 	addw	x, #0x0003
+      000128 16 01            [ 2]  330 	ldw	y, (0x01, sp)
+      00012A 90 E6 03         [ 1]  331 	ld	a, (0x3, y)
+      00012D F7               [ 1]  332 	ld	(x), a
+                           00012E   333 	Sstm8s_flash$FLASH_ProgramWord$61 ==.
+                                    334 ;	StdPeriphLib/src/stm8s_flash.c: 229: }
+      00012E 5B 04            [ 2]  335 	addw	sp, #4
+                           000130   336 	Sstm8s_flash$FLASH_ProgramWord$62 ==.
+                           000130   337 	XG$FLASH_ProgramWord$0$0 ==.
+      000130 32u00u00         [ 1]  338 	pop	_fp_
+      000133 32u00u01         [ 1]  339 	pop	_fp_+1
+      000136 81               [ 4]  340 	ret
+                           000137   341 	Sstm8s_flash$FLASH_ProgramWord$63 ==.
+                           000137   342 	Sstm8s_flash$FLASH_ProgramOptionByte$64 ==.
+                                    343 ;	StdPeriphLib/src/stm8s_flash.c: 237: void FLASH_ProgramOptionByte(uint16_t Address, uint8_t Data)
+                                    344 ;	-----------------------------------------
+                                    345 ;	 function FLASH_ProgramOptionByte
+                                    346 ;	-----------------------------------------
+      000137                        347 _FLASH_ProgramOptionByte:
+      000137 3Bu00u01         [ 1]  348 	push	_fp_+1
+      00013A 3Bu00u00         [ 1]  349 	push	_fp_
+      00013D 90 96            [ 1]  350 	ldw	y, sp
+      00013F 90 CFu00u00      [ 2]  351 	ldw	_fp_, y
+                           000143   352 	Sstm8s_flash$FLASH_ProgramOptionByte$65 ==.
+                           000143   353 	Sstm8s_flash$FLASH_ProgramOptionByte$66 ==.
+                                    354 ;	StdPeriphLib/src/stm8s_flash.c: 243: FLASH->CR2 |= FLASH_CR2_OPT;
+      000143 72 1E 50 5B      [ 1]  355 	bset	0x505b, #7
+                           000147   356 	Sstm8s_flash$FLASH_ProgramOptionByte$67 ==.
+                                    357 ;	StdPeriphLib/src/stm8s_flash.c: 244: FLASH->NCR2 &= (uint8_t)(~FLASH_NCR2_NOPT);
+      000147 AE 50 5C         [ 2]  358 	ldw	x, #0x505c
+      00014A F6               [ 1]  359 	ld	a, (x)
+      00014B A4 7F            [ 1]  360 	and	a, #0x7f
+      00014D F7               [ 1]  361 	ld	(x), a
+                           00014E   362 	Sstm8s_flash$FLASH_ProgramOptionByte$68 ==.
+                                    363 ;	StdPeriphLib/src/stm8s_flash.c: 247: if(Address == 0x4800)
+      00014E 1E 05            [ 2]  364 	ldw	x, (0x05, sp)
+      000150 A3 48 00         [ 2]  365 	cpw	x, #0x4800
+      000153 26 07            [ 1]  366 	jrne	00102$
+                           000155   367 	Sstm8s_flash$FLASH_ProgramOptionByte$69 ==.
+                                    368 ;	StdPeriphLib/src/stm8s_flash.c: 250: *((NEAR uint8_t*)Address) = Data;
+      000155 1E 05            [ 2]  369 	ldw	x, (0x05, sp)
+      000157 7B 07            [ 1]  370 	ld	a, (0x07, sp)
+      000159 F7               [ 1]  371 	ld	(x), a
+      00015A 20 0C            [ 2]  372 	jra	00103$
+      00015C                        373 00102$:
+                           00015C   374 	Sstm8s_flash$FLASH_ProgramOptionByte$70 ==.
+                                    375 ;	StdPeriphLib/src/stm8s_flash.c: 255: *((NEAR uint8_t*)Address) = Data;
+      00015C 1E 05            [ 2]  376 	ldw	x, (0x05, sp)
+      00015E 7B 07            [ 1]  377 	ld	a, (0x07, sp)
+      000160 F7               [ 1]  378 	ld	(x), a
+                           000161   379 	Sstm8s_flash$FLASH_ProgramOptionByte$71 ==.
+                                    380 ;	StdPeriphLib/src/stm8s_flash.c: 256: *((NEAR uint8_t*)((uint16_t)(Address + 1))) = (uint8_t)(~Data);
+      000161 1E 05            [ 2]  381 	ldw	x, (0x05, sp)
+      000163 5C               [ 2]  382 	incw	x
+      000164 7B 07            [ 1]  383 	ld	a, (0x07, sp)
+      000166 43               [ 1]  384 	cpl	a
+      000167 F7               [ 1]  385 	ld	(x), a
+      000168                        386 00103$:
+                           000168   387 	Sstm8s_flash$FLASH_ProgramOptionByte$72 ==.
+                                    388 ;	StdPeriphLib/src/stm8s_flash.c: 258: FLASH_WaitForLastOperation(FLASH_MEMTYPE_PROG);
+      000168 4B FD            [ 1]  389 	push	#0xfd
+      00016A CDr02rE7         [ 4]  390 	call	_FLASH_WaitForLastOperation
+      00016D 84               [ 1]  391 	pop	a
+                           00016E   392 	Sstm8s_flash$FLASH_ProgramOptionByte$73 ==.
+                                    393 ;	StdPeriphLib/src/stm8s_flash.c: 261: FLASH->CR2 &= (uint8_t)(~FLASH_CR2_OPT);
+      00016E 72 1F 50 5B      [ 1]  394 	bres	0x505b, #7
+                           000172   395 	Sstm8s_flash$FLASH_ProgramOptionByte$74 ==.
+                                    396 ;	StdPeriphLib/src/stm8s_flash.c: 262: FLASH->NCR2 |= FLASH_NCR2_NOPT;
+      000172 72 1E 50 5C      [ 1]  397 	bset	0x505c, #7
+                           000176   398 	Sstm8s_flash$FLASH_ProgramOptionByte$75 ==.
+                                    399 ;	StdPeriphLib/src/stm8s_flash.c: 263: }
+                           000176   400 	Sstm8s_flash$FLASH_ProgramOptionByte$76 ==.
+                           000176   401 	XG$FLASH_ProgramOptionByte$0$0 ==.
+      000176 32u00u00         [ 1]  402 	pop	_fp_
+      000179 32u00u01         [ 1]  403 	pop	_fp_+1
+      00017C 81               [ 4]  404 	ret
+                           00017D   405 	Sstm8s_flash$FLASH_ProgramOptionByte$77 ==.
+                           00017D   406 	Sstm8s_flash$FLASH_EraseOptionByte$78 ==.
+                                    407 ;	StdPeriphLib/src/stm8s_flash.c: 270: void FLASH_EraseOptionByte(uint16_t Address)
+                                    408 ;	-----------------------------------------
+                                    409 ;	 function FLASH_EraseOptionByte
+                                    410 ;	-----------------------------------------
+      00017D                        411 _FLASH_EraseOptionByte:
+      00017D 3Bu00u01         [ 1]  412 	push	_fp_+1
+      000180 3Bu00u00         [ 1]  413 	push	_fp_
+      000183 90 96            [ 1]  414 	ldw	y, sp
+      000185 90 CFu00u00      [ 2]  415 	ldw	_fp_, y
+                           000189   416 	Sstm8s_flash$FLASH_EraseOptionByte$79 ==.
+                           000189   417 	Sstm8s_flash$FLASH_EraseOptionByte$80 ==.
+                                    418 ;	StdPeriphLib/src/stm8s_flash.c: 276: FLASH->CR2 |= FLASH_CR2_OPT;
+      000189 72 1E 50 5B      [ 1]  419 	bset	0x505b, #7
+                           00018D   420 	Sstm8s_flash$FLASH_EraseOptionByte$81 ==.
+                                    421 ;	StdPeriphLib/src/stm8s_flash.c: 277: FLASH->NCR2 &= (uint8_t)(~FLASH_NCR2_NOPT);
+      00018D AE 50 5C         [ 2]  422 	ldw	x, #0x505c
+      000190 F6               [ 1]  423 	ld	a, (x)
+      000191 A4 7F            [ 1]  424 	and	a, #0x7f
+      000193 F7               [ 1]  425 	ld	(x), a
+                           000194   426 	Sstm8s_flash$FLASH_EraseOptionByte$82 ==.
+                                    427 ;	StdPeriphLib/src/stm8s_flash.c: 280: if(Address == 0x4800)
+      000194 1E 05            [ 2]  428 	ldw	x, (0x05, sp)
+      000196 A3 48 00         [ 2]  429 	cpw	x, #0x4800
+      000199 26 05            [ 1]  430 	jrne	00102$
+                           00019B   431 	Sstm8s_flash$FLASH_EraseOptionByte$83 ==.
+                                    432 ;	StdPeriphLib/src/stm8s_flash.c: 283: *((NEAR uint8_t*)Address) = FLASH_CLEAR_BYTE;
+      00019B 1E 05            [ 2]  433 	ldw	x, (0x05, sp)
+      00019D 7F               [ 1]  434 	clr	(x)
+      00019E 20 09            [ 2]  435 	jra	00103$
+      0001A0                        436 00102$:
+                           0001A0   437 	Sstm8s_flash$FLASH_EraseOptionByte$84 ==.
+                                    438 ;	StdPeriphLib/src/stm8s_flash.c: 288: *((NEAR uint8_t*)Address) = FLASH_CLEAR_BYTE;
+      0001A0 1E 05            [ 2]  439 	ldw	x, (0x05, sp)
+      0001A2 7F               [ 1]  440 	clr	(x)
+                           0001A3   441 	Sstm8s_flash$FLASH_EraseOptionByte$85 ==.
+                                    442 ;	StdPeriphLib/src/stm8s_flash.c: 289: *((NEAR uint8_t*)((uint16_t)(Address + (uint16_t)1 ))) = FLASH_SET_BYTE;
+      0001A3 1E 05            [ 2]  443 	ldw	x, (0x05, sp)
+      0001A5 5C               [ 2]  444 	incw	x
+      0001A6 A6 FF            [ 1]  445 	ld	a, #0xff
+      0001A8 F7               [ 1]  446 	ld	(x), a
+      0001A9                        447 00103$:
+                           0001A9   448 	Sstm8s_flash$FLASH_EraseOptionByte$86 ==.
+                                    449 ;	StdPeriphLib/src/stm8s_flash.c: 291: FLASH_WaitForLastOperation(FLASH_MEMTYPE_PROG);
+      0001A9 4B FD            [ 1]  450 	push	#0xfd
+      0001AB CDr02rE7         [ 4]  451 	call	_FLASH_WaitForLastOperation
+      0001AE 84               [ 1]  452 	pop	a
+                           0001AF   453 	Sstm8s_flash$FLASH_EraseOptionByte$87 ==.
+                                    454 ;	StdPeriphLib/src/stm8s_flash.c: 294: FLASH->CR2 &= (uint8_t)(~FLASH_CR2_OPT);
+      0001AF 72 1F 50 5B      [ 1]  455 	bres	0x505b, #7
+                           0001B3   456 	Sstm8s_flash$FLASH_EraseOptionByte$88 ==.
+                                    457 ;	StdPeriphLib/src/stm8s_flash.c: 295: FLASH->NCR2 |= FLASH_NCR2_NOPT;
+      0001B3 72 1E 50 5C      [ 1]  458 	bset	0x505c, #7
+                           0001B7   459 	Sstm8s_flash$FLASH_EraseOptionByte$89 ==.
+                                    460 ;	StdPeriphLib/src/stm8s_flash.c: 296: }
+                           0001B7   461 	Sstm8s_flash$FLASH_EraseOptionByte$90 ==.
+                           0001B7   462 	XG$FLASH_EraseOptionByte$0$0 ==.
+      0001B7 32u00u00         [ 1]  463 	pop	_fp_
+      0001BA 32u00u01         [ 1]  464 	pop	_fp_+1
+      0001BD 81               [ 4]  465 	ret
+                           0001BE   466 	Sstm8s_flash$FLASH_EraseOptionByte$91 ==.
+                           0001BE   467 	Sstm8s_flash$FLASH_ReadOptionByte$92 ==.
+                                    468 ;	StdPeriphLib/src/stm8s_flash.c: 303: uint16_t FLASH_ReadOptionByte(uint16_t Address)
+                                    469 ;	-----------------------------------------
+                                    470 ;	 function FLASH_ReadOptionByte
+                                    471 ;	-----------------------------------------
+      0001BE                        472 _FLASH_ReadOptionByte:
+      0001BE 3Bu00u01         [ 1]  473 	push	_fp_+1
+      0001C1 3Bu00u00         [ 1]  474 	push	_fp_
+      0001C4 90 96            [ 1]  475 	ldw	y, sp
+      0001C6 90 CFu00u00      [ 2]  476 	ldw	_fp_, y
+                           0001CA   477 	Sstm8s_flash$FLASH_ReadOptionByte$93 ==.
+      0001CA 52 03            [ 2]  478 	sub	sp, #3
+                           0001CC   479 	Sstm8s_flash$FLASH_ReadOptionByte$94 ==.
+                                    480 ;	StdPeriphLib/src/stm8s_flash.c: 311: value_optbyte = *((NEAR uint8_t*)Address); /* Read option byte */
+      0001CC 1E 08            [ 2]  481 	ldw	x, (0x08, sp)
+      0001CE F6               [ 1]  482 	ld	a, (x)
+                           0001CF   483 	Sstm8s_flash$FLASH_ReadOptionByte$95 ==.
+                                    484 ;	StdPeriphLib/src/stm8s_flash.c: 312: value_optbyte_complement = *(((NEAR uint8_t*)Address) + 1); /* Read option byte complement */
+      0001CF 88               [ 1]  485 	push	a
+      0001D0 E6 01            [ 1]  486 	ld	a, (0x1, x)
+      0001D2 90 97            [ 1]  487 	ld	yl, a
+      0001D4 84               [ 1]  488 	pop	a
+                           0001D5   489 	Sstm8s_flash$FLASH_ReadOptionByte$96 ==.
+                                    490 ;	StdPeriphLib/src/stm8s_flash.c: 315: if(Address == 0x4800)
+      0001D5 1E 08            [ 2]  491 	ldw	x, (0x08, sp)
+      0001D7 A3 48 00         [ 2]  492 	cpw	x, #0x4800
+      0001DA 26 04            [ 1]  493 	jrne	00105$
+                           0001DC   494 	Sstm8s_flash$FLASH_ReadOptionByte$97 ==.
+                                    495 ;	StdPeriphLib/src/stm8s_flash.c: 317: res_value =	 value_optbyte;
+      0001DC 5F               [ 1]  496 	clrw	x
+      0001DD 97               [ 1]  497 	ld	xl, a
+      0001DE 20 20            [ 2]  498 	jra	00106$
+      0001E0                        499 00105$:
+                           0001E0   500 	Sstm8s_flash$FLASH_ReadOptionByte$98 ==.
+                                    501 ;	StdPeriphLib/src/stm8s_flash.c: 321: if(value_optbyte == (uint8_t)(~value_optbyte_complement))
+      0001E0 88               [ 1]  502 	push	a
+      0001E1 90 9F            [ 1]  503 	ld	a, yl
+      0001E3 43               [ 1]  504 	cpl	a
+      0001E4 6B 02            [ 1]  505 	ld	(0x02, sp), a
+      0001E6 84               [ 1]  506 	pop	a
+      0001E7 11 01            [ 1]  507 	cp	a, (0x01, sp)
+      0001E9 26 12            [ 1]  508 	jrne	00102$
+                           0001EB   509 	Sstm8s_flash$FLASH_ReadOptionByte$99 ==.
+                                    510 ;	StdPeriphLib/src/stm8s_flash.c: 323: res_value = (uint16_t)((uint16_t)value_optbyte << 8);
+      0001EB 97               [ 1]  511 	ld	xl, a
+      0001EC 4F               [ 1]  512 	clr	a
+      0001ED 4F               [ 1]  513 	clr	a
+      0001EE 02               [ 1]  514 	rlwa	x
+                           0001EF   515 	Sstm8s_flash$FLASH_ReadOptionByte$100 ==.
+                                    516 ;	StdPeriphLib/src/stm8s_flash.c: 324: res_value = res_value | (uint16_t)value_optbyte_complement;
+      0001EF 90 9F            [ 1]  517 	ld	a, yl
+      0001F1 0F 02            [ 1]  518 	clr	(0x02, sp)
+      0001F3 89               [ 2]  519 	pushw	x
+      0001F4 1A 02            [ 1]  520 	or	a, (2, sp)
+      0001F6 85               [ 2]  521 	popw	x
+      0001F7 02               [ 1]  522 	rlwa	x
+      0001F8 1A 02            [ 1]  523 	or	a, (0x02, sp)
+      0001FA 95               [ 1]  524 	ld	xh, a
+      0001FB 20 03            [ 2]  525 	jra	00106$
+      0001FD                        526 00102$:
+                           0001FD   527 	Sstm8s_flash$FLASH_ReadOptionByte$101 ==.
+                                    528 ;	StdPeriphLib/src/stm8s_flash.c: 328: res_value = FLASH_OPTIONBYTE_ERROR;
+      0001FD AE 55 55         [ 2]  529 	ldw	x, #0x5555
+      000200                        530 00106$:
+                           000200   531 	Sstm8s_flash$FLASH_ReadOptionByte$102 ==.
+                                    532 ;	StdPeriphLib/src/stm8s_flash.c: 331: return(res_value);
+                           000200   533 	Sstm8s_flash$FLASH_ReadOptionByte$103 ==.
+                                    534 ;	StdPeriphLib/src/stm8s_flash.c: 332: }
+      000200 5B 03            [ 2]  535 	addw	sp, #3
+                           000202   536 	Sstm8s_flash$FLASH_ReadOptionByte$104 ==.
+                           000202   537 	XG$FLASH_ReadOptionByte$0$0 ==.
+      000202 32u00u00         [ 1]  538 	pop	_fp_
+      000205 32u00u01         [ 1]  539 	pop	_fp_+1
+      000208 81               [ 4]  540 	ret
+                           000209   541 	Sstm8s_flash$FLASH_ReadOptionByte$105 ==.
+                           000209   542 	Sstm8s_flash$FLASH_SetLowPowerMode$106 ==.
+                                    543 ;	StdPeriphLib/src/stm8s_flash.c: 340: void FLASH_SetLowPowerMode(FLASH_LPMode_TypeDef FLASH_LPMode)
+                                    544 ;	-----------------------------------------
+                                    545 ;	 function FLASH_SetLowPowerMode
+                                    546 ;	-----------------------------------------
+      000209                        547 _FLASH_SetLowPowerMode:
+      000209 3Bu00u01         [ 1]  548 	push	_fp_+1
+      00020C 3Bu00u00         [ 1]  549 	push	_fp_
+      00020F 90 96            [ 1]  550 	ldw	y, sp
+      000211 90 CFu00u00      [ 2]  551 	ldw	_fp_, y
+                           000215   552 	Sstm8s_flash$FLASH_SetLowPowerMode$107 ==.
+                           000215   553 	Sstm8s_flash$FLASH_SetLowPowerMode$108 ==.
+                                    554 ;	StdPeriphLib/src/stm8s_flash.c: 346: FLASH->CR1 &= (uint8_t)(~(FLASH_CR1_HALT | FLASH_CR1_AHALT));
+      000215 AE 50 5A         [ 2]  555 	ldw	x, #0x505a
+      000218 F6               [ 1]  556 	ld	a, (x)
+      000219 A4 F3            [ 1]  557 	and	a, #0xf3
+      00021B F7               [ 1]  558 	ld	(x), a
+                           00021C   559 	Sstm8s_flash$FLASH_SetLowPowerMode$109 ==.
+                                    560 ;	StdPeriphLib/src/stm8s_flash.c: 349: FLASH->CR1 |= (uint8_t)FLASH_LPMode;
+      00021C AE 50 5A         [ 2]  561 	ldw	x, #0x505a
+      00021F F6               [ 1]  562 	ld	a, (x)
+      000220 1A 05            [ 1]  563 	or	a, (0x05, sp)
+      000222 AE 50 5A         [ 2]  564 	ldw	x, #0x505a
+      000225 F7               [ 1]  565 	ld	(x), a
+                           000226   566 	Sstm8s_flash$FLASH_SetLowPowerMode$110 ==.
+                                    567 ;	StdPeriphLib/src/stm8s_flash.c: 350: }
+                           000226   568 	Sstm8s_flash$FLASH_SetLowPowerMode$111 ==.
+                           000226   569 	XG$FLASH_SetLowPowerMode$0$0 ==.
+      000226 32u00u00         [ 1]  570 	pop	_fp_
+      000229 32u00u01         [ 1]  571 	pop	_fp_+1
+      00022C 81               [ 4]  572 	ret
+                           00022D   573 	Sstm8s_flash$FLASH_SetLowPowerMode$112 ==.
+                           00022D   574 	Sstm8s_flash$FLASH_SetProgrammingTime$113 ==.
+                                    575 ;	StdPeriphLib/src/stm8s_flash.c: 358: void FLASH_SetProgrammingTime(FLASH_ProgramTime_TypeDef FLASH_ProgTime)
+                                    576 ;	-----------------------------------------
+                                    577 ;	 function FLASH_SetProgrammingTime
+                                    578 ;	-----------------------------------------
+      00022D                        579 _FLASH_SetProgrammingTime:
+      00022D 3Bu00u01         [ 1]  580 	push	_fp_+1
+      000230 3Bu00u00         [ 1]  581 	push	_fp_
+      000233 90 96            [ 1]  582 	ldw	y, sp
+      000235 90 CFu00u00      [ 2]  583 	ldw	_fp_, y
+                           000239   584 	Sstm8s_flash$FLASH_SetProgrammingTime$114 ==.
+                           000239   585 	Sstm8s_flash$FLASH_SetProgrammingTime$115 ==.
+                                    586 ;	StdPeriphLib/src/stm8s_flash.c: 363: FLASH->CR1 &= (uint8_t)(~FLASH_CR1_FIX);
+      000239 72 11 50 5A      [ 1]  587 	bres	0x505a, #0
+                           00023D   588 	Sstm8s_flash$FLASH_SetProgrammingTime$116 ==.
+                                    589 ;	StdPeriphLib/src/stm8s_flash.c: 364: FLASH->CR1 |= (uint8_t)FLASH_ProgTime;
+      00023D AE 50 5A         [ 2]  590 	ldw	x, #0x505a
+      000240 F6               [ 1]  591 	ld	a, (x)
+      000241 1A 05            [ 1]  592 	or	a, (0x05, sp)
+      000243 AE 50 5A         [ 2]  593 	ldw	x, #0x505a
+      000246 F7               [ 1]  594 	ld	(x), a
+                           000247   595 	Sstm8s_flash$FLASH_SetProgrammingTime$117 ==.
+                                    596 ;	StdPeriphLib/src/stm8s_flash.c: 365: }
+                           000247   597 	Sstm8s_flash$FLASH_SetProgrammingTime$118 ==.
+                           000247   598 	XG$FLASH_SetProgrammingTime$0$0 ==.
+      000247 32u00u00         [ 1]  599 	pop	_fp_
+      00024A 32u00u01         [ 1]  600 	pop	_fp_+1
+      00024D 81               [ 4]  601 	ret
+                           00024E   602 	Sstm8s_flash$FLASH_SetProgrammingTime$119 ==.
+                           00024E   603 	Sstm8s_flash$FLASH_GetLowPowerMode$120 ==.
+                                    604 ;	StdPeriphLib/src/stm8s_flash.c: 372: FLASH_LPMode_TypeDef FLASH_GetLowPowerMode(void)
+                                    605 ;	-----------------------------------------
+                                    606 ;	 function FLASH_GetLowPowerMode
+                                    607 ;	-----------------------------------------
+      00024E                        608 _FLASH_GetLowPowerMode:
+      00024E 3Bu00u01         [ 1]  609 	push	_fp_+1
+      000251 3Bu00u00         [ 1]  610 	push	_fp_
+      000254 90 96            [ 1]  611 	ldw	y, sp
+      000256 90 CFu00u00      [ 2]  612 	ldw	_fp_, y
+                           00025A   613 	Sstm8s_flash$FLASH_GetLowPowerMode$121 ==.
+                           00025A   614 	Sstm8s_flash$FLASH_GetLowPowerMode$122 ==.
+                                    615 ;	StdPeriphLib/src/stm8s_flash.c: 374: return((FLASH_LPMode_TypeDef)(FLASH->CR1 & (uint8_t)(FLASH_CR1_HALT | FLASH_CR1_AHALT)));
+      00025A AE 50 5A         [ 2]  616 	ldw	x, #0x505a
+      00025D F6               [ 1]  617 	ld	a, (x)
+      00025E A4 0C            [ 1]  618 	and	a, #0x0c
+                           000260   619 	Sstm8s_flash$FLASH_GetLowPowerMode$123 ==.
+                                    620 ;	StdPeriphLib/src/stm8s_flash.c: 375: }
+                           000260   621 	Sstm8s_flash$FLASH_GetLowPowerMode$124 ==.
+                           000260   622 	XG$FLASH_GetLowPowerMode$0$0 ==.
+      000260 32u00u00         [ 1]  623 	pop	_fp_
+      000263 32u00u01         [ 1]  624 	pop	_fp_+1
+      000266 81               [ 4]  625 	ret
+                           000267   626 	Sstm8s_flash$FLASH_GetLowPowerMode$125 ==.
+                           000267   627 	Sstm8s_flash$FLASH_GetProgrammingTime$126 ==.
+                                    628 ;	StdPeriphLib/src/stm8s_flash.c: 382: FLASH_ProgramTime_TypeDef FLASH_GetProgrammingTime(void)
+                                    629 ;	-----------------------------------------
+                                    630 ;	 function FLASH_GetProgrammingTime
+                                    631 ;	-----------------------------------------
+      000267                        632 _FLASH_GetProgrammingTime:
+      000267 3Bu00u01         [ 1]  633 	push	_fp_+1
+      00026A 3Bu00u00         [ 1]  634 	push	_fp_
+      00026D 90 96            [ 1]  635 	ldw	y, sp
+      00026F 90 CFu00u00      [ 2]  636 	ldw	_fp_, y
+                           000273   637 	Sstm8s_flash$FLASH_GetProgrammingTime$127 ==.
+                           000273   638 	Sstm8s_flash$FLASH_GetProgrammingTime$128 ==.
+                                    639 ;	StdPeriphLib/src/stm8s_flash.c: 384: return((FLASH_ProgramTime_TypeDef)(FLASH->CR1 & FLASH_CR1_FIX));
+      000273 AE 50 5A         [ 2]  640 	ldw	x, #0x505a
+      000276 F6               [ 1]  641 	ld	a, (x)
+      000277 A4 01            [ 1]  642 	and	a, #0x01
+                           000279   643 	Sstm8s_flash$FLASH_GetProgrammingTime$129 ==.
+                                    644 ;	StdPeriphLib/src/stm8s_flash.c: 385: }
+                           000279   645 	Sstm8s_flash$FLASH_GetProgrammingTime$130 ==.
+                           000279   646 	XG$FLASH_GetProgrammingTime$0$0 ==.
+      000279 32u00u00         [ 1]  647 	pop	_fp_
+      00027C 32u00u01         [ 1]  648 	pop	_fp_+1
+      00027F 81               [ 4]  649 	ret
+                           000280   650 	Sstm8s_flash$FLASH_GetProgrammingTime$131 ==.
+                           000280   651 	Sstm8s_flash$FLASH_GetBootSize$132 ==.
+                                    652 ;	StdPeriphLib/src/stm8s_flash.c: 392: uint32_t FLASH_GetBootSize(void)
+                                    653 ;	-----------------------------------------
+                                    654 ;	 function FLASH_GetBootSize
+                                    655 ;	-----------------------------------------
+      000280                        656 _FLASH_GetBootSize:
+      000280 3Bu00u01         [ 1]  657 	push	_fp_+1
+      000283 3Bu00u00         [ 1]  658 	push	_fp_
+      000286 90 96            [ 1]  659 	ldw	y, sp
+      000288 90 CFu00u00      [ 2]  660 	ldw	_fp_, y
+                           00028C   661 	Sstm8s_flash$FLASH_GetBootSize$133 ==.
+      00028C 52 04            [ 2]  662 	sub	sp, #4
+                           00028E   663 	Sstm8s_flash$FLASH_GetBootSize$134 ==.
+                                    664 ;	StdPeriphLib/src/stm8s_flash.c: 397: temp = (uint32_t)((uint32_t)FLASH->FPR * (uint32_t)512);
+      00028E AE 50 5D         [ 2]  665 	ldw	x, #0x505d
+      000291 F6               [ 1]  666 	ld	a, (x)
+      000292 5F               [ 1]  667 	clrw	x
+      000293 97               [ 1]  668 	ld	xl, a
+      000294 90 5F            [ 1]  669 	clrw	y
+      000296 A6 09            [ 1]  670 	ld	a, #0x09
+      000298                        671 00108$:
+      000298 58               [ 2]  672 	sllw	x
+      000299 90 59            [ 2]  673 	rlcw	y
+      00029B 4A               [ 1]  674 	dec	a
+      00029C 26 FA            [ 1]  675 	jrne	00108$
+      00029E 17 01            [ 2]  676 	ldw	(0x01, sp), y
+                           0002A0   677 	Sstm8s_flash$FLASH_GetBootSize$135 ==.
+                                    678 ;	StdPeriphLib/src/stm8s_flash.c: 400: if(FLASH->FPR == 0xFF)
+      0002A0 90 AE 50 5D      [ 2]  679 	ldw	y, #0x505d
+      0002A4 90 F6            [ 1]  680 	ld	a, (y)
+      0002A6 A1 FF            [ 1]  681 	cp	a, #0xff
+      0002A8 26 11            [ 1]  682 	jrne	00102$
+                           0002AA   683 	Sstm8s_flash$FLASH_GetBootSize$136 ==.
+                                    684 ;	StdPeriphLib/src/stm8s_flash.c: 402: temp += 512;
+      0002AA 1C 02 00         [ 2]  685 	addw	x, #0x0200
+      0002AD 7B 02            [ 1]  686 	ld	a, (0x02, sp)
+      0002AF A9 00            [ 1]  687 	adc	a, #0x00
+      0002B1 90 97            [ 1]  688 	ld	yl, a
+      0002B3 7B 01            [ 1]  689 	ld	a, (0x01, sp)
+      0002B5 A9 00            [ 1]  690 	adc	a, #0x00
+      0002B7 90 95            [ 1]  691 	ld	yh, a
+      0002B9 17 01            [ 2]  692 	ldw	(0x01, sp), y
+      0002BB                        693 00102$:
+                           0002BB   694 	Sstm8s_flash$FLASH_GetBootSize$137 ==.
+                                    695 ;	StdPeriphLib/src/stm8s_flash.c: 406: return(temp);
+      0002BB 16 01            [ 2]  696 	ldw	y, (0x01, sp)
+                           0002BD   697 	Sstm8s_flash$FLASH_GetBootSize$138 ==.
+                                    698 ;	StdPeriphLib/src/stm8s_flash.c: 407: }
+      0002BD 5B 04            [ 2]  699 	addw	sp, #4
+                           0002BF   700 	Sstm8s_flash$FLASH_GetBootSize$139 ==.
+                           0002BF   701 	XG$FLASH_GetBootSize$0$0 ==.
+      0002BF 32u00u00         [ 1]  702 	pop	_fp_
+      0002C2 32u00u01         [ 1]  703 	pop	_fp_+1
+      0002C5 81               [ 4]  704 	ret
+                           0002C6   705 	Sstm8s_flash$FLASH_GetBootSize$140 ==.
+                           0002C6   706 	Sstm8s_flash$FLASH_GetFlagStatus$141 ==.
+                                    707 ;	StdPeriphLib/src/stm8s_flash.c: 417: FlagStatus FLASH_GetFlagStatus(FLASH_Flag_TypeDef FLASH_FLAG)
+                                    708 ;	-----------------------------------------
+                                    709 ;	 function FLASH_GetFlagStatus
+                                    710 ;	-----------------------------------------
+      0002C6                        711 _FLASH_GetFlagStatus:
+      0002C6 3Bu00u01         [ 1]  712 	push	_fp_+1
+      0002C9 3Bu00u00         [ 1]  713 	push	_fp_
+      0002CC 90 96            [ 1]  714 	ldw	y, sp
+      0002CE 90 CFu00u00      [ 2]  715 	ldw	_fp_, y
+                           0002D2   716 	Sstm8s_flash$FLASH_GetFlagStatus$142 ==.
+                           0002D2   717 	Sstm8s_flash$FLASH_GetFlagStatus$143 ==.
+                                    718 ;	StdPeriphLib/src/stm8s_flash.c: 424: if((FLASH->IAPSR & (uint8_t)FLASH_FLAG) != (uint8_t)RESET)
+      0002D2 AE 50 5F         [ 2]  719 	ldw	x, #0x505f
+      0002D5 F6               [ 1]  720 	ld	a, (x)
+      0002D6 14 05            [ 1]  721 	and	a, (0x05, sp)
+      0002D8 4D               [ 1]  722 	tnz	a
+      0002D9 27 04            [ 1]  723 	jreq	00102$
+                           0002DB   724 	Sstm8s_flash$FLASH_GetFlagStatus$144 ==.
+                                    725 ;	StdPeriphLib/src/stm8s_flash.c: 426: status = SET; /* FLASH_FLAG is set */
+      0002DB A6 01            [ 1]  726 	ld	a, #0x01
+      0002DD 20 01            [ 2]  727 	jra	00103$
+      0002DF                        728 00102$:
+                           0002DF   729 	Sstm8s_flash$FLASH_GetFlagStatus$145 ==.
+                                    730 ;	StdPeriphLib/src/stm8s_flash.c: 430: status = RESET; /* FLASH_FLAG is reset*/
+      0002DF 4F               [ 1]  731 	clr	a
+      0002E0                        732 00103$:
+                           0002E0   733 	Sstm8s_flash$FLASH_GetFlagStatus$146 ==.
+                                    734 ;	StdPeriphLib/src/stm8s_flash.c: 434: return status;
+                           0002E0   735 	Sstm8s_flash$FLASH_GetFlagStatus$147 ==.
+                                    736 ;	StdPeriphLib/src/stm8s_flash.c: 435: }
+                           0002E0   737 	Sstm8s_flash$FLASH_GetFlagStatus$148 ==.
+                           0002E0   738 	XG$FLASH_GetFlagStatus$0$0 ==.
+      0002E0 32u00u00         [ 1]  739 	pop	_fp_
+      0002E3 32u00u01         [ 1]  740 	pop	_fp_+1
+      0002E6 81               [ 4]  741 	ret
+                           0002E7   742 	Sstm8s_flash$FLASH_GetFlagStatus$149 ==.
+                           0002E7   743 	Sstm8s_flash$FLASH_WaitForLastOperation$150 ==.
+                                    744 ;	StdPeriphLib/src/stm8s_flash.c: 549: IN_RAM(FLASH_Status_TypeDef FLASH_WaitForLastOperation(FLASH_MemType_TypeDef FLASH_MemType))
+                                    745 ;	-----------------------------------------
+                                    746 ;	 function FLASH_WaitForLastOperation
+                                    747 ;	-----------------------------------------
+      0002E7                        748 _FLASH_WaitForLastOperation:
+      0002E7 3Bu00u01         [ 1]  749 	push	_fp_+1
+      0002EA 3Bu00u00         [ 1]  750 	push	_fp_
+      0002ED 90 96            [ 1]  751 	ldw	y, sp
+      0002EF 90 CFu00u00      [ 2]  752 	ldw	_fp_, y
+                           0002F3   753 	Sstm8s_flash$FLASH_WaitForLastOperation$151 ==.
+                           0002F3   754 	Sstm8s_flash$FLASH_WaitForLastOperation$152 ==.
+                                    755 ;	StdPeriphLib/src/stm8s_flash.c: 551: uint8_t flagstatus = 0x00;
+      0002F3 4F               [ 1]  756 	clr	a
+                           0002F4   757 	Sstm8s_flash$FLASH_WaitForLastOperation$153 ==.
+                                    758 ;	StdPeriphLib/src/stm8s_flash.c: 557: if(FLASH_MemType == FLASH_MEMTYPE_PROG)
+      0002F4 88               [ 1]  759 	push	a
+      0002F5 7B 06            [ 1]  760 	ld	a, (0x06, sp)
+      0002F7 A1 FD            [ 1]  761 	cp	a, #0xfd
+      0002F9 84               [ 1]  762 	pop	a
+      0002FA 26 14            [ 1]  763 	jrne	00121$
+                           0002FC   764 	Sstm8s_flash$FLASH_WaitForLastOperation$154 ==.
+                                    765 ;	StdPeriphLib/src/stm8s_flash.c: 559: while((flagstatus == 0x00) && (timeout != 0x00))
+      0002FC AE FF FF         [ 2]  766 	ldw	x, #0xffff
+      0002FF                        767 00102$:
+      0002FF 4D               [ 1]  768 	tnz	a
+      000300 26 22            [ 1]  769 	jrne	00123$
+      000302 5D               [ 2]  770 	tnzw	x
+      000303 27 1F            [ 1]  771 	jreq	00123$
+                           000305   772 	Sstm8s_flash$FLASH_WaitForLastOperation$155 ==.
+                                    773 ;	StdPeriphLib/src/stm8s_flash.c: 561: flagstatus = (uint8_t)(FLASH->IAPSR & (uint8_t)(FLASH_IAPSR_EOP |
+      000305 90 AE 50 5F      [ 2]  774 	ldw	y, #0x505f
+      000309 90 F6            [ 1]  775 	ld	a, (y)
+      00030B A4 05            [ 1]  776 	and	a, #0x05
+                           00030D   777 	Sstm8s_flash$FLASH_WaitForLastOperation$156 ==.
+                                    778 ;	StdPeriphLib/src/stm8s_flash.c: 563: timeout--;
+      00030D 5A               [ 2]  779 	decw	x
+      00030E 20 EF            [ 2]  780 	jra	00102$
+                           000310   781 	Sstm8s_flash$FLASH_WaitForLastOperation$157 ==.
+                                    782 ;	StdPeriphLib/src/stm8s_flash.c: 568: while((flagstatus == 0x00) && (timeout != 0x00))
+      000310                        783 00121$:
+      000310 AE FF FF         [ 2]  784 	ldw	x, #0xffff
+      000313                        785 00106$:
+      000313 4D               [ 1]  786 	tnz	a
+      000314 26 10            [ 1]  787 	jrne	00124$
+      000316 5D               [ 2]  788 	tnzw	x
+      000317 27 0D            [ 1]  789 	jreq	00124$
+                           000319   790 	Sstm8s_flash$FLASH_WaitForLastOperation$158 ==.
+                                    791 ;	StdPeriphLib/src/stm8s_flash.c: 570: flagstatus = (uint8_t)(FLASH->IAPSR & (uint8_t)(FLASH_IAPSR_HVOFF |
+      000319 90 AE 50 5F      [ 2]  792 	ldw	y, #0x505f
+      00031D 90 F6            [ 1]  793 	ld	a, (y)
+      00031F A4 41            [ 1]  794 	and	a, #0x41
+                           000321   795 	Sstm8s_flash$FLASH_WaitForLastOperation$159 ==.
+                                    796 ;	StdPeriphLib/src/stm8s_flash.c: 572: timeout--;
+      000321 5A               [ 2]  797 	decw	x
+      000322 20 EF            [ 2]  798 	jra	00106$
+      000324                        799 00123$:
+                           000324   800 	Sstm8s_flash$FLASH_WaitForLastOperation$160 ==.
+                                    801 ;	StdPeriphLib/src/stm8s_flash.c: 589: return((FLASH_Status_TypeDef)flagstatus);
+      000324 20 00            [ 2]  802 	jra	00111$
+                           000326   803 	Sstm8s_flash$FLASH_WaitForLastOperation$161 ==.
+                                    804 ;	StdPeriphLib/src/stm8s_flash.c: 572: timeout--;
+      000326                        805 00124$:
+      000326                        806 00111$:
+                           000326   807 	Sstm8s_flash$FLASH_WaitForLastOperation$162 ==.
+                                    808 ;	StdPeriphLib/src/stm8s_flash.c: 584: if(timeout == 0x00 )
+      000326 5D               [ 2]  809 	tnzw	x
+      000327 26 02            [ 1]  810 	jrne	00113$
+                           000329   811 	Sstm8s_flash$FLASH_WaitForLastOperation$163 ==.
+                                    812 ;	StdPeriphLib/src/stm8s_flash.c: 586: flagstatus = FLASH_STATUS_TIMEOUT;
+      000329 A6 02            [ 1]  813 	ld	a, #0x02
+      00032B                        814 00113$:
+                           00032B   815 	Sstm8s_flash$FLASH_WaitForLastOperation$164 ==.
+                                    816 ;	StdPeriphLib/src/stm8s_flash.c: 589: return((FLASH_Status_TypeDef)flagstatus);
+                           00032B   817 	Sstm8s_flash$FLASH_WaitForLastOperation$165 ==.
+                                    818 ;	StdPeriphLib/src/stm8s_flash.c: 590: }
+                           00032B   819 	Sstm8s_flash$FLASH_WaitForLastOperation$166 ==.
+                           00032B   820 	XG$FLASH_WaitForLastOperation$0$0 ==.
+      00032B 32u00u00         [ 1]  821 	pop	_fp_
+      00032E 32u00u01         [ 1]  822 	pop	_fp_+1
+      000331 81               [ 4]  823 	ret
+                           000332   824 	Sstm8s_flash$FLASH_WaitForLastOperation$167 ==.
+                           000332   825 	Sstm8s_flash$FLASH_EraseBlock$168 ==.
+                                    826 ;	StdPeriphLib/src/stm8s_flash.c: 599: IN_RAM(void FLASH_EraseBlock(uint16_t BlockNum, FLASH_MemType_TypeDef FLASH_MemType))
+                                    827 ;	-----------------------------------------
+                                    828 ;	 function FLASH_EraseBlock
+                                    829 ;	-----------------------------------------
+      000332                        830 _FLASH_EraseBlock:
+      000332 3Bu00u01         [ 1]  831 	push	_fp_+1
+      000335 3Bu00u00         [ 1]  832 	push	_fp_
+      000338 90 96            [ 1]  833 	ldw	y, sp
+      00033A 90 CFu00u00      [ 2]  834 	ldw	_fp_, y
+                           00033E   835 	Sstm8s_flash$FLASH_EraseBlock$169 ==.
+      00033E 52 06            [ 2]  836 	sub	sp, #6
+                           000340   837 	Sstm8s_flash$FLASH_EraseBlock$170 ==.
+                                    838 ;	StdPeriphLib/src/stm8s_flash.c: 612: if(FLASH_MemType == FLASH_MEMTYPE_PROG)
+      000340 7B 0D            [ 1]  839 	ld	a, (0x0d, sp)
+      000342 A1 FD            [ 1]  840 	cp	a, #0xfd
+      000344 26 0A            [ 1]  841 	jrne	00102$
+                           000346   842 	Sstm8s_flash$FLASH_EraseBlock$171 ==.
+                                    843 ;	StdPeriphLib/src/stm8s_flash.c: 615: startaddress = FLASH_PROG_START_PHYSICAL_ADDRESS;
+      000346 AE 80 00         [ 2]  844 	ldw	x, #0x8000
+      000349 1F 05            [ 2]  845 	ldw	(0x05, sp), x
+      00034B 5F               [ 1]  846 	clrw	x
+      00034C 1F 03            [ 2]  847 	ldw	(0x03, sp), x
+      00034E 20 08            [ 2]  848 	jra	00103$
+      000350                        849 00102$:
+                           000350   850 	Sstm8s_flash$FLASH_EraseBlock$172 ==.
+                                    851 ;	StdPeriphLib/src/stm8s_flash.c: 620: startaddress = FLASH_DATA_START_PHYSICAL_ADDRESS;
+      000350 AE 40 00         [ 2]  852 	ldw	x, #0x4000
+      000353 1F 05            [ 2]  853 	ldw	(0x05, sp), x
+      000355 5F               [ 1]  854 	clrw	x
+      000356 1F 03            [ 2]  855 	ldw	(0x03, sp), x
+      000358                        856 00103$:
+                           000358   857 	Sstm8s_flash$FLASH_EraseBlock$173 ==.
+                                    858 ;	StdPeriphLib/src/stm8s_flash.c: 628: pwFlash = (PointerAttr uint32_t *)(MemoryAddressCast)(startaddress + ((uint32_t)BlockNum * FLASH_BLOCK_SIZE));
+      000358 16 0B            [ 2]  859 	ldw	y, (0x0b, sp)
+      00035A 5F               [ 1]  860 	clrw	x
+      00035B A6 07            [ 1]  861 	ld	a, #0x07
+      00035D                        862 00112$:
+      00035D 90 58            [ 2]  863 	sllw	y
+      00035F 59               [ 2]  864 	rlcw	x
+      000360 4A               [ 1]  865 	dec	a
+      000361 26 FA            [ 1]  866 	jrne	00112$
+      000363 72 F9 05         [ 2]  867 	addw	y, (0x05, sp)
+      000366 9F               [ 1]  868 	ld	a, xl
+      000367 19 04            [ 1]  869 	adc	a, (0x04, sp)
+      000369 02               [ 1]  870 	rlwa	x
+      00036A 19 03            [ 1]  871 	adc	a, (0x03, sp)
+      00036C 17 01            [ 2]  872 	ldw	(0x01, sp), y
+                           00036E   873 	Sstm8s_flash$FLASH_EraseBlock$174 ==.
+                                    874 ;	StdPeriphLib/src/stm8s_flash.c: 632: FLASH->CR2 |= FLASH_CR2_ERASE;
+      00036E AE 50 5B         [ 2]  875 	ldw	x, #0x505b
+      000371 F6               [ 1]  876 	ld	a, (x)
+      000372 AA 20            [ 1]  877 	or	a, #0x20
+      000374 F7               [ 1]  878 	ld	(x), a
+                           000375   879 	Sstm8s_flash$FLASH_EraseBlock$175 ==.
+                                    880 ;	StdPeriphLib/src/stm8s_flash.c: 633: FLASH->NCR2 &= (uint8_t)(~FLASH_NCR2_NERASE);
+      000375 AE 50 5C         [ 2]  881 	ldw	x, #0x505c
+      000378 F6               [ 1]  882 	ld	a, (x)
+      000379 A4 DF            [ 1]  883 	and	a, #0xdf
+      00037B F7               [ 1]  884 	ld	(x), a
+                           00037C   885 	Sstm8s_flash$FLASH_EraseBlock$176 ==.
+                                    886 ;	StdPeriphLib/src/stm8s_flash.c: 637: *pwFlash = (uint32_t)0;
+      00037C 1E 01            [ 2]  887 	ldw	x, (0x01, sp)
+      00037E 6F 03            [ 1]  888 	clr	(0x3, x)
+      000380 6F 02            [ 1]  889 	clr	(0x2, x)
+      000382 6F 01            [ 1]  890 	clr	(0x1, x)
+      000384 7F               [ 1]  891 	clr	(x)
+                           000385   892 	Sstm8s_flash$FLASH_EraseBlock$177 ==.
+                                    893 ;	StdPeriphLib/src/stm8s_flash.c: 645: }
+      000385 5B 06            [ 2]  894 	addw	sp, #6
+                           000387   895 	Sstm8s_flash$FLASH_EraseBlock$178 ==.
+                           000387   896 	XG$FLASH_EraseBlock$0$0 ==.
+      000387 32u00u00         [ 1]  897 	pop	_fp_
+      00038A 32u00u01         [ 1]  898 	pop	_fp_+1
+      00038D 81               [ 4]  899 	ret
+                           00038E   900 	Sstm8s_flash$FLASH_EraseBlock$179 ==.
+                           00038E   901 	Sstm8s_flash$FLASH_ProgramBlock$180 ==.
+                                    902 ;	StdPeriphLib/src/stm8s_flash.c: 656: IN_RAM(void FLASH_ProgramBlock(uint16_t BlockNum, FLASH_MemType_TypeDef FLASH_MemType,
+                                    903 ;	-----------------------------------------
+                                    904 ;	 function FLASH_ProgramBlock
+                                    905 ;	-----------------------------------------
+      00038E                        906 _FLASH_ProgramBlock:
+      00038E 3Bu00u01         [ 1]  907 	push	_fp_+1
+      000391 3Bu00u00         [ 1]  908 	push	_fp_
+      000394 90 96            [ 1]  909 	ldw	y, sp
+      000396 90 CFu00u00      [ 2]  910 	ldw	_fp_, y
+                           00039A   911 	Sstm8s_flash$FLASH_ProgramBlock$181 ==.
+      00039A 52 12            [ 2]  912 	sub	sp, #18
+                           00039C   913 	Sstm8s_flash$FLASH_ProgramBlock$182 ==.
+                                    914 ;	StdPeriphLib/src/stm8s_flash.c: 665: if(FLASH_MemType == FLASH_MEMTYPE_PROG)
+      00039C 7B 19            [ 1]  915 	ld	a, (0x19, sp)
+      00039E A1 FD            [ 1]  916 	cp	a, #0xfd
+      0003A0 26 0A            [ 1]  917 	jrne	00102$
+                           0003A2   918 	Sstm8s_flash$FLASH_ProgramBlock$183 ==.
+                                    919 ;	StdPeriphLib/src/stm8s_flash.c: 668: startaddress = FLASH_PROG_START_PHYSICAL_ADDRESS;
+      0003A2 AE 80 00         [ 2]  920 	ldw	x, #0x8000
+      0003A5 1F 03            [ 2]  921 	ldw	(0x03, sp), x
+      0003A7 5F               [ 1]  922 	clrw	x
+      0003A8 1F 01            [ 2]  923 	ldw	(0x01, sp), x
+      0003AA 20 08            [ 2]  924 	jra	00103$
+      0003AC                        925 00102$:
+                           0003AC   926 	Sstm8s_flash$FLASH_ProgramBlock$184 ==.
+                                    927 ;	StdPeriphLib/src/stm8s_flash.c: 673: startaddress = FLASH_DATA_START_PHYSICAL_ADDRESS;
+      0003AC AE 40 00         [ 2]  928 	ldw	x, #0x4000
+      0003AF 1F 03            [ 2]  929 	ldw	(0x03, sp), x
+      0003B1 5F               [ 1]  930 	clrw	x
+      0003B2 1F 01            [ 2]  931 	ldw	(0x01, sp), x
+      0003B4                        932 00103$:
+                           0003B4   933 	Sstm8s_flash$FLASH_ProgramBlock$185 ==.
+                                    934 ;	StdPeriphLib/src/stm8s_flash.c: 677: startaddress = startaddress + ((uint32_t)BlockNum * FLASH_BLOCK_SIZE);
+      0003B4 16 17            [ 2]  935 	ldw	y, (0x17, sp)
+      0003B6 17 0D            [ 2]  936 	ldw	(0x0d, sp), y
+      0003B8 0F 0C            [ 1]  937 	clr	(0x0c, sp)
+      0003BA 0F 0B            [ 1]  938 	clr	(0x0b, sp)
+      0003BC 16 0B            [ 2]  939 	ldw	y, (0x0b, sp)
+      0003BE 17 07            [ 2]  940 	ldw	(0x07, sp), y
+      0003C0 1E 0D            [ 2]  941 	ldw	x, (0x0d, sp)
+      0003C2 A6 07            [ 1]  942 	ld	a, #0x07
+      0003C4                        943 00125$:
+      0003C4 58               [ 2]  944 	sllw	x
+      0003C5 09 08            [ 1]  945 	rlc	(0x08, sp)
+      0003C7 09 07            [ 1]  946 	rlc	(0x07, sp)
+      0003C9 4A               [ 1]  947 	dec	a
+      0003CA 26 F8            [ 1]  948 	jrne	00125$
+      0003CC 1F 09            [ 2]  949 	ldw	(0x09, sp), x
+      0003CE 1E 03            [ 2]  950 	ldw	x, (0x03, sp)
+      0003D0 72 FB 09         [ 2]  951 	addw	x, (0x09, sp)
+      0003D3 1F 11            [ 2]  952 	ldw	(0x11, sp), x
+      0003D5 7B 02            [ 1]  953 	ld	a, (0x02, sp)
+      0003D7 19 08            [ 1]  954 	adc	a, (0x08, sp)
+      0003D9 6B 10            [ 1]  955 	ld	(0x10, sp), a
+      0003DB 7B 01            [ 1]  956 	ld	a, (0x01, sp)
+      0003DD 19 07            [ 1]  957 	adc	a, (0x07, sp)
+      0003DF 6B 0F            [ 1]  958 	ld	(0x0f, sp), a
+      0003E1 16 11            [ 2]  959 	ldw	y, (0x11, sp)
+      0003E3 17 03            [ 2]  960 	ldw	(0x03, sp), y
+      0003E5 16 0F            [ 2]  961 	ldw	y, (0x0f, sp)
+      0003E7 17 01            [ 2]  962 	ldw	(0x01, sp), y
+                           0003E9   963 	Sstm8s_flash$FLASH_ProgramBlock$186 ==.
+                                    964 ;	StdPeriphLib/src/stm8s_flash.c: 680: if(FLASH_ProgMode == FLASH_PROGRAMMODE_STANDARD)
+      0003E9 0D 1A            [ 1]  965 	tnz	(0x1a, sp)
+      0003EB 26 0D            [ 1]  966 	jrne	00105$
+                           0003ED   967 	Sstm8s_flash$FLASH_ProgramBlock$187 ==.
+                                    968 ;	StdPeriphLib/src/stm8s_flash.c: 683: FLASH->CR2 |= FLASH_CR2_PRG;
+      0003ED 72 10 50 5B      [ 1]  969 	bset	0x505b, #0
+                           0003F1   970 	Sstm8s_flash$FLASH_ProgramBlock$188 ==.
+                                    971 ;	StdPeriphLib/src/stm8s_flash.c: 684: FLASH->NCR2 &= (uint8_t)(~FLASH_NCR2_NPRG);
+      0003F1 AE 50 5C         [ 2]  972 	ldw	x, #0x505c
+      0003F4 F6               [ 1]  973 	ld	a, (x)
+      0003F5 A4 FE            [ 1]  974 	and	a, #0xfe
+      0003F7 F7               [ 1]  975 	ld	(x), a
+      0003F8 20 0E            [ 2]  976 	jra	00114$
+      0003FA                        977 00105$:
+                           0003FA   978 	Sstm8s_flash$FLASH_ProgramBlock$189 ==.
+                                    979 ;	StdPeriphLib/src/stm8s_flash.c: 689: FLASH->CR2 |= FLASH_CR2_FPRG;
+      0003FA AE 50 5B         [ 2]  980 	ldw	x, #0x505b
+      0003FD F6               [ 1]  981 	ld	a, (x)
+      0003FE AA 10            [ 1]  982 	or	a, #0x10
+      000400 F7               [ 1]  983 	ld	(x), a
+                           000401   984 	Sstm8s_flash$FLASH_ProgramBlock$190 ==.
+                                    985 ;	StdPeriphLib/src/stm8s_flash.c: 690: FLASH->NCR2 &= (uint8_t)(~FLASH_NCR2_NFPRG);
+      000401 AE 50 5C         [ 2]  986 	ldw	x, #0x505c
+      000404 F6               [ 1]  987 	ld	a, (x)
+      000405 A4 EF            [ 1]  988 	and	a, #0xef
+      000407 F7               [ 1]  989 	ld	(x), a
+                           000408   990 	Sstm8s_flash$FLASH_ProgramBlock$191 ==.
+                                    991 ;	StdPeriphLib/src/stm8s_flash.c: 694: for(Count = 0; Count < FLASH_BLOCK_SIZE; Count++)
+      000408                        992 00114$:
+      000408 5F               [ 1]  993 	clrw	x
+      000409 1F 05            [ 2]  994 	ldw	(0x05, sp), x
+      00040B                        995 00108$:
+                           00040B   996 	Sstm8s_flash$FLASH_ProgramBlock$192 ==.
+                                    997 ;	StdPeriphLib/src/stm8s_flash.c: 696: *((PointerAttr uint8_t*) (MemoryAddressCast)startaddress + Count) = ((uint8_t)(Buffer[Count]));
+      00040B 1E 03            [ 2]  998 	ldw	x, (0x03, sp)
+      00040D 72 FB 05         [ 2]  999 	addw	x, (0x05, sp)
+      000410 16 1B            [ 2] 1000 	ldw	y, (0x1b, sp)
+      000412 72 F9 05         [ 2] 1001 	addw	y, (0x05, sp)
+      000415 90 F6            [ 1] 1002 	ld	a, (y)
+      000417 F7               [ 1] 1003 	ld	(x), a
+                           000418  1004 	Sstm8s_flash$FLASH_ProgramBlock$193 ==.
+                                   1005 ;	StdPeriphLib/src/stm8s_flash.c: 694: for(Count = 0; Count < FLASH_BLOCK_SIZE; Count++)
+      000418 1E 05            [ 2] 1006 	ldw	x, (0x05, sp)
+      00041A 5C               [ 2] 1007 	incw	x
+      00041B 1F 05            [ 2] 1008 	ldw	(0x05, sp), x
+      00041D 1E 05            [ 2] 1009 	ldw	x, (0x05, sp)
+      00041F A3 00 80         [ 2] 1010 	cpw	x, #0x0080
+      000422 25 E7            [ 1] 1011 	jrc	00108$
+                           000424  1012 	Sstm8s_flash$FLASH_ProgramBlock$194 ==.
+                                   1013 ;	StdPeriphLib/src/stm8s_flash.c: 698: }
+      000424 5B 12            [ 2] 1014 	addw	sp, #18
+                           000426  1015 	Sstm8s_flash$FLASH_ProgramBlock$195 ==.
+                           000426  1016 	XG$FLASH_ProgramBlock$0$0 ==.
+      000426 32u00u00         [ 1] 1017 	pop	_fp_
+      000429 32u00u01         [ 1] 1018 	pop	_fp_+1
+      00042C 81               [ 4] 1019 	ret
+                           00042D  1020 	Sstm8s_flash$FLASH_ProgramBlock$196 ==.
+                                   1021 	.area CODE
+                                   1022 	.area INITIALIZER
+                                   1023 	.area CABS (ABS)
+                                   1024 
+                                   1025 	.area .debug_line (NOLOAD)
+      000000 00 00 05 32           1026 	.dw	0,Ldebug_line_end-Ldebug_line_start
+      000004                       1027 Ldebug_line_start:
+      000004 00 02                 1028 	.dw	2
+      000006 00 00 01 1A           1029 	.dw	0,Ldebug_line_stmt-6-Ldebug_line_start
+      00000A 01                    1030 	.db	1
+      00000B 01                    1031 	.db	1
+      00000C FB                    1032 	.db	-5
+      00000D 0F                    1033 	.db	15
+      00000E 0A                    1034 	.db	10
+      00000F 00                    1035 	.db	0
+      000010 01                    1036 	.db	1
+      000011 01                    1037 	.db	1
+      000012 01                    1038 	.db	1
+      000013 01                    1039 	.db	1
+      000014 00                    1040 	.db	0
+      000015 00                    1041 	.db	0
+      000016 00                    1042 	.db	0
+      000017 01                    1043 	.db	1
+      000018 2F 68 6F 6D 65 2F 63  1044 	.ascii "/home/cas/software/stm8-binutils/bin/../share/sdcc/include/stm8"
+             61 73 2F 73 6F 66 74
+             77 61 72 65 2F 73 74
+             6D 38 2D 62 69 6E 75
+             74 69 6C 73 2F 62 69
+             6E 2F 2E 2E 2F 73 68
+             61 72 65 2F 73 64 63
+             63 2F 69 6E 63 6C 75
+             64 65 2F 73 74 6D 38
+      000057 00                    1045 	.db	0
+      000058 2F 68 6F 6D 65 2F 63  1046 	.ascii "/home/cas/software/stm8-binutils/share/sdcc/include/stm8"
+             61 73 2F 73 6F 66 74
+             77 61 72 65 2F 73 74
+             6D 38 2D 62 69 6E 75
+             74 69 6C 73 2F 73 68
+             61 72 65 2F 73 64 63
+             63 2F 69 6E 63 6C 75
+             64 65 2F 73 74 6D 38
+      000090 00                    1047 	.db	0
+      000091 2F 68 6F 6D 65 2F 63  1048 	.ascii "/home/cas/software/stm8-binutils/bin/../share/sdcc/include"
+             61 73 2F 73 6F 66 74
+             77 61 72 65 2F 73 74
+             6D 38 2D 62 69 6E 75
+             74 69 6C 73 2F 62 69
+             6E 2F 2E 2E 2F 73 68
+             61 72 65 2F 73 64 63
+             63 2F 69 6E 63 6C 75
+             64 65
+      0000CB 00                    1049 	.db	0
+      0000CC 2F 68 6F 6D 65 2F 63  1050 	.ascii "/home/cas/software/stm8-binutils/share/sdcc/include"
+             61 73 2F 73 6F 66 74
+             77 61 72 65 2F 73 74
+             6D 38 2D 62 69 6E 75
+             74 69 6C 73 2F 73 68
+             61 72 65 2F 73 64 63
+             63 2F 69 6E 63 6C 75
+             64 65
+      0000FF 00                    1051 	.db	0
+      000100 00                    1052 	.db	0
+      000101 53 74 64 50 65 72 69  1053 	.ascii "StdPeriphLib/src/stm8s_flash.c"
+             70 68 4C 69 62 2F 73
+             72 63 2F 73 74 6D 38
+             73 5F 66 6C 61 73 68
+             2E 63
+      00011F 00                    1054 	.db	0
+      000120 00                    1055 	.uleb128	0
+      000121 00                    1056 	.uleb128	0
+      000122 00                    1057 	.uleb128	0
+      000123 00                    1058 	.db	0
+      000124                       1059 Ldebug_line_stmt:
+      000124 00                    1060 	.db	0
+      000125 05                    1061 	.uleb128	5
+      000126 02                    1062 	.db	2
+      000127 00 00r00r00           1063 	.dw	0,(Sstm8s_flash$FLASH_Unlock$0)
+      00012B 03                    1064 	.db	3
+      00012C D6 00                 1065 	.sleb128	86
+      00012E 01                    1066 	.db	1
+      00012F 09                    1067 	.db	9
+      000130 00 0C                 1068 	.dw	Sstm8s_flash$FLASH_Unlock$2-Sstm8s_flash$FLASH_Unlock$0
+      000132 03                    1069 	.db	3
+      000133 06                    1070 	.sleb128	6
+      000134 01                    1071 	.db	1
+      000135 09                    1072 	.db	9
+      000136 00 06                 1073 	.dw	Sstm8s_flash$FLASH_Unlock$3-Sstm8s_flash$FLASH_Unlock$2
+      000138 03                    1074 	.db	3
+      000139 02                    1075 	.sleb128	2
+      00013A 01                    1076 	.db	1
+      00013B 09                    1077 	.db	9
+      00013C 00 04                 1078 	.dw	Sstm8s_flash$FLASH_Unlock$4-Sstm8s_flash$FLASH_Unlock$3
+      00013E 03                    1079 	.db	3
+      00013F 01                    1080 	.sleb128	1
+      000140 01                    1081 	.db	1
+      000141 09                    1082 	.db	9
+      000142 00 06                 1083 	.dw	Sstm8s_flash$FLASH_Unlock$5-Sstm8s_flash$FLASH_Unlock$4
+      000144 03                    1084 	.db	3
+      000145 05                    1085 	.sleb128	5
+      000146 01                    1086 	.db	1
+      000147 09                    1087 	.db	9
+      000148 00 04                 1088 	.dw	Sstm8s_flash$FLASH_Unlock$6-Sstm8s_flash$FLASH_Unlock$5
+      00014A 03                    1089 	.db	3
+      00014B 01                    1090 	.sleb128	1
+      00014C 01                    1091 	.db	1
+      00014D 09                    1092 	.db	9
+      00014E 00 04                 1093 	.dw	Sstm8s_flash$FLASH_Unlock$7-Sstm8s_flash$FLASH_Unlock$6
+      000150 03                    1094 	.db	3
+      000151 02                    1095 	.sleb128	2
+      000152 01                    1096 	.db	1
+      000153 09                    1097 	.db	9
+      000154 00 07                 1098 	.dw	7+Sstm8s_flash$FLASH_Unlock$8-Sstm8s_flash$FLASH_Unlock$7
+      000156 00                    1099 	.db	0
+      000157 01                    1100 	.uleb128	1
+      000158 01                    1101 	.db	1
+      000159 00                    1102 	.db	0
+      00015A 05                    1103 	.uleb128	5
+      00015B 02                    1104 	.db	2
+      00015C 00 00r00r2B           1105 	.dw	0,(Sstm8s_flash$FLASH_Lock$10)
+      000160 03                    1106 	.db	3
+      000161 EF 00                 1107 	.sleb128	111
+      000163 01                    1108 	.db	1
+      000164 09                    1109 	.db	9
+      000165 00 0C                 1110 	.dw	Sstm8s_flash$FLASH_Lock$12-Sstm8s_flash$FLASH_Lock$10
+      000167 03                    1111 	.db	3
+      000168 06                    1112 	.sleb128	6
+      000169 01                    1113 	.db	1
+      00016A 09                    1114 	.db	9
+      00016B 00 0A                 1115 	.dw	Sstm8s_flash$FLASH_Lock$13-Sstm8s_flash$FLASH_Lock$12
+      00016D 03                    1116 	.db	3
+      00016E 01                    1117 	.sleb128	1
+      00016F 01                    1118 	.db	1
+      000170 09                    1119 	.db	9
+      000171 00 07                 1120 	.dw	7+Sstm8s_flash$FLASH_Lock$14-Sstm8s_flash$FLASH_Lock$13
+      000173 00                    1121 	.db	0
+      000174 01                    1122 	.uleb128	1
+      000175 01                    1123 	.db	1
+      000176 00                    1124 	.db	0
+      000177 05                    1125 	.uleb128	5
+      000178 02                    1126 	.db	2
+      000179 00 00r00r48           1127 	.dw	0,(Sstm8s_flash$FLASH_DeInit$16)
+      00017D 03                    1128 	.db	3
+      00017E FD 00                 1129 	.sleb128	125
+      000180 01                    1130 	.db	1
+      000181 09                    1131 	.db	9
+      000182 00 0C                 1132 	.dw	Sstm8s_flash$FLASH_DeInit$18-Sstm8s_flash$FLASH_DeInit$16
+      000184 03                    1133 	.db	3
+      000185 02                    1134 	.sleb128	2
+      000186 01                    1135 	.db	1
+      000187 09                    1136 	.db	9
+      000188 00 04                 1137 	.dw	Sstm8s_flash$FLASH_DeInit$19-Sstm8s_flash$FLASH_DeInit$18
+      00018A 03                    1138 	.db	3
+      00018B 01                    1139 	.sleb128	1
+      00018C 01                    1140 	.db	1
+      00018D 09                    1141 	.db	9
+      00018E 00 04                 1142 	.dw	Sstm8s_flash$FLASH_DeInit$20-Sstm8s_flash$FLASH_DeInit$19
+      000190 03                    1143 	.db	3
+      000191 01                    1144 	.sleb128	1
+      000192 01                    1145 	.db	1
+      000193 09                    1146 	.db	9
+      000194 00 04                 1147 	.dw	Sstm8s_flash$FLASH_DeInit$21-Sstm8s_flash$FLASH_DeInit$20
+      000196 03                    1148 	.db	3
+      000197 01                    1149 	.sleb128	1
+      000198 01                    1150 	.db	1
+      000199 09                    1151 	.db	9
+      00019A 00 07                 1152 	.dw	Sstm8s_flash$FLASH_DeInit$22-Sstm8s_flash$FLASH_DeInit$21
+      00019C 03                    1153 	.db	3
+      00019D 01                    1154 	.sleb128	1
+      00019E 01                    1155 	.db	1
+      00019F 09                    1156 	.db	9
+      0001A0 00 07                 1157 	.dw	Sstm8s_flash$FLASH_DeInit$23-Sstm8s_flash$FLASH_DeInit$22
+      0001A2 03                    1158 	.db	3
+      0001A3 01                    1159 	.sleb128	1
+      0001A4 01                    1160 	.db	1
+      0001A5 09                    1161 	.db	9
+      0001A6 00 04                 1162 	.dw	Sstm8s_flash$FLASH_DeInit$24-Sstm8s_flash$FLASH_DeInit$23
+      0001A8 03                    1163 	.db	3
+      0001A9 01                    1164 	.sleb128	1
+      0001AA 01                    1165 	.db	1
+      0001AB 09                    1166 	.db	9
+      0001AC 00 07                 1167 	.dw	7+Sstm8s_flash$FLASH_DeInit$25-Sstm8s_flash$FLASH_DeInit$24
+      0001AE 00                    1168 	.db	0
+      0001AF 01                    1169 	.uleb128	1
+      0001B0 01                    1170 	.db	1
+      0001B1 00                    1171 	.db	0
+      0001B2 05                    1172 	.uleb128	5
+      0001B3 02                    1173 	.db	2
+      0001B4 00 00r00r79           1174 	.dw	0,(Sstm8s_flash$FLASH_ITConfig$27)
+      0001B8 03                    1175 	.db	3
+      0001B9 8D 01                 1176 	.sleb128	141
+      0001BB 01                    1177 	.db	1
+      0001BC 09                    1178 	.db	9
+      0001BD 00 0C                 1179 	.dw	Sstm8s_flash$FLASH_ITConfig$29-Sstm8s_flash$FLASH_ITConfig$27
+      0001BF 03                    1180 	.db	3
+      0001C0 05                    1181 	.sleb128	5
+      0001C1 01                    1182 	.db	1
+      0001C2 09                    1183 	.db	9
+      0001C3 00 04                 1184 	.dw	Sstm8s_flash$FLASH_ITConfig$30-Sstm8s_flash$FLASH_ITConfig$29
+      0001C5 03                    1185 	.db	3
+      0001C6 02                    1186 	.sleb128	2
+      0001C7 01                    1187 	.db	1
+      0001C8 09                    1188 	.db	9
+      0001C9 00 09                 1189 	.dw	Sstm8s_flash$FLASH_ITConfig$31-Sstm8s_flash$FLASH_ITConfig$30
+      0001CB 03                    1190 	.db	3
+      0001CC 04                    1191 	.sleb128	4
+      0001CD 01                    1192 	.db	1
+      0001CE 09                    1193 	.db	9
+      0001CF 00 07                 1194 	.dw	Sstm8s_flash$FLASH_ITConfig$32-Sstm8s_flash$FLASH_ITConfig$31
+      0001D1 03                    1195 	.db	3
+      0001D2 02                    1196 	.sleb128	2
+      0001D3 01                    1197 	.db	1
+      0001D4 09                    1198 	.db	9
+      0001D5 00 07                 1199 	.dw	7+Sstm8s_flash$FLASH_ITConfig$33-Sstm8s_flash$FLASH_ITConfig$32
+      0001D7 00                    1200 	.db	0
+      0001D8 01                    1201 	.uleb128	1
+      0001D9 01                    1202 	.db	1
+      0001DA 00                    1203 	.db	0
+      0001DB 05                    1204 	.uleb128	5
+      0001DC 02                    1205 	.db	2
+      0001DD 00 00r00rA0           1206 	.dw	0,(Sstm8s_flash$FLASH_EraseByte$35)
+      0001E1 03                    1207 	.db	3
+      0001E2 A3 01                 1208 	.sleb128	163
+      0001E4 01                    1209 	.db	1
+      0001E5 09                    1210 	.db	9
+      0001E6 00 0C                 1211 	.dw	Sstm8s_flash$FLASH_EraseByte$37-Sstm8s_flash$FLASH_EraseByte$35
+      0001E8 03                    1212 	.db	3
+      0001E9 06                    1213 	.sleb128	6
+      0001EA 01                    1214 	.db	1
+      0001EB 09                    1215 	.db	9
+      0001EC 00 03                 1216 	.dw	Sstm8s_flash$FLASH_EraseByte$38-Sstm8s_flash$FLASH_EraseByte$37
+      0001EE 03                    1217 	.db	3
+      0001EF 01                    1218 	.sleb128	1
+      0001F0 01                    1219 	.db	1
+      0001F1 09                    1220 	.db	9
+      0001F2 00 07                 1221 	.dw	7+Sstm8s_flash$FLASH_EraseByte$39-Sstm8s_flash$FLASH_EraseByte$38
+      0001F4 00                    1222 	.db	0
+      0001F5 01                    1223 	.uleb128	1
+      0001F6 01                    1224 	.db	1
+      0001F7 00                    1225 	.db	0
+      0001F8 05                    1226 	.uleb128	5
+      0001F9 02                    1227 	.db	2
+      0001FA 00 00r00rB6           1228 	.dw	0,(Sstm8s_flash$FLASH_ProgramByte$41)
+      0001FE 03                    1229 	.db	3
+      0001FF B4 01                 1230 	.sleb128	180
+      000201 01                    1231 	.db	1
+      000202 09                    1232 	.db	9
+      000203 00 0C                 1233 	.dw	Sstm8s_flash$FLASH_ProgramByte$43-Sstm8s_flash$FLASH_ProgramByte$41
+      000205 03                    1234 	.db	3
+      000206 04                    1235 	.sleb128	4
+      000207 01                    1236 	.db	1
+      000208 09                    1237 	.db	9
+      000209 00 05                 1238 	.dw	Sstm8s_flash$FLASH_ProgramByte$44-Sstm8s_flash$FLASH_ProgramByte$43
+      00020B 03                    1239 	.db	3
+      00020C 01                    1240 	.sleb128	1
+      00020D 01                    1241 	.db	1
+      00020E 09                    1242 	.db	9
+      00020F 00 07                 1243 	.dw	7+Sstm8s_flash$FLASH_ProgramByte$45-Sstm8s_flash$FLASH_ProgramByte$44
+      000211 00                    1244 	.db	0
+      000212 01                    1245 	.uleb128	1
+      000213 01                    1246 	.db	1
+      000214 00                    1247 	.db	0
+      000215 05                    1248 	.uleb128	5
+      000216 02                    1249 	.db	2
+      000217 00 00r00rCE           1250 	.dw	0,(Sstm8s_flash$FLASH_ReadByte$47)
+      00021B 03                    1251 	.db	3
+      00021C C2 01                 1252 	.sleb128	194
+      00021E 01                    1253 	.db	1
+      00021F 09                    1254 	.db	9
+      000220 00 0C                 1255 	.dw	Sstm8s_flash$FLASH_ReadByte$49-Sstm8s_flash$FLASH_ReadByte$47
+      000222 03                    1256 	.db	3
+      000223 06                    1257 	.sleb128	6
+      000224 01                    1258 	.db	1
+      000225 09                    1259 	.db	9
+      000226 00 03                 1260 	.dw	Sstm8s_flash$FLASH_ReadByte$50-Sstm8s_flash$FLASH_ReadByte$49
+      000228 03                    1261 	.db	3
+      000229 01                    1262 	.sleb128	1
+      00022A 01                    1263 	.db	1
+      00022B 09                    1264 	.db	9
+      00022C 00 07                 1265 	.dw	7+Sstm8s_flash$FLASH_ReadByte$51-Sstm8s_flash$FLASH_ReadByte$50
+      00022E 00                    1266 	.db	0
+      00022F 01                    1267 	.uleb128	1
+      000230 01                    1268 	.db	1
+      000231 00                    1269 	.db	0
+      000232 05                    1270 	.uleb128	5
+      000233 02                    1271 	.db	2
+      000234 00 00r00rE4           1272 	.dw	0,(Sstm8s_flash$FLASH_ProgramWord$53)
+      000238 03                    1273 	.db	3
+      000239 D3 01                 1274 	.sleb128	211
+      00023B 01                    1275 	.db	1
+      00023C 09                    1276 	.db	9
+      00023D 00 0E                 1277 	.dw	Sstm8s_flash$FLASH_ProgramWord$55-Sstm8s_flash$FLASH_ProgramWord$53
+      00023F 03                    1278 	.db	3
+      000240 06                    1279 	.sleb128	6
+      000241 01                    1280 	.db	1
+      000242 09                    1281 	.db	9
+      000243 00 07                 1282 	.dw	Sstm8s_flash$FLASH_ProgramWord$56-Sstm8s_flash$FLASH_ProgramWord$55
+      000245 03                    1283 	.db	3
+      000246 01                    1284 	.sleb128	1
+      000247 01                    1285 	.db	1
+      000248 09                    1286 	.db	9
+      000249 00 07                 1287 	.dw	Sstm8s_flash$FLASH_ProgramWord$57-Sstm8s_flash$FLASH_ProgramWord$56
+      00024B 03                    1288 	.db	3
+      00024C 03                    1289 	.sleb128	3
+      00024D 01                    1290 	.db	1
+      00024E 09                    1291 	.db	9
+      00024F 00 10                 1292 	.dw	Sstm8s_flash$FLASH_ProgramWord$58-Sstm8s_flash$FLASH_ProgramWord$57
+      000251 03                    1293 	.db	3
+      000252 02                    1294 	.sleb128	2
+      000253 01                    1295 	.db	1
+      000254 09                    1296 	.db	9
+      000255 00 09                 1297 	.dw	Sstm8s_flash$FLASH_ProgramWord$59-Sstm8s_flash$FLASH_ProgramWord$58
+      000257 03                    1298 	.db	3
+      000258 02                    1299 	.sleb128	2
+      000259 01                    1300 	.db	1
+      00025A 09                    1301 	.db	9
+      00025B 00 0A                 1302 	.dw	Sstm8s_flash$FLASH_ProgramWord$60-Sstm8s_flash$FLASH_ProgramWord$59
+      00025D 03                    1303 	.db	3
+      00025E 02                    1304 	.sleb128	2
+      00025F 01                    1305 	.db	1
+      000260 09                    1306 	.db	9
+      000261 00 0B                 1307 	.dw	Sstm8s_flash$FLASH_ProgramWord$61-Sstm8s_flash$FLASH_ProgramWord$60
+      000263 03                    1308 	.db	3
+      000264 01                    1309 	.sleb128	1
+      000265 01                    1310 	.db	1
+      000266 09                    1311 	.db	9
+      000267 00 09                 1312 	.dw	7+Sstm8s_flash$FLASH_ProgramWord$62-Sstm8s_flash$FLASH_ProgramWord$61
+      000269 00                    1313 	.db	0
+      00026A 01                    1314 	.uleb128	1
+      00026B 01                    1315 	.db	1
+      00026C 00                    1316 	.db	0
+      00026D 05                    1317 	.uleb128	5
+      00026E 02                    1318 	.db	2
+      00026F 00 00r01r37           1319 	.dw	0,(Sstm8s_flash$FLASH_ProgramOptionByte$64)
+      000273 03                    1320 	.db	3
+      000274 EC 01                 1321 	.sleb128	236
+      000276 01                    1322 	.db	1
+      000277 09                    1323 	.db	9
+      000278 00 0C                 1324 	.dw	Sstm8s_flash$FLASH_ProgramOptionByte$66-Sstm8s_flash$FLASH_ProgramOptionByte$64
+      00027A 03                    1325 	.db	3
+      00027B 06                    1326 	.sleb128	6
+      00027C 01                    1327 	.db	1
+      00027D 09                    1328 	.db	9
+      00027E 00 04                 1329 	.dw	Sstm8s_flash$FLASH_ProgramOptionByte$67-Sstm8s_flash$FLASH_ProgramOptionByte$66
+      000280 03                    1330 	.db	3
+      000281 01                    1331 	.sleb128	1
+      000282 01                    1332 	.db	1
+      000283 09                    1333 	.db	9
+      000284 00 07                 1334 	.dw	Sstm8s_flash$FLASH_ProgramOptionByte$68-Sstm8s_flash$FLASH_ProgramOptionByte$67
+      000286 03                    1335 	.db	3
+      000287 03                    1336 	.sleb128	3
+      000288 01                    1337 	.db	1
+      000289 09                    1338 	.db	9
+      00028A 00 07                 1339 	.dw	Sstm8s_flash$FLASH_ProgramOptionByte$69-Sstm8s_flash$FLASH_ProgramOptionByte$68
+      00028C 03                    1340 	.db	3
+      00028D 03                    1341 	.sleb128	3
+      00028E 01                    1342 	.db	1
+      00028F 09                    1343 	.db	9
+      000290 00 07                 1344 	.dw	Sstm8s_flash$FLASH_ProgramOptionByte$70-Sstm8s_flash$FLASH_ProgramOptionByte$69
+      000292 03                    1345 	.db	3
+      000293 05                    1346 	.sleb128	5
+      000294 01                    1347 	.db	1
+      000295 09                    1348 	.db	9
+      000296 00 05                 1349 	.dw	Sstm8s_flash$FLASH_ProgramOptionByte$71-Sstm8s_flash$FLASH_ProgramOptionByte$70
+      000298 03                    1350 	.db	3
+      000299 01                    1351 	.sleb128	1
+      00029A 01                    1352 	.db	1
+      00029B 09                    1353 	.db	9
+      00029C 00 07                 1354 	.dw	Sstm8s_flash$FLASH_ProgramOptionByte$72-Sstm8s_flash$FLASH_ProgramOptionByte$71
+      00029E 03                    1355 	.db	3
+      00029F 02                    1356 	.sleb128	2
+      0002A0 01                    1357 	.db	1
+      0002A1 09                    1358 	.db	9
+      0002A2 00 06                 1359 	.dw	Sstm8s_flash$FLASH_ProgramOptionByte$73-Sstm8s_flash$FLASH_ProgramOptionByte$72
+      0002A4 03                    1360 	.db	3
+      0002A5 03                    1361 	.sleb128	3
+      0002A6 01                    1362 	.db	1
+      0002A7 09                    1363 	.db	9
+      0002A8 00 04                 1364 	.dw	Sstm8s_flash$FLASH_ProgramOptionByte$74-Sstm8s_flash$FLASH_ProgramOptionByte$73
+      0002AA 03                    1365 	.db	3
+      0002AB 01                    1366 	.sleb128	1
+      0002AC 01                    1367 	.db	1
+      0002AD 09                    1368 	.db	9
+      0002AE 00 04                 1369 	.dw	Sstm8s_flash$FLASH_ProgramOptionByte$75-Sstm8s_flash$FLASH_ProgramOptionByte$74
+      0002B0 03                    1370 	.db	3
+      0002B1 01                    1371 	.sleb128	1
+      0002B2 01                    1372 	.db	1
+      0002B3 09                    1373 	.db	9
+      0002B4 00 07                 1374 	.dw	7+Sstm8s_flash$FLASH_ProgramOptionByte$76-Sstm8s_flash$FLASH_ProgramOptionByte$75
+      0002B6 00                    1375 	.db	0
+      0002B7 01                    1376 	.uleb128	1
+      0002B8 01                    1377 	.db	1
+      0002B9 00                    1378 	.db	0
+      0002BA 05                    1379 	.uleb128	5
+      0002BB 02                    1380 	.db	2
+      0002BC 00 00r01r7D           1381 	.dw	0,(Sstm8s_flash$FLASH_EraseOptionByte$78)
+      0002C0 03                    1382 	.db	3
+      0002C1 8D 02                 1383 	.sleb128	269
+      0002C3 01                    1384 	.db	1
+      0002C4 09                    1385 	.db	9
+      0002C5 00 0C                 1386 	.dw	Sstm8s_flash$FLASH_EraseOptionByte$80-Sstm8s_flash$FLASH_EraseOptionByte$78
+      0002C7 03                    1387 	.db	3
+      0002C8 06                    1388 	.sleb128	6
+      0002C9 01                    1389 	.db	1
+      0002CA 09                    1390 	.db	9
+      0002CB 00 04                 1391 	.dw	Sstm8s_flash$FLASH_EraseOptionByte$81-Sstm8s_flash$FLASH_EraseOptionByte$80
+      0002CD 03                    1392 	.db	3
+      0002CE 01                    1393 	.sleb128	1
+      0002CF 01                    1394 	.db	1
+      0002D0 09                    1395 	.db	9
+      0002D1 00 07                 1396 	.dw	Sstm8s_flash$FLASH_EraseOptionByte$82-Sstm8s_flash$FLASH_EraseOptionByte$81
+      0002D3 03                    1397 	.db	3
+      0002D4 03                    1398 	.sleb128	3
+      0002D5 01                    1399 	.db	1
+      0002D6 09                    1400 	.db	9
+      0002D7 00 07                 1401 	.dw	Sstm8s_flash$FLASH_EraseOptionByte$83-Sstm8s_flash$FLASH_EraseOptionByte$82
+      0002D9 03                    1402 	.db	3
+      0002DA 03                    1403 	.sleb128	3
+      0002DB 01                    1404 	.db	1
+      0002DC 09                    1405 	.db	9
+      0002DD 00 05                 1406 	.dw	Sstm8s_flash$FLASH_EraseOptionByte$84-Sstm8s_flash$FLASH_EraseOptionByte$83
+      0002DF 03                    1407 	.db	3
+      0002E0 05                    1408 	.sleb128	5
+      0002E1 01                    1409 	.db	1
+      0002E2 09                    1410 	.db	9
+      0002E3 00 03                 1411 	.dw	Sstm8s_flash$FLASH_EraseOptionByte$85-Sstm8s_flash$FLASH_EraseOptionByte$84
+      0002E5 03                    1412 	.db	3
+      0002E6 01                    1413 	.sleb128	1
+      0002E7 01                    1414 	.db	1
+      0002E8 09                    1415 	.db	9
+      0002E9 00 06                 1416 	.dw	Sstm8s_flash$FLASH_EraseOptionByte$86-Sstm8s_flash$FLASH_EraseOptionByte$85
+      0002EB 03                    1417 	.db	3
+      0002EC 02                    1418 	.sleb128	2
+      0002ED 01                    1419 	.db	1
+      0002EE 09                    1420 	.db	9
+      0002EF 00 06                 1421 	.dw	Sstm8s_flash$FLASH_EraseOptionByte$87-Sstm8s_flash$FLASH_EraseOptionByte$86
+      0002F1 03                    1422 	.db	3
+      0002F2 03                    1423 	.sleb128	3
+      0002F3 01                    1424 	.db	1
+      0002F4 09                    1425 	.db	9
+      0002F5 00 04                 1426 	.dw	Sstm8s_flash$FLASH_EraseOptionByte$88-Sstm8s_flash$FLASH_EraseOptionByte$87
+      0002F7 03                    1427 	.db	3
+      0002F8 01                    1428 	.sleb128	1
+      0002F9 01                    1429 	.db	1
+      0002FA 09                    1430 	.db	9
+      0002FB 00 04                 1431 	.dw	Sstm8s_flash$FLASH_EraseOptionByte$89-Sstm8s_flash$FLASH_EraseOptionByte$88
+      0002FD 03                    1432 	.db	3
+      0002FE 01                    1433 	.sleb128	1
+      0002FF 01                    1434 	.db	1
+      000300 09                    1435 	.db	9
+      000301 00 07                 1436 	.dw	7+Sstm8s_flash$FLASH_EraseOptionByte$90-Sstm8s_flash$FLASH_EraseOptionByte$89
+      000303 00                    1437 	.db	0
+      000304 01                    1438 	.uleb128	1
+      000305 01                    1439 	.db	1
+      000306 00                    1440 	.db	0
+      000307 05                    1441 	.uleb128	5
+      000308 02                    1442 	.db	2
+      000309 00 00r01rBE           1443 	.dw	0,(Sstm8s_flash$FLASH_ReadOptionByte$92)
+      00030D 03                    1444 	.db	3
+      00030E AE 02                 1445 	.sleb128	302
+      000310 01                    1446 	.db	1
+      000311 09                    1447 	.db	9
+      000312 00 0E                 1448 	.dw	Sstm8s_flash$FLASH_ReadOptionByte$94-Sstm8s_flash$FLASH_ReadOptionByte$92
+      000314 03                    1449 	.db	3
+      000315 08                    1450 	.sleb128	8
+      000316 01                    1451 	.db	1
+      000317 09                    1452 	.db	9
+      000318 00 03                 1453 	.dw	Sstm8s_flash$FLASH_ReadOptionByte$95-Sstm8s_flash$FLASH_ReadOptionByte$94
+      00031A 03                    1454 	.db	3
+      00031B 01                    1455 	.sleb128	1
+      00031C 01                    1456 	.db	1
+      00031D 09                    1457 	.db	9
+      00031E 00 06                 1458 	.dw	Sstm8s_flash$FLASH_ReadOptionByte$96-Sstm8s_flash$FLASH_ReadOptionByte$95
+      000320 03                    1459 	.db	3
+      000321 03                    1460 	.sleb128	3
+      000322 01                    1461 	.db	1
+      000323 09                    1462 	.db	9
+      000324 00 07                 1463 	.dw	Sstm8s_flash$FLASH_ReadOptionByte$97-Sstm8s_flash$FLASH_ReadOptionByte$96
+      000326 03                    1464 	.db	3
+      000327 02                    1465 	.sleb128	2
+      000328 01                    1466 	.db	1
+      000329 09                    1467 	.db	9
+      00032A 00 04                 1468 	.dw	Sstm8s_flash$FLASH_ReadOptionByte$98-Sstm8s_flash$FLASH_ReadOptionByte$97
+      00032C 03                    1469 	.db	3
+      00032D 04                    1470 	.sleb128	4
+      00032E 01                    1471 	.db	1
+      00032F 09                    1472 	.db	9
+      000330 00 0B                 1473 	.dw	Sstm8s_flash$FLASH_ReadOptionByte$99-Sstm8s_flash$FLASH_ReadOptionByte$98
+      000332 03                    1474 	.db	3
+      000333 02                    1475 	.sleb128	2
+      000334 01                    1476 	.db	1
+      000335 09                    1477 	.db	9
+      000336 00 04                 1478 	.dw	Sstm8s_flash$FLASH_ReadOptionByte$100-Sstm8s_flash$FLASH_ReadOptionByte$99
+      000338 03                    1479 	.db	3
+      000339 01                    1480 	.sleb128	1
+      00033A 01                    1481 	.db	1
+      00033B 09                    1482 	.db	9
+      00033C 00 0E                 1483 	.dw	Sstm8s_flash$FLASH_ReadOptionByte$101-Sstm8s_flash$FLASH_ReadOptionByte$100
+      00033E 03                    1484 	.db	3
+      00033F 04                    1485 	.sleb128	4
+      000340 01                    1486 	.db	1
+      000341 09                    1487 	.db	9
+      000342 00 03                 1488 	.dw	Sstm8s_flash$FLASH_ReadOptionByte$102-Sstm8s_flash$FLASH_ReadOptionByte$101
+      000344 03                    1489 	.db	3
+      000345 03                    1490 	.sleb128	3
+      000346 01                    1491 	.db	1
+      000347 09                    1492 	.db	9
+      000348 00 00                 1493 	.dw	Sstm8s_flash$FLASH_ReadOptionByte$103-Sstm8s_flash$FLASH_ReadOptionByte$102
+      00034A 03                    1494 	.db	3
+      00034B 01                    1495 	.sleb128	1
+      00034C 01                    1496 	.db	1
+      00034D 09                    1497 	.db	9
+      00034E 00 09                 1498 	.dw	7+Sstm8s_flash$FLASH_ReadOptionByte$104-Sstm8s_flash$FLASH_ReadOptionByte$103
+      000350 00                    1499 	.db	0
+      000351 01                    1500 	.uleb128	1
+      000352 01                    1501 	.db	1
+      000353 00                    1502 	.db	0
+      000354 05                    1503 	.uleb128	5
+      000355 02                    1504 	.db	2
+      000356 00 00r02r09           1505 	.dw	0,(Sstm8s_flash$FLASH_SetLowPowerMode$106)
+      00035A 03                    1506 	.db	3
+      00035B D3 02                 1507 	.sleb128	339
+      00035D 01                    1508 	.db	1
+      00035E 09                    1509 	.db	9
+      00035F 00 0C                 1510 	.dw	Sstm8s_flash$FLASH_SetLowPowerMode$108-Sstm8s_flash$FLASH_SetLowPowerMode$106
+      000361 03                    1511 	.db	3
+      000362 06                    1512 	.sleb128	6
+      000363 01                    1513 	.db	1
+      000364 09                    1514 	.db	9
+      000365 00 07                 1515 	.dw	Sstm8s_flash$FLASH_SetLowPowerMode$109-Sstm8s_flash$FLASH_SetLowPowerMode$108
+      000367 03                    1516 	.db	3
+      000368 03                    1517 	.sleb128	3
+      000369 01                    1518 	.db	1
+      00036A 09                    1519 	.db	9
+      00036B 00 0A                 1520 	.dw	Sstm8s_flash$FLASH_SetLowPowerMode$110-Sstm8s_flash$FLASH_SetLowPowerMode$109
+      00036D 03                    1521 	.db	3
+      00036E 01                    1522 	.sleb128	1
+      00036F 01                    1523 	.db	1
+      000370 09                    1524 	.db	9
+      000371 00 07                 1525 	.dw	7+Sstm8s_flash$FLASH_SetLowPowerMode$111-Sstm8s_flash$FLASH_SetLowPowerMode$110
+      000373 00                    1526 	.db	0
+      000374 01                    1527 	.uleb128	1
+      000375 01                    1528 	.db	1
+      000376 00                    1529 	.db	0
+      000377 05                    1530 	.uleb128	5
+      000378 02                    1531 	.db	2
+      000379 00 00r02r2D           1532 	.dw	0,(Sstm8s_flash$FLASH_SetProgrammingTime$113)
+      00037D 03                    1533 	.db	3
+      00037E E5 02                 1534 	.sleb128	357
+      000380 01                    1535 	.db	1
+      000381 09                    1536 	.db	9
+      000382 00 0C                 1537 	.dw	Sstm8s_flash$FLASH_SetProgrammingTime$115-Sstm8s_flash$FLASH_SetProgrammingTime$113
+      000384 03                    1538 	.db	3
+      000385 05                    1539 	.sleb128	5
+      000386 01                    1540 	.db	1
+      000387 09                    1541 	.db	9
+      000388 00 04                 1542 	.dw	Sstm8s_flash$FLASH_SetProgrammingTime$116-Sstm8s_flash$FLASH_SetProgrammingTime$115
+      00038A 03                    1543 	.db	3
+      00038B 01                    1544 	.sleb128	1
+      00038C 01                    1545 	.db	1
+      00038D 09                    1546 	.db	9
+      00038E 00 0A                 1547 	.dw	Sstm8s_flash$FLASH_SetProgrammingTime$117-Sstm8s_flash$FLASH_SetProgrammingTime$116
+      000390 03                    1548 	.db	3
+      000391 01                    1549 	.sleb128	1
+      000392 01                    1550 	.db	1
+      000393 09                    1551 	.db	9
+      000394 00 07                 1552 	.dw	7+Sstm8s_flash$FLASH_SetProgrammingTime$118-Sstm8s_flash$FLASH_SetProgrammingTime$117
+      000396 00                    1553 	.db	0
+      000397 01                    1554 	.uleb128	1
+      000398 01                    1555 	.db	1
+      000399 00                    1556 	.db	0
+      00039A 05                    1557 	.uleb128	5
+      00039B 02                    1558 	.db	2
+      00039C 00 00r02r4E           1559 	.dw	0,(Sstm8s_flash$FLASH_GetLowPowerMode$120)
+      0003A0 03                    1560 	.db	3
+      0003A1 F3 02                 1561 	.sleb128	371
+      0003A3 01                    1562 	.db	1
+      0003A4 09                    1563 	.db	9
+      0003A5 00 0C                 1564 	.dw	Sstm8s_flash$FLASH_GetLowPowerMode$122-Sstm8s_flash$FLASH_GetLowPowerMode$120
+      0003A7 03                    1565 	.db	3
+      0003A8 02                    1566 	.sleb128	2
+      0003A9 01                    1567 	.db	1
+      0003AA 09                    1568 	.db	9
+      0003AB 00 06                 1569 	.dw	Sstm8s_flash$FLASH_GetLowPowerMode$123-Sstm8s_flash$FLASH_GetLowPowerMode$122
+      0003AD 03                    1570 	.db	3
+      0003AE 01                    1571 	.sleb128	1
+      0003AF 01                    1572 	.db	1
+      0003B0 09                    1573 	.db	9
+      0003B1 00 07                 1574 	.dw	7+Sstm8s_flash$FLASH_GetLowPowerMode$124-Sstm8s_flash$FLASH_GetLowPowerMode$123
+      0003B3 00                    1575 	.db	0
+      0003B4 01                    1576 	.uleb128	1
+      0003B5 01                    1577 	.db	1
+      0003B6 00                    1578 	.db	0
+      0003B7 05                    1579 	.uleb128	5
+      0003B8 02                    1580 	.db	2
+      0003B9 00 00r02r67           1581 	.dw	0,(Sstm8s_flash$FLASH_GetProgrammingTime$126)
+      0003BD 03                    1582 	.db	3
+      0003BE FD 02                 1583 	.sleb128	381
+      0003C0 01                    1584 	.db	1
+      0003C1 09                    1585 	.db	9
+      0003C2 00 0C                 1586 	.dw	Sstm8s_flash$FLASH_GetProgrammingTime$128-Sstm8s_flash$FLASH_GetProgrammingTime$126
+      0003C4 03                    1587 	.db	3
+      0003C5 02                    1588 	.sleb128	2
+      0003C6 01                    1589 	.db	1
+      0003C7 09                    1590 	.db	9
+      0003C8 00 06                 1591 	.dw	Sstm8s_flash$FLASH_GetProgrammingTime$129-Sstm8s_flash$FLASH_GetProgrammingTime$128
+      0003CA 03                    1592 	.db	3
+      0003CB 01                    1593 	.sleb128	1
+      0003CC 01                    1594 	.db	1
+      0003CD 09                    1595 	.db	9
+      0003CE 00 07                 1596 	.dw	7+Sstm8s_flash$FLASH_GetProgrammingTime$130-Sstm8s_flash$FLASH_GetProgrammingTime$129
+      0003D0 00                    1597 	.db	0
+      0003D1 01                    1598 	.uleb128	1
+      0003D2 01                    1599 	.db	1
+      0003D3 00                    1600 	.db	0
+      0003D4 05                    1601 	.uleb128	5
+      0003D5 02                    1602 	.db	2
+      0003D6 00 00r02r80           1603 	.dw	0,(Sstm8s_flash$FLASH_GetBootSize$132)
+      0003DA 03                    1604 	.db	3
+      0003DB 87 03                 1605 	.sleb128	391
+      0003DD 01                    1606 	.db	1
+      0003DE 09                    1607 	.db	9
+      0003DF 00 0E                 1608 	.dw	Sstm8s_flash$FLASH_GetBootSize$134-Sstm8s_flash$FLASH_GetBootSize$132
+      0003E1 03                    1609 	.db	3
+      0003E2 05                    1610 	.sleb128	5
+      0003E3 01                    1611 	.db	1
+      0003E4 09                    1612 	.db	9
+      0003E5 00 12                 1613 	.dw	Sstm8s_flash$FLASH_GetBootSize$135-Sstm8s_flash$FLASH_GetBootSize$134
+      0003E7 03                    1614 	.db	3
+      0003E8 03                    1615 	.sleb128	3
+      0003E9 01                    1616 	.db	1
+      0003EA 09                    1617 	.db	9
+      0003EB 00 0A                 1618 	.dw	Sstm8s_flash$FLASH_GetBootSize$136-Sstm8s_flash$FLASH_GetBootSize$135
+      0003ED 03                    1619 	.db	3
+      0003EE 02                    1620 	.sleb128	2
+      0003EF 01                    1621 	.db	1
+      0003F0 09                    1622 	.db	9
+      0003F1 00 11                 1623 	.dw	Sstm8s_flash$FLASH_GetBootSize$137-Sstm8s_flash$FLASH_GetBootSize$136
+      0003F3 03                    1624 	.db	3
+      0003F4 04                    1625 	.sleb128	4
+      0003F5 01                    1626 	.db	1
+      0003F6 09                    1627 	.db	9
+      0003F7 00 02                 1628 	.dw	Sstm8s_flash$FLASH_GetBootSize$138-Sstm8s_flash$FLASH_GetBootSize$137
+      0003F9 03                    1629 	.db	3
+      0003FA 01                    1630 	.sleb128	1
+      0003FB 01                    1631 	.db	1
+      0003FC 09                    1632 	.db	9
+      0003FD 00 09                 1633 	.dw	7+Sstm8s_flash$FLASH_GetBootSize$139-Sstm8s_flash$FLASH_GetBootSize$138
+      0003FF 00                    1634 	.db	0
+      000400 01                    1635 	.uleb128	1
+      000401 01                    1636 	.db	1
+      000402 00                    1637 	.db	0
+      000403 05                    1638 	.uleb128	5
+      000404 02                    1639 	.db	2
+      000405 00 00r02rC6           1640 	.dw	0,(Sstm8s_flash$FLASH_GetFlagStatus$141)
+      000409 03                    1641 	.db	3
+      00040A A0 03                 1642 	.sleb128	416
+      00040C 01                    1643 	.db	1
+      00040D 09                    1644 	.db	9
+      00040E 00 0C                 1645 	.dw	Sstm8s_flash$FLASH_GetFlagStatus$143-Sstm8s_flash$FLASH_GetFlagStatus$141
+      000410 03                    1646 	.db	3
+      000411 07                    1647 	.sleb128	7
+      000412 01                    1648 	.db	1
+      000413 09                    1649 	.db	9
+      000414 00 09                 1650 	.dw	Sstm8s_flash$FLASH_GetFlagStatus$144-Sstm8s_flash$FLASH_GetFlagStatus$143
+      000416 03                    1651 	.db	3
+      000417 02                    1652 	.sleb128	2
+      000418 01                    1653 	.db	1
+      000419 09                    1654 	.db	9
+      00041A 00 04                 1655 	.dw	Sstm8s_flash$FLASH_GetFlagStatus$145-Sstm8s_flash$FLASH_GetFlagStatus$144
+      00041C 03                    1656 	.db	3
+      00041D 04                    1657 	.sleb128	4
+      00041E 01                    1658 	.db	1
+      00041F 09                    1659 	.db	9
+      000420 00 01                 1660 	.dw	Sstm8s_flash$FLASH_GetFlagStatus$146-Sstm8s_flash$FLASH_GetFlagStatus$145
+      000422 03                    1661 	.db	3
+      000423 04                    1662 	.sleb128	4
+      000424 01                    1663 	.db	1
+      000425 09                    1664 	.db	9
+      000426 00 00                 1665 	.dw	Sstm8s_flash$FLASH_GetFlagStatus$147-Sstm8s_flash$FLASH_GetFlagStatus$146
+      000428 03                    1666 	.db	3
+      000429 01                    1667 	.sleb128	1
+      00042A 01                    1668 	.db	1
+      00042B 09                    1669 	.db	9
+      00042C 00 07                 1670 	.dw	7+Sstm8s_flash$FLASH_GetFlagStatus$148-Sstm8s_flash$FLASH_GetFlagStatus$147
+      00042E 00                    1671 	.db	0
+      00042F 01                    1672 	.uleb128	1
+      000430 01                    1673 	.db	1
+      000431 00                    1674 	.db	0
+      000432 05                    1675 	.uleb128	5
+      000433 02                    1676 	.db	2
+      000434 00 00r02rE7           1677 	.dw	0,(Sstm8s_flash$FLASH_WaitForLastOperation$150)
+      000438 03                    1678 	.db	3
+      000439 A4 04                 1679 	.sleb128	548
+      00043B 01                    1680 	.db	1
+      00043C 09                    1681 	.db	9
+      00043D 00 0C                 1682 	.dw	Sstm8s_flash$FLASH_WaitForLastOperation$152-Sstm8s_flash$FLASH_WaitForLastOperation$150
+      00043F 03                    1683 	.db	3
+      000440 02                    1684 	.sleb128	2
+      000441 01                    1685 	.db	1
+      000442 09                    1686 	.db	9
+      000443 00 01                 1687 	.dw	Sstm8s_flash$FLASH_WaitForLastOperation$153-Sstm8s_flash$FLASH_WaitForLastOperation$152
+      000445 03                    1688 	.db	3
+      000446 06                    1689 	.sleb128	6
+      000447 01                    1690 	.db	1
+      000448 09                    1691 	.db	9
+      000449 00 08                 1692 	.dw	Sstm8s_flash$FLASH_WaitForLastOperation$154-Sstm8s_flash$FLASH_WaitForLastOperation$153
+      00044B 03                    1693 	.db	3
+      00044C 02                    1694 	.sleb128	2
+      00044D 01                    1695 	.db	1
+      00044E 09                    1696 	.db	9
+      00044F 00 09                 1697 	.dw	Sstm8s_flash$FLASH_WaitForLastOperation$155-Sstm8s_flash$FLASH_WaitForLastOperation$154
+      000451 03                    1698 	.db	3
+      000452 02                    1699 	.sleb128	2
+      000453 01                    1700 	.db	1
+      000454 09                    1701 	.db	9
+      000455 00 08                 1702 	.dw	Sstm8s_flash$FLASH_WaitForLastOperation$156-Sstm8s_flash$FLASH_WaitForLastOperation$155
+      000457 03                    1703 	.db	3
+      000458 02                    1704 	.sleb128	2
+      000459 01                    1705 	.db	1
+      00045A 09                    1706 	.db	9
+      00045B 00 03                 1707 	.dw	Sstm8s_flash$FLASH_WaitForLastOperation$157-Sstm8s_flash$FLASH_WaitForLastOperation$156
+      00045D 03                    1708 	.db	3
+      00045E 05                    1709 	.sleb128	5
+      00045F 01                    1710 	.db	1
+      000460 09                    1711 	.db	9
+      000461 00 09                 1712 	.dw	Sstm8s_flash$FLASH_WaitForLastOperation$158-Sstm8s_flash$FLASH_WaitForLastOperation$157
+      000463 03                    1713 	.db	3
+      000464 02                    1714 	.sleb128	2
+      000465 01                    1715 	.db	1
+      000466 09                    1716 	.db	9
+      000467 00 08                 1717 	.dw	Sstm8s_flash$FLASH_WaitForLastOperation$159-Sstm8s_flash$FLASH_WaitForLastOperation$158
+      000469 03                    1718 	.db	3
+      00046A 02                    1719 	.sleb128	2
+      00046B 01                    1720 	.db	1
+      00046C 09                    1721 	.db	9
+      00046D 00 03                 1722 	.dw	Sstm8s_flash$FLASH_WaitForLastOperation$160-Sstm8s_flash$FLASH_WaitForLastOperation$159
+      00046F 03                    1723 	.db	3
+      000470 11                    1724 	.sleb128	17
+      000471 01                    1725 	.db	1
+      000472 09                    1726 	.db	9
+      000473 00 02                 1727 	.dw	Sstm8s_flash$FLASH_WaitForLastOperation$161-Sstm8s_flash$FLASH_WaitForLastOperation$160
+      000475 03                    1728 	.db	3
+      000476 6F                    1729 	.sleb128	-17
+      000477 01                    1730 	.db	1
+      000478 09                    1731 	.db	9
+      000479 00 00                 1732 	.dw	Sstm8s_flash$FLASH_WaitForLastOperation$162-Sstm8s_flash$FLASH_WaitForLastOperation$161
+      00047B 03                    1733 	.db	3
+      00047C 0C                    1734 	.sleb128	12
+      00047D 01                    1735 	.db	1
+      00047E 09                    1736 	.db	9
+      00047F 00 03                 1737 	.dw	Sstm8s_flash$FLASH_WaitForLastOperation$163-Sstm8s_flash$FLASH_WaitForLastOperation$162
+      000481 03                    1738 	.db	3
+      000482 02                    1739 	.sleb128	2
+      000483 01                    1740 	.db	1
+      000484 09                    1741 	.db	9
+      000485 00 02                 1742 	.dw	Sstm8s_flash$FLASH_WaitForLastOperation$164-Sstm8s_flash$FLASH_WaitForLastOperation$163
+      000487 03                    1743 	.db	3
+      000488 03                    1744 	.sleb128	3
+      000489 01                    1745 	.db	1
+      00048A 09                    1746 	.db	9
+      00048B 00 00                 1747 	.dw	Sstm8s_flash$FLASH_WaitForLastOperation$165-Sstm8s_flash$FLASH_WaitForLastOperation$164
+      00048D 03                    1748 	.db	3
+      00048E 01                    1749 	.sleb128	1
+      00048F 01                    1750 	.db	1
+      000490 09                    1751 	.db	9
+      000491 00 07                 1752 	.dw	7+Sstm8s_flash$FLASH_WaitForLastOperation$166-Sstm8s_flash$FLASH_WaitForLastOperation$165
+      000493 00                    1753 	.db	0
+      000494 01                    1754 	.uleb128	1
+      000495 01                    1755 	.db	1
+      000496 00                    1756 	.db	0
+      000497 05                    1757 	.uleb128	5
+      000498 02                    1758 	.db	2
+      000499 00 00r03r32           1759 	.dw	0,(Sstm8s_flash$FLASH_EraseBlock$168)
+      00049D 03                    1760 	.db	3
+      00049E D6 04                 1761 	.sleb128	598
+      0004A0 01                    1762 	.db	1
+      0004A1 09                    1763 	.db	9
+      0004A2 00 0E                 1764 	.dw	Sstm8s_flash$FLASH_EraseBlock$170-Sstm8s_flash$FLASH_EraseBlock$168
+      0004A4 03                    1765 	.db	3
+      0004A5 0D                    1766 	.sleb128	13
+      0004A6 01                    1767 	.db	1
+      0004A7 09                    1768 	.db	9
+      0004A8 00 06                 1769 	.dw	Sstm8s_flash$FLASH_EraseBlock$171-Sstm8s_flash$FLASH_EraseBlock$170
+      0004AA 03                    1770 	.db	3
+      0004AB 03                    1771 	.sleb128	3
+      0004AC 01                    1772 	.db	1
+      0004AD 09                    1773 	.db	9
+      0004AE 00 0A                 1774 	.dw	Sstm8s_flash$FLASH_EraseBlock$172-Sstm8s_flash$FLASH_EraseBlock$171
+      0004B0 03                    1775 	.db	3
+      0004B1 05                    1776 	.sleb128	5
+      0004B2 01                    1777 	.db	1
+      0004B3 09                    1778 	.db	9
+      0004B4 00 08                 1779 	.dw	Sstm8s_flash$FLASH_EraseBlock$173-Sstm8s_flash$FLASH_EraseBlock$172
+      0004B6 03                    1780 	.db	3
+      0004B7 08                    1781 	.sleb128	8
+      0004B8 01                    1782 	.db	1
+      0004B9 09                    1783 	.db	9
+      0004BA 00 16                 1784 	.dw	Sstm8s_flash$FLASH_EraseBlock$174-Sstm8s_flash$FLASH_EraseBlock$173
+      0004BC 03                    1785 	.db	3
+      0004BD 04                    1786 	.sleb128	4
+      0004BE 01                    1787 	.db	1
+      0004BF 09                    1788 	.db	9
+      0004C0 00 07                 1789 	.dw	Sstm8s_flash$FLASH_EraseBlock$175-Sstm8s_flash$FLASH_EraseBlock$174
+      0004C2 03                    1790 	.db	3
+      0004C3 01                    1791 	.sleb128	1
+      0004C4 01                    1792 	.db	1
+      0004C5 09                    1793 	.db	9
+      0004C6 00 07                 1794 	.dw	Sstm8s_flash$FLASH_EraseBlock$176-Sstm8s_flash$FLASH_EraseBlock$175
+      0004C8 03                    1795 	.db	3
+      0004C9 04                    1796 	.sleb128	4
+      0004CA 01                    1797 	.db	1
+      0004CB 09                    1798 	.db	9
+      0004CC 00 09                 1799 	.dw	Sstm8s_flash$FLASH_EraseBlock$177-Sstm8s_flash$FLASH_EraseBlock$176
+      0004CE 03                    1800 	.db	3
+      0004CF 08                    1801 	.sleb128	8
+      0004D0 01                    1802 	.db	1
+      0004D1 09                    1803 	.db	9
+      0004D2 00 09                 1804 	.dw	7+Sstm8s_flash$FLASH_EraseBlock$178-Sstm8s_flash$FLASH_EraseBlock$177
+      0004D4 00                    1805 	.db	0
+      0004D5 01                    1806 	.uleb128	1
+      0004D6 01                    1807 	.db	1
+      0004D7 00                    1808 	.db	0
+      0004D8 05                    1809 	.uleb128	5
+      0004D9 02                    1810 	.db	2
+      0004DA 00 00r03r8E           1811 	.dw	0,(Sstm8s_flash$FLASH_ProgramBlock$180)
+      0004DE 03                    1812 	.db	3
+      0004DF 8F 05                 1813 	.sleb128	655
+      0004E1 01                    1814 	.db	1
+      0004E2 09                    1815 	.db	9
+      0004E3 00 0E                 1816 	.dw	Sstm8s_flash$FLASH_ProgramBlock$182-Sstm8s_flash$FLASH_ProgramBlock$180
+      0004E5 03                    1817 	.db	3
+      0004E6 09                    1818 	.sleb128	9
+      0004E7 01                    1819 	.db	1
+      0004E8 09                    1820 	.db	9
+      0004E9 00 06                 1821 	.dw	Sstm8s_flash$FLASH_ProgramBlock$183-Sstm8s_flash$FLASH_ProgramBlock$182
+      0004EB 03                    1822 	.db	3
+      0004EC 03                    1823 	.sleb128	3
+      0004ED 01                    1824 	.db	1
+      0004EE 09                    1825 	.db	9
+      0004EF 00 0A                 1826 	.dw	Sstm8s_flash$FLASH_ProgramBlock$184-Sstm8s_flash$FLASH_ProgramBlock$183
+      0004F1 03                    1827 	.db	3
+      0004F2 05                    1828 	.sleb128	5
+      0004F3 01                    1829 	.db	1
+      0004F4 09                    1830 	.db	9
+      0004F5 00 08                 1831 	.dw	Sstm8s_flash$FLASH_ProgramBlock$185-Sstm8s_flash$FLASH_ProgramBlock$184
+      0004F7 03                    1832 	.db	3
+      0004F8 04                    1833 	.sleb128	4
+      0004F9 01                    1834 	.db	1
+      0004FA 09                    1835 	.db	9
+      0004FB 00 35                 1836 	.dw	Sstm8s_flash$FLASH_ProgramBlock$186-Sstm8s_flash$FLASH_ProgramBlock$185
+      0004FD 03                    1837 	.db	3
+      0004FE 03                    1838 	.sleb128	3
+      0004FF 01                    1839 	.db	1
+      000500 09                    1840 	.db	9
+      000501 00 04                 1841 	.dw	Sstm8s_flash$FLASH_ProgramBlock$187-Sstm8s_flash$FLASH_ProgramBlock$186
+      000503 03                    1842 	.db	3
+      000504 03                    1843 	.sleb128	3
+      000505 01                    1844 	.db	1
+      000506 09                    1845 	.db	9
+      000507 00 04                 1846 	.dw	Sstm8s_flash$FLASH_ProgramBlock$188-Sstm8s_flash$FLASH_ProgramBlock$187
+      000509 03                    1847 	.db	3
+      00050A 01                    1848 	.sleb128	1
+      00050B 01                    1849 	.db	1
+      00050C 09                    1850 	.db	9
+      00050D 00 09                 1851 	.dw	Sstm8s_flash$FLASH_ProgramBlock$189-Sstm8s_flash$FLASH_ProgramBlock$188
+      00050F 03                    1852 	.db	3
+      000510 05                    1853 	.sleb128	5
+      000511 01                    1854 	.db	1
+      000512 09                    1855 	.db	9
+      000513 00 07                 1856 	.dw	Sstm8s_flash$FLASH_ProgramBlock$190-Sstm8s_flash$FLASH_ProgramBlock$189
+      000515 03                    1857 	.db	3
+      000516 01                    1858 	.sleb128	1
+      000517 01                    1859 	.db	1
+      000518 09                    1860 	.db	9
+      000519 00 07                 1861 	.dw	Sstm8s_flash$FLASH_ProgramBlock$191-Sstm8s_flash$FLASH_ProgramBlock$190
+      00051B 03                    1862 	.db	3
+      00051C 04                    1863 	.sleb128	4
+      00051D 01                    1864 	.db	1
+      00051E 09                    1865 	.db	9
+      00051F 00 03                 1866 	.dw	Sstm8s_flash$FLASH_ProgramBlock$192-Sstm8s_flash$FLASH_ProgramBlock$191
+      000521 03                    1867 	.db	3
+      000522 02                    1868 	.sleb128	2
+      000523 01                    1869 	.db	1
+      000524 09                    1870 	.db	9
+      000525 00 0D                 1871 	.dw	Sstm8s_flash$FLASH_ProgramBlock$193-Sstm8s_flash$FLASH_ProgramBlock$192
+      000527 03                    1872 	.db	3
+      000528 7E                    1873 	.sleb128	-2
+      000529 01                    1874 	.db	1
+      00052A 09                    1875 	.db	9
+      00052B 00 0C                 1876 	.dw	Sstm8s_flash$FLASH_ProgramBlock$194-Sstm8s_flash$FLASH_ProgramBlock$193
+      00052D 03                    1877 	.db	3
+      00052E 04                    1878 	.sleb128	4
+      00052F 01                    1879 	.db	1
+      000530 09                    1880 	.db	9
+      000531 00 09                 1881 	.dw	7+Sstm8s_flash$FLASH_ProgramBlock$195-Sstm8s_flash$FLASH_ProgramBlock$194
+      000533 00                    1882 	.db	0
+      000534 01                    1883 	.uleb128	1
+      000535 01                    1884 	.db	1
+      000536                       1885 Ldebug_line_end:
+                                   1886 
+                                   1887 	.area .debug_loc (NOLOAD)
+      000000                       1888 Ldebug_loc_start:
+      000000 00 00r03r9A           1889 	.dw	0,(Sstm8s_flash$FLASH_ProgramBlock$181)
+      000004 00 00r04r2D           1890 	.dw	0,(Sstm8s_flash$FLASH_ProgramBlock$196)
+      000008 00 02                 1891 	.dw	2
+      00000A 8F                    1892 	.db	143
+      00000B 01                    1893 	.sleb128	1
+      00000C 00 00 00 00           1894 	.dw	0,0
+      000010 00 00 00 00           1895 	.dw	0,0
+      000014 00 00r03r3E           1896 	.dw	0,(Sstm8s_flash$FLASH_EraseBlock$169)
+      000018 00 00r03r8E           1897 	.dw	0,(Sstm8s_flash$FLASH_EraseBlock$179)
+      00001C 00 02                 1898 	.dw	2
+      00001E 8F                    1899 	.db	143
+      00001F 01                    1900 	.sleb128	1
+      000020 00 00 00 00           1901 	.dw	0,0
+      000024 00 00 00 00           1902 	.dw	0,0
+      000028 00 00r02rF3           1903 	.dw	0,(Sstm8s_flash$FLASH_WaitForLastOperation$151)
+      00002C 00 00r03r32           1904 	.dw	0,(Sstm8s_flash$FLASH_WaitForLastOperation$167)
+      000030 00 02                 1905 	.dw	2
+      000032 8F                    1906 	.db	143
+      000033 01                    1907 	.sleb128	1
+      000034 00 00 00 00           1908 	.dw	0,0
+      000038 00 00 00 00           1909 	.dw	0,0
+      00003C 00 00r02rD2           1910 	.dw	0,(Sstm8s_flash$FLASH_GetFlagStatus$142)
+      000040 00 00r02rE7           1911 	.dw	0,(Sstm8s_flash$FLASH_GetFlagStatus$149)
+      000044 00 02                 1912 	.dw	2
+      000046 8F                    1913 	.db	143
+      000047 01                    1914 	.sleb128	1
+      000048 00 00 00 00           1915 	.dw	0,0
+      00004C 00 00 00 00           1916 	.dw	0,0
+      000050 00 00r02r8C           1917 	.dw	0,(Sstm8s_flash$FLASH_GetBootSize$133)
+      000054 00 00r02rC6           1918 	.dw	0,(Sstm8s_flash$FLASH_GetBootSize$140)
+      000058 00 02                 1919 	.dw	2
+      00005A 8F                    1920 	.db	143
+      00005B 01                    1921 	.sleb128	1
+      00005C 00 00 00 00           1922 	.dw	0,0
+      000060 00 00 00 00           1923 	.dw	0,0
+      000064 00 00r02r73           1924 	.dw	0,(Sstm8s_flash$FLASH_GetProgrammingTime$127)
+      000068 00 00r02r80           1925 	.dw	0,(Sstm8s_flash$FLASH_GetProgrammingTime$131)
+      00006C 00 02                 1926 	.dw	2
+      00006E 8F                    1927 	.db	143
+      00006F 01                    1928 	.sleb128	1
+      000070 00 00 00 00           1929 	.dw	0,0
+      000074 00 00 00 00           1930 	.dw	0,0
+      000078 00 00r02r5A           1931 	.dw	0,(Sstm8s_flash$FLASH_GetLowPowerMode$121)
+      00007C 00 00r02r67           1932 	.dw	0,(Sstm8s_flash$FLASH_GetLowPowerMode$125)
+      000080 00 02                 1933 	.dw	2
+      000082 8F                    1934 	.db	143
+      000083 01                    1935 	.sleb128	1
+      000084 00 00 00 00           1936 	.dw	0,0
+      000088 00 00 00 00           1937 	.dw	0,0
+      00008C 00 00r02r39           1938 	.dw	0,(Sstm8s_flash$FLASH_SetProgrammingTime$114)
+      000090 00 00r02r4E           1939 	.dw	0,(Sstm8s_flash$FLASH_SetProgrammingTime$119)
+      000094 00 02                 1940 	.dw	2
+      000096 8F                    1941 	.db	143
+      000097 01                    1942 	.sleb128	1
+      000098 00 00 00 00           1943 	.dw	0,0
+      00009C 00 00 00 00           1944 	.dw	0,0
+      0000A0 00 00r02r15           1945 	.dw	0,(Sstm8s_flash$FLASH_SetLowPowerMode$107)
+      0000A4 00 00r02r2D           1946 	.dw	0,(Sstm8s_flash$FLASH_SetLowPowerMode$112)
+      0000A8 00 02                 1947 	.dw	2
+      0000AA 8F                    1948 	.db	143
+      0000AB 01                    1949 	.sleb128	1
+      0000AC 00 00 00 00           1950 	.dw	0,0
+      0000B0 00 00 00 00           1951 	.dw	0,0
+      0000B4 00 00r01rCA           1952 	.dw	0,(Sstm8s_flash$FLASH_ReadOptionByte$93)
+      0000B8 00 00r02r09           1953 	.dw	0,(Sstm8s_flash$FLASH_ReadOptionByte$105)
+      0000BC 00 02                 1954 	.dw	2
+      0000BE 8F                    1955 	.db	143
+      0000BF 01                    1956 	.sleb128	1
+      0000C0 00 00 00 00           1957 	.dw	0,0
+      0000C4 00 00 00 00           1958 	.dw	0,0
+      0000C8 00 00r01r89           1959 	.dw	0,(Sstm8s_flash$FLASH_EraseOptionByte$79)
+      0000CC 00 00r01rBE           1960 	.dw	0,(Sstm8s_flash$FLASH_EraseOptionByte$91)
+      0000D0 00 02                 1961 	.dw	2
+      0000D2 8F                    1962 	.db	143
+      0000D3 01                    1963 	.sleb128	1
+      0000D4 00 00 00 00           1964 	.dw	0,0
+      0000D8 00 00 00 00           1965 	.dw	0,0
+      0000DC 00 00r01r43           1966 	.dw	0,(Sstm8s_flash$FLASH_ProgramOptionByte$65)
+      0000E0 00 00r01r7D           1967 	.dw	0,(Sstm8s_flash$FLASH_ProgramOptionByte$77)
+      0000E4 00 02                 1968 	.dw	2
+      0000E6 8F                    1969 	.db	143
+      0000E7 01                    1970 	.sleb128	1
+      0000E8 00 00 00 00           1971 	.dw	0,0
+      0000EC 00 00 00 00           1972 	.dw	0,0
+      0000F0 00 00r00rF0           1973 	.dw	0,(Sstm8s_flash$FLASH_ProgramWord$54)
+      0000F4 00 00r01r37           1974 	.dw	0,(Sstm8s_flash$FLASH_ProgramWord$63)
+      0000F8 00 02                 1975 	.dw	2
+      0000FA 8F                    1976 	.db	143
+      0000FB 01                    1977 	.sleb128	1
+      0000FC 00 00 00 00           1978 	.dw	0,0
+      000100 00 00 00 00           1979 	.dw	0,0
+      000104 00 00r00rDA           1980 	.dw	0,(Sstm8s_flash$FLASH_ReadByte$48)
+      000108 00 00r00rE4           1981 	.dw	0,(Sstm8s_flash$FLASH_ReadByte$52)
+      00010C 00 02                 1982 	.dw	2
+      00010E 8F                    1983 	.db	143
+      00010F 01                    1984 	.sleb128	1
+      000110 00 00 00 00           1985 	.dw	0,0
+      000114 00 00 00 00           1986 	.dw	0,0
+      000118 00 00r00rC2           1987 	.dw	0,(Sstm8s_flash$FLASH_ProgramByte$42)
+      00011C 00 00r00rCE           1988 	.dw	0,(Sstm8s_flash$FLASH_ProgramByte$46)
+      000120 00 02                 1989 	.dw	2
+      000122 8F                    1990 	.db	143
+      000123 01                    1991 	.sleb128	1
+      000124 00 00 00 00           1992 	.dw	0,0
+      000128 00 00 00 00           1993 	.dw	0,0
+      00012C 00 00r00rAC           1994 	.dw	0,(Sstm8s_flash$FLASH_EraseByte$36)
+      000130 00 00r00rB6           1995 	.dw	0,(Sstm8s_flash$FLASH_EraseByte$40)
+      000134 00 02                 1996 	.dw	2
+      000136 8F                    1997 	.db	143
+      000137 01                    1998 	.sleb128	1
+      000138 00 00 00 00           1999 	.dw	0,0
+      00013C 00 00 00 00           2000 	.dw	0,0
+      000140 00 00r00r85           2001 	.dw	0,(Sstm8s_flash$FLASH_ITConfig$28)
+      000144 00 00r00rA0           2002 	.dw	0,(Sstm8s_flash$FLASH_ITConfig$34)
+      000148 00 02                 2003 	.dw	2
+      00014A 8F                    2004 	.db	143
+      00014B 01                    2005 	.sleb128	1
+      00014C 00 00 00 00           2006 	.dw	0,0
+      000150 00 00 00 00           2007 	.dw	0,0
+      000154 00 00r00r54           2008 	.dw	0,(Sstm8s_flash$FLASH_DeInit$17)
+      000158 00 00r00r79           2009 	.dw	0,(Sstm8s_flash$FLASH_DeInit$26)
+      00015C 00 02                 2010 	.dw	2
+      00015E 8F                    2011 	.db	143
+      00015F 01                    2012 	.sleb128	1
+      000160 00 00 00 00           2013 	.dw	0,0
+      000164 00 00 00 00           2014 	.dw	0,0
+      000168 00 00r00r37           2015 	.dw	0,(Sstm8s_flash$FLASH_Lock$11)
+      00016C 00 00r00r48           2016 	.dw	0,(Sstm8s_flash$FLASH_Lock$15)
+      000170 00 02                 2017 	.dw	2
+      000172 8F                    2018 	.db	143
+      000173 01                    2019 	.sleb128	1
+      000174 00 00 00 00           2020 	.dw	0,0
+      000178 00 00 00 00           2021 	.dw	0,0
+      00017C 00 00r00r0C           2022 	.dw	0,(Sstm8s_flash$FLASH_Unlock$1)
+      000180 00 00r00r2B           2023 	.dw	0,(Sstm8s_flash$FLASH_Unlock$9)
+      000184 00 02                 2024 	.dw	2
+      000186 8F                    2025 	.db	143
+      000187 01                    2026 	.sleb128	1
+      000188 00 00 00 00           2027 	.dw	0,0
+      00018C 00 00 00 00           2028 	.dw	0,0
+                                   2029 
+                                   2030 	.area .debug_abbrev (NOLOAD)
+      000000                       2031 Ldebug_abbrev:
+      000000 0C                    2032 	.uleb128	12
+      000001 0F                    2033 	.uleb128	15
+      000002 00                    2034 	.db	0
+      000003 0B                    2035 	.uleb128	11
+      000004 0B                    2036 	.uleb128	11
+      000005 49                    2037 	.uleb128	73
+      000006 13                    2038 	.uleb128	19
+      000007 00                    2039 	.uleb128	0
+      000008 00                    2040 	.uleb128	0
+      000009 0A                    2041 	.uleb128	10
+      00000A 34                    2042 	.uleb128	52
+      00000B 00                    2043 	.db	0
+      00000C 03                    2044 	.uleb128	3
+      00000D 08                    2045 	.uleb128	8
+      00000E 49                    2046 	.uleb128	73
+      00000F 13                    2047 	.uleb128	19
+      000010 00                    2048 	.uleb128	0
+      000011 00                    2049 	.uleb128	0
+      000012 04                    2050 	.uleb128	4
+      000013 0B                    2051 	.uleb128	11
+      000014 00                    2052 	.db	0
+      000015 00                    2053 	.uleb128	0
+      000016 00                    2054 	.uleb128	0
+      000017 0B                    2055 	.uleb128	11
+      000018 2E                    2056 	.uleb128	46
+      000019 00                    2057 	.db	0
+      00001A 03                    2058 	.uleb128	3
+      00001B 08                    2059 	.uleb128	8
+      00001C 11                    2060 	.uleb128	17
+      00001D 01                    2061 	.uleb128	1
+      00001E 12                    2062 	.uleb128	18
+      00001F 01                    2063 	.uleb128	1
+      000020 3F                    2064 	.uleb128	63
+      000021 0C                    2065 	.uleb128	12
+      000022 40                    2066 	.uleb128	64
+      000023 06                    2067 	.uleb128	6
+      000024 49                    2068 	.uleb128	73
+      000025 13                    2069 	.uleb128	19
+      000026 00                    2070 	.uleb128	0
+      000027 00                    2071 	.uleb128	0
+      000028 03                    2072 	.uleb128	3
+      000029 05                    2073 	.uleb128	5
+      00002A 00                    2074 	.db	0
+      00002B 02                    2075 	.uleb128	2
+      00002C 0A                    2076 	.uleb128	10
+      00002D 03                    2077 	.uleb128	3
+      00002E 08                    2078 	.uleb128	8
+      00002F 49                    2079 	.uleb128	73
+      000030 13                    2080 	.uleb128	19
+      000031 00                    2081 	.uleb128	0
+      000032 00                    2082 	.uleb128	0
+      000033 02                    2083 	.uleb128	2
+      000034 2E                    2084 	.uleb128	46
+      000035 01                    2085 	.db	1
+      000036 01                    2086 	.uleb128	1
+      000037 13                    2087 	.uleb128	19
+      000038 03                    2088 	.uleb128	3
+      000039 08                    2089 	.uleb128	8
+      00003A 11                    2090 	.uleb128	17
+      00003B 01                    2091 	.uleb128	1
+      00003C 12                    2092 	.uleb128	18
+      00003D 01                    2093 	.uleb128	1
+      00003E 3F                    2094 	.uleb128	63
+      00003F 0C                    2095 	.uleb128	12
+      000040 40                    2096 	.uleb128	64
+      000041 06                    2097 	.uleb128	6
+      000042 00                    2098 	.uleb128	0
+      000043 00                    2099 	.uleb128	0
+      000044 09                    2100 	.uleb128	9
+      000045 34                    2101 	.uleb128	52
+      000046 00                    2102 	.db	0
+      000047 02                    2103 	.uleb128	2
+      000048 0A                    2104 	.uleb128	10
+      000049 03                    2105 	.uleb128	3
+      00004A 08                    2106 	.uleb128	8
+      00004B 49                    2107 	.uleb128	73
+      00004C 13                    2108 	.uleb128	19
+      00004D 00                    2109 	.uleb128	0
+      00004E 00                    2110 	.uleb128	0
+      00004F 07                    2111 	.uleb128	7
+      000050 2E                    2112 	.uleb128	46
+      000051 01                    2113 	.db	1
+      000052 01                    2114 	.uleb128	1
+      000053 13                    2115 	.uleb128	19
+      000054 03                    2116 	.uleb128	3
+      000055 08                    2117 	.uleb128	8
+      000056 11                    2118 	.uleb128	17
+      000057 01                    2119 	.uleb128	1
+      000058 12                    2120 	.uleb128	18
+      000059 01                    2121 	.uleb128	1
+      00005A 3F                    2122 	.uleb128	63
+      00005B 0C                    2123 	.uleb128	12
+      00005C 40                    2124 	.uleb128	64
+      00005D 06                    2125 	.uleb128	6
+      00005E 49                    2126 	.uleb128	73
+      00005F 13                    2127 	.uleb128	19
+      000060 00                    2128 	.uleb128	0
+      000061 00                    2129 	.uleb128	0
+      000062 08                    2130 	.uleb128	8
+      000063 0B                    2131 	.uleb128	11
+      000064 01                    2132 	.db	1
+      000065 01                    2133 	.uleb128	1
+      000066 13                    2134 	.uleb128	19
+      000067 00                    2135 	.uleb128	0
+      000068 00                    2136 	.uleb128	0
+      000069 01                    2137 	.uleb128	1
+      00006A 11                    2138 	.uleb128	17
+      00006B 01                    2139 	.db	1
+      00006C 03                    2140 	.uleb128	3
+      00006D 08                    2141 	.uleb128	8
+      00006E 10                    2142 	.uleb128	16
+      00006F 06                    2143 	.uleb128	6
+      000070 13                    2144 	.uleb128	19
+      000071 0B                    2145 	.uleb128	11
+      000072 25                    2146 	.uleb128	37
+      000073 08                    2147 	.uleb128	8
+      000074 00                    2148 	.uleb128	0
+      000075 00                    2149 	.uleb128	0
+      000076 06                    2150 	.uleb128	6
+      000077 2E                    2151 	.uleb128	46
+      000078 00                    2152 	.db	0
+      000079 03                    2153 	.uleb128	3
+      00007A 08                    2154 	.uleb128	8
+      00007B 11                    2155 	.uleb128	17
+      00007C 01                    2156 	.uleb128	1
+      00007D 12                    2157 	.uleb128	18
+      00007E 01                    2158 	.uleb128	1
+      00007F 3F                    2159 	.uleb128	63
+      000080 0C                    2160 	.uleb128	12
+      000081 40                    2161 	.uleb128	64
+      000082 06                    2162 	.uleb128	6
+      000083 00                    2163 	.uleb128	0
+      000084 00                    2164 	.uleb128	0
+      000085 0D                    2165 	.uleb128	13
+      000086 2E                    2166 	.uleb128	46
+      000087 01                    2167 	.db	1
+      000088 03                    2168 	.uleb128	3
+      000089 08                    2169 	.uleb128	8
+      00008A 11                    2170 	.uleb128	17
+      00008B 01                    2171 	.uleb128	1
+      00008C 12                    2172 	.uleb128	18
+      00008D 01                    2173 	.uleb128	1
+      00008E 3F                    2174 	.uleb128	63
+      00008F 0C                    2175 	.uleb128	12
+      000090 40                    2176 	.uleb128	64
+      000091 06                    2177 	.uleb128	6
+      000092 00                    2178 	.uleb128	0
+      000093 00                    2179 	.uleb128	0
+      000094 05                    2180 	.uleb128	5
+      000095 24                    2181 	.uleb128	36
+      000096 00                    2182 	.db	0
+      000097 03                    2183 	.uleb128	3
+      000098 08                    2184 	.uleb128	8
+      000099 0B                    2185 	.uleb128	11
+      00009A 0B                    2186 	.uleb128	11
+      00009B 3E                    2187 	.uleb128	62
+      00009C 0B                    2188 	.uleb128	11
+      00009D 00                    2189 	.uleb128	0
+      00009E 00                    2190 	.uleb128	0
+      00009F 00                    2191 	.uleb128	0
+                                   2192 
+                                   2193 	.area .debug_info (NOLOAD)
+      000000 00 00 06 13           2194 	.dw	0,Ldebug_info_end-Ldebug_info_start
+      000004                       2195 Ldebug_info_start:
+      000004 00 02                 2196 	.dw	2
+      000006 00 00r00r00           2197 	.dw	0,(Ldebug_abbrev)
+      00000A 04                    2198 	.db	4
+      00000B 01                    2199 	.uleb128	1
+      00000C 53 74 64 50 65 72 69  2200 	.ascii "StdPeriphLib/src/stm8s_flash.c"
+             70 68 4C 69 62 2F 73
+             72 63 2F 73 74 6D 38
+             73 5F 66 6C 61 73 68
+             2E 63
+      00002A 00                    2201 	.db	0
+      00002B 00 00r00r00           2202 	.dw	0,(Ldebug_line_start+-4)
+      00002F 01                    2203 	.db	1
+      000030 53 44 43 43 20 76 65  2204 	.ascii "SDCC version 3.6.0 #9615"
+             72 73 69 6F 6E 20 33
+             2E 36 2E 30 20 23 39
+             36 31 35
+      000048 00                    2205 	.db	0
+      000049 02                    2206 	.uleb128	2
+      00004A 00 00 00 81           2207 	.dw	0,129
+      00004E 46 4C 41 53 48 5F 55  2208 	.ascii "FLASH_Unlock"
+             6E 6C 6F 63 6B
+      00005A 00                    2209 	.db	0
+      00005B 00 00r00r00           2210 	.dw	0,(_FLASH_Unlock)
+      00005F 00 00r00r2B           2211 	.dw	0,(XG$FLASH_Unlock$0$0+7)
+      000063 01                    2212 	.db	1
+      000064 00 00r01r7C           2213 	.dw	0,(Ldebug_loc_start+380)
+      000068 03                    2214 	.uleb128	3
+      000069 02                    2215 	.db	2
+      00006A 91                    2216 	.db	145
+      00006B 04                    2217 	.sleb128	4
+      00006C 46 4C 41 53 48 5F 4D  2218 	.ascii "FLASH_MemType"
+             65 6D 54 79 70 65
+      000079 00                    2219 	.db	0
+      00007A 00 00 00 81           2220 	.dw	0,129
+      00007E 04                    2221 	.uleb128	4
+      00007F 04                    2222 	.uleb128	4
+      000080 00                    2223 	.uleb128	0
+      000081 05                    2224 	.uleb128	5
+      000082 75 6E 73 69 67 6E 65  2225 	.ascii "unsigned char"
+             64 20 63 68 61 72
+      00008F 00                    2226 	.db	0
+      000090 01                    2227 	.db	1
+      000091 08                    2228 	.db	8
+      000092 02                    2229 	.uleb128	2
+      000093 00 00 00 C6           2230 	.dw	0,198
+      000097 46 4C 41 53 48 5F 4C  2231 	.ascii "FLASH_Lock"
+             6F 63 6B
+      0000A1 00                    2232 	.db	0
+      0000A2 00 00r00r2B           2233 	.dw	0,(_FLASH_Lock)
+      0000A6 00 00r00r48           2234 	.dw	0,(XG$FLASH_Lock$0$0+7)
+      0000AA 01                    2235 	.db	1
+      0000AB 00 00r01r68           2236 	.dw	0,(Ldebug_loc_start+360)
+      0000AF 03                    2237 	.uleb128	3
+      0000B0 02                    2238 	.db	2
+      0000B1 91                    2239 	.db	145
+      0000B2 04                    2240 	.sleb128	4
+      0000B3 46 4C 41 53 48 5F 4D  2241 	.ascii "FLASH_MemType"
+             65 6D 54 79 70 65
+      0000C0 00                    2242 	.db	0
+      0000C1 00 00 00 81           2243 	.dw	0,129
+      0000C5 00                    2244 	.uleb128	0
+      0000C6 06                    2245 	.uleb128	6
+      0000C7 46 4C 41 53 48 5F 44  2246 	.ascii "FLASH_DeInit"
+             65 49 6E 69 74
+      0000D3 00                    2247 	.db	0
+      0000D4 00 00r00r48           2248 	.dw	0,(_FLASH_DeInit)
+      0000D8 00 00r00r79           2249 	.dw	0,(XG$FLASH_DeInit$0$0+7)
+      0000DC 01                    2250 	.db	1
+      0000DD 00 00r01r54           2251 	.dw	0,(Ldebug_loc_start+340)
+      0000E1 02                    2252 	.uleb128	2
+      0000E2 00 00 01 16           2253 	.dw	0,278
+      0000E6 46 4C 41 53 48 5F 49  2254 	.ascii "FLASH_ITConfig"
+             54 43 6F 6E 66 69 67
+      0000F4 00                    2255 	.db	0
+      0000F5 00 00r00r79           2256 	.dw	0,(_FLASH_ITConfig)
+      0000F9 00 00r00rA0           2257 	.dw	0,(XG$FLASH_ITConfig$0$0+7)
+      0000FD 01                    2258 	.db	1
+      0000FE 00 00r01r40           2259 	.dw	0,(Ldebug_loc_start+320)
+      000102 03                    2260 	.uleb128	3
+      000103 02                    2261 	.db	2
+      000104 91                    2262 	.db	145
+      000105 04                    2263 	.sleb128	4
+      000106 4E 65 77 53 74 61 74  2264 	.ascii "NewState"
+             65
+      00010E 00                    2265 	.db	0
+      00010F 00 00 00 81           2266 	.dw	0,129
+      000113 04                    2267 	.uleb128	4
+      000114 04                    2268 	.uleb128	4
+      000115 00                    2269 	.uleb128	0
+      000116 02                    2270 	.uleb128	2
+      000117 00 00 01 49           2271 	.dw	0,329
+      00011B 46 4C 41 53 48 5F 45  2272 	.ascii "FLASH_EraseByte"
+             72 61 73 65 42 79 74
+             65
+      00012A 00                    2273 	.db	0
+      00012B 00 00r00rA0           2274 	.dw	0,(_FLASH_EraseByte)
+      00012F 00 00r00rB6           2275 	.dw	0,(XG$FLASH_EraseByte$0$0+7)
+      000133 01                    2276 	.db	1
+      000134 00 00r01r2C           2277 	.dw	0,(Ldebug_loc_start+300)
+      000138 03                    2278 	.uleb128	3
+      000139 02                    2279 	.db	2
+      00013A 91                    2280 	.db	145
+      00013B 04                    2281 	.sleb128	4
+      00013C 41 64 64 72 65 73 73  2282 	.ascii "Address"
+      000143 00                    2283 	.db	0
+      000144 00 00 01 49           2284 	.dw	0,329
+      000148 00                    2285 	.uleb128	0
+      000149 05                    2286 	.uleb128	5
+      00014A 75 6E 73 69 67 6E 65  2287 	.ascii "unsigned long"
+             64 20 6C 6F 6E 67
+      000157 00                    2288 	.db	0
+      000158 04                    2289 	.db	4
+      000159 07                    2290 	.db	7
+      00015A 02                    2291 	.uleb128	2
+      00015B 00 00 01 9C           2292 	.dw	0,412
+      00015F 46 4C 41 53 48 5F 50  2293 	.ascii "FLASH_ProgramByte"
+             72 6F 67 72 61 6D 42
+             79 74 65
+      000170 00                    2294 	.db	0
+      000171 00 00r00rB6           2295 	.dw	0,(_FLASH_ProgramByte)
+      000175 00 00r00rCE           2296 	.dw	0,(XG$FLASH_ProgramByte$0$0+7)
+      000179 01                    2297 	.db	1
+      00017A 00 00r01r18           2298 	.dw	0,(Ldebug_loc_start+280)
+      00017E 03                    2299 	.uleb128	3
+      00017F 02                    2300 	.db	2
+      000180 91                    2301 	.db	145
+      000181 04                    2302 	.sleb128	4
+      000182 41 64 64 72 65 73 73  2303 	.ascii "Address"
+      000189 00                    2304 	.db	0
+      00018A 00 00 01 49           2305 	.dw	0,329
+      00018E 03                    2306 	.uleb128	3
+      00018F 02                    2307 	.db	2
+      000190 91                    2308 	.db	145
+      000191 08                    2309 	.sleb128	8
+      000192 44 61 74 61           2310 	.ascii "Data"
+      000196 00                    2311 	.db	0
+      000197 00 00 00 81           2312 	.dw	0,129
+      00019B 00                    2313 	.uleb128	0
+      00019C 07                    2314 	.uleb128	7
+      00019D 00 00 01 D2           2315 	.dw	0,466
+      0001A1 46 4C 41 53 48 5F 52  2316 	.ascii "FLASH_ReadByte"
+             65 61 64 42 79 74 65
+      0001AF 00                    2317 	.db	0
+      0001B0 00 00r00rCE           2318 	.dw	0,(_FLASH_ReadByte)
+      0001B4 00 00r00rE4           2319 	.dw	0,(XG$FLASH_ReadByte$0$0+7)
+      0001B8 01                    2320 	.db	1
+      0001B9 00 00r01r04           2321 	.dw	0,(Ldebug_loc_start+260)
+      0001BD 00 00 00 81           2322 	.dw	0,129
+      0001C1 03                    2323 	.uleb128	3
+      0001C2 02                    2324 	.db	2
+      0001C3 91                    2325 	.db	145
+      0001C4 04                    2326 	.sleb128	4
+      0001C5 41 64 64 72 65 73 73  2327 	.ascii "Address"
+      0001CC 00                    2328 	.db	0
+      0001CD 00 00 01 49           2329 	.dw	0,329
+      0001D1 00                    2330 	.uleb128	0
+      0001D2 02                    2331 	.uleb128	2
+      0001D3 00 00 02 14           2332 	.dw	0,532
+      0001D7 46 4C 41 53 48 5F 50  2333 	.ascii "FLASH_ProgramWord"
+             72 6F 67 72 61 6D 57
+             6F 72 64
+      0001E8 00                    2334 	.db	0
+      0001E9 00 00r00rE4           2335 	.dw	0,(_FLASH_ProgramWord)
+      0001ED 00 00r01r37           2336 	.dw	0,(XG$FLASH_ProgramWord$0$0+7)
+      0001F1 01                    2337 	.db	1
+      0001F2 00 00r00rF0           2338 	.dw	0,(Ldebug_loc_start+240)
+      0001F6 03                    2339 	.uleb128	3
+      0001F7 02                    2340 	.db	2
+      0001F8 91                    2341 	.db	145
+      0001F9 04                    2342 	.sleb128	4
+      0001FA 41 64 64 72 65 73 73  2343 	.ascii "Address"
+      000201 00                    2344 	.db	0
+      000202 00 00 01 49           2345 	.dw	0,329
+      000206 03                    2346 	.uleb128	3
+      000207 02                    2347 	.db	2
+      000208 91                    2348 	.db	145
+      000209 08                    2349 	.sleb128	8
+      00020A 44 61 74 61           2350 	.ascii "Data"
+      00020E 00                    2351 	.db	0
+      00020F 00 00 01 49           2352 	.dw	0,329
+      000213 00                    2353 	.uleb128	0
+      000214 02                    2354 	.uleb128	2
+      000215 00 00 02 5E           2355 	.dw	0,606
+      000219 46 4C 41 53 48 5F 50  2356 	.ascii "FLASH_ProgramOptionByte"
+             72 6F 67 72 61 6D 4F
+             70 74 69 6F 6E 42 79
+             74 65
+      000230 00                    2357 	.db	0
+      000231 00 00r01r37           2358 	.dw	0,(_FLASH_ProgramOptionByte)
+      000235 00 00r01r7D           2359 	.dw	0,(XG$FLASH_ProgramOptionByte$0$0+7)
+      000239 01                    2360 	.db	1
+      00023A 00 00r00rDC           2361 	.dw	0,(Ldebug_loc_start+220)
+      00023E 03                    2362 	.uleb128	3
+      00023F 02                    2363 	.db	2
+      000240 91                    2364 	.db	145
+      000241 04                    2365 	.sleb128	4
+      000242 41 64 64 72 65 73 73  2366 	.ascii "Address"
+      000249 00                    2367 	.db	0
+      00024A 00 00 02 5E           2368 	.dw	0,606
+      00024E 03                    2369 	.uleb128	3
+      00024F 02                    2370 	.db	2
+      000250 91                    2371 	.db	145
+      000251 06                    2372 	.sleb128	6
+      000252 44 61 74 61           2373 	.ascii "Data"
+      000256 00                    2374 	.db	0
+      000257 00 00 00 81           2375 	.dw	0,129
+      00025B 04                    2376 	.uleb128	4
+      00025C 04                    2377 	.uleb128	4
+      00025D 00                    2378 	.uleb128	0
+      00025E 05                    2379 	.uleb128	5
+      00025F 75 6E 73 69 67 6E 65  2380 	.ascii "unsigned int"
+             64 20 69 6E 74
+      00026B 00                    2381 	.db	0
+      00026C 02                    2382 	.db	2
+      00026D 07                    2383 	.db	7
+      00026E 02                    2384 	.uleb128	2
+      00026F 00 00 02 A9           2385 	.dw	0,681
+      000273 46 4C 41 53 48 5F 45  2386 	.ascii "FLASH_EraseOptionByte"
+             72 61 73 65 4F 70 74
+             69 6F 6E 42 79 74 65
+      000288 00                    2387 	.db	0
+      000289 00 00r01r7D           2388 	.dw	0,(_FLASH_EraseOptionByte)
+      00028D 00 00r01rBE           2389 	.dw	0,(XG$FLASH_EraseOptionByte$0$0+7)
+      000291 01                    2390 	.db	1
+      000292 00 00r00rC8           2391 	.dw	0,(Ldebug_loc_start+200)
+      000296 03                    2392 	.uleb128	3
+      000297 02                    2393 	.db	2
+      000298 91                    2394 	.db	145
+      000299 04                    2395 	.sleb128	4
+      00029A 41 64 64 72 65 73 73  2396 	.ascii "Address"
+      0002A1 00                    2397 	.db	0
+      0002A2 00 00 02 5E           2398 	.dw	0,606
+      0002A6 04                    2399 	.uleb128	4
+      0002A7 04                    2400 	.uleb128	4
+      0002A8 00                    2401 	.uleb128	0
+      0002A9 07                    2402 	.uleb128	7
+      0002AA 00 00 03 30           2403 	.dw	0,816
+      0002AE 46 4C 41 53 48 5F 52  2404 	.ascii "FLASH_ReadOptionByte"
+             65 61 64 4F 70 74 69
+             6F 6E 42 79 74 65
+      0002C2 00                    2405 	.db	0
+      0002C3 00 00r01rBE           2406 	.dw	0,(_FLASH_ReadOptionByte)
+      0002C7 00 00r02r09           2407 	.dw	0,(XG$FLASH_ReadOptionByte$0$0+7)
+      0002CB 01                    2408 	.db	1
+      0002CC 00 00r00rB4           2409 	.dw	0,(Ldebug_loc_start+180)
+      0002D0 00 00 02 5E           2410 	.dw	0,606
+      0002D4 03                    2411 	.uleb128	3
+      0002D5 02                    2412 	.db	2
+      0002D6 91                    2413 	.db	145
+      0002D7 04                    2414 	.sleb128	4
+      0002D8 41 64 64 72 65 73 73  2415 	.ascii "Address"
+      0002DF 00                    2416 	.db	0
+      0002E0 00 00 02 5E           2417 	.dw	0,606
+      0002E4 04                    2418 	.uleb128	4
+      0002E5 08                    2419 	.uleb128	8
+      0002E6 00 00 02 ED           2420 	.dw	0,749
+      0002EA 04                    2421 	.uleb128	4
+      0002EB 04                    2422 	.uleb128	4
+      0002EC 00                    2423 	.uleb128	0
+      0002ED 09                    2424 	.uleb128	9
+      0002EE 01                    2425 	.db	1
+      0002EF 51                    2426 	.db	81
+      0002F0 76 61 6C 75 65 5F 6F  2427 	.ascii "value_optbyte"
+             70 74 62 79 74 65
+      0002FD 00                    2428 	.db	0
+      0002FE 00 00 00 81           2429 	.dw	0,129
+      000302 0A                    2430 	.uleb128	10
+      000303 76 61 6C 75 65 5F 6F  2431 	.ascii "value_optbyte_complement"
+             70 74 62 79 74 65 5F
+             63 6F 6D 70 6C 65 6D
+             65 6E 74
+      00031B 00                    2432 	.db	0
+      00031C 00 00 00 81           2433 	.dw	0,129
+      000320 0A                    2434 	.uleb128	10
+      000321 72 65 73 5F 76 61 6C  2435 	.ascii "res_value"
+             75 65
+      00032A 00                    2436 	.db	0
+      00032B 00 00 02 5E           2437 	.dw	0,606
+      00032F 00                    2438 	.uleb128	0
+      000330 02                    2439 	.uleb128	2
+      000331 00 00 03 6E           2440 	.dw	0,878
+      000335 46 4C 41 53 48 5F 53  2441 	.ascii "FLASH_SetLowPowerMode"
+             65 74 4C 6F 77 50 6F
+             77 65 72 4D 6F 64 65
+      00034A 00                    2442 	.db	0
+      00034B 00 00r02r09           2443 	.dw	0,(_FLASH_SetLowPowerMode)
+      00034F 00 00r02r2D           2444 	.dw	0,(XG$FLASH_SetLowPowerMode$0$0+7)
+      000353 01                    2445 	.db	1
+      000354 00 00r00rA0           2446 	.dw	0,(Ldebug_loc_start+160)
+      000358 03                    2447 	.uleb128	3
+      000359 02                    2448 	.db	2
+      00035A 91                    2449 	.db	145
+      00035B 04                    2450 	.sleb128	4
+      00035C 46 4C 41 53 48 5F 4C  2451 	.ascii "FLASH_LPMode"
+             50 4D 6F 64 65
+      000368 00                    2452 	.db	0
+      000369 00 00 00 81           2453 	.dw	0,129
+      00036D 00                    2454 	.uleb128	0
+      00036E 02                    2455 	.uleb128	2
+      00036F 00 00 03 B1           2456 	.dw	0,945
+      000373 46 4C 41 53 48 5F 53  2457 	.ascii "FLASH_SetProgrammingTime"
+             65 74 50 72 6F 67 72
+             61 6D 6D 69 6E 67 54
+             69 6D 65
+      00038B 00                    2458 	.db	0
+      00038C 00 00r02r2D           2459 	.dw	0,(_FLASH_SetProgrammingTime)
+      000390 00 00r02r4E           2460 	.dw	0,(XG$FLASH_SetProgrammingTime$0$0+7)
+      000394 01                    2461 	.db	1
+      000395 00 00r00r8C           2462 	.dw	0,(Ldebug_loc_start+140)
+      000399 03                    2463 	.uleb128	3
+      00039A 02                    2464 	.db	2
+      00039B 91                    2465 	.db	145
+      00039C 04                    2466 	.sleb128	4
+      00039D 46 4C 41 53 48 5F 50  2467 	.ascii "FLASH_ProgTime"
+             72 6F 67 54 69 6D 65
+      0003AB 00                    2468 	.db	0
+      0003AC 00 00 00 81           2469 	.dw	0,129
+      0003B0 00                    2470 	.uleb128	0
+      0003B1 0B                    2471 	.uleb128	11
+      0003B2 46 4C 41 53 48 5F 47  2472 	.ascii "FLASH_GetLowPowerMode"
+             65 74 4C 6F 77 50 6F
+             77 65 72 4D 6F 64 65
+      0003C7 00                    2473 	.db	0
+      0003C8 00 00r02r4E           2474 	.dw	0,(_FLASH_GetLowPowerMode)
+      0003CC 00 00r02r67           2475 	.dw	0,(XG$FLASH_GetLowPowerMode$0$0+7)
+      0003D0 01                    2476 	.db	1
+      0003D1 00 00r00r78           2477 	.dw	0,(Ldebug_loc_start+120)
+      0003D5 00 00 00 81           2478 	.dw	0,129
+      0003D9 0B                    2479 	.uleb128	11
+      0003DA 46 4C 41 53 48 5F 47  2480 	.ascii "FLASH_GetProgrammingTime"
+             65 74 50 72 6F 67 72
+             61 6D 6D 69 6E 67 54
+             69 6D 65
+      0003F2 00                    2481 	.db	0
+      0003F3 00 00r02r67           2482 	.dw	0,(_FLASH_GetProgrammingTime)
+      0003F7 00 00r02r80           2483 	.dw	0,(XG$FLASH_GetProgrammingTime$0$0+7)
+      0003FB 01                    2484 	.db	1
+      0003FC 00 00r00r64           2485 	.dw	0,(Ldebug_loc_start+100)
+      000400 00 00 00 81           2486 	.dw	0,129
+      000404 07                    2487 	.uleb128	7
+      000405 00 00 04 3B           2488 	.dw	0,1083
+      000409 46 4C 41 53 48 5F 47  2489 	.ascii "FLASH_GetBootSize"
+             65 74 42 6F 6F 74 53
+             69 7A 65
+      00041A 00                    2490 	.db	0
+      00041B 00 00r02r80           2491 	.dw	0,(_FLASH_GetBootSize)
+      00041F 00 00r02rC6           2492 	.dw	0,(XG$FLASH_GetBootSize$0$0+7)
+      000423 01                    2493 	.db	1
+      000424 00 00r00r50           2494 	.dw	0,(Ldebug_loc_start+80)
+      000428 00 00 01 49           2495 	.dw	0,329
+      00042C 04                    2496 	.uleb128	4
+      00042D 09                    2497 	.uleb128	9
+      00042E 02                    2498 	.db	2
+      00042F 91                    2499 	.db	145
+      000430 7C                    2500 	.sleb128	-4
+      000431 74 65 6D 70           2501 	.ascii "temp"
+      000435 00                    2502 	.db	0
+      000436 00 00 01 49           2503 	.dw	0,329
+      00043A 00                    2504 	.uleb128	0
+      00043B 07                    2505 	.uleb128	7
+      00043C 00 00 04 89           2506 	.dw	0,1161
+      000440 46 4C 41 53 48 5F 47  2507 	.ascii "FLASH_GetFlagStatus"
+             65 74 46 6C 61 67 53
+             74 61 74 75 73
+      000453 00                    2508 	.db	0
+      000454 00 00r02rC6           2509 	.dw	0,(_FLASH_GetFlagStatus)
+      000458 00 00r02rE7           2510 	.dw	0,(XG$FLASH_GetFlagStatus$0$0+7)
+      00045C 01                    2511 	.db	1
+      00045D 00 00r00r3C           2512 	.dw	0,(Ldebug_loc_start+60)
+      000461 00 00 00 81           2513 	.dw	0,129
+      000465 03                    2514 	.uleb128	3
+      000466 02                    2515 	.db	2
+      000467 91                    2516 	.db	145
+      000468 04                    2517 	.sleb128	4
+      000469 46 4C 41 53 48 5F 46  2518 	.ascii "FLASH_FLAG"
+             4C 41 47
+      000473 00                    2519 	.db	0
+      000474 00 00 00 81           2520 	.dw	0,129
+      000478 04                    2521 	.uleb128	4
+      000479 04                    2522 	.uleb128	4
+      00047A 09                    2523 	.uleb128	9
+      00047B 01                    2524 	.db	1
+      00047C 51                    2525 	.db	81
+      00047D 73 74 61 74 75 73     2526 	.ascii "status"
+      000483 00                    2527 	.db	0
+      000484 00 00 00 81           2528 	.dw	0,129
+      000488 00                    2529 	.uleb128	0
+      000489 07                    2530 	.uleb128	7
+      00048A 00 00 04 FF           2531 	.dw	0,1279
+      00048E 46 4C 41 53 48 5F 57  2532 	.ascii "FLASH_WaitForLastOperation"
+             61 69 74 46 6F 72 4C
+             61 73 74 4F 70 65 72
+             61 74 69 6F 6E
+      0004A8 00                    2533 	.db	0
+      0004A9 00 00r02rE7           2534 	.dw	0,(_FLASH_WaitForLastOperation)
+      0004AD 00 00r03r32           2535 	.dw	0,(XG$FLASH_WaitForLastOperation$0$0+7)
+      0004B1 01                    2536 	.db	1
+      0004B2 00 00r00r28           2537 	.dw	0,(Ldebug_loc_start+40)
+      0004B6 00 00 00 81           2538 	.dw	0,129
+      0004BA 03                    2539 	.uleb128	3
+      0004BB 02                    2540 	.db	2
+      0004BC 91                    2541 	.db	145
+      0004BD 04                    2542 	.sleb128	4
+      0004BE 46 4C 41 53 48 5F 4D  2543 	.ascii "FLASH_MemType"
+             65 6D 54 79 70 65
+      0004CB 00                    2544 	.db	0
+      0004CC 00 00 00 81           2545 	.dw	0,129
+      0004D0 08                    2546 	.uleb128	8
+      0004D1 00 00 04 D7           2547 	.dw	0,1239
+      0004D5 04                    2548 	.uleb128	4
+      0004D6 00                    2549 	.uleb128	0
+      0004D7 08                    2550 	.uleb128	8
+      0004D8 00 00 04 DE           2551 	.dw	0,1246
+      0004DC 04                    2552 	.uleb128	4
+      0004DD 00                    2553 	.uleb128	0
+      0004DE 04                    2554 	.uleb128	4
+      0004DF 09                    2555 	.uleb128	9
+      0004E0 01                    2556 	.db	1
+      0004E1 51                    2557 	.db	81
+      0004E2 66 6C 61 67 73 74 61  2558 	.ascii "flagstatus"
+             74 75 73
+      0004EC 00                    2559 	.db	0
+      0004ED 00 00 00 81           2560 	.dw	0,129
+      0004F1 0A                    2561 	.uleb128	10
+      0004F2 74 69 6D 65 6F 75 74  2562 	.ascii "timeout"
+      0004F9 00                    2563 	.db	0
+      0004FA 00 00 02 5E           2564 	.dw	0,606
+      0004FE 00                    2565 	.uleb128	0
+      0004FF 02                    2566 	.uleb128	2
+      000500 00 00 05 77           2567 	.dw	0,1399
+      000504 46 4C 41 53 48 5F 45  2568 	.ascii "FLASH_EraseBlock"
+             72 61 73 65 42 6C 6F
+             63 6B
+      000514 00                    2569 	.db	0
+      000515 00 00r03r32           2570 	.dw	0,(_FLASH_EraseBlock)
+      000519 00 00r03r8E           2571 	.dw	0,(XG$FLASH_EraseBlock$0$0+7)
+      00051D 01                    2572 	.db	1
+      00051E 00 00r00r14           2573 	.dw	0,(Ldebug_loc_start+20)
+      000522 03                    2574 	.uleb128	3
+      000523 02                    2575 	.db	2
+      000524 91                    2576 	.db	145
+      000525 04                    2577 	.sleb128	4
+      000526 42 6C 6F 63 6B 4E 75  2578 	.ascii "BlockNum"
+             6D
+      00052E 00                    2579 	.db	0
+      00052F 00 00 02 5E           2580 	.dw	0,606
+      000533 03                    2581 	.uleb128	3
+      000534 02                    2582 	.db	2
+      000535 91                    2583 	.db	145
+      000536 06                    2584 	.sleb128	6
+      000537 46 4C 41 53 48 5F 4D  2585 	.ascii "FLASH_MemType"
+             65 6D 54 79 70 65
+      000544 00                    2586 	.db	0
+      000545 00 00 00 81           2587 	.dw	0,129
+      000549 04                    2588 	.uleb128	4
+      00054A 04                    2589 	.uleb128	4
+      00054B 09                    2590 	.uleb128	9
+      00054C 02                    2591 	.db	2
+      00054D 91                    2592 	.db	145
+      00054E 7C                    2593 	.sleb128	-4
+      00054F 73 74 61 72 74 61 64  2594 	.ascii "startaddress"
+             64 72 65 73 73
+      00055B 00                    2595 	.db	0
+      00055C 00 00 01 49           2596 	.dw	0,329
+      000560 0C                    2597 	.uleb128	12
+      000561 02                    2598 	.db	2
+      000562 00 00 01 49           2599 	.dw	0,329
+      000566 09                    2600 	.uleb128	9
+      000567 02                    2601 	.db	2
+      000568 91                    2602 	.db	145
+      000569 7A                    2603 	.sleb128	-6
+      00056A 70 77 46 6C 61 73 68  2604 	.ascii "pwFlash"
+      000571 00                    2605 	.db	0
+      000572 00 00 05 60           2606 	.dw	0,1376
+      000576 00                    2607 	.uleb128	0
+      000577 0D                    2608 	.uleb128	13
+      000578 46 4C 41 53 48 5F 50  2609 	.ascii "FLASH_ProgramBlock"
+             72 6F 67 72 61 6D 42
+             6C 6F 63 6B
+      00058A 00                    2610 	.db	0
+      00058B 00 00r03r8E           2611 	.dw	0,(_FLASH_ProgramBlock)
+      00058F 00 00r04r2D           2612 	.dw	0,(XG$FLASH_ProgramBlock$0$0+7)
+      000593 01                    2613 	.db	1
+      000594 00 00r00r00           2614 	.dw	0,(Ldebug_loc_start)
+      000598 03                    2615 	.uleb128	3
+      000599 02                    2616 	.db	2
+      00059A 91                    2617 	.db	145
+      00059B 04                    2618 	.sleb128	4
+      00059C 42 6C 6F 63 6B 4E 75  2619 	.ascii "BlockNum"
+             6D
+      0005A4 00                    2620 	.db	0
+      0005A5 00 00 02 5E           2621 	.dw	0,606
+      0005A9 03                    2622 	.uleb128	3
+      0005AA 02                    2623 	.db	2
+      0005AB 91                    2624 	.db	145
+      0005AC 06                    2625 	.sleb128	6
+      0005AD 46 4C 41 53 48 5F 4D  2626 	.ascii "FLASH_MemType"
+             65 6D 54 79 70 65
+      0005BA 00                    2627 	.db	0
+      0005BB 00 00 00 81           2628 	.dw	0,129
+      0005BF 03                    2629 	.uleb128	3
+      0005C0 02                    2630 	.db	2
+      0005C1 91                    2631 	.db	145
+      0005C2 07                    2632 	.sleb128	7
+      0005C3 46 4C 41 53 48 5F 50  2633 	.ascii "FLASH_ProgMode"
+             72 6F 67 4D 6F 64 65
+      0005D1 00                    2634 	.db	0
+      0005D2 00 00 00 81           2635 	.dw	0,129
+      0005D6 0C                    2636 	.uleb128	12
+      0005D7 02                    2637 	.db	2
+      0005D8 00 00 00 81           2638 	.dw	0,129
+      0005DC 03                    2639 	.uleb128	3
+      0005DD 02                    2640 	.db	2
+      0005DE 91                    2641 	.db	145
+      0005DF 08                    2642 	.sleb128	8
+      0005E0 42 75 66 66 65 72     2643 	.ascii "Buffer"
+      0005E6 00                    2644 	.db	0
+      0005E7 00 00 05 D6           2645 	.dw	0,1494
+      0005EB 04                    2646 	.uleb128	4
+      0005EC 04                    2647 	.uleb128	4
+      0005ED 04                    2648 	.uleb128	4
+      0005EE 04                    2649 	.uleb128	4
+      0005EF 04                    2650 	.uleb128	4
+      0005F0 09                    2651 	.uleb128	9
+      0005F1 02                    2652 	.db	2
+      0005F2 91                    2653 	.db	145
+      0005F3 72                    2654 	.sleb128	-14
+      0005F4 43 6F 75 6E 74        2655 	.ascii "Count"
+      0005F9 00                    2656 	.db	0
+      0005FA 00 00 02 5E           2657 	.dw	0,606
+      0005FE 09                    2658 	.uleb128	9
+      0005FF 02                    2659 	.db	2
+      000600 91                    2660 	.db	145
+      000601 6E                    2661 	.sleb128	-18
+      000602 73 74 61 72 74 61 64  2662 	.ascii "startaddress"
+             64 72 65 73 73
+      00060E 00                    2663 	.db	0
+      00060F 00 00 01 49           2664 	.dw	0,329
+      000613 00                    2665 	.uleb128	0
+      000614 00                    2666 	.uleb128	0
+      000615 00                    2667 	.uleb128	0
+      000616 00                    2668 	.uleb128	0
+      000617                       2669 Ldebug_info_end:
+                                   2670 
+                                   2671 	.area .debug_pubnames (NOLOAD)
+      000000 00 00 01 DB           2672 	.dw	0,Ldebug_pubnames_end-Ldebug_pubnames_start
+      000004                       2673 Ldebug_pubnames_start:
+      000004 00 02                 2674 	.dw	2
+      000006 00 00r00r00           2675 	.dw	0,(Ldebug_info_start-4)
+      00000A 00 00 06 17           2676 	.dw	0,4+Ldebug_info_end-Ldebug_info_start
+      00000E 00 00 00 49           2677 	.dw	0,73
+      000012 46 4C 41 53 48 5F 55  2678 	.ascii "FLASH_Unlock"
+             6E 6C 6F 63 6B
+      00001E 00                    2679 	.db	0
+      00001F 00 00 00 92           2680 	.dw	0,146
+      000023 46 4C 41 53 48 5F 4C  2681 	.ascii "FLASH_Lock"
+             6F 63 6B
+      00002D 00                    2682 	.db	0
+      00002E 00 00 00 C6           2683 	.dw	0,198
+      000032 46 4C 41 53 48 5F 44  2684 	.ascii "FLASH_DeInit"
+             65 49 6E 69 74
+      00003E 00                    2685 	.db	0
+      00003F 00 00 00 E1           2686 	.dw	0,225
+      000043 46 4C 41 53 48 5F 49  2687 	.ascii "FLASH_ITConfig"
+             54 43 6F 6E 66 69 67
+      000051 00                    2688 	.db	0
+      000052 00 00 01 16           2689 	.dw	0,278
+      000056 46 4C 41 53 48 5F 45  2690 	.ascii "FLASH_EraseByte"
+             72 61 73 65 42 79 74
+             65
+      000065 00                    2691 	.db	0
+      000066 00 00 01 5A           2692 	.dw	0,346
+      00006A 46 4C 41 53 48 5F 50  2693 	.ascii "FLASH_ProgramByte"
+             72 6F 67 72 61 6D 42
+             79 74 65
+      00007B 00                    2694 	.db	0
+      00007C 00 00 01 9C           2695 	.dw	0,412
+      000080 46 4C 41 53 48 5F 52  2696 	.ascii "FLASH_ReadByte"
+             65 61 64 42 79 74 65
+      00008E 00                    2697 	.db	0
+      00008F 00 00 01 D2           2698 	.dw	0,466
+      000093 46 4C 41 53 48 5F 50  2699 	.ascii "FLASH_ProgramWord"
+             72 6F 67 72 61 6D 57
+             6F 72 64
+      0000A4 00                    2700 	.db	0
+      0000A5 00 00 02 14           2701 	.dw	0,532
+      0000A9 46 4C 41 53 48 5F 50  2702 	.ascii "FLASH_ProgramOptionByte"
+             72 6F 67 72 61 6D 4F
+             70 74 69 6F 6E 42 79
+             74 65
+      0000C0 00                    2703 	.db	0
+      0000C1 00 00 02 6E           2704 	.dw	0,622
+      0000C5 46 4C 41 53 48 5F 45  2705 	.ascii "FLASH_EraseOptionByte"
+             72 61 73 65 4F 70 74
+             69 6F 6E 42 79 74 65
+      0000DA 00                    2706 	.db	0
+      0000DB 00 00 02 A9           2707 	.dw	0,681
+      0000DF 46 4C 41 53 48 5F 52  2708 	.ascii "FLASH_ReadOptionByte"
+             65 61 64 4F 70 74 69
+             6F 6E 42 79 74 65
+      0000F3 00                    2709 	.db	0
+      0000F4 00 00 03 30           2710 	.dw	0,816
+      0000F8 46 4C 41 53 48 5F 53  2711 	.ascii "FLASH_SetLowPowerMode"
+             65 74 4C 6F 77 50 6F
+             77 65 72 4D 6F 64 65
+      00010D 00                    2712 	.db	0
+      00010E 00 00 03 6E           2713 	.dw	0,878
+      000112 46 4C 41 53 48 5F 53  2714 	.ascii "FLASH_SetProgrammingTime"
+             65 74 50 72 6F 67 72
+             61 6D 6D 69 6E 67 54
+             69 6D 65
+      00012A 00                    2715 	.db	0
+      00012B 00 00 03 B1           2716 	.dw	0,945
+      00012F 46 4C 41 53 48 5F 47  2717 	.ascii "FLASH_GetLowPowerMode"
+             65 74 4C 6F 77 50 6F
+             77 65 72 4D 6F 64 65
+      000144 00                    2718 	.db	0
+      000145 00 00 03 D9           2719 	.dw	0,985
+      000149 46 4C 41 53 48 5F 47  2720 	.ascii "FLASH_GetProgrammingTime"
+             65 74 50 72 6F 67 72
+             61 6D 6D 69 6E 67 54
+             69 6D 65
+      000161 00                    2721 	.db	0
+      000162 00 00 04 04           2722 	.dw	0,1028
+      000166 46 4C 41 53 48 5F 47  2723 	.ascii "FLASH_GetBootSize"
+             65 74 42 6F 6F 74 53
+             69 7A 65
+      000177 00                    2724 	.db	0
+      000178 00 00 04 3B           2725 	.dw	0,1083
+      00017C 46 4C 41 53 48 5F 47  2726 	.ascii "FLASH_GetFlagStatus"
+             65 74 46 6C 61 67 53
+             74 61 74 75 73
+      00018F 00                    2727 	.db	0
+      000190 00 00 04 89           2728 	.dw	0,1161
+      000194 46 4C 41 53 48 5F 57  2729 	.ascii "FLASH_WaitForLastOperation"
+             61 69 74 46 6F 72 4C
+             61 73 74 4F 70 65 72
+             61 74 69 6F 6E
+      0001AE 00                    2730 	.db	0
+      0001AF 00 00 04 FF           2731 	.dw	0,1279
+      0001B3 46 4C 41 53 48 5F 45  2732 	.ascii "FLASH_EraseBlock"
+             72 61 73 65 42 6C 6F
+             63 6B
+      0001C3 00                    2733 	.db	0
+      0001C4 00 00 05 77           2734 	.dw	0,1399
+      0001C8 46 4C 41 53 48 5F 50  2735 	.ascii "FLASH_ProgramBlock"
+             72 6F 67 72 61 6D 42
+             6C 6F 63 6B
+      0001DA 00                    2736 	.db	0
+      0001DB 00 00 00 00           2737 	.dw	0,0
+      0001DF                       2738 Ldebug_pubnames_end:
+                                   2739 
+                                   2740 	.area .debug_frame (NOLOAD)
+      000000 00 00                 2741 	.dw	0
+      000002 00 0E                 2742 	.dw	Ldebug_CIE_end-Ldebug_CIE_start
+      000004                       2743 Ldebug_CIE_start:
+      000004 FF FF                 2744 	.dw	0xffff
+      000006 FF FF                 2745 	.dw	0xffff
+      000008 01                    2746 	.db	1
+      000009 00                    2747 	.db	0
+      00000A 01                    2748 	.uleb128	1
+      00000B 01                    2749 	.sleb128	1
+      00000C 00                    2750 	.db	0
+      00000D 0C                    2751 	.db	12
+      00000E 00                    2752 	.uleb128	0
+      00000F 00                    2753 	.uleb128	0
+      000010 80                    2754 	.db	128
+      000011 00                    2755 	.uleb128	0
+      000012                       2756 Ldebug_CIE_end:

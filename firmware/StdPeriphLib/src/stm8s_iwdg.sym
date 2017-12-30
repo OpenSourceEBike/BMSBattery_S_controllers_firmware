@@ -1,0 +1,135 @@
+ASxxxx Assembler V02.00 + NoICE + SDCC mods  (STMicroelectronics STM8), page 1.
+Hexadecimal [24-Bits]
+
+Symbol Table
+
+    .__.$$$.                                                    =  002710 L
+    .__.ABS.                                                    =  000000 G
+    .__.CPU.                                                    =  000000 L
+    .__.H$L.                                                    =  000001 L
+  7 A$stm8s_iwdg$100                                               000038 GR
+  7 A$stm8s_iwdg$101                                               00003A GR
+  7 A$stm8s_iwdg$105                                               00003E GR
+  7 A$stm8s_iwdg$106                                               000041 GR
+  7 A$stm8s_iwdg$107                                               000043 GR
+  7 A$stm8s_iwdg$112                                               000044 GR
+  7 A$stm8s_iwdg$113                                               000047 GR
+  7 A$stm8s_iwdg$114                                               00004A GR
+  7 A$stm8s_iwdg$122                                               00004B GR
+  7 A$stm8s_iwdg$123                                               00004E GR
+  7 A$stm8s_iwdg$124                                               000051 GR
+  7 A$stm8s_iwdg$125                                               000053 GR
+  7 A$stm8s_iwdg$129                                               000057 GR
+  7 A$stm8s_iwdg$134                                               00005B GR
+  7 A$stm8s_iwdg$135                                               00005E GR
+  7 A$stm8s_iwdg$136                                               000061 GR
+  7 A$stm8s_iwdg$144                                               000062 GR
+  7 A$stm8s_iwdg$145                                               000065 GR
+  7 A$stm8s_iwdg$146                                               000068 GR
+  7 A$stm8s_iwdg$147                                               00006A GR
+  7 A$stm8s_iwdg$151                                               00006E GR
+  7 A$stm8s_iwdg$156                                               000072 GR
+  7 A$stm8s_iwdg$157                                               000075 GR
+  7 A$stm8s_iwdg$158                                               000078 GR
+  7 A$stm8s_iwdg$50                                                000000 GR
+  7 A$stm8s_iwdg$51                                                000003 GR
+  7 A$stm8s_iwdg$52                                                000006 GR
+  7 A$stm8s_iwdg$53                                                000008 GR
+  7 A$stm8s_iwdg$57                                                00000C GR
+  7 A$stm8s_iwdg$58                                                00000F GR
+  7 A$stm8s_iwdg$59                                                000011 GR
+  7 A$stm8s_iwdg$64                                                000012 GR
+  7 A$stm8s_iwdg$65                                                000015 GR
+  7 A$stm8s_iwdg$66                                                000018 GR
+  7 A$stm8s_iwdg$74                                                000019 GR
+  7 A$stm8s_iwdg$75                                                00001C GR
+  7 A$stm8s_iwdg$76                                                00001F GR
+  7 A$stm8s_iwdg$77                                                000021 GR
+  7 A$stm8s_iwdg$81                                                000025 GR
+  7 A$stm8s_iwdg$82                                                000028 GR
+  7 A$stm8s_iwdg$83                                                00002A GR
+  7 A$stm8s_iwdg$88                                                00002B GR
+  7 A$stm8s_iwdg$89                                                00002E GR
+  7 A$stm8s_iwdg$90                                                000031 GR
+  7 A$stm8s_iwdg$98                                                000032 GR
+  7 A$stm8s_iwdg$99                                                000035 GR
+  F Ldebug_CIE_end                                                 000012 R
+  F Ldebug_CIE_start                                               000004 R
+  C Ldebug_abbrev                                                  000000 R
+  D Ldebug_info_end                                                000149 R
+  D Ldebug_info_start                                              000004 R
+ASxxxx Assembler V02.00 + NoICE + SDCC mods  (STMicroelectronics STM8), page 2.
+Hexadecimal [24-Bits]
+
+Symbol Table
+
+  A Ldebug_line_end                                                0001B2 R
+  A Ldebug_line_start                                              000004 R
+  A Ldebug_line_stmt                                               000123 R
+  B Ldebug_loc_start                                               000000 R
+  E Ldebug_pubnames_end                                            00007A R
+  E Ldebug_pubnames_start                                          000004 R
+  7 Sstm8s_iwdg$IWDG_Enable$24                                  =  000062 GR
+  7 Sstm8s_iwdg$IWDG_Enable$25                                  =  00006E GR
+  7 Sstm8s_iwdg$IWDG_Enable$26                                  =  00006E GR
+  7 Sstm8s_iwdg$IWDG_Enable$27                                  =  000072 GR
+  7 Sstm8s_iwdg$IWDG_Enable$28                                  =  000072 GR
+  7 Sstm8s_iwdg$IWDG_Enable$29                                  =  000079 GR
+  7 Sstm8s_iwdg$IWDG_ReloadCounter$18                           =  00004B GR
+  7 Sstm8s_iwdg$IWDG_ReloadCounter$19                           =  000057 GR
+  7 Sstm8s_iwdg$IWDG_ReloadCounter$20                           =  000057 GR
+  7 Sstm8s_iwdg$IWDG_ReloadCounter$21                           =  00005B GR
+  7 Sstm8s_iwdg$IWDG_ReloadCounter$22                           =  00005B GR
+  7 Sstm8s_iwdg$IWDG_ReloadCounter$23                           =  000062 GR
+  7 Sstm8s_iwdg$IWDG_SetPrescaler$10                            =  00002B GR
+  7 Sstm8s_iwdg$IWDG_SetPrescaler$11                            =  000032 GR
+  7 Sstm8s_iwdg$IWDG_SetPrescaler$6                             =  000019 GR
+  7 Sstm8s_iwdg$IWDG_SetPrescaler$7                             =  000025 GR
+  7 Sstm8s_iwdg$IWDG_SetPrescaler$8                             =  000025 GR
+  7 Sstm8s_iwdg$IWDG_SetPrescaler$9                             =  00002B GR
+  7 Sstm8s_iwdg$IWDG_SetReload$12                               =  000032 GR
+  7 Sstm8s_iwdg$IWDG_SetReload$13                               =  00003E GR
+  7 Sstm8s_iwdg$IWDG_SetReload$14                               =  00003E GR
+  7 Sstm8s_iwdg$IWDG_SetReload$15                               =  000044 GR
+  7 Sstm8s_iwdg$IWDG_SetReload$16                               =  000044 GR
+  7 Sstm8s_iwdg$IWDG_SetReload$17                               =  00004B GR
+  7 Sstm8s_iwdg$IWDG_WriteAccessCmd$0                           =  000000 GR
+  7 Sstm8s_iwdg$IWDG_WriteAccessCmd$1                           =  00000C GR
+  7 Sstm8s_iwdg$IWDG_WriteAccessCmd$2                           =  00000C GR
+  7 Sstm8s_iwdg$IWDG_WriteAccessCmd$3                           =  000012 GR
+  7 Sstm8s_iwdg$IWDG_WriteAccessCmd$4                           =  000012 GR
+  7 Sstm8s_iwdg$IWDG_WriteAccessCmd$5                           =  000019 GR
+  7 XG$IWDG_Enable$0$0                                          =  000072 GR
+  7 XG$IWDG_ReloadCounter$0$0                                   =  00005B GR
+  7 XG$IWDG_SetPrescaler$0$0                                    =  00002B GR
+  7 XG$IWDG_SetReload$0$0                                       =  000044 GR
+  7 XG$IWDG_WriteAccessCmd$0$0                                  =  000012 GR
+  7 _IWDG_Enable                                                   000062 GR
+  7 _IWDG_ReloadCounter                                            00004B GR
+  7 _IWDG_SetPrescaler                                             000019 GR
+  7 _IWDG_SetReload                                                000032 GR
+  7 _IWDG_WriteAccessCmd                                           000000 GR
+    _fp_                                                           ****** GX
+
+ASxxxx Assembler V02.00 + NoICE + SDCC mods  (STMicroelectronics STM8), page 3.
+Hexadecimal [24-Bits]
+
+Area Table
+
+   0 _CODE                                      size      0   flags    0
+   1 DATA                                       size      0   flags    0
+   2 INITIALIZED                                size      0   flags    0
+   3 DABS                                       size      0   flags    8
+   4 HOME                                       size      0   flags    0
+   5 GSINIT                                     size      0   flags    0
+   6 GSFINAL                                    size      0   flags    0
+   7 CODE                                       size     79   flags    0
+   8 INITIALIZER                                size      0   flags    0
+   9 CABS                                       size      0   flags    8
+   A .debug_line                                size    1B2   flags  100
+   B .debug_loc                                 size     64   flags  100
+   C .debug_abbrev                              size     44   flags  100
+   D .debug_info                                size    149   flags  100
+   E .debug_pubnames                            size     7A   flags  100
+   F .debug_frame                               size     12   flags  100
+

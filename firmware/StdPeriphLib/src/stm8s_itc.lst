@@ -1,0 +1,1656 @@
+                                      1 ;--------------------------------------------------------
+                                      2 ; File Created by SDCC : free open source ANSI-C Compiler
+                                      3 ; Version 3.6.0 #9615 (Linux)
+                                      4 ;--------------------------------------------------------
+                                      5 	.module stm8s_itc
+                                      6 	.optsdcc -mstm8
+                                      7 	
+                                      8 ;--------------------------------------------------------
+                                      9 ; Public variables in this module
+                                     10 ;--------------------------------------------------------
+                                     11 	.globl _ITC_GetCPUCC
+                                     12 	.globl _ITC_DeInit
+                                     13 	.globl _ITC_GetSoftIntStatus
+                                     14 	.globl _ITC_GetSoftwarePriority
+                                     15 	.globl _ITC_SetSoftwarePriority
+                                     16 ;--------------------------------------------------------
+                                     17 ; ram data
+                                     18 ;--------------------------------------------------------
+                                     19 	.area DATA
+                                     20 ;--------------------------------------------------------
+                                     21 ; ram data
+                                     22 ;--------------------------------------------------------
+                                     23 	.area INITIALIZED
+                                     24 ;--------------------------------------------------------
+                                     25 ; absolute external ram data
+                                     26 ;--------------------------------------------------------
+                                     27 	.area DABS (ABS)
+                                     28 ;--------------------------------------------------------
+                                     29 ; global & static initialisations
+                                     30 ;--------------------------------------------------------
+                                     31 	.area HOME
+                                     32 	.area GSINIT
+                                     33 	.area GSFINAL
+                                     34 	.area GSINIT
+                                     35 ;--------------------------------------------------------
+                                     36 ; Home
+                                     37 ;--------------------------------------------------------
+                                     38 	.area HOME
+                                     39 	.area HOME
+                                     40 ;--------------------------------------------------------
+                                     41 ; code
+                                     42 ;--------------------------------------------------------
+                                     43 	.area CODE
+                           000000    44 	Sstm8s_itc$ITC_GetCPUCC$0 ==.
+                                     45 ;	StdPeriphLib/src/stm8s_itc.c: 54: uint8_t ITC_GetCPUCC(void)
+                                     46 ;	-----------------------------------------
+                                     47 ;	 function ITC_GetCPUCC
+                                     48 ;	-----------------------------------------
+      000000                         49 _ITC_GetCPUCC:
+      000000 3Bu00u01         [ 1]   50 	push	_fp_+1
+      000003 3Bu00u00         [ 1]   51 	push	_fp_
+      000006 90 96            [ 1]   52 	ldw	y, sp
+      000008 90 CFu00u00      [ 2]   53 	ldw	_fp_, y
+                           00000C    54 	Sstm8s_itc$ITC_GetCPUCC$1 ==.
+                           00000C    55 	Sstm8s_itc$ITC_GetCPUCC$2 ==.
+                                     56 ;	StdPeriphLib/src/stm8s_itc.c: 63: __asm__("push cc");
+      00000C 8A               [ 1]   57 	push	cc
+                           00000D    58 	Sstm8s_itc$ITC_GetCPUCC$3 ==.
+                                     59 ;	StdPeriphLib/src/stm8s_itc.c: 64: __asm__("pop a"); /* Ignore compiler warning, the returned value is in A register */
+      00000D 84               [ 1]   60 	pop	a
+                           00000E    61 	Sstm8s_itc$ITC_GetCPUCC$4 ==.
+                                     62 ;	StdPeriphLib/src/stm8s_itc.c: 69: }
+                           00000E    63 	Sstm8s_itc$ITC_GetCPUCC$5 ==.
+                           00000E    64 	XG$ITC_GetCPUCC$0$0 ==.
+      00000E 32u00u00         [ 1]   65 	pop	_fp_
+      000011 32u00u01         [ 1]   66 	pop	_fp_+1
+      000014 81               [ 4]   67 	ret
+                           000015    68 	Sstm8s_itc$ITC_GetCPUCC$6 ==.
+                           000015    69 	Sstm8s_itc$ITC_DeInit$7 ==.
+                                     70 ;	StdPeriphLib/src/stm8s_itc.c: 90: void ITC_DeInit(void)
+                                     71 ;	-----------------------------------------
+                                     72 ;	 function ITC_DeInit
+                                     73 ;	-----------------------------------------
+      000015                         74 _ITC_DeInit:
+      000015 3Bu00u01         [ 1]   75 	push	_fp_+1
+      000018 3Bu00u00         [ 1]   76 	push	_fp_
+      00001B 90 96            [ 1]   77 	ldw	y, sp
+      00001D 90 CFu00u00      [ 2]   78 	ldw	_fp_, y
+                           000021    79 	Sstm8s_itc$ITC_DeInit$8 ==.
+                           000021    80 	Sstm8s_itc$ITC_DeInit$9 ==.
+                                     81 ;	StdPeriphLib/src/stm8s_itc.c: 92: ITC->ISPR1 = ITC_SPRX_RESET_VALUE;
+      000021 35 FF 7F 70      [ 1]   82 	mov	0x7f70+0, #0xff
+                           000025    83 	Sstm8s_itc$ITC_DeInit$10 ==.
+                                     84 ;	StdPeriphLib/src/stm8s_itc.c: 93: ITC->ISPR2 = ITC_SPRX_RESET_VALUE;
+      000025 35 FF 7F 71      [ 1]   85 	mov	0x7f71+0, #0xff
+                           000029    86 	Sstm8s_itc$ITC_DeInit$11 ==.
+                                     87 ;	StdPeriphLib/src/stm8s_itc.c: 94: ITC->ISPR3 = ITC_SPRX_RESET_VALUE;
+      000029 35 FF 7F 72      [ 1]   88 	mov	0x7f72+0, #0xff
+                           00002D    89 	Sstm8s_itc$ITC_DeInit$12 ==.
+                                     90 ;	StdPeriphLib/src/stm8s_itc.c: 95: ITC->ISPR4 = ITC_SPRX_RESET_VALUE;
+      00002D 35 FF 7F 73      [ 1]   91 	mov	0x7f73+0, #0xff
+                           000031    92 	Sstm8s_itc$ITC_DeInit$13 ==.
+                                     93 ;	StdPeriphLib/src/stm8s_itc.c: 96: ITC->ISPR5 = ITC_SPRX_RESET_VALUE;
+      000031 35 FF 7F 74      [ 1]   94 	mov	0x7f74+0, #0xff
+                           000035    95 	Sstm8s_itc$ITC_DeInit$14 ==.
+                                     96 ;	StdPeriphLib/src/stm8s_itc.c: 97: ITC->ISPR6 = ITC_SPRX_RESET_VALUE;
+      000035 35 FF 7F 75      [ 1]   97 	mov	0x7f75+0, #0xff
+                           000039    98 	Sstm8s_itc$ITC_DeInit$15 ==.
+                                     99 ;	StdPeriphLib/src/stm8s_itc.c: 98: ITC->ISPR7 = ITC_SPRX_RESET_VALUE;
+      000039 35 FF 7F 76      [ 1]  100 	mov	0x7f76+0, #0xff
+                           00003D   101 	Sstm8s_itc$ITC_DeInit$16 ==.
+                                    102 ;	StdPeriphLib/src/stm8s_itc.c: 99: ITC->ISPR8 = ITC_SPRX_RESET_VALUE;
+      00003D 35 FF 7F 77      [ 1]  103 	mov	0x7f77+0, #0xff
+                           000041   104 	Sstm8s_itc$ITC_DeInit$17 ==.
+                                    105 ;	StdPeriphLib/src/stm8s_itc.c: 100: }
+                           000041   106 	Sstm8s_itc$ITC_DeInit$18 ==.
+                           000041   107 	XG$ITC_DeInit$0$0 ==.
+      000041 32u00u00         [ 1]  108 	pop	_fp_
+      000044 32u00u01         [ 1]  109 	pop	_fp_+1
+      000047 81               [ 4]  110 	ret
+                           000048   111 	Sstm8s_itc$ITC_DeInit$19 ==.
+                           000048   112 	Sstm8s_itc$ITC_GetSoftIntStatus$20 ==.
+                                    113 ;	StdPeriphLib/src/stm8s_itc.c: 107: uint8_t ITC_GetSoftIntStatus(void)
+                                    114 ;	-----------------------------------------
+                                    115 ;	 function ITC_GetSoftIntStatus
+                                    116 ;	-----------------------------------------
+      000048                        117 _ITC_GetSoftIntStatus:
+      000048 3Bu00u01         [ 1]  118 	push	_fp_+1
+      00004B 3Bu00u00         [ 1]  119 	push	_fp_
+      00004E 90 96            [ 1]  120 	ldw	y, sp
+      000050 90 CFu00u00      [ 2]  121 	ldw	_fp_, y
+                           000054   122 	Sstm8s_itc$ITC_GetSoftIntStatus$21 ==.
+                           000054   123 	Sstm8s_itc$ITC_GetSoftIntStatus$22 ==.
+                                    124 ;	StdPeriphLib/src/stm8s_itc.c: 109: return (uint8_t)(ITC_GetCPUCC() & CPU_CC_I1I0);
+      000054 CDr00r00         [ 4]  125 	call	_ITC_GetCPUCC
+      000057 A4 28            [ 1]  126 	and	a, #0x28
+                           000059   127 	Sstm8s_itc$ITC_GetSoftIntStatus$23 ==.
+                                    128 ;	StdPeriphLib/src/stm8s_itc.c: 110: }
+                           000059   129 	Sstm8s_itc$ITC_GetSoftIntStatus$24 ==.
+                           000059   130 	XG$ITC_GetSoftIntStatus$0$0 ==.
+      000059 32u00u00         [ 1]  131 	pop	_fp_
+      00005C 32u00u01         [ 1]  132 	pop	_fp_+1
+      00005F 81               [ 4]  133 	ret
+                           000060   134 	Sstm8s_itc$ITC_GetSoftIntStatus$25 ==.
+                           000060   135 	Sstm8s_itc$ITC_GetSoftwarePriority$26 ==.
+                                    136 ;	StdPeriphLib/src/stm8s_itc.c: 117: ITC_PriorityLevel_TypeDef ITC_GetSoftwarePriority(ITC_Irq_TypeDef IrqNum)
+                                    137 ;	-----------------------------------------
+                                    138 ;	 function ITC_GetSoftwarePriority
+                                    139 ;	-----------------------------------------
+      000060                        140 _ITC_GetSoftwarePriority:
+      000060 3Bu00u01         [ 1]  141 	push	_fp_+1
+      000063 3Bu00u00         [ 1]  142 	push	_fp_
+      000066 90 96            [ 1]  143 	ldw	y, sp
+      000068 90 CFu00u00      [ 2]  144 	ldw	_fp_, y
+                           00006C   145 	Sstm8s_itc$ITC_GetSoftwarePriority$27 ==.
+      00006C 52 02            [ 2]  146 	sub	sp, #2
+                           00006E   147 	Sstm8s_itc$ITC_GetSoftwarePriority$28 ==.
+                                    148 ;	StdPeriphLib/src/stm8s_itc.c: 119: uint8_t Value = 0;
+      00006E 4F               [ 1]  149 	clr	a
+                           00006F   150 	Sstm8s_itc$ITC_GetSoftwarePriority$29 ==.
+                                    151 ;	StdPeriphLib/src/stm8s_itc.c: 126: Mask = (uint8_t)(0x03U << (((uint8_t)IrqNum % 4U) * 2U));
+      00006F 5F               [ 1]  152 	clrw	x
+      000070 41               [ 1]  153 	exg	a, xl
+      000071 7B 07            [ 1]  154 	ld	a, (0x07, sp)
+      000073 41               [ 1]  155 	exg	a, xl
+      000074 88               [ 1]  156 	push	a
+      000075 9F               [ 1]  157 	ld	a, xl
+      000076 A4 03            [ 1]  158 	and	a, #0x03
+      000078 97               [ 1]  159 	ld	xl, a
+      000079 4F               [ 1]  160 	clr	a
+      00007A 95               [ 1]  161 	ld	xh, a
+      00007B 84               [ 1]  162 	pop	a
+      00007C 41               [ 1]  163 	exg	a, xl
+      00007D 6B 02            [ 1]  164 	ld	(0x02, sp), a
+      00007F 41               [ 1]  165 	exg	a, xl
+      000080 08 02            [ 1]  166 	sll	(0x02, sp)
+      000082 88               [ 1]  167 	push	a
+      000083 A6 03            [ 1]  168 	ld	a, #0x03
+      000085 97               [ 1]  169 	ld	xl, a
+      000086 7B 03            [ 1]  170 	ld	a, (0x03, sp)
+      000088 27 06            [ 1]  171 	jreq	00130$
+      00008A                        172 00129$:
+      00008A 41               [ 1]  173 	exg	a, xl
+      00008B 48               [ 1]  174 	sll	a
+      00008C 41               [ 1]  175 	exg	a, xl
+      00008D 4A               [ 1]  176 	dec	a
+      00008E 26 FA            [ 1]  177 	jrne	00129$
+      000090                        178 00130$:
+      000090 84               [ 1]  179 	pop	a
+      000091 41               [ 1]  180 	exg	a, xl
+      000092 6B 01            [ 1]  181 	ld	(0x01, sp), a
+      000094 41               [ 1]  182 	exg	a, xl
+                           000095   183 	Sstm8s_itc$ITC_GetSoftwarePriority$30 ==.
+                                    184 ;	StdPeriphLib/src/stm8s_itc.c: 128: switch (IrqNum)
+      000095 88               [ 1]  185 	push	a
+      000096 7B 08            [ 1]  186 	ld	a, (0x08, sp)
+      000098 A1 18            [ 1]  187 	cp	a, #0x18
+      00009A 84               [ 1]  188 	pop	a
+      00009B 23 03            [ 2]  189 	jrule	00131$
+      00009D CCr01r17         [ 2]  190 	jp	00123$
+      0000A0                        191 00131$:
+      0000A0 5F               [ 1]  192 	clrw	x
+      0000A1 41               [ 1]  193 	exg	a, xl
+      0000A2 7B 07            [ 1]  194 	ld	a, (0x07, sp)
+      0000A4 41               [ 1]  195 	exg	a, xl
+      0000A5 58               [ 2]  196 	sllw	x
+      0000A6 DEu00uAA         [ 2]  197 	ldw	x, (#00132$, x)
+      0000A9 FC               [ 2]  198 	jp	(x)
+      0000AA                        199 00132$:
+      0000AAr00rDC                  200 	.dw	#00101$
+      0000ACr00rDC                  201 	.dw	#00102$
+      0000AEr00rDC                  202 	.dw	#00103$
+      0000B0r00rDC                  203 	.dw	#00104$
+      0000B2r00rE5                  204 	.dw	#00105$
+      0000B4r00rE5                  205 	.dw	#00106$
+      0000B6r00rE5                  206 	.dw	#00107$
+      0000B8r00rE5                  207 	.dw	#00108$
+      0000BAr01r17                  208 	.dw	#00122$
+      0000BCr01r17                  209 	.dw	#00122$
+      0000BEr00rEE                  210 	.dw	#00109$
+      0000C0r00rEE                  211 	.dw	#00110$
+      0000C2r00rF7                  212 	.dw	#00111$
+      0000C4r00rF7                  213 	.dw	#00112$
+      0000C6r00rF7                  214 	.dw	#00113$
+      0000C8r00rF7                  215 	.dw	#00114$
+      0000CAr00rFF                  216 	.dw	#00115$
+      0000CCr01r17                  217 	.dw	#00122$
+      0000CEr01r17                  218 	.dw	#00122$
+      0000D0r00rFF                  219 	.dw	#00116$
+      0000D2r01r07                  220 	.dw	#00117$
+      0000D4r01r07                  221 	.dw	#00118$
+      0000D6r01r07                  222 	.dw	#00119$
+      0000D8r01r07                  223 	.dw	#00120$
+      0000DAr01r0F                  224 	.dw	#00121$
+                           0000DC   225 	Sstm8s_itc$ITC_GetSoftwarePriority$31 ==.
+                                    226 ;	StdPeriphLib/src/stm8s_itc.c: 130: case ITC_IRQ_TLI: /* TLI software priority can be read but has no meaning */
+      0000DC                        227 00101$:
+                           0000DC   228 	Sstm8s_itc$ITC_GetSoftwarePriority$32 ==.
+                                    229 ;	StdPeriphLib/src/stm8s_itc.c: 131: case ITC_IRQ_AWU:
+      0000DC                        230 00102$:
+                           0000DC   231 	Sstm8s_itc$ITC_GetSoftwarePriority$33 ==.
+                                    232 ;	StdPeriphLib/src/stm8s_itc.c: 132: case ITC_IRQ_CLK:
+      0000DC                        233 00103$:
+                           0000DC   234 	Sstm8s_itc$ITC_GetSoftwarePriority$34 ==.
+                                    235 ;	StdPeriphLib/src/stm8s_itc.c: 133: case ITC_IRQ_PORTA:
+      0000DC                        236 00104$:
+                           0000DC   237 	Sstm8s_itc$ITC_GetSoftwarePriority$35 ==.
+                                    238 ;	StdPeriphLib/src/stm8s_itc.c: 134: Value = (uint8_t)(ITC->ISPR1 & Mask); /* Read software priority */
+      0000DC AE 7F 70         [ 2]  239 	ldw	x, #0x7f70
+      0000DF F6               [ 1]  240 	ld	a, (x)
+      0000E0 14 01            [ 1]  241 	and	a, (0x01, sp)
+                           0000E2   242 	Sstm8s_itc$ITC_GetSoftwarePriority$36 ==.
+                                    243 ;	StdPeriphLib/src/stm8s_itc.c: 135: break;
+      0000E2 CCr01r17         [ 2]  244 	jp	00123$
+                           0000E5   245 	Sstm8s_itc$ITC_GetSoftwarePriority$37 ==.
+                                    246 ;	StdPeriphLib/src/stm8s_itc.c: 137: case ITC_IRQ_PORTB:
+      0000E5                        247 00105$:
+                           0000E5   248 	Sstm8s_itc$ITC_GetSoftwarePriority$38 ==.
+                                    249 ;	StdPeriphLib/src/stm8s_itc.c: 138: case ITC_IRQ_PORTC:
+      0000E5                        250 00106$:
+                           0000E5   251 	Sstm8s_itc$ITC_GetSoftwarePriority$39 ==.
+                                    252 ;	StdPeriphLib/src/stm8s_itc.c: 139: case ITC_IRQ_PORTD:
+      0000E5                        253 00107$:
+                           0000E5   254 	Sstm8s_itc$ITC_GetSoftwarePriority$40 ==.
+                                    255 ;	StdPeriphLib/src/stm8s_itc.c: 140: case ITC_IRQ_PORTE:
+      0000E5                        256 00108$:
+                           0000E5   257 	Sstm8s_itc$ITC_GetSoftwarePriority$41 ==.
+                                    258 ;	StdPeriphLib/src/stm8s_itc.c: 141: Value = (uint8_t)(ITC->ISPR2 & Mask); /* Read software priority */
+      0000E5 AE 7F 71         [ 2]  259 	ldw	x, #0x7f71
+      0000E8 F6               [ 1]  260 	ld	a, (x)
+      0000E9 14 01            [ 1]  261 	and	a, (0x01, sp)
+                           0000EB   262 	Sstm8s_itc$ITC_GetSoftwarePriority$42 ==.
+                                    263 ;	StdPeriphLib/src/stm8s_itc.c: 142: break;
+      0000EB CCr01r17         [ 2]  264 	jp	00123$
+                           0000EE   265 	Sstm8s_itc$ITC_GetSoftwarePriority$43 ==.
+                                    266 ;	StdPeriphLib/src/stm8s_itc.c: 151: case ITC_IRQ_SPI:
+      0000EE                        267 00109$:
+                           0000EE   268 	Sstm8s_itc$ITC_GetSoftwarePriority$44 ==.
+                                    269 ;	StdPeriphLib/src/stm8s_itc.c: 152: case ITC_IRQ_TIM1_OVF:
+      0000EE                        270 00110$:
+                           0000EE   271 	Sstm8s_itc$ITC_GetSoftwarePriority$45 ==.
+                                    272 ;	StdPeriphLib/src/stm8s_itc.c: 153: Value = (uint8_t)(ITC->ISPR3 & Mask); /* Read software priority */
+      0000EE AE 7F 72         [ 2]  273 	ldw	x, #0x7f72
+      0000F1 F6               [ 1]  274 	ld	a, (x)
+      0000F2 14 01            [ 1]  275 	and	a, (0x01, sp)
+                           0000F4   276 	Sstm8s_itc$ITC_GetSoftwarePriority$46 ==.
+                                    277 ;	StdPeriphLib/src/stm8s_itc.c: 154: break;
+      0000F4 CCr01r17         [ 2]  278 	jp	00123$
+                           0000F7   279 	Sstm8s_itc$ITC_GetSoftwarePriority$47 ==.
+                                    280 ;	StdPeriphLib/src/stm8s_itc.c: 156: case ITC_IRQ_TIM1_CAPCOM:
+      0000F7                        281 00111$:
+                           0000F7   282 	Sstm8s_itc$ITC_GetSoftwarePriority$48 ==.
+                                    283 ;	StdPeriphLib/src/stm8s_itc.c: 161: case ITC_IRQ_TIM2_OVF:
+      0000F7                        284 00112$:
+                           0000F7   285 	Sstm8s_itc$ITC_GetSoftwarePriority$49 ==.
+                                    286 ;	StdPeriphLib/src/stm8s_itc.c: 162: case ITC_IRQ_TIM2_CAPCOM:
+      0000F7                        287 00113$:
+                           0000F7   288 	Sstm8s_itc$ITC_GetSoftwarePriority$50 ==.
+                                    289 ;	StdPeriphLib/src/stm8s_itc.c: 164: case ITC_IRQ_TIM3_OVF:
+      0000F7                        290 00114$:
+                           0000F7   291 	Sstm8s_itc$ITC_GetSoftwarePriority$51 ==.
+                                    292 ;	StdPeriphLib/src/stm8s_itc.c: 165: Value = (uint8_t)(ITC->ISPR4 & Mask); /* Read software priority */
+      0000F7 AE 7F 73         [ 2]  293 	ldw	x, #0x7f73
+      0000FA F6               [ 1]  294 	ld	a, (x)
+      0000FB 14 01            [ 1]  295 	and	a, (0x01, sp)
+                           0000FD   296 	Sstm8s_itc$ITC_GetSoftwarePriority$52 ==.
+                                    297 ;	StdPeriphLib/src/stm8s_itc.c: 166: break;
+      0000FD 20 18            [ 2]  298 	jra	00123$
+                           0000FF   299 	Sstm8s_itc$ITC_GetSoftwarePriority$53 ==.
+                                    300 ;	StdPeriphLib/src/stm8s_itc.c: 168: case ITC_IRQ_TIM3_CAPCOM:
+      0000FF                        301 00115$:
+                           0000FF   302 	Sstm8s_itc$ITC_GetSoftwarePriority$54 ==.
+                                    303 ;	StdPeriphLib/src/stm8s_itc.c: 178: case ITC_IRQ_I2C:
+      0000FF                        304 00116$:
+                           0000FF   305 	Sstm8s_itc$ITC_GetSoftwarePriority$55 ==.
+                                    306 ;	StdPeriphLib/src/stm8s_itc.c: 179: Value = (uint8_t)(ITC->ISPR5 & Mask); /* Read software priority */
+      0000FF AE 7F 74         [ 2]  307 	ldw	x, #0x7f74
+      000102 F6               [ 1]  308 	ld	a, (x)
+      000103 14 01            [ 1]  309 	and	a, (0x01, sp)
+                           000105   310 	Sstm8s_itc$ITC_GetSoftwarePriority$56 ==.
+                                    311 ;	StdPeriphLib/src/stm8s_itc.c: 180: break;
+      000105 20 10            [ 2]  312 	jra	00123$
+                           000107   313 	Sstm8s_itc$ITC_GetSoftwarePriority$57 ==.
+                                    314 ;	StdPeriphLib/src/stm8s_itc.c: 183: case ITC_IRQ_UART2_TX:
+      000107                        315 00117$:
+                           000107   316 	Sstm8s_itc$ITC_GetSoftwarePriority$58 ==.
+                                    317 ;	StdPeriphLib/src/stm8s_itc.c: 184: case ITC_IRQ_UART2_RX:
+      000107                        318 00118$:
+                           000107   319 	Sstm8s_itc$ITC_GetSoftwarePriority$59 ==.
+                                    320 ;	StdPeriphLib/src/stm8s_itc.c: 194: case ITC_IRQ_ADC1:
+      000107                        321 00119$:
+                           000107   322 	Sstm8s_itc$ITC_GetSoftwarePriority$60 ==.
+                                    323 ;	StdPeriphLib/src/stm8s_itc.c: 199: case ITC_IRQ_TIM4_OVF:
+      000107                        324 00120$:
+                           000107   325 	Sstm8s_itc$ITC_GetSoftwarePriority$61 ==.
+                                    326 ;	StdPeriphLib/src/stm8s_itc.c: 201: Value = (uint8_t)(ITC->ISPR6 & Mask); /* Read software priority */
+      000107 AE 7F 75         [ 2]  327 	ldw	x, #0x7f75
+      00010A F6               [ 1]  328 	ld	a, (x)
+      00010B 14 01            [ 1]  329 	and	a, (0x01, sp)
+                           00010D   330 	Sstm8s_itc$ITC_GetSoftwarePriority$62 ==.
+                                    331 ;	StdPeriphLib/src/stm8s_itc.c: 202: break;
+      00010D 20 08            [ 2]  332 	jra	00123$
+                           00010F   333 	Sstm8s_itc$ITC_GetSoftwarePriority$63 ==.
+                                    334 ;	StdPeriphLib/src/stm8s_itc.c: 204: case ITC_IRQ_EEPROM_EEC:
+      00010F                        335 00121$:
+                           00010F   336 	Sstm8s_itc$ITC_GetSoftwarePriority$64 ==.
+                                    337 ;	StdPeriphLib/src/stm8s_itc.c: 205: Value = (uint8_t)(ITC->ISPR7 & Mask); /* Read software priority */
+      00010F AE 7F 76         [ 2]  338 	ldw	x, #0x7f76
+      000112 F6               [ 1]  339 	ld	a, (x)
+      000113 14 01            [ 1]  340 	and	a, (0x01, sp)
+                           000115   341 	Sstm8s_itc$ITC_GetSoftwarePriority$65 ==.
+                                    342 ;	StdPeriphLib/src/stm8s_itc.c: 206: break;
+      000115 20 00            [ 2]  343 	jra	00123$
+                           000117   344 	Sstm8s_itc$ITC_GetSoftwarePriority$66 ==.
+                                    345 ;	StdPeriphLib/src/stm8s_itc.c: 208: default:
+      000117                        346 00122$:
+                           000117   347 	Sstm8s_itc$ITC_GetSoftwarePriority$67 ==.
+                                    348 ;	StdPeriphLib/src/stm8s_itc.c: 210: }
+      000117                        349 00123$:
+                           000117   350 	Sstm8s_itc$ITC_GetSoftwarePriority$68 ==.
+                                    351 ;	StdPeriphLib/src/stm8s_itc.c: 212: Value >>= (uint8_t)(((uint8_t)IrqNum % 4u) * 2u);
+      000117 88               [ 1]  352 	push	a
+      000118 7B 03            [ 1]  353 	ld	a, (0x03, sp)
+      00011A 27 05            [ 1]  354 	jreq	00134$
+      00011C                        355 00133$:
+      00011C 04 01            [ 1]  356 	srl	(1, sp)
+      00011E 4A               [ 1]  357 	dec	a
+      00011F 26 FB            [ 1]  358 	jrne	00133$
+      000121                        359 00134$:
+      000121 84               [ 1]  360 	pop	a
+                           000122   361 	Sstm8s_itc$ITC_GetSoftwarePriority$69 ==.
+                                    362 ;	StdPeriphLib/src/stm8s_itc.c: 214: return((ITC_PriorityLevel_TypeDef)Value);
+                           000122   363 	Sstm8s_itc$ITC_GetSoftwarePriority$70 ==.
+                                    364 ;	StdPeriphLib/src/stm8s_itc.c: 215: }
+      000122 5B 02            [ 2]  365 	addw	sp, #2
+                           000124   366 	Sstm8s_itc$ITC_GetSoftwarePriority$71 ==.
+                           000124   367 	XG$ITC_GetSoftwarePriority$0$0 ==.
+      000124 32u00u00         [ 1]  368 	pop	_fp_
+      000127 32u00u01         [ 1]  369 	pop	_fp_+1
+      00012A 81               [ 4]  370 	ret
+                           00012B   371 	Sstm8s_itc$ITC_GetSoftwarePriority$72 ==.
+                           00012B   372 	Sstm8s_itc$ITC_SetSoftwarePriority$73 ==.
+                                    373 ;	StdPeriphLib/src/stm8s_itc.c: 230: void ITC_SetSoftwarePriority(ITC_Irq_TypeDef IrqNum, ITC_PriorityLevel_TypeDef PriorityValue)
+                                    374 ;	-----------------------------------------
+                                    375 ;	 function ITC_SetSoftwarePriority
+                                    376 ;	-----------------------------------------
+      00012B                        377 _ITC_SetSoftwarePriority:
+      00012B 3Bu00u01         [ 1]  378 	push	_fp_+1
+      00012E 3Bu00u00         [ 1]  379 	push	_fp_
+      000131 90 96            [ 1]  380 	ldw	y, sp
+      000133 90 CFu00u00      [ 2]  381 	ldw	_fp_, y
+                           000137   382 	Sstm8s_itc$ITC_SetSoftwarePriority$74 ==.
+      000137 52 04            [ 2]  383 	sub	sp, #4
+                           000139   384 	Sstm8s_itc$ITC_SetSoftwarePriority$75 ==.
+                                    385 ;	StdPeriphLib/src/stm8s_itc.c: 244: Mask = (uint8_t)(~(uint8_t)(0x03U << (((uint8_t)IrqNum % 4U) * 2U)));
+      000139 7B 09            [ 1]  386 	ld	a, (0x09, sp)
+      00013B 0F 03            [ 1]  387 	clr	(0x03, sp)
+      00013D A4 03            [ 1]  388 	and	a, #0x03
+      00013F 97               [ 1]  389 	ld	xl, a
+      000140 4F               [ 1]  390 	clr	a
+      000141 58               [ 2]  391 	sllw	x
+      000142 A6 03            [ 1]  392 	ld	a, #0x03
+      000144 88               [ 1]  393 	push	a
+      000145 9F               [ 1]  394 	ld	a, xl
+      000146 4D               [ 1]  395 	tnz	a
+      000147 27 05            [ 1]  396 	jreq	00130$
+      000149                        397 00129$:
+      000149 08 01            [ 1]  398 	sll	(1, sp)
+      00014B 4A               [ 1]  399 	dec	a
+      00014C 26 FB            [ 1]  400 	jrne	00129$
+      00014E                        401 00130$:
+      00014E 84               [ 1]  402 	pop	a
+      00014F 43               [ 1]  403 	cpl	a
+      000150 6B 02            [ 1]  404 	ld	(0x02, sp), a
+                           000152   405 	Sstm8s_itc$ITC_SetSoftwarePriority$76 ==.
+                                    406 ;	StdPeriphLib/src/stm8s_itc.c: 247: NewPriority = (uint8_t)((uint8_t)(PriorityValue) << (((uint8_t)IrqNum % 4U) * 2U));
+      000152 7B 0A            [ 1]  407 	ld	a, (0x0a, sp)
+      000154 88               [ 1]  408 	push	a
+      000155 9F               [ 1]  409 	ld	a, xl
+      000156 4D               [ 1]  410 	tnz	a
+      000157 27 05            [ 1]  411 	jreq	00132$
+      000159                        412 00131$:
+      000159 08 01            [ 1]  413 	sll	(1, sp)
+      00015B 4A               [ 1]  414 	dec	a
+      00015C 26 FB            [ 1]  415 	jrne	00131$
+      00015E                        416 00132$:
+      00015E 84               [ 1]  417 	pop	a
+      00015F 6B 01            [ 1]  418 	ld	(0x01, sp), a
+                           000161   419 	Sstm8s_itc$ITC_SetSoftwarePriority$77 ==.
+                                    420 ;	StdPeriphLib/src/stm8s_itc.c: 249: switch (IrqNum)
+      000161 7B 09            [ 1]  421 	ld	a, (0x09, sp)
+      000163 A1 18            [ 1]  422 	cp	a, #0x18
+      000165 23 03            [ 2]  423 	jrule	00133$
+      000167 CCr02r43         [ 2]  424 	jp	00124$
+      00016A                        425 00133$:
+      00016A 5F               [ 1]  426 	clrw	x
+      00016B 7B 09            [ 1]  427 	ld	a, (0x09, sp)
+      00016D 97               [ 1]  428 	ld	xl, a
+      00016E 58               [ 2]  429 	sllw	x
+      00016F DEu01u73         [ 2]  430 	ldw	x, (#00134$, x)
+      000172 FC               [ 2]  431 	jp	(x)
+      000173                        432 00134$:
+      000173r01rA5                  433 	.dw	#00101$
+      000175r01rA5                  434 	.dw	#00102$
+      000177r01rA5                  435 	.dw	#00103$
+      000179r01rA5                  436 	.dw	#00104$
+      00017Br01rBC                  437 	.dw	#00105$
+      00017Dr01rBC                  438 	.dw	#00106$
+      00017Fr01rBC                  439 	.dw	#00107$
+      000181r01rBC                  440 	.dw	#00108$
+      000183r02r43                  441 	.dw	#00122$
+      000185r02r43                  442 	.dw	#00122$
+      000187r01rD3                  443 	.dw	#00109$
+      000189r01rD3                  444 	.dw	#00110$
+      00018Br01rEA                  445 	.dw	#00111$
+      00018Dr01rEA                  446 	.dw	#00112$
+      00018Fr01rEA                  447 	.dw	#00113$
+      000191r01rEA                  448 	.dw	#00114$
+      000193r02r01                  449 	.dw	#00115$
+      000195r02r43                  450 	.dw	#00122$
+      000197r02r43                  451 	.dw	#00122$
+      000199r02r01                  452 	.dw	#00116$
+      00019Br02r17                  453 	.dw	#00117$
+      00019Dr02r17                  454 	.dw	#00118$
+      00019Fr02r17                  455 	.dw	#00119$
+      0001A1r02r17                  456 	.dw	#00120$
+      0001A3r02r2D                  457 	.dw	#00121$
+                           0001A5   458 	Sstm8s_itc$ITC_SetSoftwarePriority$78 ==.
+                                    459 ;	StdPeriphLib/src/stm8s_itc.c: 251: case ITC_IRQ_TLI: /* TLI software priority can be written but has no meaning */
+      0001A5                        460 00101$:
+                           0001A5   461 	Sstm8s_itc$ITC_SetSoftwarePriority$79 ==.
+                                    462 ;	StdPeriphLib/src/stm8s_itc.c: 252: case ITC_IRQ_AWU:
+      0001A5                        463 00102$:
+                           0001A5   464 	Sstm8s_itc$ITC_SetSoftwarePriority$80 ==.
+                                    465 ;	StdPeriphLib/src/stm8s_itc.c: 253: case ITC_IRQ_CLK:
+      0001A5                        466 00103$:
+                           0001A5   467 	Sstm8s_itc$ITC_SetSoftwarePriority$81 ==.
+                                    468 ;	StdPeriphLib/src/stm8s_itc.c: 254: case ITC_IRQ_PORTA:
+      0001A5                        469 00104$:
+                           0001A5   470 	Sstm8s_itc$ITC_SetSoftwarePriority$82 ==.
+                                    471 ;	StdPeriphLib/src/stm8s_itc.c: 255: ITC->ISPR1 &= Mask;
+      0001A5 AE 7F 70         [ 2]  472 	ldw	x, #0x7f70
+      0001A8 F6               [ 1]  473 	ld	a, (x)
+      0001A9 14 02            [ 1]  474 	and	a, (0x02, sp)
+      0001AB AE 7F 70         [ 2]  475 	ldw	x, #0x7f70
+      0001AE F7               [ 1]  476 	ld	(x), a
+                           0001AF   477 	Sstm8s_itc$ITC_SetSoftwarePriority$83 ==.
+                                    478 ;	StdPeriphLib/src/stm8s_itc.c: 256: ITC->ISPR1 |= NewPriority;
+      0001AF AE 7F 70         [ 2]  479 	ldw	x, #0x7f70
+      0001B2 F6               [ 1]  480 	ld	a, (x)
+      0001B3 1A 01            [ 1]  481 	or	a, (0x01, sp)
+      0001B5 AE 7F 70         [ 2]  482 	ldw	x, #0x7f70
+      0001B8 F7               [ 1]  483 	ld	(x), a
+                           0001B9   484 	Sstm8s_itc$ITC_SetSoftwarePriority$84 ==.
+                                    485 ;	StdPeriphLib/src/stm8s_itc.c: 257: break;
+      0001B9 CCr02r43         [ 2]  486 	jp	00124$
+                           0001BC   487 	Sstm8s_itc$ITC_SetSoftwarePriority$85 ==.
+                                    488 ;	StdPeriphLib/src/stm8s_itc.c: 259: case ITC_IRQ_PORTB:
+      0001BC                        489 00105$:
+                           0001BC   490 	Sstm8s_itc$ITC_SetSoftwarePriority$86 ==.
+                                    491 ;	StdPeriphLib/src/stm8s_itc.c: 260: case ITC_IRQ_PORTC:
+      0001BC                        492 00106$:
+                           0001BC   493 	Sstm8s_itc$ITC_SetSoftwarePriority$87 ==.
+                                    494 ;	StdPeriphLib/src/stm8s_itc.c: 261: case ITC_IRQ_PORTD:
+      0001BC                        495 00107$:
+                           0001BC   496 	Sstm8s_itc$ITC_SetSoftwarePriority$88 ==.
+                                    497 ;	StdPeriphLib/src/stm8s_itc.c: 262: case ITC_IRQ_PORTE:
+      0001BC                        498 00108$:
+                           0001BC   499 	Sstm8s_itc$ITC_SetSoftwarePriority$89 ==.
+                                    500 ;	StdPeriphLib/src/stm8s_itc.c: 263: ITC->ISPR2 &= Mask;
+      0001BC AE 7F 71         [ 2]  501 	ldw	x, #0x7f71
+      0001BF F6               [ 1]  502 	ld	a, (x)
+      0001C0 14 02            [ 1]  503 	and	a, (0x02, sp)
+      0001C2 AE 7F 71         [ 2]  504 	ldw	x, #0x7f71
+      0001C5 F7               [ 1]  505 	ld	(x), a
+                           0001C6   506 	Sstm8s_itc$ITC_SetSoftwarePriority$90 ==.
+                                    507 ;	StdPeriphLib/src/stm8s_itc.c: 264: ITC->ISPR2 |= NewPriority;
+      0001C6 AE 7F 71         [ 2]  508 	ldw	x, #0x7f71
+      0001C9 F6               [ 1]  509 	ld	a, (x)
+      0001CA 1A 01            [ 1]  510 	or	a, (0x01, sp)
+      0001CC AE 7F 71         [ 2]  511 	ldw	x, #0x7f71
+      0001CF F7               [ 1]  512 	ld	(x), a
+                           0001D0   513 	Sstm8s_itc$ITC_SetSoftwarePriority$91 ==.
+                                    514 ;	StdPeriphLib/src/stm8s_itc.c: 265: break;
+      0001D0 CCr02r43         [ 2]  515 	jp	00124$
+                           0001D3   516 	Sstm8s_itc$ITC_SetSoftwarePriority$92 ==.
+                                    517 ;	StdPeriphLib/src/stm8s_itc.c: 274: case ITC_IRQ_SPI:
+      0001D3                        518 00109$:
+                           0001D3   519 	Sstm8s_itc$ITC_SetSoftwarePriority$93 ==.
+                                    520 ;	StdPeriphLib/src/stm8s_itc.c: 275: case ITC_IRQ_TIM1_OVF:
+      0001D3                        521 00110$:
+                           0001D3   522 	Sstm8s_itc$ITC_SetSoftwarePriority$94 ==.
+                                    523 ;	StdPeriphLib/src/stm8s_itc.c: 276: ITC->ISPR3 &= Mask;
+      0001D3 AE 7F 72         [ 2]  524 	ldw	x, #0x7f72
+      0001D6 F6               [ 1]  525 	ld	a, (x)
+      0001D7 14 02            [ 1]  526 	and	a, (0x02, sp)
+      0001D9 AE 7F 72         [ 2]  527 	ldw	x, #0x7f72
+      0001DC F7               [ 1]  528 	ld	(x), a
+                           0001DD   529 	Sstm8s_itc$ITC_SetSoftwarePriority$95 ==.
+                                    530 ;	StdPeriphLib/src/stm8s_itc.c: 277: ITC->ISPR3 |= NewPriority;
+      0001DD AE 7F 72         [ 2]  531 	ldw	x, #0x7f72
+      0001E0 F6               [ 1]  532 	ld	a, (x)
+      0001E1 1A 01            [ 1]  533 	or	a, (0x01, sp)
+      0001E3 AE 7F 72         [ 2]  534 	ldw	x, #0x7f72
+      0001E6 F7               [ 1]  535 	ld	(x), a
+                           0001E7   536 	Sstm8s_itc$ITC_SetSoftwarePriority$96 ==.
+                                    537 ;	StdPeriphLib/src/stm8s_itc.c: 278: break;
+      0001E7 CCr02r43         [ 2]  538 	jp	00124$
+                           0001EA   539 	Sstm8s_itc$ITC_SetSoftwarePriority$97 ==.
+                                    540 ;	StdPeriphLib/src/stm8s_itc.c: 280: case ITC_IRQ_TIM1_CAPCOM:
+      0001EA                        541 00111$:
+                           0001EA   542 	Sstm8s_itc$ITC_SetSoftwarePriority$98 ==.
+                                    543 ;	StdPeriphLib/src/stm8s_itc.c: 285: case ITC_IRQ_TIM2_OVF:
+      0001EA                        544 00112$:
+                           0001EA   545 	Sstm8s_itc$ITC_SetSoftwarePriority$99 ==.
+                                    546 ;	StdPeriphLib/src/stm8s_itc.c: 286: case ITC_IRQ_TIM2_CAPCOM:
+      0001EA                        547 00113$:
+                           0001EA   548 	Sstm8s_itc$ITC_SetSoftwarePriority$100 ==.
+                                    549 ;	StdPeriphLib/src/stm8s_itc.c: 288: case ITC_IRQ_TIM3_OVF:
+      0001EA                        550 00114$:
+                           0001EA   551 	Sstm8s_itc$ITC_SetSoftwarePriority$101 ==.
+                                    552 ;	StdPeriphLib/src/stm8s_itc.c: 289: ITC->ISPR4 &= Mask;
+      0001EA AE 7F 73         [ 2]  553 	ldw	x, #0x7f73
+      0001ED F6               [ 1]  554 	ld	a, (x)
+      0001EE 14 02            [ 1]  555 	and	a, (0x02, sp)
+      0001F0 AE 7F 73         [ 2]  556 	ldw	x, #0x7f73
+      0001F3 F7               [ 1]  557 	ld	(x), a
+                           0001F4   558 	Sstm8s_itc$ITC_SetSoftwarePriority$102 ==.
+                                    559 ;	StdPeriphLib/src/stm8s_itc.c: 290: ITC->ISPR4 |= NewPriority;
+      0001F4 AE 7F 73         [ 2]  560 	ldw	x, #0x7f73
+      0001F7 F6               [ 1]  561 	ld	a, (x)
+      0001F8 1A 01            [ 1]  562 	or	a, (0x01, sp)
+      0001FA AE 7F 73         [ 2]  563 	ldw	x, #0x7f73
+      0001FD F7               [ 1]  564 	ld	(x), a
+                           0001FE   565 	Sstm8s_itc$ITC_SetSoftwarePriority$103 ==.
+                                    566 ;	StdPeriphLib/src/stm8s_itc.c: 291: break;
+      0001FE CCr02r43         [ 2]  567 	jp	00124$
+                           000201   568 	Sstm8s_itc$ITC_SetSoftwarePriority$104 ==.
+                                    569 ;	StdPeriphLib/src/stm8s_itc.c: 293: case ITC_IRQ_TIM3_CAPCOM:
+      000201                        570 00115$:
+                           000201   571 	Sstm8s_itc$ITC_SetSoftwarePriority$105 ==.
+                                    572 ;	StdPeriphLib/src/stm8s_itc.c: 303: case ITC_IRQ_I2C:
+      000201                        573 00116$:
+                           000201   574 	Sstm8s_itc$ITC_SetSoftwarePriority$106 ==.
+                                    575 ;	StdPeriphLib/src/stm8s_itc.c: 304: ITC->ISPR5 &= Mask;
+      000201 AE 7F 74         [ 2]  576 	ldw	x, #0x7f74
+      000204 F6               [ 1]  577 	ld	a, (x)
+      000205 14 02            [ 1]  578 	and	a, (0x02, sp)
+      000207 AE 7F 74         [ 2]  579 	ldw	x, #0x7f74
+      00020A F7               [ 1]  580 	ld	(x), a
+                           00020B   581 	Sstm8s_itc$ITC_SetSoftwarePriority$107 ==.
+                                    582 ;	StdPeriphLib/src/stm8s_itc.c: 305: ITC->ISPR5 |= NewPriority;
+      00020B AE 7F 74         [ 2]  583 	ldw	x, #0x7f74
+      00020E F6               [ 1]  584 	ld	a, (x)
+      00020F 1A 01            [ 1]  585 	or	a, (0x01, sp)
+      000211 AE 7F 74         [ 2]  586 	ldw	x, #0x7f74
+      000214 F7               [ 1]  587 	ld	(x), a
+                           000215   588 	Sstm8s_itc$ITC_SetSoftwarePriority$108 ==.
+                                    589 ;	StdPeriphLib/src/stm8s_itc.c: 306: break;
+      000215 20 2C            [ 2]  590 	jra	00124$
+                           000217   591 	Sstm8s_itc$ITC_SetSoftwarePriority$109 ==.
+                                    592 ;	StdPeriphLib/src/stm8s_itc.c: 309: case ITC_IRQ_UART2_TX:
+      000217                        593 00117$:
+                           000217   594 	Sstm8s_itc$ITC_SetSoftwarePriority$110 ==.
+                                    595 ;	StdPeriphLib/src/stm8s_itc.c: 310: case ITC_IRQ_UART2_RX:
+      000217                        596 00118$:
+                           000217   597 	Sstm8s_itc$ITC_SetSoftwarePriority$111 ==.
+                                    598 ;	StdPeriphLib/src/stm8s_itc.c: 322: case ITC_IRQ_ADC1:
+      000217                        599 00119$:
+                           000217   600 	Sstm8s_itc$ITC_SetSoftwarePriority$112 ==.
+                                    601 ;	StdPeriphLib/src/stm8s_itc.c: 328: case ITC_IRQ_TIM4_OVF:
+      000217                        602 00120$:
+                           000217   603 	Sstm8s_itc$ITC_SetSoftwarePriority$113 ==.
+                                    604 ;	StdPeriphLib/src/stm8s_itc.c: 330: ITC->ISPR6 &= Mask;
+      000217 AE 7F 75         [ 2]  605 	ldw	x, #0x7f75
+      00021A F6               [ 1]  606 	ld	a, (x)
+      00021B 14 02            [ 1]  607 	and	a, (0x02, sp)
+      00021D AE 7F 75         [ 2]  608 	ldw	x, #0x7f75
+      000220 F7               [ 1]  609 	ld	(x), a
+                           000221   610 	Sstm8s_itc$ITC_SetSoftwarePriority$114 ==.
+                                    611 ;	StdPeriphLib/src/stm8s_itc.c: 331: ITC->ISPR6 |= NewPriority;
+      000221 AE 7F 75         [ 2]  612 	ldw	x, #0x7f75
+      000224 F6               [ 1]  613 	ld	a, (x)
+      000225 1A 01            [ 1]  614 	or	a, (0x01, sp)
+      000227 AE 7F 75         [ 2]  615 	ldw	x, #0x7f75
+      00022A F7               [ 1]  616 	ld	(x), a
+                           00022B   617 	Sstm8s_itc$ITC_SetSoftwarePriority$115 ==.
+                                    618 ;	StdPeriphLib/src/stm8s_itc.c: 332: break;
+      00022B 20 16            [ 2]  619 	jra	00124$
+                           00022D   620 	Sstm8s_itc$ITC_SetSoftwarePriority$116 ==.
+                                    621 ;	StdPeriphLib/src/stm8s_itc.c: 334: case ITC_IRQ_EEPROM_EEC:
+      00022D                        622 00121$:
+                           00022D   623 	Sstm8s_itc$ITC_SetSoftwarePriority$117 ==.
+                                    624 ;	StdPeriphLib/src/stm8s_itc.c: 335: ITC->ISPR7 &= Mask;
+      00022D AE 7F 76         [ 2]  625 	ldw	x, #0x7f76
+      000230 F6               [ 1]  626 	ld	a, (x)
+      000231 14 02            [ 1]  627 	and	a, (0x02, sp)
+      000233 AE 7F 76         [ 2]  628 	ldw	x, #0x7f76
+      000236 F7               [ 1]  629 	ld	(x), a
+                           000237   630 	Sstm8s_itc$ITC_SetSoftwarePriority$118 ==.
+                                    631 ;	StdPeriphLib/src/stm8s_itc.c: 336: ITC->ISPR7 |= NewPriority;
+      000237 AE 7F 76         [ 2]  632 	ldw	x, #0x7f76
+      00023A F6               [ 1]  633 	ld	a, (x)
+      00023B 1A 01            [ 1]  634 	or	a, (0x01, sp)
+      00023D AE 7F 76         [ 2]  635 	ldw	x, #0x7f76
+      000240 F7               [ 1]  636 	ld	(x), a
+                           000241   637 	Sstm8s_itc$ITC_SetSoftwarePriority$119 ==.
+                                    638 ;	StdPeriphLib/src/stm8s_itc.c: 337: break;
+      000241 20 00            [ 2]  639 	jra	00124$
+                           000243   640 	Sstm8s_itc$ITC_SetSoftwarePriority$120 ==.
+                                    641 ;	StdPeriphLib/src/stm8s_itc.c: 339: default:
+      000243                        642 00122$:
+                           000243   643 	Sstm8s_itc$ITC_SetSoftwarePriority$121 ==.
+                                    644 ;	StdPeriphLib/src/stm8s_itc.c: 341: }
+      000243                        645 00124$:
+                           000243   646 	Sstm8s_itc$ITC_SetSoftwarePriority$122 ==.
+                                    647 ;	StdPeriphLib/src/stm8s_itc.c: 342: }
+      000243 5B 04            [ 2]  648 	addw	sp, #4
+                           000245   649 	Sstm8s_itc$ITC_SetSoftwarePriority$123 ==.
+                           000245   650 	XG$ITC_SetSoftwarePriority$0$0 ==.
+      000245 32u00u00         [ 1]  651 	pop	_fp_
+      000248 32u00u01         [ 1]  652 	pop	_fp_+1
+      00024B 81               [ 4]  653 	ret
+                           00024C   654 	Sstm8s_itc$ITC_SetSoftwarePriority$124 ==.
+                                    655 	.area CODE
+                                    656 	.area INITIALIZER
+                                    657 	.area CABS (ABS)
+                                    658 
+                                    659 	.area .debug_line (NOLOAD)
+      000000 00 00 03 E8            660 	.dw	0,Ldebug_line_end-Ldebug_line_start
+      000004                        661 Ldebug_line_start:
+      000004 00 02                  662 	.dw	2
+      000006 00 00 01 18            663 	.dw	0,Ldebug_line_stmt-6-Ldebug_line_start
+      00000A 01                     664 	.db	1
+      00000B 01                     665 	.db	1
+      00000C FB                     666 	.db	-5
+      00000D 0F                     667 	.db	15
+      00000E 0A                     668 	.db	10
+      00000F 00                     669 	.db	0
+      000010 01                     670 	.db	1
+      000011 01                     671 	.db	1
+      000012 01                     672 	.db	1
+      000013 01                     673 	.db	1
+      000014 00                     674 	.db	0
+      000015 00                     675 	.db	0
+      000016 00                     676 	.db	0
+      000017 01                     677 	.db	1
+      000018 2F 68 6F 6D 65 2F 63   678 	.ascii "/home/cas/software/stm8-binutils/bin/../share/sdcc/include/stm8"
+             61 73 2F 73 6F 66 74
+             77 61 72 65 2F 73 74
+             6D 38 2D 62 69 6E 75
+             74 69 6C 73 2F 62 69
+             6E 2F 2E 2E 2F 73 68
+             61 72 65 2F 73 64 63
+             63 2F 69 6E 63 6C 75
+             64 65 2F 73 74 6D 38
+      000057 00                     679 	.db	0
+      000058 2F 68 6F 6D 65 2F 63   680 	.ascii "/home/cas/software/stm8-binutils/share/sdcc/include/stm8"
+             61 73 2F 73 6F 66 74
+             77 61 72 65 2F 73 74
+             6D 38 2D 62 69 6E 75
+             74 69 6C 73 2F 73 68
+             61 72 65 2F 73 64 63
+             63 2F 69 6E 63 6C 75
+             64 65 2F 73 74 6D 38
+      000090 00                     681 	.db	0
+      000091 2F 68 6F 6D 65 2F 63   682 	.ascii "/home/cas/software/stm8-binutils/bin/../share/sdcc/include"
+             61 73 2F 73 6F 66 74
+             77 61 72 65 2F 73 74
+             6D 38 2D 62 69 6E 75
+             74 69 6C 73 2F 62 69
+             6E 2F 2E 2E 2F 73 68
+             61 72 65 2F 73 64 63
+             63 2F 69 6E 63 6C 75
+             64 65
+      0000CB 00                     683 	.db	0
+      0000CC 2F 68 6F 6D 65 2F 63   684 	.ascii "/home/cas/software/stm8-binutils/share/sdcc/include"
+             61 73 2F 73 6F 66 74
+             77 61 72 65 2F 73 74
+             6D 38 2D 62 69 6E 75
+             74 69 6C 73 2F 73 68
+             61 72 65 2F 73 64 63
+             63 2F 69 6E 63 6C 75
+             64 65
+      0000FF 00                     685 	.db	0
+      000100 00                     686 	.db	0
+      000101 53 74 64 50 65 72 69   687 	.ascii "StdPeriphLib/src/stm8s_itc.c"
+             70 68 4C 69 62 2F 73
+             72 63 2F 73 74 6D 38
+             73 5F 69 74 63 2E 63
+      00011D 00                     688 	.db	0
+      00011E 00                     689 	.uleb128	0
+      00011F 00                     690 	.uleb128	0
+      000120 00                     691 	.uleb128	0
+      000121 00                     692 	.db	0
+      000122                        693 Ldebug_line_stmt:
+      000122 00                     694 	.db	0
+      000123 05                     695 	.uleb128	5
+      000124 02                     696 	.db	2
+      000125 00 00r00r00            697 	.dw	0,(Sstm8s_itc$ITC_GetCPUCC$0)
+      000129 03                     698 	.db	3
+      00012A 35                     699 	.sleb128	53
+      00012B 01                     700 	.db	1
+      00012C 09                     701 	.db	9
+      00012D 00 0C                  702 	.dw	Sstm8s_itc$ITC_GetCPUCC$2-Sstm8s_itc$ITC_GetCPUCC$0
+      00012F 03                     703 	.db	3
+      000130 09                     704 	.sleb128	9
+      000131 01                     705 	.db	1
+      000132 09                     706 	.db	9
+      000133 00 01                  707 	.dw	Sstm8s_itc$ITC_GetCPUCC$3-Sstm8s_itc$ITC_GetCPUCC$2
+      000135 03                     708 	.db	3
+      000136 01                     709 	.sleb128	1
+      000137 01                     710 	.db	1
+      000138 09                     711 	.db	9
+      000139 00 01                  712 	.dw	Sstm8s_itc$ITC_GetCPUCC$4-Sstm8s_itc$ITC_GetCPUCC$3
+      00013B 03                     713 	.db	3
+      00013C 05                     714 	.sleb128	5
+      00013D 01                     715 	.db	1
+      00013E 09                     716 	.db	9
+      00013F 00 07                  717 	.dw	7+Sstm8s_itc$ITC_GetCPUCC$5-Sstm8s_itc$ITC_GetCPUCC$4
+      000141 00                     718 	.db	0
+      000142 01                     719 	.uleb128	1
+      000143 01                     720 	.db	1
+      000144 00                     721 	.db	0
+      000145 05                     722 	.uleb128	5
+      000146 02                     723 	.db	2
+      000147 00 00r00r15            724 	.dw	0,(Sstm8s_itc$ITC_DeInit$7)
+      00014B 03                     725 	.db	3
+      00014C D9 00                  726 	.sleb128	89
+      00014E 01                     727 	.db	1
+      00014F 09                     728 	.db	9
+      000150 00 0C                  729 	.dw	Sstm8s_itc$ITC_DeInit$9-Sstm8s_itc$ITC_DeInit$7
+      000152 03                     730 	.db	3
+      000153 02                     731 	.sleb128	2
+      000154 01                     732 	.db	1
+      000155 09                     733 	.db	9
+      000156 00 04                  734 	.dw	Sstm8s_itc$ITC_DeInit$10-Sstm8s_itc$ITC_DeInit$9
+      000158 03                     735 	.db	3
+      000159 01                     736 	.sleb128	1
+      00015A 01                     737 	.db	1
+      00015B 09                     738 	.db	9
+      00015C 00 04                  739 	.dw	Sstm8s_itc$ITC_DeInit$11-Sstm8s_itc$ITC_DeInit$10
+      00015E 03                     740 	.db	3
+      00015F 01                     741 	.sleb128	1
+      000160 01                     742 	.db	1
+      000161 09                     743 	.db	9
+      000162 00 04                  744 	.dw	Sstm8s_itc$ITC_DeInit$12-Sstm8s_itc$ITC_DeInit$11
+      000164 03                     745 	.db	3
+      000165 01                     746 	.sleb128	1
+      000166 01                     747 	.db	1
+      000167 09                     748 	.db	9
+      000168 00 04                  749 	.dw	Sstm8s_itc$ITC_DeInit$13-Sstm8s_itc$ITC_DeInit$12
+      00016A 03                     750 	.db	3
+      00016B 01                     751 	.sleb128	1
+      00016C 01                     752 	.db	1
+      00016D 09                     753 	.db	9
+      00016E 00 04                  754 	.dw	Sstm8s_itc$ITC_DeInit$14-Sstm8s_itc$ITC_DeInit$13
+      000170 03                     755 	.db	3
+      000171 01                     756 	.sleb128	1
+      000172 01                     757 	.db	1
+      000173 09                     758 	.db	9
+      000174 00 04                  759 	.dw	Sstm8s_itc$ITC_DeInit$15-Sstm8s_itc$ITC_DeInit$14
+      000176 03                     760 	.db	3
+      000177 01                     761 	.sleb128	1
+      000178 01                     762 	.db	1
+      000179 09                     763 	.db	9
+      00017A 00 04                  764 	.dw	Sstm8s_itc$ITC_DeInit$16-Sstm8s_itc$ITC_DeInit$15
+      00017C 03                     765 	.db	3
+      00017D 01                     766 	.sleb128	1
+      00017E 01                     767 	.db	1
+      00017F 09                     768 	.db	9
+      000180 00 04                  769 	.dw	Sstm8s_itc$ITC_DeInit$17-Sstm8s_itc$ITC_DeInit$16
+      000182 03                     770 	.db	3
+      000183 01                     771 	.sleb128	1
+      000184 01                     772 	.db	1
+      000185 09                     773 	.db	9
+      000186 00 07                  774 	.dw	7+Sstm8s_itc$ITC_DeInit$18-Sstm8s_itc$ITC_DeInit$17
+      000188 00                     775 	.db	0
+      000189 01                     776 	.uleb128	1
+      00018A 01                     777 	.db	1
+      00018B 00                     778 	.db	0
+      00018C 05                     779 	.uleb128	5
+      00018D 02                     780 	.db	2
+      00018E 00 00r00r48            781 	.dw	0,(Sstm8s_itc$ITC_GetSoftIntStatus$20)
+      000192 03                     782 	.db	3
+      000193 EA 00                  783 	.sleb128	106
+      000195 01                     784 	.db	1
+      000196 09                     785 	.db	9
+      000197 00 0C                  786 	.dw	Sstm8s_itc$ITC_GetSoftIntStatus$22-Sstm8s_itc$ITC_GetSoftIntStatus$20
+      000199 03                     787 	.db	3
+      00019A 02                     788 	.sleb128	2
+      00019B 01                     789 	.db	1
+      00019C 09                     790 	.db	9
+      00019D 00 05                  791 	.dw	Sstm8s_itc$ITC_GetSoftIntStatus$23-Sstm8s_itc$ITC_GetSoftIntStatus$22
+      00019F 03                     792 	.db	3
+      0001A0 01                     793 	.sleb128	1
+      0001A1 01                     794 	.db	1
+      0001A2 09                     795 	.db	9
+      0001A3 00 07                  796 	.dw	7+Sstm8s_itc$ITC_GetSoftIntStatus$24-Sstm8s_itc$ITC_GetSoftIntStatus$23
+      0001A5 00                     797 	.db	0
+      0001A6 01                     798 	.uleb128	1
+      0001A7 01                     799 	.db	1
+      0001A8 00                     800 	.db	0
+      0001A9 05                     801 	.uleb128	5
+      0001AA 02                     802 	.db	2
+      0001AB 00 00r00r60            803 	.dw	0,(Sstm8s_itc$ITC_GetSoftwarePriority$26)
+      0001AF 03                     804 	.db	3
+      0001B0 F4 00                  805 	.sleb128	116
+      0001B2 01                     806 	.db	1
+      0001B3 09                     807 	.db	9
+      0001B4 00 0E                  808 	.dw	Sstm8s_itc$ITC_GetSoftwarePriority$28-Sstm8s_itc$ITC_GetSoftwarePriority$26
+      0001B6 03                     809 	.db	3
+      0001B7 02                     810 	.sleb128	2
+      0001B8 01                     811 	.db	1
+      0001B9 09                     812 	.db	9
+      0001BA 00 01                  813 	.dw	Sstm8s_itc$ITC_GetSoftwarePriority$29-Sstm8s_itc$ITC_GetSoftwarePriority$28
+      0001BC 03                     814 	.db	3
+      0001BD 07                     815 	.sleb128	7
+      0001BE 01                     816 	.db	1
+      0001BF 09                     817 	.db	9
+      0001C0 00 26                  818 	.dw	Sstm8s_itc$ITC_GetSoftwarePriority$30-Sstm8s_itc$ITC_GetSoftwarePriority$29
+      0001C2 03                     819 	.db	3
+      0001C3 02                     820 	.sleb128	2
+      0001C4 01                     821 	.db	1
+      0001C5 09                     822 	.db	9
+      0001C6 00 47                  823 	.dw	Sstm8s_itc$ITC_GetSoftwarePriority$31-Sstm8s_itc$ITC_GetSoftwarePriority$30
+      0001C8 03                     824 	.db	3
+      0001C9 02                     825 	.sleb128	2
+      0001CA 01                     826 	.db	1
+      0001CB 09                     827 	.db	9
+      0001CC 00 00                  828 	.dw	Sstm8s_itc$ITC_GetSoftwarePriority$32-Sstm8s_itc$ITC_GetSoftwarePriority$31
+      0001CE 03                     829 	.db	3
+      0001CF 01                     830 	.sleb128	1
+      0001D0 01                     831 	.db	1
+      0001D1 09                     832 	.db	9
+      0001D2 00 00                  833 	.dw	Sstm8s_itc$ITC_GetSoftwarePriority$33-Sstm8s_itc$ITC_GetSoftwarePriority$32
+      0001D4 03                     834 	.db	3
+      0001D5 01                     835 	.sleb128	1
+      0001D6 01                     836 	.db	1
+      0001D7 09                     837 	.db	9
+      0001D8 00 00                  838 	.dw	Sstm8s_itc$ITC_GetSoftwarePriority$34-Sstm8s_itc$ITC_GetSoftwarePriority$33
+      0001DA 03                     839 	.db	3
+      0001DB 01                     840 	.sleb128	1
+      0001DC 01                     841 	.db	1
+      0001DD 09                     842 	.db	9
+      0001DE 00 00                  843 	.dw	Sstm8s_itc$ITC_GetSoftwarePriority$35-Sstm8s_itc$ITC_GetSoftwarePriority$34
+      0001E0 03                     844 	.db	3
+      0001E1 01                     845 	.sleb128	1
+      0001E2 01                     846 	.db	1
+      0001E3 09                     847 	.db	9
+      0001E4 00 06                  848 	.dw	Sstm8s_itc$ITC_GetSoftwarePriority$36-Sstm8s_itc$ITC_GetSoftwarePriority$35
+      0001E6 03                     849 	.db	3
+      0001E7 01                     850 	.sleb128	1
+      0001E8 01                     851 	.db	1
+      0001E9 09                     852 	.db	9
+      0001EA 00 03                  853 	.dw	Sstm8s_itc$ITC_GetSoftwarePriority$37-Sstm8s_itc$ITC_GetSoftwarePriority$36
+      0001EC 03                     854 	.db	3
+      0001ED 02                     855 	.sleb128	2
+      0001EE 01                     856 	.db	1
+      0001EF 09                     857 	.db	9
+      0001F0 00 00                  858 	.dw	Sstm8s_itc$ITC_GetSoftwarePriority$38-Sstm8s_itc$ITC_GetSoftwarePriority$37
+      0001F2 03                     859 	.db	3
+      0001F3 01                     860 	.sleb128	1
+      0001F4 01                     861 	.db	1
+      0001F5 09                     862 	.db	9
+      0001F6 00 00                  863 	.dw	Sstm8s_itc$ITC_GetSoftwarePriority$39-Sstm8s_itc$ITC_GetSoftwarePriority$38
+      0001F8 03                     864 	.db	3
+      0001F9 01                     865 	.sleb128	1
+      0001FA 01                     866 	.db	1
+      0001FB 09                     867 	.db	9
+      0001FC 00 00                  868 	.dw	Sstm8s_itc$ITC_GetSoftwarePriority$40-Sstm8s_itc$ITC_GetSoftwarePriority$39
+      0001FE 03                     869 	.db	3
+      0001FF 01                     870 	.sleb128	1
+      000200 01                     871 	.db	1
+      000201 09                     872 	.db	9
+      000202 00 00                  873 	.dw	Sstm8s_itc$ITC_GetSoftwarePriority$41-Sstm8s_itc$ITC_GetSoftwarePriority$40
+      000204 03                     874 	.db	3
+      000205 01                     875 	.sleb128	1
+      000206 01                     876 	.db	1
+      000207 09                     877 	.db	9
+      000208 00 06                  878 	.dw	Sstm8s_itc$ITC_GetSoftwarePriority$42-Sstm8s_itc$ITC_GetSoftwarePriority$41
+      00020A 03                     879 	.db	3
+      00020B 01                     880 	.sleb128	1
+      00020C 01                     881 	.db	1
+      00020D 09                     882 	.db	9
+      00020E 00 03                  883 	.dw	Sstm8s_itc$ITC_GetSoftwarePriority$43-Sstm8s_itc$ITC_GetSoftwarePriority$42
+      000210 03                     884 	.db	3
+      000211 09                     885 	.sleb128	9
+      000212 01                     886 	.db	1
+      000213 09                     887 	.db	9
+      000214 00 00                  888 	.dw	Sstm8s_itc$ITC_GetSoftwarePriority$44-Sstm8s_itc$ITC_GetSoftwarePriority$43
+      000216 03                     889 	.db	3
+      000217 01                     890 	.sleb128	1
+      000218 01                     891 	.db	1
+      000219 09                     892 	.db	9
+      00021A 00 00                  893 	.dw	Sstm8s_itc$ITC_GetSoftwarePriority$45-Sstm8s_itc$ITC_GetSoftwarePriority$44
+      00021C 03                     894 	.db	3
+      00021D 01                     895 	.sleb128	1
+      00021E 01                     896 	.db	1
+      00021F 09                     897 	.db	9
+      000220 00 06                  898 	.dw	Sstm8s_itc$ITC_GetSoftwarePriority$46-Sstm8s_itc$ITC_GetSoftwarePriority$45
+      000222 03                     899 	.db	3
+      000223 01                     900 	.sleb128	1
+      000224 01                     901 	.db	1
+      000225 09                     902 	.db	9
+      000226 00 03                  903 	.dw	Sstm8s_itc$ITC_GetSoftwarePriority$47-Sstm8s_itc$ITC_GetSoftwarePriority$46
+      000228 03                     904 	.db	3
+      000229 02                     905 	.sleb128	2
+      00022A 01                     906 	.db	1
+      00022B 09                     907 	.db	9
+      00022C 00 00                  908 	.dw	Sstm8s_itc$ITC_GetSoftwarePriority$48-Sstm8s_itc$ITC_GetSoftwarePriority$47
+      00022E 03                     909 	.db	3
+      00022F 05                     910 	.sleb128	5
+      000230 01                     911 	.db	1
+      000231 09                     912 	.db	9
+      000232 00 00                  913 	.dw	Sstm8s_itc$ITC_GetSoftwarePriority$49-Sstm8s_itc$ITC_GetSoftwarePriority$48
+      000234 03                     914 	.db	3
+      000235 01                     915 	.sleb128	1
+      000236 01                     916 	.db	1
+      000237 09                     917 	.db	9
+      000238 00 00                  918 	.dw	Sstm8s_itc$ITC_GetSoftwarePriority$50-Sstm8s_itc$ITC_GetSoftwarePriority$49
+      00023A 03                     919 	.db	3
+      00023B 02                     920 	.sleb128	2
+      00023C 01                     921 	.db	1
+      00023D 09                     922 	.db	9
+      00023E 00 00                  923 	.dw	Sstm8s_itc$ITC_GetSoftwarePriority$51-Sstm8s_itc$ITC_GetSoftwarePriority$50
+      000240 03                     924 	.db	3
+      000241 01                     925 	.sleb128	1
+      000242 01                     926 	.db	1
+      000243 09                     927 	.db	9
+      000244 00 06                  928 	.dw	Sstm8s_itc$ITC_GetSoftwarePriority$52-Sstm8s_itc$ITC_GetSoftwarePriority$51
+      000246 03                     929 	.db	3
+      000247 01                     930 	.sleb128	1
+      000248 01                     931 	.db	1
+      000249 09                     932 	.db	9
+      00024A 00 02                  933 	.dw	Sstm8s_itc$ITC_GetSoftwarePriority$53-Sstm8s_itc$ITC_GetSoftwarePriority$52
+      00024C 03                     934 	.db	3
+      00024D 02                     935 	.sleb128	2
+      00024E 01                     936 	.db	1
+      00024F 09                     937 	.db	9
+      000250 00 00                  938 	.dw	Sstm8s_itc$ITC_GetSoftwarePriority$54-Sstm8s_itc$ITC_GetSoftwarePriority$53
+      000252 03                     939 	.db	3
+      000253 0A                     940 	.sleb128	10
+      000254 01                     941 	.db	1
+      000255 09                     942 	.db	9
+      000256 00 00                  943 	.dw	Sstm8s_itc$ITC_GetSoftwarePriority$55-Sstm8s_itc$ITC_GetSoftwarePriority$54
+      000258 03                     944 	.db	3
+      000259 01                     945 	.sleb128	1
+      00025A 01                     946 	.db	1
+      00025B 09                     947 	.db	9
+      00025C 00 06                  948 	.dw	Sstm8s_itc$ITC_GetSoftwarePriority$56-Sstm8s_itc$ITC_GetSoftwarePriority$55
+      00025E 03                     949 	.db	3
+      00025F 01                     950 	.sleb128	1
+      000260 01                     951 	.db	1
+      000261 09                     952 	.db	9
+      000262 00 02                  953 	.dw	Sstm8s_itc$ITC_GetSoftwarePriority$57-Sstm8s_itc$ITC_GetSoftwarePriority$56
+      000264 03                     954 	.db	3
+      000265 03                     955 	.sleb128	3
+      000266 01                     956 	.db	1
+      000267 09                     957 	.db	9
+      000268 00 00                  958 	.dw	Sstm8s_itc$ITC_GetSoftwarePriority$58-Sstm8s_itc$ITC_GetSoftwarePriority$57
+      00026A 03                     959 	.db	3
+      00026B 01                     960 	.sleb128	1
+      00026C 01                     961 	.db	1
+      00026D 09                     962 	.db	9
+      00026E 00 00                  963 	.dw	Sstm8s_itc$ITC_GetSoftwarePriority$59-Sstm8s_itc$ITC_GetSoftwarePriority$58
+      000270 03                     964 	.db	3
+      000271 0A                     965 	.sleb128	10
+      000272 01                     966 	.db	1
+      000273 09                     967 	.db	9
+      000274 00 00                  968 	.dw	Sstm8s_itc$ITC_GetSoftwarePriority$60-Sstm8s_itc$ITC_GetSoftwarePriority$59
+      000276 03                     969 	.db	3
+      000277 05                     970 	.sleb128	5
+      000278 01                     971 	.db	1
+      000279 09                     972 	.db	9
+      00027A 00 00                  973 	.dw	Sstm8s_itc$ITC_GetSoftwarePriority$61-Sstm8s_itc$ITC_GetSoftwarePriority$60
+      00027C 03                     974 	.db	3
+      00027D 02                     975 	.sleb128	2
+      00027E 01                     976 	.db	1
+      00027F 09                     977 	.db	9
+      000280 00 06                  978 	.dw	Sstm8s_itc$ITC_GetSoftwarePriority$62-Sstm8s_itc$ITC_GetSoftwarePriority$61
+      000282 03                     979 	.db	3
+      000283 01                     980 	.sleb128	1
+      000284 01                     981 	.db	1
+      000285 09                     982 	.db	9
+      000286 00 02                  983 	.dw	Sstm8s_itc$ITC_GetSoftwarePriority$63-Sstm8s_itc$ITC_GetSoftwarePriority$62
+      000288 03                     984 	.db	3
+      000289 02                     985 	.sleb128	2
+      00028A 01                     986 	.db	1
+      00028B 09                     987 	.db	9
+      00028C 00 00                  988 	.dw	Sstm8s_itc$ITC_GetSoftwarePriority$64-Sstm8s_itc$ITC_GetSoftwarePriority$63
+      00028E 03                     989 	.db	3
+      00028F 01                     990 	.sleb128	1
+      000290 01                     991 	.db	1
+      000291 09                     992 	.db	9
+      000292 00 06                  993 	.dw	Sstm8s_itc$ITC_GetSoftwarePriority$65-Sstm8s_itc$ITC_GetSoftwarePriority$64
+      000294 03                     994 	.db	3
+      000295 01                     995 	.sleb128	1
+      000296 01                     996 	.db	1
+      000297 09                     997 	.db	9
+      000298 00 02                  998 	.dw	Sstm8s_itc$ITC_GetSoftwarePriority$66-Sstm8s_itc$ITC_GetSoftwarePriority$65
+      00029A 03                     999 	.db	3
+      00029B 02                    1000 	.sleb128	2
+      00029C 01                    1001 	.db	1
+      00029D 09                    1002 	.db	9
+      00029E 00 00                 1003 	.dw	Sstm8s_itc$ITC_GetSoftwarePriority$67-Sstm8s_itc$ITC_GetSoftwarePriority$66
+      0002A0 03                    1004 	.db	3
+      0002A1 02                    1005 	.sleb128	2
+      0002A2 01                    1006 	.db	1
+      0002A3 09                    1007 	.db	9
+      0002A4 00 00                 1008 	.dw	Sstm8s_itc$ITC_GetSoftwarePriority$68-Sstm8s_itc$ITC_GetSoftwarePriority$67
+      0002A6 03                    1009 	.db	3
+      0002A7 02                    1010 	.sleb128	2
+      0002A8 01                    1011 	.db	1
+      0002A9 09                    1012 	.db	9
+      0002AA 00 0B                 1013 	.dw	Sstm8s_itc$ITC_GetSoftwarePriority$69-Sstm8s_itc$ITC_GetSoftwarePriority$68
+      0002AC 03                    1014 	.db	3
+      0002AD 02                    1015 	.sleb128	2
+      0002AE 01                    1016 	.db	1
+      0002AF 09                    1017 	.db	9
+      0002B0 00 00                 1018 	.dw	Sstm8s_itc$ITC_GetSoftwarePriority$70-Sstm8s_itc$ITC_GetSoftwarePriority$69
+      0002B2 03                    1019 	.db	3
+      0002B3 01                    1020 	.sleb128	1
+      0002B4 01                    1021 	.db	1
+      0002B5 09                    1022 	.db	9
+      0002B6 00 09                 1023 	.dw	7+Sstm8s_itc$ITC_GetSoftwarePriority$71-Sstm8s_itc$ITC_GetSoftwarePriority$70
+      0002B8 00                    1024 	.db	0
+      0002B9 01                    1025 	.uleb128	1
+      0002BA 01                    1026 	.db	1
+      0002BB 00                    1027 	.db	0
+      0002BC 05                    1028 	.uleb128	5
+      0002BD 02                    1029 	.db	2
+      0002BE 00 00r01r2B           1030 	.dw	0,(Sstm8s_itc$ITC_SetSoftwarePriority$73)
+      0002C2 03                    1031 	.db	3
+      0002C3 E5 01                 1032 	.sleb128	229
+      0002C5 01                    1033 	.db	1
+      0002C6 09                    1034 	.db	9
+      0002C7 00 0E                 1035 	.dw	Sstm8s_itc$ITC_SetSoftwarePriority$75-Sstm8s_itc$ITC_SetSoftwarePriority$73
+      0002C9 03                    1036 	.db	3
+      0002CA 0E                    1037 	.sleb128	14
+      0002CB 01                    1038 	.db	1
+      0002CC 09                    1039 	.db	9
+      0002CD 00 19                 1040 	.dw	Sstm8s_itc$ITC_SetSoftwarePriority$76-Sstm8s_itc$ITC_SetSoftwarePriority$75
+      0002CF 03                    1041 	.db	3
+      0002D0 03                    1042 	.sleb128	3
+      0002D1 01                    1043 	.db	1
+      0002D2 09                    1044 	.db	9
+      0002D3 00 0F                 1045 	.dw	Sstm8s_itc$ITC_SetSoftwarePriority$77-Sstm8s_itc$ITC_SetSoftwarePriority$76
+      0002D5 03                    1046 	.db	3
+      0002D6 02                    1047 	.sleb128	2
+      0002D7 01                    1048 	.db	1
+      0002D8 09                    1049 	.db	9
+      0002D9 00 44                 1050 	.dw	Sstm8s_itc$ITC_SetSoftwarePriority$78-Sstm8s_itc$ITC_SetSoftwarePriority$77
+      0002DB 03                    1051 	.db	3
+      0002DC 02                    1052 	.sleb128	2
+      0002DD 01                    1053 	.db	1
+      0002DE 09                    1054 	.db	9
+      0002DF 00 00                 1055 	.dw	Sstm8s_itc$ITC_SetSoftwarePriority$79-Sstm8s_itc$ITC_SetSoftwarePriority$78
+      0002E1 03                    1056 	.db	3
+      0002E2 01                    1057 	.sleb128	1
+      0002E3 01                    1058 	.db	1
+      0002E4 09                    1059 	.db	9
+      0002E5 00 00                 1060 	.dw	Sstm8s_itc$ITC_SetSoftwarePriority$80-Sstm8s_itc$ITC_SetSoftwarePriority$79
+      0002E7 03                    1061 	.db	3
+      0002E8 01                    1062 	.sleb128	1
+      0002E9 01                    1063 	.db	1
+      0002EA 09                    1064 	.db	9
+      0002EB 00 00                 1065 	.dw	Sstm8s_itc$ITC_SetSoftwarePriority$81-Sstm8s_itc$ITC_SetSoftwarePriority$80
+      0002ED 03                    1066 	.db	3
+      0002EE 01                    1067 	.sleb128	1
+      0002EF 01                    1068 	.db	1
+      0002F0 09                    1069 	.db	9
+      0002F1 00 00                 1070 	.dw	Sstm8s_itc$ITC_SetSoftwarePriority$82-Sstm8s_itc$ITC_SetSoftwarePriority$81
+      0002F3 03                    1071 	.db	3
+      0002F4 01                    1072 	.sleb128	1
+      0002F5 01                    1073 	.db	1
+      0002F6 09                    1074 	.db	9
+      0002F7 00 0A                 1075 	.dw	Sstm8s_itc$ITC_SetSoftwarePriority$83-Sstm8s_itc$ITC_SetSoftwarePriority$82
+      0002F9 03                    1076 	.db	3
+      0002FA 01                    1077 	.sleb128	1
+      0002FB 01                    1078 	.db	1
+      0002FC 09                    1079 	.db	9
+      0002FD 00 0A                 1080 	.dw	Sstm8s_itc$ITC_SetSoftwarePriority$84-Sstm8s_itc$ITC_SetSoftwarePriority$83
+      0002FF 03                    1081 	.db	3
+      000300 01                    1082 	.sleb128	1
+      000301 01                    1083 	.db	1
+      000302 09                    1084 	.db	9
+      000303 00 03                 1085 	.dw	Sstm8s_itc$ITC_SetSoftwarePriority$85-Sstm8s_itc$ITC_SetSoftwarePriority$84
+      000305 03                    1086 	.db	3
+      000306 02                    1087 	.sleb128	2
+      000307 01                    1088 	.db	1
+      000308 09                    1089 	.db	9
+      000309 00 00                 1090 	.dw	Sstm8s_itc$ITC_SetSoftwarePriority$86-Sstm8s_itc$ITC_SetSoftwarePriority$85
+      00030B 03                    1091 	.db	3
+      00030C 01                    1092 	.sleb128	1
+      00030D 01                    1093 	.db	1
+      00030E 09                    1094 	.db	9
+      00030F 00 00                 1095 	.dw	Sstm8s_itc$ITC_SetSoftwarePriority$87-Sstm8s_itc$ITC_SetSoftwarePriority$86
+      000311 03                    1096 	.db	3
+      000312 01                    1097 	.sleb128	1
+      000313 01                    1098 	.db	1
+      000314 09                    1099 	.db	9
+      000315 00 00                 1100 	.dw	Sstm8s_itc$ITC_SetSoftwarePriority$88-Sstm8s_itc$ITC_SetSoftwarePriority$87
+      000317 03                    1101 	.db	3
+      000318 01                    1102 	.sleb128	1
+      000319 01                    1103 	.db	1
+      00031A 09                    1104 	.db	9
+      00031B 00 00                 1105 	.dw	Sstm8s_itc$ITC_SetSoftwarePriority$89-Sstm8s_itc$ITC_SetSoftwarePriority$88
+      00031D 03                    1106 	.db	3
+      00031E 01                    1107 	.sleb128	1
+      00031F 01                    1108 	.db	1
+      000320 09                    1109 	.db	9
+      000321 00 0A                 1110 	.dw	Sstm8s_itc$ITC_SetSoftwarePriority$90-Sstm8s_itc$ITC_SetSoftwarePriority$89
+      000323 03                    1111 	.db	3
+      000324 01                    1112 	.sleb128	1
+      000325 01                    1113 	.db	1
+      000326 09                    1114 	.db	9
+      000327 00 0A                 1115 	.dw	Sstm8s_itc$ITC_SetSoftwarePriority$91-Sstm8s_itc$ITC_SetSoftwarePriority$90
+      000329 03                    1116 	.db	3
+      00032A 01                    1117 	.sleb128	1
+      00032B 01                    1118 	.db	1
+      00032C 09                    1119 	.db	9
+      00032D 00 03                 1120 	.dw	Sstm8s_itc$ITC_SetSoftwarePriority$92-Sstm8s_itc$ITC_SetSoftwarePriority$91
+      00032F 03                    1121 	.db	3
+      000330 09                    1122 	.sleb128	9
+      000331 01                    1123 	.db	1
+      000332 09                    1124 	.db	9
+      000333 00 00                 1125 	.dw	Sstm8s_itc$ITC_SetSoftwarePriority$93-Sstm8s_itc$ITC_SetSoftwarePriority$92
+      000335 03                    1126 	.db	3
+      000336 01                    1127 	.sleb128	1
+      000337 01                    1128 	.db	1
+      000338 09                    1129 	.db	9
+      000339 00 00                 1130 	.dw	Sstm8s_itc$ITC_SetSoftwarePriority$94-Sstm8s_itc$ITC_SetSoftwarePriority$93
+      00033B 03                    1131 	.db	3
+      00033C 01                    1132 	.sleb128	1
+      00033D 01                    1133 	.db	1
+      00033E 09                    1134 	.db	9
+      00033F 00 0A                 1135 	.dw	Sstm8s_itc$ITC_SetSoftwarePriority$95-Sstm8s_itc$ITC_SetSoftwarePriority$94
+      000341 03                    1136 	.db	3
+      000342 01                    1137 	.sleb128	1
+      000343 01                    1138 	.db	1
+      000344 09                    1139 	.db	9
+      000345 00 0A                 1140 	.dw	Sstm8s_itc$ITC_SetSoftwarePriority$96-Sstm8s_itc$ITC_SetSoftwarePriority$95
+      000347 03                    1141 	.db	3
+      000348 01                    1142 	.sleb128	1
+      000349 01                    1143 	.db	1
+      00034A 09                    1144 	.db	9
+      00034B 00 03                 1145 	.dw	Sstm8s_itc$ITC_SetSoftwarePriority$97-Sstm8s_itc$ITC_SetSoftwarePriority$96
+      00034D 03                    1146 	.db	3
+      00034E 02                    1147 	.sleb128	2
+      00034F 01                    1148 	.db	1
+      000350 09                    1149 	.db	9
+      000351 00 00                 1150 	.dw	Sstm8s_itc$ITC_SetSoftwarePriority$98-Sstm8s_itc$ITC_SetSoftwarePriority$97
+      000353 03                    1151 	.db	3
+      000354 05                    1152 	.sleb128	5
+      000355 01                    1153 	.db	1
+      000356 09                    1154 	.db	9
+      000357 00 00                 1155 	.dw	Sstm8s_itc$ITC_SetSoftwarePriority$99-Sstm8s_itc$ITC_SetSoftwarePriority$98
+      000359 03                    1156 	.db	3
+      00035A 01                    1157 	.sleb128	1
+      00035B 01                    1158 	.db	1
+      00035C 09                    1159 	.db	9
+      00035D 00 00                 1160 	.dw	Sstm8s_itc$ITC_SetSoftwarePriority$100-Sstm8s_itc$ITC_SetSoftwarePriority$99
+      00035F 03                    1161 	.db	3
+      000360 02                    1162 	.sleb128	2
+      000361 01                    1163 	.db	1
+      000362 09                    1164 	.db	9
+      000363 00 00                 1165 	.dw	Sstm8s_itc$ITC_SetSoftwarePriority$101-Sstm8s_itc$ITC_SetSoftwarePriority$100
+      000365 03                    1166 	.db	3
+      000366 01                    1167 	.sleb128	1
+      000367 01                    1168 	.db	1
+      000368 09                    1169 	.db	9
+      000369 00 0A                 1170 	.dw	Sstm8s_itc$ITC_SetSoftwarePriority$102-Sstm8s_itc$ITC_SetSoftwarePriority$101
+      00036B 03                    1171 	.db	3
+      00036C 01                    1172 	.sleb128	1
+      00036D 01                    1173 	.db	1
+      00036E 09                    1174 	.db	9
+      00036F 00 0A                 1175 	.dw	Sstm8s_itc$ITC_SetSoftwarePriority$103-Sstm8s_itc$ITC_SetSoftwarePriority$102
+      000371 03                    1176 	.db	3
+      000372 01                    1177 	.sleb128	1
+      000373 01                    1178 	.db	1
+      000374 09                    1179 	.db	9
+      000375 00 03                 1180 	.dw	Sstm8s_itc$ITC_SetSoftwarePriority$104-Sstm8s_itc$ITC_SetSoftwarePriority$103
+      000377 03                    1181 	.db	3
+      000378 02                    1182 	.sleb128	2
+      000379 01                    1183 	.db	1
+      00037A 09                    1184 	.db	9
+      00037B 00 00                 1185 	.dw	Sstm8s_itc$ITC_SetSoftwarePriority$105-Sstm8s_itc$ITC_SetSoftwarePriority$104
+      00037D 03                    1186 	.db	3
+      00037E 0A                    1187 	.sleb128	10
+      00037F 01                    1188 	.db	1
+      000380 09                    1189 	.db	9
+      000381 00 00                 1190 	.dw	Sstm8s_itc$ITC_SetSoftwarePriority$106-Sstm8s_itc$ITC_SetSoftwarePriority$105
+      000383 03                    1191 	.db	3
+      000384 01                    1192 	.sleb128	1
+      000385 01                    1193 	.db	1
+      000386 09                    1194 	.db	9
+      000387 00 0A                 1195 	.dw	Sstm8s_itc$ITC_SetSoftwarePriority$107-Sstm8s_itc$ITC_SetSoftwarePriority$106
+      000389 03                    1196 	.db	3
+      00038A 01                    1197 	.sleb128	1
+      00038B 01                    1198 	.db	1
+      00038C 09                    1199 	.db	9
+      00038D 00 0A                 1200 	.dw	Sstm8s_itc$ITC_SetSoftwarePriority$108-Sstm8s_itc$ITC_SetSoftwarePriority$107
+      00038F 03                    1201 	.db	3
+      000390 01                    1202 	.sleb128	1
+      000391 01                    1203 	.db	1
+      000392 09                    1204 	.db	9
+      000393 00 02                 1205 	.dw	Sstm8s_itc$ITC_SetSoftwarePriority$109-Sstm8s_itc$ITC_SetSoftwarePriority$108
+      000395 03                    1206 	.db	3
+      000396 03                    1207 	.sleb128	3
+      000397 01                    1208 	.db	1
+      000398 09                    1209 	.db	9
+      000399 00 00                 1210 	.dw	Sstm8s_itc$ITC_SetSoftwarePriority$110-Sstm8s_itc$ITC_SetSoftwarePriority$109
+      00039B 03                    1211 	.db	3
+      00039C 01                    1212 	.sleb128	1
+      00039D 01                    1213 	.db	1
+      00039E 09                    1214 	.db	9
+      00039F 00 00                 1215 	.dw	Sstm8s_itc$ITC_SetSoftwarePriority$111-Sstm8s_itc$ITC_SetSoftwarePriority$110
+      0003A1 03                    1216 	.db	3
+      0003A2 0C                    1217 	.sleb128	12
+      0003A3 01                    1218 	.db	1
+      0003A4 09                    1219 	.db	9
+      0003A5 00 00                 1220 	.dw	Sstm8s_itc$ITC_SetSoftwarePriority$112-Sstm8s_itc$ITC_SetSoftwarePriority$111
+      0003A7 03                    1221 	.db	3
+      0003A8 06                    1222 	.sleb128	6
+      0003A9 01                    1223 	.db	1
+      0003AA 09                    1224 	.db	9
+      0003AB 00 00                 1225 	.dw	Sstm8s_itc$ITC_SetSoftwarePriority$113-Sstm8s_itc$ITC_SetSoftwarePriority$112
+      0003AD 03                    1226 	.db	3
+      0003AE 02                    1227 	.sleb128	2
+      0003AF 01                    1228 	.db	1
+      0003B0 09                    1229 	.db	9
+      0003B1 00 0A                 1230 	.dw	Sstm8s_itc$ITC_SetSoftwarePriority$114-Sstm8s_itc$ITC_SetSoftwarePriority$113
+      0003B3 03                    1231 	.db	3
+      0003B4 01                    1232 	.sleb128	1
+      0003B5 01                    1233 	.db	1
+      0003B6 09                    1234 	.db	9
+      0003B7 00 0A                 1235 	.dw	Sstm8s_itc$ITC_SetSoftwarePriority$115-Sstm8s_itc$ITC_SetSoftwarePriority$114
+      0003B9 03                    1236 	.db	3
+      0003BA 01                    1237 	.sleb128	1
+      0003BB 01                    1238 	.db	1
+      0003BC 09                    1239 	.db	9
+      0003BD 00 02                 1240 	.dw	Sstm8s_itc$ITC_SetSoftwarePriority$116-Sstm8s_itc$ITC_SetSoftwarePriority$115
+      0003BF 03                    1241 	.db	3
+      0003C0 02                    1242 	.sleb128	2
+      0003C1 01                    1243 	.db	1
+      0003C2 09                    1244 	.db	9
+      0003C3 00 00                 1245 	.dw	Sstm8s_itc$ITC_SetSoftwarePriority$117-Sstm8s_itc$ITC_SetSoftwarePriority$116
+      0003C5 03                    1246 	.db	3
+      0003C6 01                    1247 	.sleb128	1
+      0003C7 01                    1248 	.db	1
+      0003C8 09                    1249 	.db	9
+      0003C9 00 0A                 1250 	.dw	Sstm8s_itc$ITC_SetSoftwarePriority$118-Sstm8s_itc$ITC_SetSoftwarePriority$117
+      0003CB 03                    1251 	.db	3
+      0003CC 01                    1252 	.sleb128	1
+      0003CD 01                    1253 	.db	1
+      0003CE 09                    1254 	.db	9
+      0003CF 00 0A                 1255 	.dw	Sstm8s_itc$ITC_SetSoftwarePriority$119-Sstm8s_itc$ITC_SetSoftwarePriority$118
+      0003D1 03                    1256 	.db	3
+      0003D2 01                    1257 	.sleb128	1
+      0003D3 01                    1258 	.db	1
+      0003D4 09                    1259 	.db	9
+      0003D5 00 02                 1260 	.dw	Sstm8s_itc$ITC_SetSoftwarePriority$120-Sstm8s_itc$ITC_SetSoftwarePriority$119
+      0003D7 03                    1261 	.db	3
+      0003D8 02                    1262 	.sleb128	2
+      0003D9 01                    1263 	.db	1
+      0003DA 09                    1264 	.db	9
+      0003DB 00 00                 1265 	.dw	Sstm8s_itc$ITC_SetSoftwarePriority$121-Sstm8s_itc$ITC_SetSoftwarePriority$120
+      0003DD 03                    1266 	.db	3
+      0003DE 02                    1267 	.sleb128	2
+      0003DF 01                    1268 	.db	1
+      0003E0 09                    1269 	.db	9
+      0003E1 00 00                 1270 	.dw	Sstm8s_itc$ITC_SetSoftwarePriority$122-Sstm8s_itc$ITC_SetSoftwarePriority$121
+      0003E3 03                    1271 	.db	3
+      0003E4 01                    1272 	.sleb128	1
+      0003E5 01                    1273 	.db	1
+      0003E6 09                    1274 	.db	9
+      0003E7 00 09                 1275 	.dw	7+Sstm8s_itc$ITC_SetSoftwarePriority$123-Sstm8s_itc$ITC_SetSoftwarePriority$122
+      0003E9 00                    1276 	.db	0
+      0003EA 01                    1277 	.uleb128	1
+      0003EB 01                    1278 	.db	1
+      0003EC                       1279 Ldebug_line_end:
+                                   1280 
+                                   1281 	.area .debug_loc (NOLOAD)
+      000000                       1282 Ldebug_loc_start:
+      000000 00 00r01r37           1283 	.dw	0,(Sstm8s_itc$ITC_SetSoftwarePriority$74)
+      000004 00 00r02r4C           1284 	.dw	0,(Sstm8s_itc$ITC_SetSoftwarePriority$124)
+      000008 00 02                 1285 	.dw	2
+      00000A 8F                    1286 	.db	143
+      00000B 01                    1287 	.sleb128	1
+      00000C 00 00 00 00           1288 	.dw	0,0
+      000010 00 00 00 00           1289 	.dw	0,0
+      000014 00 00r00r6C           1290 	.dw	0,(Sstm8s_itc$ITC_GetSoftwarePriority$27)
+      000018 00 00r01r2B           1291 	.dw	0,(Sstm8s_itc$ITC_GetSoftwarePriority$72)
+      00001C 00 02                 1292 	.dw	2
+      00001E 8F                    1293 	.db	143
+      00001F 01                    1294 	.sleb128	1
+      000020 00 00 00 00           1295 	.dw	0,0
+      000024 00 00 00 00           1296 	.dw	0,0
+      000028 00 00r00r54           1297 	.dw	0,(Sstm8s_itc$ITC_GetSoftIntStatus$21)
+      00002C 00 00r00r60           1298 	.dw	0,(Sstm8s_itc$ITC_GetSoftIntStatus$25)
+      000030 00 02                 1299 	.dw	2
+      000032 8F                    1300 	.db	143
+      000033 01                    1301 	.sleb128	1
+      000034 00 00 00 00           1302 	.dw	0,0
+      000038 00 00 00 00           1303 	.dw	0,0
+      00003C 00 00r00r21           1304 	.dw	0,(Sstm8s_itc$ITC_DeInit$8)
+      000040 00 00r00r48           1305 	.dw	0,(Sstm8s_itc$ITC_DeInit$19)
+      000044 00 02                 1306 	.dw	2
+      000046 8F                    1307 	.db	143
+      000047 01                    1308 	.sleb128	1
+      000048 00 00 00 00           1309 	.dw	0,0
+      00004C 00 00 00 00           1310 	.dw	0,0
+      000050 00 00r00r0C           1311 	.dw	0,(Sstm8s_itc$ITC_GetCPUCC$1)
+      000054 00 00r00r15           1312 	.dw	0,(Sstm8s_itc$ITC_GetCPUCC$6)
+      000058 00 02                 1313 	.dw	2
+      00005A 8F                    1314 	.db	143
+      00005B 01                    1315 	.sleb128	1
+      00005C 00 00 00 00           1316 	.dw	0,0
+      000060 00 00 00 00           1317 	.dw	0,0
+                                   1318 
+                                   1319 	.area .debug_abbrev (NOLOAD)
+      000000                       1320 Ldebug_abbrev:
+      000000 07                    1321 	.uleb128	7
+      000001 0B                    1322 	.uleb128	11
+      000002 00                    1323 	.db	0
+      000003 00                    1324 	.uleb128	0
+      000004 00                    1325 	.uleb128	0
+      000005 03                    1326 	.uleb128	3
+      000006 2E                    1327 	.uleb128	46
+      000007 00                    1328 	.db	0
+      000008 03                    1329 	.uleb128	3
+      000009 08                    1330 	.uleb128	8
+      00000A 11                    1331 	.uleb128	17
+      00000B 01                    1332 	.uleb128	1
+      00000C 12                    1333 	.uleb128	18
+      00000D 01                    1334 	.uleb128	1
+      00000E 3F                    1335 	.uleb128	63
+      00000F 0C                    1336 	.uleb128	12
+      000010 40                    1337 	.uleb128	64
+      000011 06                    1338 	.uleb128	6
+      000012 49                    1339 	.uleb128	73
+      000013 13                    1340 	.uleb128	19
+      000014 00                    1341 	.uleb128	0
+      000015 00                    1342 	.uleb128	0
+      000016 06                    1343 	.uleb128	6
+      000017 05                    1344 	.uleb128	5
+      000018 00                    1345 	.db	0
+      000019 02                    1346 	.uleb128	2
+      00001A 0A                    1347 	.uleb128	10
+      00001B 03                    1348 	.uleb128	3
+      00001C 08                    1349 	.uleb128	8
+      00001D 49                    1350 	.uleb128	73
+      00001E 13                    1351 	.uleb128	19
+      00001F 00                    1352 	.uleb128	0
+      000020 00                    1353 	.uleb128	0
+      000021 08                    1354 	.uleb128	8
+      000022 34                    1355 	.uleb128	52
+      000023 00                    1356 	.db	0
+      000024 02                    1357 	.uleb128	2
+      000025 0A                    1358 	.uleb128	10
+      000026 03                    1359 	.uleb128	3
+      000027 08                    1360 	.uleb128	8
+      000028 49                    1361 	.uleb128	73
+      000029 13                    1362 	.uleb128	19
+      00002A 00                    1363 	.uleb128	0
+      00002B 00                    1364 	.uleb128	0
+      00002C 05                    1365 	.uleb128	5
+      00002D 2E                    1366 	.uleb128	46
+      00002E 01                    1367 	.db	1
+      00002F 01                    1368 	.uleb128	1
+      000030 13                    1369 	.uleb128	19
+      000031 03                    1370 	.uleb128	3
+      000032 08                    1371 	.uleb128	8
+      000033 11                    1372 	.uleb128	17
+      000034 01                    1373 	.uleb128	1
+      000035 12                    1374 	.uleb128	18
+      000036 01                    1375 	.uleb128	1
+      000037 3F                    1376 	.uleb128	63
+      000038 0C                    1377 	.uleb128	12
+      000039 40                    1378 	.uleb128	64
+      00003A 06                    1379 	.uleb128	6
+      00003B 49                    1380 	.uleb128	73
+      00003C 13                    1381 	.uleb128	19
+      00003D 00                    1382 	.uleb128	0
+      00003E 00                    1383 	.uleb128	0
+      00003F 01                    1384 	.uleb128	1
+      000040 11                    1385 	.uleb128	17
+      000041 01                    1386 	.db	1
+      000042 03                    1387 	.uleb128	3
+      000043 08                    1388 	.uleb128	8
+      000044 10                    1389 	.uleb128	16
+      000045 06                    1390 	.uleb128	6
+      000046 13                    1391 	.uleb128	19
+      000047 0B                    1392 	.uleb128	11
+      000048 25                    1393 	.uleb128	37
+      000049 08                    1394 	.uleb128	8
+      00004A 00                    1395 	.uleb128	0
+      00004B 00                    1396 	.uleb128	0
+      00004C 04                    1397 	.uleb128	4
+      00004D 2E                    1398 	.uleb128	46
+      00004E 00                    1399 	.db	0
+      00004F 03                    1400 	.uleb128	3
+      000050 08                    1401 	.uleb128	8
+      000051 11                    1402 	.uleb128	17
+      000052 01                    1403 	.uleb128	1
+      000053 12                    1404 	.uleb128	18
+      000054 01                    1405 	.uleb128	1
+      000055 3F                    1406 	.uleb128	63
+      000056 0C                    1407 	.uleb128	12
+      000057 40                    1408 	.uleb128	64
+      000058 06                    1409 	.uleb128	6
+      000059 00                    1410 	.uleb128	0
+      00005A 00                    1411 	.uleb128	0
+      00005B 09                    1412 	.uleb128	9
+      00005C 2E                    1413 	.uleb128	46
+      00005D 01                    1414 	.db	1
+      00005E 03                    1415 	.uleb128	3
+      00005F 08                    1416 	.uleb128	8
+      000060 11                    1417 	.uleb128	17
+      000061 01                    1418 	.uleb128	1
+      000062 12                    1419 	.uleb128	18
+      000063 01                    1420 	.uleb128	1
+      000064 3F                    1421 	.uleb128	63
+      000065 0C                    1422 	.uleb128	12
+      000066 40                    1423 	.uleb128	64
+      000067 06                    1424 	.uleb128	6
+      000068 00                    1425 	.uleb128	0
+      000069 00                    1426 	.uleb128	0
+      00006A 02                    1427 	.uleb128	2
+      00006B 24                    1428 	.uleb128	36
+      00006C 00                    1429 	.db	0
+      00006D 03                    1430 	.uleb128	3
+      00006E 08                    1431 	.uleb128	8
+      00006F 0B                    1432 	.uleb128	11
+      000070 0B                    1433 	.uleb128	11
+      000071 3E                    1434 	.uleb128	62
+      000072 0B                    1435 	.uleb128	11
+      000073 00                    1436 	.uleb128	0
+      000074 00                    1437 	.uleb128	0
+      000075 00                    1438 	.uleb128	0
+                                   1439 
+                                   1440 	.area .debug_info (NOLOAD)
+      000000 00 00 01 7D           1441 	.dw	0,Ldebug_info_end-Ldebug_info_start
+      000004                       1442 Ldebug_info_start:
+      000004 00 02                 1443 	.dw	2
+      000006 00 00r00r00           1444 	.dw	0,(Ldebug_abbrev)
+      00000A 04                    1445 	.db	4
+      00000B 01                    1446 	.uleb128	1
+      00000C 53 74 64 50 65 72 69  1447 	.ascii "StdPeriphLib/src/stm8s_itc.c"
+             70 68 4C 69 62 2F 73
+             72 63 2F 73 74 6D 38
+             73 5F 69 74 63 2E 63
+      000028 00                    1448 	.db	0
+      000029 00 00r00r00           1449 	.dw	0,(Ldebug_line_start+-4)
+      00002D 01                    1450 	.db	1
+      00002E 53 44 43 43 20 76 65  1451 	.ascii "SDCC version 3.6.0 #9615"
+             72 73 69 6F 6E 20 33
+             2E 36 2E 30 20 23 39
+             36 31 35
+      000046 00                    1452 	.db	0
+      000047 02                    1453 	.uleb128	2
+      000048 75 6E 73 69 67 6E 65  1454 	.ascii "unsigned char"
+             64 20 63 68 61 72
+      000055 00                    1455 	.db	0
+      000056 01                    1456 	.db	1
+      000057 08                    1457 	.db	8
+      000058 03                    1458 	.uleb128	3
+      000059 49 54 43 5F 47 65 74  1459 	.ascii "ITC_GetCPUCC"
+             43 50 55 43 43
+      000065 00                    1460 	.db	0
+      000066 00 00r00r00           1461 	.dw	0,(_ITC_GetCPUCC)
+      00006A 00 00r00r15           1462 	.dw	0,(XG$ITC_GetCPUCC$0$0+7)
+      00006E 01                    1463 	.db	1
+      00006F 00 00r00r50           1464 	.dw	0,(Ldebug_loc_start+80)
+      000073 00 00 00 47           1465 	.dw	0,71
+      000077 04                    1466 	.uleb128	4
+      000078 49 54 43 5F 44 65 49  1467 	.ascii "ITC_DeInit"
+             6E 69 74
+      000082 00                    1468 	.db	0
+      000083 00 00r00r15           1469 	.dw	0,(_ITC_DeInit)
+      000087 00 00r00r48           1470 	.dw	0,(XG$ITC_DeInit$0$0+7)
+      00008B 01                    1471 	.db	1
+      00008C 00 00r00r3C           1472 	.dw	0,(Ldebug_loc_start+60)
+      000090 03                    1473 	.uleb128	3
+      000091 49 54 43 5F 47 65 74  1474 	.ascii "ITC_GetSoftIntStatus"
+             53 6F 66 74 49 6E 74
+             53 74 61 74 75 73
+      0000A5 00                    1475 	.db	0
+      0000A6 00 00r00r48           1476 	.dw	0,(_ITC_GetSoftIntStatus)
+      0000AA 00 00r00r60           1477 	.dw	0,(XG$ITC_GetSoftIntStatus$0$0+7)
+      0000AE 01                    1478 	.db	1
+      0000AF 00 00r00r28           1479 	.dw	0,(Ldebug_loc_start+40)
+      0000B3 00 00 00 47           1480 	.dw	0,71
+      0000B7 05                    1481 	.uleb128	5
+      0000B8 00 00 01 10           1482 	.dw	0,272
+      0000BC 49 54 43 5F 47 65 74  1483 	.ascii "ITC_GetSoftwarePriority"
+             53 6F 66 74 77 61 72
+             65 50 72 69 6F 72 69
+             74 79
+      0000D3 00                    1484 	.db	0
+      0000D4 00 00r00r60           1485 	.dw	0,(_ITC_GetSoftwarePriority)
+      0000D8 00 00r01r2B           1486 	.dw	0,(XG$ITC_GetSoftwarePriority$0$0+7)
+      0000DC 01                    1487 	.db	1
+      0000DD 00 00r00r14           1488 	.dw	0,(Ldebug_loc_start+20)
+      0000E1 00 00 00 47           1489 	.dw	0,71
+      0000E5 06                    1490 	.uleb128	6
+      0000E6 02                    1491 	.db	2
+      0000E7 91                    1492 	.db	145
+      0000E8 04                    1493 	.sleb128	4
+      0000E9 49 72 71 4E 75 6D     1494 	.ascii "IrqNum"
+      0000EF 00                    1495 	.db	0
+      0000F0 00 00 00 47           1496 	.dw	0,71
+      0000F4 07                    1497 	.uleb128	7
+      0000F5 08                    1498 	.uleb128	8
+      0000F6 01                    1499 	.db	1
+      0000F7 51                    1500 	.db	81
+      0000F8 56 61 6C 75 65        1501 	.ascii "Value"
+      0000FD 00                    1502 	.db	0
+      0000FE 00 00 00 47           1503 	.dw	0,71
+      000102 08                    1504 	.uleb128	8
+      000103 02                    1505 	.db	2
+      000104 91                    1506 	.db	145
+      000105 7E                    1507 	.sleb128	-2
+      000106 4D 61 73 6B           1508 	.ascii "Mask"
+      00010A 00                    1509 	.db	0
+      00010B 00 00 00 47           1510 	.dw	0,71
+      00010F 00                    1511 	.uleb128	0
+      000110 09                    1512 	.uleb128	9
+      000111 49 54 43 5F 53 65 74  1513 	.ascii "ITC_SetSoftwarePriority"
+             53 6F 66 74 77 61 72
+             65 50 72 69 6F 72 69
+             74 79
+      000128 00                    1514 	.db	0
+      000129 00 00r01r2B           1515 	.dw	0,(_ITC_SetSoftwarePriority)
+      00012D 00 00r02r4C           1516 	.dw	0,(XG$ITC_SetSoftwarePriority$0$0+7)
+      000131 01                    1517 	.db	1
+      000132 00 00r00r00           1518 	.dw	0,(Ldebug_loc_start)
+      000136 06                    1519 	.uleb128	6
+      000137 02                    1520 	.db	2
+      000138 91                    1521 	.db	145
+      000139 04                    1522 	.sleb128	4
+      00013A 49 72 71 4E 75 6D     1523 	.ascii "IrqNum"
+      000140 00                    1524 	.db	0
+      000141 00 00 00 47           1525 	.dw	0,71
+      000145 06                    1526 	.uleb128	6
+      000146 02                    1527 	.db	2
+      000147 91                    1528 	.db	145
+      000148 05                    1529 	.sleb128	5
+      000149 50 72 69 6F 72 69 74  1530 	.ascii "PriorityValue"
+             79 56 61 6C 75 65
+      000156 00                    1531 	.db	0
+      000157 00 00 00 47           1532 	.dw	0,71
+      00015B 07                    1533 	.uleb128	7
+      00015C 08                    1534 	.uleb128	8
+      00015D 02                    1535 	.db	2
+      00015E 91                    1536 	.db	145
+      00015F 7D                    1537 	.sleb128	-3
+      000160 4D 61 73 6B           1538 	.ascii "Mask"
+      000164 00                    1539 	.db	0
+      000165 00 00 00 47           1540 	.dw	0,71
+      000169 08                    1541 	.uleb128	8
+      00016A 02                    1542 	.db	2
+      00016B 91                    1543 	.db	145
+      00016C 7C                    1544 	.sleb128	-4
+      00016D 4E 65 77 50 72 69 6F  1545 	.ascii "NewPriority"
+             72 69 74 79
+      000178 00                    1546 	.db	0
+      000179 00 00 00 47           1547 	.dw	0,71
+      00017D 00                    1548 	.uleb128	0
+      00017E 00                    1549 	.uleb128	0
+      00017F 00                    1550 	.uleb128	0
+      000180 00                    1551 	.uleb128	0
+      000181                       1552 Ldebug_info_end:
+                                   1553 
+                                   1554 	.area .debug_pubnames (NOLOAD)
+      000000 00 00 00 7F           1555 	.dw	0,Ldebug_pubnames_end-Ldebug_pubnames_start
+      000004                       1556 Ldebug_pubnames_start:
+      000004 00 02                 1557 	.dw	2
+      000006 00 00r00r00           1558 	.dw	0,(Ldebug_info_start-4)
+      00000A 00 00 01 81           1559 	.dw	0,4+Ldebug_info_end-Ldebug_info_start
+      00000E 00 00 00 58           1560 	.dw	0,88
+      000012 49 54 43 5F 47 65 74  1561 	.ascii "ITC_GetCPUCC"
+             43 50 55 43 43
+      00001E 00                    1562 	.db	0
+      00001F 00 00 00 77           1563 	.dw	0,119
+      000023 49 54 43 5F 44 65 49  1564 	.ascii "ITC_DeInit"
+             6E 69 74
+      00002D 00                    1565 	.db	0
+      00002E 00 00 00 90           1566 	.dw	0,144
+      000032 49 54 43 5F 47 65 74  1567 	.ascii "ITC_GetSoftIntStatus"
+             53 6F 66 74 49 6E 74
+             53 74 61 74 75 73
+      000046 00                    1568 	.db	0
+      000047 00 00 00 B7           1569 	.dw	0,183
+      00004B 49 54 43 5F 47 65 74  1570 	.ascii "ITC_GetSoftwarePriority"
+             53 6F 66 74 77 61 72
+             65 50 72 69 6F 72 69
+             74 79
+      000062 00                    1571 	.db	0
+      000063 00 00 01 10           1572 	.dw	0,272
+      000067 49 54 43 5F 53 65 74  1573 	.ascii "ITC_SetSoftwarePriority"
+             53 6F 66 74 77 61 72
+             65 50 72 69 6F 72 69
+             74 79
+      00007E 00                    1574 	.db	0
+      00007F 00 00 00 00           1575 	.dw	0,0
+      000083                       1576 Ldebug_pubnames_end:
+                                   1577 
+                                   1578 	.area .debug_frame (NOLOAD)
+      000000 00 00                 1579 	.dw	0
+      000002 00 0E                 1580 	.dw	Ldebug_CIE_end-Ldebug_CIE_start
+      000004                       1581 Ldebug_CIE_start:
+      000004 FF FF                 1582 	.dw	0xffff
+      000006 FF FF                 1583 	.dw	0xffff
+      000008 01                    1584 	.db	1
+      000009 00                    1585 	.db	0
+      00000A 01                    1586 	.uleb128	1
+      00000B 01                    1587 	.sleb128	1
+      00000C 00                    1588 	.db	0
+      00000D 0C                    1589 	.db	12
+      00000E 00                    1590 	.uleb128	0
+      00000F 00                    1591 	.uleb128	0
+      000010 80                    1592 	.db	128
+      000011 00                    1593 	.uleb128	0
+      000012                       1594 Ldebug_CIE_end:
