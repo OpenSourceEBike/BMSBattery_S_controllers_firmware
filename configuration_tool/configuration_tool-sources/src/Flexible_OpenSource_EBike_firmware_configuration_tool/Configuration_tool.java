@@ -135,16 +135,17 @@ public class Configuration_tool extends javax.swing.JFrame {
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("Configuration tool");
-        setBounds(new java.awt.Rectangle(0, 0, 420, 800));
-        setMinimumSize(new java.awt.Dimension(500, 800));
-        setResizable(false);
-        setSize(new java.awt.Dimension(500, 810));
+        setBounds(new java.awt.Rectangle(0, 0, 500, 700));
+        setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
+        setMinimumSize(new java.awt.Dimension(500, 500));
+        setPreferredSize(new java.awt.Dimension(500, 700));
+        setSize(new java.awt.Dimension(500, 700));
 
         jScrollPane1.setHorizontalScrollBar(null);
-        jScrollPane1.setMinimumSize(new java.awt.Dimension(500, 810));
-        jScrollPane1.setPreferredSize(new java.awt.Dimension(500, 810));
+        jScrollPane1.setMinimumSize(new java.awt.Dimension(500, 500));
+        jScrollPane1.setPreferredSize(new java.awt.Dimension(500, 700));
 
-        jPanel1.setMinimumSize(new java.awt.Dimension(500, 2000));
+        jPanel1.setMinimumSize(new java.awt.Dimension(500, 2250));
         jPanel1.setName(""); // NOI18N
         jPanel1.setPreferredSize(new java.awt.Dimension(500, 2250));
         jPanel1.setRequestFocusEnabled(false);
@@ -814,9 +815,7 @@ public class Configuration_tool extends javax.swing.JFrame {
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(layout.createSequentialGroup()
-                .add(jScrollPane1, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                .add(0, 0, Short.MAX_VALUE))
+            .add(jScrollPane1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
 
         pack();

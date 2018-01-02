@@ -11,5 +11,6 @@ firmware/*.rel
 firmware/*.rst
 firmware/*.sym
 firmware/Debug
-configuration_tool/configuration_tool-sources/Flexible_OpenSource_EBike_firmware-Configuration_tool/dist
-configuration_tool/configuration_tool-sources/Flexible_OpenSource_EBike_firmware-Configuration_tool/build
+configuration_tool/configuration_tool-sources/build
+configuration_tool/configuration_tool-sources/dist
+
