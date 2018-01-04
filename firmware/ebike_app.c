@@ -603,7 +603,9 @@ void ebike_throotle_type_throotle_pas (void)
 		 (uint32_t) 0,
 		 (uint32_t) 255));
 
+#if !defined(EBIKE_THROTTLE_TYPE_THROTTLE_PAS_ASSIST_LEVEL_PAS_ONLY)
   ui8_temp = ui8_max (ui8_throttle_value_filtered, ui8_temp); // use the max value from throotle or pas cadence
+#endif
 
   // scale with assist level value
   switch (lcd_configuration_variables.ui8_assist_level)
@@ -639,8 +641,14 @@ void ebike_throotle_type_throotle_pas (void)
 
   f_temp = (float) (((float) ui8_temp) * f_temp);
 
+#if !defined(EBIKE_THROTTLE_TYPE_THROTTLE_PAS_ASSIST_LEVEL_PAS_ONLY)
+  ui8_temp = (uint8_t) f_temp;
+#else
+  ui8_temp = ui8_max (ui8_throttle_value_filtered, (uint8_t) f_temp); // use the max value from throotle or (pas cadence * assist level)
+#endif
+
   // map to motor controller current
-  ui16_temp = (uint16_t) (map ((uint32_t) f_temp,
+  ui16_temp = (uint16_t) (map ((uint32_t) ui8_temp,
 		   (uint32_t) 0,
 		   (uint32_t) 255,
 		   (uint32_t) 0,
@@ -658,7 +666,7 @@ void ebike_throotle_type_throotle_pas (void)
   {
     // PAS cadence will setup motor speed
     // map PAS candence value to motor speed value
-    ui16_target_speed_erps = (uint16_t) (map ((uint32_t) f_temp,
+    ui16_target_speed_erps = (uint16_t) (map ((uint32_t) ui8_temp,
 		  (uint32_t) 0,
 		  (uint32_t) 255,
 		  (uint32_t) 0, // motor speed min value

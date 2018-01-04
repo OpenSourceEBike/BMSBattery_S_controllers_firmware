@@ -31,6 +31,9 @@
 //#define EBIKE_THROTTLE_TYPE_THROTTLE_PAS_PWM_DUTY_CYCLE // direct PWM duty_cycle control
 #define EBIKE_THROTTLE_TYPE_THROTTLE_PAS_CURRENT_SPEED // control using motor current/torque and/or wheel speed
 
+// in the case of EBIKE_THROTTLE_TYPE = EBIKE_THROTTLE_TYPE_THROTTLE_PAS, LCD assist level will apply only to PAS
+#define EBIKE_THROTTLE_TYPE_THROTTLE_PAS_ASSIST_LEVEL_PAS_ONLY
+
 // next, if enabled, output of torque sensor algorithm is the human power (torque * cadence) other way will be the same as the torque signal
 // (only apply to torque sensor)
 #define EBIKE_THROTTLE_TYPE_TORQUE_SENSOR_HUMAN_POWER
