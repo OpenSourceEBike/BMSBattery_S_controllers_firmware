@@ -72,6 +72,7 @@ void ebike_throotle_type_throotle_pas (void);
 void ebike_throotle_type_torque_sensor (void);
 void read_throotle (void);
 void read_pas_cadence_and_direction (void);
+uint8_t pas_is_set (void);
 
 void ebike_app_controller (void)
 {
@@ -201,7 +202,7 @@ void communications_controller (void)
   if (brake_is_set ()) { ui8_moving_indication |= (1 << 5); }
   if (ebike_app_cruise_control_is_set ()) { ui8_moving_indication |= (1 << 3); }
   if (throttle_is_set ()) { ui8_moving_indication |= (1 << 1); }
-//  if (pas_is_set ()) { ui8_moving_indication |= (1 << 4); }
+  if (pas_is_set ()) { ui8_moving_indication |= (1 << 4); }
 
   // preparing the package
   // B0: start package (?)
@@ -538,6 +539,11 @@ void read_pas_cadence_and_direction (void)
   }
 
   if (ui8_pas_direction) { ui8_pas_cadence_rpm = 0; }
+}
+
+uint8_t pas_is_set (void)
+{
+  return (ui8_pas_cadence_rpm) ? 1: 0;
 }
 
 void ebike_throotle_type_throotle_pas (void)
