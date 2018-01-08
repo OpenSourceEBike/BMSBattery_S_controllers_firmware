@@ -270,6 +270,7 @@ void communications_controller (void)
 
     // see if CRC is ok
     if (((ui8_crc ^ 10) == ui8_rx_buffer [7]) 	|| // some versions of CRC LCD5 (??)
+	((ui8_crc ^ 5) == ui8_rx_buffer [7]) 	|| // CRC LCD3 (tested with KT36/48SVPR, from PSWpower)
 	((ui8_crc ^ 9) == ui8_rx_buffer [7]) 	|| // CRC LCD5
 	((ui8_crc ^ 2) == ui8_rx_buffer [7])) 	   // CRC LCD3
     {
