@@ -138,7 +138,6 @@ public class Configuration_tool extends javax.swing.JFrame {
         setBounds(new java.awt.Rectangle(0, 0, 500, 700));
         setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
         setMinimumSize(new java.awt.Dimension(500, 500));
-        setPreferredSize(new java.awt.Dimension(500, 700));
         setSize(new java.awt.Dimension(500, 700));
 
         jScrollPane1.setHorizontalScrollBar(null);
@@ -1082,7 +1081,7 @@ public class Configuration_tool extends javax.swing.JFrame {
                 TextToSave = "#define BATTERY_LI_ION_CELLS_NUMBER 7";
             } else if (lion_cells_number.getSelectedItem().equals("36V (10s)")) {
                 TextToSave = "#define BATTERY_LI_ION_CELLS_NUMBER 10";
-            } else if (lion_cells_number.getSelectedItem().equals("48V (13S)")) {
+            } else if (lion_cells_number.getSelectedItem().equals("48V (13s)")) {
                 TextToSave = "#define BATTERY_LI_ION_CELLS_NUMBER 13";
             }
             pWriter.println(TextToSave);
