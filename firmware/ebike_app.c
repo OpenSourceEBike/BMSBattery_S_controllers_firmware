@@ -210,7 +210,7 @@ void communications_controller (void)
   // B1: battery level
   ui8_tx_buffer [1] = ui16_battery_soc;
   // B2: 24V controller
-  ui8_tx_buffer [2] = COMMUNICATIONS_BATTERY_VOLTAGE;
+  ui8_tx_buffer [2] = (uint8_t) COMMUNICATIONS_BATTERY_VOLTAGE;
   // B3: speed, wheel rotation period, ms; period(ms)=B3*256+B4;
   ui8_tx_buffer [3] = (ui16_wheel_period_ms >> 8) & 0xff;
   ui8_tx_buffer [4] = ui16_wheel_period_ms & 0xff;
@@ -230,7 +230,7 @@ void communications_controller (void)
   // each unit of B8 = 0.25A
   i8_motor_current_filtered_10b = motor_get_current_filtered_10b ();
   if (i8_motor_current_filtered_10b < 0) { i8_motor_current_filtered_10b = 0; } // limit to be only positive value, LCD don't accept regen current value
-  ui8_tx_buffer [8] = (uint8_t) (i8_motor_current_filtered_10b << 1);
+  ui8_tx_buffer [8] = ((uint8_t) (i8_motor_current_filtered_10b)) << 1;
   // B9: motor temperature
   ui8_tx_buffer [9] = 0;
   // B10 and B11: 0

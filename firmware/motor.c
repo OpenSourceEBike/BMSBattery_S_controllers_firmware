@@ -322,7 +322,7 @@ uint16_t ui16_target_erps = 0;
 volatile uint16_t ui16_target_erps_max = MOTOR_OVER_SPEED_ERPS;
 uint16_t ui16_target_current_10b = 0;
 
-uint16_t ui16_adc_battery_voltage_accumulated = ADC_BATTERY_VOLTAGE_MED;
+uint16_t ui16_adc_battery_voltage_accumulated = (uint16_t) ADC_BATTERY_VOLTAGE_MED;
 uint8_t ui8_adc_battery_voltage_filtered;
 
 uint16_t ui16_adc_motor_current_accumulated_10b = ADC_MOTOR_CURRENT_MAX_MED_10B;
@@ -576,7 +576,7 @@ void TIM1_UPD_OVF_TRG_BRK_IRQHandler(void) __interrupt(TIM1_UPD_OVF_TRG_BRK_IRQH
   // if battery voltage is over or equal to absolute battery max voltage, and if so
   // reduce regen current
   else if ((ui8_adc_motor_total_current < ui8_motor_total_current_offset) &&
-      (UI8_ADC_BATTERY_VOLTAGE >= ADC_BATTERY_VOLTAGE_MAX))
+      (UI8_ADC_BATTERY_VOLTAGE >= ((uint8_t) ADC_BATTERY_VOLTAGE_MAX)))
   {
     if (ui8_duty_cycle < 255)
     {
@@ -963,7 +963,7 @@ void do_battery_voltage_protection (void)
   ui16_adc_battery_voltage_accumulated += ((uint16_t) ui8_adc_read_battery_voltage ());
   ui8_adc_battery_voltage_filtered = ui16_adc_battery_voltage_accumulated >> 6;
 
-  if (ui8_adc_battery_voltage_filtered < ADC_BATTERY_VOLTAGE_MIN)
+  if (ui8_adc_battery_voltage_filtered < ((uint8_t) ADC_BATTERY_VOLTAGE_MIN))
   {
     // motor will stop and battery symbol on LCD will be empty and flashing
     motor_controller_set_state (MOTOR_CONTROLLER_STATE_UNDER_VOLTAGE);
