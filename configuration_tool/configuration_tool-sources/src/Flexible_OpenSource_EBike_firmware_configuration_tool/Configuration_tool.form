@@ -41,7 +41,7 @@
     </DimensionLayout>
     <DimensionLayout dim="1">
       <Group type="103" groupAlignment="0" attributes="0">
-          <Component id="jScrollPane1" max="32767" attributes="0"/>
+          <Component id="jScrollPane1" alignment="0" pref="724" max="32767" attributes="0"/>
       </Group>
     </DimensionLayout>
   </Layout>
@@ -88,7 +88,6 @@
                                   <Component id="throttle_control_algorithm_output" alignment="1" min="-2" pref="437" max="-2" attributes="0"/>
                                   <Component id="throotle_type" alignment="1" min="-2" pref="437" max="-2" attributes="0"/>
                                   <Group type="103" groupAlignment="0" max="-2" attributes="0">
-                                      <Component id="motor_max_regen_current" alignment="0" min="-2" pref="60" max="-2" attributes="0"/>
                                       <Group type="102" alignment="0" attributes="0">
                                           <Group type="103" groupAlignment="1" max="-2" attributes="0">
                                               <Component id="LABEL_motor_max_regen_current" alignment="0" min="-2" max="-2" attributes="0"/>
@@ -151,14 +150,16 @@
                                               <Component id="LABEL_motor_max_regen_current_HELP" alignment="1" min="-2" max="-2" attributes="0"/>
                                               <Component id="LABEL_pwm_duty_cycle_ramp_up_step_HELP" alignment="1" min="-2" max="-2" attributes="0"/>
                                               <Component id="LABEL_pwm_duty_cycle_ramp_down_step_HELP" alignment="1" min="-2" max="-2" attributes="0"/>
+                                              <Component id="LABEL_lion_cells_number_HELP" alignment="1" min="-2" max="-2" attributes="0"/>
                                           </Group>
                                       </Group>
-                                      <Component id="jLabel1" alignment="0" min="-2" max="-2" attributes="0"/>
                                       <Component id="jScrollPane2" alignment="0" pref="0" max="32767" attributes="0"/>
                                       <Component id="pas_rotation_direction" alignment="0" max="32767" attributes="0"/>
-                                      <Component id="lion_cells_number" alignment="0" max="32767" attributes="0"/>
                                       <Component id="jSeparator7" alignment="0" max="32767" attributes="0"/>
                                       <Component id="jSeparator6" alignment="0" max="32767" attributes="0"/>
+                                      <Component id="motor_max_regen_current" alignment="0" min="-2" pref="60" max="-2" attributes="0"/>
+                                      <Component id="jLabel1" alignment="0" min="-2" max="-2" attributes="0"/>
+                                      <Component id="lion_cells_number" alignment="0" min="-2" pref="60" max="-2" attributes="0"/>
                                   </Group>
                                   <Component id="ButtonWriteConfiguration_HELP" alignment="1" min="-2" max="-2" attributes="0"/>
                               </Group>
@@ -264,10 +265,13 @@
                       <EmptySpace type="separate" max="-2" attributes="0"/>
                       <Component id="jLabel3" min="-2" max="-2" attributes="0"/>
                       <EmptySpace min="-2" pref="20" max="-2" attributes="0"/>
-                      <Component id="LABEL_lion_cells_number" min="-2" max="-2" attributes="0"/>
-                      <EmptySpace max="-2" attributes="0"/>
+                      <Group type="103" groupAlignment="3" attributes="0">
+                          <Component id="LABEL_lion_cells_number" alignment="3" min="-2" max="-2" attributes="0"/>
+                          <Component id="LABEL_lion_cells_number_HELP" alignment="3" min="-2" max="-2" attributes="0"/>
+                      </Group>
+                      <EmptySpace min="-2" pref="6" max="-2" attributes="0"/>
                       <Component id="lion_cells_number" min="-2" max="-2" attributes="0"/>
-                      <EmptySpace min="-2" pref="17" max="-2" attributes="0"/>
+                      <EmptySpace min="-2" pref="15" max="-2" attributes="0"/>
                       <Component id="jSeparator4" min="-2" max="-2" attributes="0"/>
                       <EmptySpace min="-2" pref="20" max="-2" attributes="0"/>
                       <Component id="jLabel4" min="-2" max="-2" attributes="0"/>
@@ -641,28 +645,8 @@
                 <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
                   <Font name="Ubuntu" size="18" style="0"/>
                 </Property>
-                <Property name="text" type="java.lang.String" value="Battery voltage / Li-ion cells number"/>
+                <Property name="text" type="java.lang.String" value="Li-ion cells number"/>
               </Properties>
-            </Component>
-            <Component class="javax.swing.JComboBox" name="lion_cells_number">
-              <Properties>
-                <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
-                  <Font name="Ubuntu" size="18" style="0"/>
-                </Property>
-                <Property name="model" type="javax.swing.ComboBoxModel" editor="org.netbeans.modules.form.editors2.ComboBoxModelEditor">
-                  <StringArray count="3">
-                    <StringItem index="0" value="24V (7s)"/>
-                    <StringItem index="1" value="36V (10s)"/>
-                    <StringItem index="2" value="48V (13s)"/>
-                  </StringArray>
-                </Property>
-              </Properties>
-              <Events>
-                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="lion_cells_numberActionPerformed"/>
-              </Events>
-              <AuxValues>
-                <AuxValue name="JavaCodeGenerator_TypeParameters" type="java.lang.String" value="&lt;String&gt;"/>
-              </AuxValues>
             </Component>
             <Component class="javax.swing.JSeparator" name="jSeparator4">
             </Component>
@@ -1117,9 +1101,6 @@
                 <Component class="javax.swing.JTextPane" name="jTextPane1">
                   <Properties>
                     <Property name="editable" type="boolean" value="false"/>
-                    <Property name="border" type="javax.swing.border.Border" editor="org.netbeans.modules.form.editors2.BorderEditor">
-                      <Border info="null"/>
-                    </Property>
                     <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
                       <Font name="Ubuntu" size="16" style="0"/>
                     </Property>
@@ -1128,6 +1109,34 @@
                 </Component>
               </SubComponents>
             </Container>
+            <Component class="javax.swing.JTextField" name="lion_cells_number">
+              <Properties>
+                <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
+                  <Font name="Ubuntu" size="18" style="0"/>
+                </Property>
+                <Property name="text" type="java.lang.String" value="7"/>
+              </Properties>
+              <Events>
+                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="lion_cells_numberActionPerformed"/>
+              </Events>
+            </Component>
+            <Component class="javax.swing.JLabel" name="LABEL_lion_cells_number_HELP">
+              <Properties>
+                <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
+                  <Font name="Ubuntu" size="18" style="0"/>
+                </Property>
+                <Property name="text" type="java.lang.String" value="&lt;html&gt;&lt;u&gt;help&lt;/u&gt;&lt;/html&gt;"/>
+                <Property name="cursor" type="java.awt.Cursor" editor="org.netbeans.modules.form.editors2.CursorEditor">
+                  <Color id="Default Cursor"/>
+                </Property>
+              </Properties>
+              <Events>
+                <EventHandler event="mouseClicked" listener="java.awt.event.MouseListener" parameters="java.awt.event.MouseEvent" handler="LABEL_lion_cells_number_HELPMouseClicked"/>
+              </Events>
+              <AuxValues>
+                <AuxValue name="JavaCodeGenerator_InitCodePost" type="java.lang.String" value="LABEL_torque_sensor_control_algorithm_output_HELP.setVisible(false);"/>
+              </AuxValues>
+            </Component>
           </SubComponents>
         </Container>
       </SubComponents>

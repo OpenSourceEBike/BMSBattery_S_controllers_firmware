@@ -92,7 +92,6 @@ public class Configuration_tool extends javax.swing.JFrame {
         jSeparator3 = new javax.swing.JSeparator();
         jLabel3 = new javax.swing.JLabel();
         LABEL_lion_cells_number = new javax.swing.JLabel();
-        lion_cells_number = new javax.swing.JComboBox<>();
         jSeparator4 = new javax.swing.JSeparator();
         jLabel4 = new javax.swing.JLabel();
         LABEL_motor_rotor_offset_angle = new javax.swing.JLabel();
@@ -132,6 +131,8 @@ public class Configuration_tool extends javax.swing.JFrame {
         ButtonWriteOptionBytes_HELP = new javax.swing.JLabel();
         jScrollPane2 = new javax.swing.JScrollPane();
         jTextPane1 = new javax.swing.JTextPane();
+        lion_cells_number = new javax.swing.JTextField();
+        LABEL_lion_cells_number_HELP = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("Configuration tool");
@@ -293,15 +294,7 @@ public class Configuration_tool extends javax.swing.JFrame {
         jLabel3.setText("Battery");
 
         LABEL_lion_cells_number.setFont(new java.awt.Font("Ubuntu", 0, 18)); // NOI18N
-        LABEL_lion_cells_number.setText("Battery voltage / Li-ion cells number");
-
-        lion_cells_number.setFont(new java.awt.Font("Ubuntu", 0, 18)); // NOI18N
-        lion_cells_number.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "24V (7s)", "36V (10s)", "48V (13s)" }));
-        lion_cells_number.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                lion_cells_numberActionPerformed(evt);
-            }
-        });
+        LABEL_lion_cells_number.setText("Li-ion cells number");
 
         jLabel4.setFont(new java.awt.Font("Ubuntu", 1, 24)); // NOI18N
         jLabel4.setText("Motor");
@@ -561,10 +554,27 @@ public class Configuration_tool extends javax.swing.JFrame {
         });
 
         jTextPane1.setEditable(false);
-        jTextPane1.setBorder(null);
         jTextPane1.setFont(new java.awt.Font("Ubuntu", 0, 16)); // NOI18N
         jTextPane1.setText("The default options work well for the following hardware combination:\n- throttle type: BMSBattery bottom bracket torque sensor\n- LCD: BMSBattery LCD5\n- battery: Li-ion 24V (7S)\n- motor: BMSBattery Q85 328 RPM 24V (geared)\n- motor controller: BMSBattery S06S\n\nIf you are not sure about some option, keep the default values as they will probably be a ok.");
         jScrollPane2.setViewportView(jTextPane1);
+
+        lion_cells_number.setFont(new java.awt.Font("Ubuntu", 0, 18)); // NOI18N
+        lion_cells_number.setText("7");
+        lion_cells_number.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                lion_cells_numberActionPerformed(evt);
+            }
+        });
+
+        LABEL_lion_cells_number_HELP.setFont(new java.awt.Font("Ubuntu", 0, 18)); // NOI18N
+        LABEL_lion_cells_number_HELP.setText("<html><u>help</u></html>");
+        LABEL_lion_cells_number_HELP.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
+        LABEL_torque_sensor_control_algorithm_output_HELP.setVisible(false);
+        LABEL_lion_cells_number_HELP.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                LABEL_lion_cells_number_HELPMouseClicked(evt);
+            }
+        });
 
         org.jdesktop.layout.GroupLayout jPanel1Layout = new org.jdesktop.layout.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
@@ -582,7 +592,6 @@ public class Configuration_tool extends javax.swing.JFrame {
                             .add(throttle_control_algorithm_output, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 437, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                             .add(throotle_type, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 437, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                             .add(jPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING, false)
-                                .add(motor_max_regen_current, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 60, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                                 .add(jPanel1Layout.createSequentialGroup()
                                     .add(jPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.TRAILING, false)
                                         .add(org.jdesktop.layout.GroupLayout.LEADING, LABEL_motor_max_regen_current)
@@ -641,13 +650,15 @@ public class Configuration_tool extends javax.swing.JFrame {
                                         .add(org.jdesktop.layout.GroupLayout.TRAILING, LABEL_motor_max_current_HELP, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                                         .add(org.jdesktop.layout.GroupLayout.TRAILING, LABEL_motor_max_regen_current_HELP, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                                         .add(org.jdesktop.layout.GroupLayout.TRAILING, LABEL_pwm_duty_cycle_ramp_up_step_HELP, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                                        .add(org.jdesktop.layout.GroupLayout.TRAILING, LABEL_pwm_duty_cycle_ramp_down_step_HELP, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)))
-                                .add(jLabel1)
+                                        .add(org.jdesktop.layout.GroupLayout.TRAILING, LABEL_pwm_duty_cycle_ramp_down_step_HELP, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                                        .add(org.jdesktop.layout.GroupLayout.TRAILING, LABEL_lion_cells_number_HELP, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)))
                                 .add(jScrollPane2, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
                                 .add(pas_rotation_direction, 0, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                .add(lion_cells_number, 0, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                                 .add(jSeparator7)
-                                .add(jSeparator6))
+                                .add(jSeparator6)
+                                .add(motor_max_regen_current, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 60, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                                .add(jLabel1)
+                                .add(lion_cells_number, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 60, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
                             .add(ButtonWriteConfiguration_HELP, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)))
                     .add(jPanel1Layout.createSequentialGroup()
                         .add(82, 82, 82)
@@ -737,10 +748,12 @@ public class Configuration_tool extends javax.swing.JFrame {
                 .add(18, 18, 18)
                 .add(jLabel3)
                 .add(20, 20, 20)
-                .add(LABEL_lion_cells_number)
-                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                .add(jPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
+                    .add(LABEL_lion_cells_number)
+                    .add(LABEL_lion_cells_number_HELP, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
+                .add(6, 6, 6)
                 .add(lion_cells_number, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                .add(17, 17, 17)
+                .add(15, 15, 15)
                 .add(jSeparator4, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                 .add(20, 20, 20)
                 .add(jLabel4)
@@ -814,7 +827,7 @@ public class Configuration_tool extends javax.swing.JFrame {
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(jScrollPane1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .add(jScrollPane1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 724, Short.MAX_VALUE)
         );
 
         pack();
@@ -922,10 +935,6 @@ public class Configuration_tool extends javax.swing.JFrame {
     private void LCD_assist_level_5ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_LCD_assist_level_5ActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_LCD_assist_level_5ActionPerformed
-
-    private void lion_cells_numberActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_lion_cells_numberActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_lion_cells_numberActionPerformed
 
     private void motor_rotor_offset_angleActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_motor_rotor_offset_angleActionPerformed
         // TODO add your handling code here:
@@ -1077,13 +1086,7 @@ public class Configuration_tool extends javax.swing.JFrame {
             TextToSave = "#define ASSIST_LEVEL_5 " + LCD_assist_level_5.getText();
             pWriter.println(TextToSave);
             
-            if (lion_cells_number.getSelectedItem().equals("24V (7s)")) {
-                TextToSave = "#define BATTERY_LI_ION_CELLS_NUMBER 7";
-            } else if (lion_cells_number.getSelectedItem().equals("36V (10s)")) {
-                TextToSave = "#define BATTERY_LI_ION_CELLS_NUMBER 10";
-            } else if (lion_cells_number.getSelectedItem().equals("48V (13s)")) {
-                TextToSave = "#define BATTERY_LI_ION_CELLS_NUMBER 13";
-            }
+            TextToSave = "#define BATTERY_LI_ION_CELLS_NUMBER " + lion_cells_number.getText();;
             pWriter.println(TextToSave);
             
             TextToSave = "#define MOTOR_ROTOR_OFFSET_ANGLE " + motor_rotor_offset_angle.getText();
@@ -1215,6 +1218,14 @@ public class Configuration_tool extends javax.swing.JFrame {
     private void ButtonWriteOptionBytes_HELPMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_ButtonWriteOptionBytes_HELPMouseClicked
         showMessageDialog(null, "Erase the microcontroller original firmware and configure the microcontroller option bytes.\nThis need to be done only once, to erase the original firmware fo the motor controller.");
     }//GEN-LAST:event_ButtonWriteOptionBytes_HELPMouseClicked
+
+    private void lion_cells_numberActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_lion_cells_numberActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_lion_cells_numberActionPerformed
+
+    private void LABEL_lion_cells_number_HELPMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_LABEL_lion_cells_number_HELPMouseClicked
+        showMessageDialog(null, "Please choose a number of Lion cells that your battery pack has. For instance, choose 7 for 24V battery pack.\nPlease note that you should use a battery pack voltage that your controller can handle, other way it will probably fail to work correctly.");
+    }//GEN-LAST:event_LABEL_lion_cells_number_HELPMouseClicked
     
     /**
      * @param args the command line arguments
@@ -1313,6 +1324,7 @@ public class Configuration_tool extends javax.swing.JFrame {
     private javax.swing.JLabel LABEL_foc_read_id_current_angle_adjust;
     private javax.swing.JLabel LABEL_foc_read_id_current_angle_adjust_HELP;
     private javax.swing.JLabel LABEL_lion_cells_number;
+    private javax.swing.JLabel LABEL_lion_cells_number_HELP;
     private javax.swing.JLabel LABEL_motor_max_current;
     private javax.swing.JLabel LABEL_motor_max_current_HELP;
     private javax.swing.JLabel LABEL_motor_max_regen_current;
@@ -1358,7 +1370,7 @@ public class Configuration_tool extends javax.swing.JFrame {
     private javax.swing.JSeparator jSeparator6;
     private javax.swing.JSeparator jSeparator7;
     private javax.swing.JTextPane jTextPane1;
-    private javax.swing.JComboBox<String> lion_cells_number;
+    private javax.swing.JTextField lion_cells_number;
     private javax.swing.JTextField motor_max_current;
     private javax.swing.JTextField motor_max_regen_current;
     private javax.swing.JTextField motor_rotor_offset_angle;
