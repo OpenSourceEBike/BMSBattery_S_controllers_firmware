@@ -10,7 +10,22 @@ firmware/*.lst
 firmware/*.rel
 firmware/*.rst
 firmware/*.sym
+firmware/StdPeriphLib/src/*.asm
+firmware/StdPeriphLib/src/*.bin
+firmware/StdPeriphLib/src/*.elf
+firmware/StdPeriphLib/src/*.ihx
+firmware/StdPeriphLib/src/*.cdb
+firmware/StdPeriphLib/src/*.lk
+firmware/StdPeriphLib/src/*.map
+firmware/StdPeriphLib/src/*.adb
+firmware/StdPeriphLib/src/*.lst
+firmware/StdPeriphLib/src/*.rel
+firmware/StdPeriphLib/src/*.rst
+firmware/StdPeriphLib/src/*.sym
 firmware/Debug
+StdPeriphLib/src/
 configuration_tool/configuration_tool-sources/build
 configuration_tool/configuration_tool-sources/dist
+
+
 

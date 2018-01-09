@@ -131,6 +131,7 @@
 #define DEFAULT_VALUE_MAX_SPEED	 		25
 #define DEFAULT_VALUE_POWER_ASSIST_CONTROL_MODE 1
 #define DEFAULT_VALUE_CONTROLLER_MAX_CURRENT	10
+// *************************************************************************** //
 
 // *************************************************************************** //
 // BATTERY
@@ -139,26 +140,13 @@
 // 29.8V --> 110 (8bits ADC)
 // 22.1V --> 81 (8bits ADC)
 // 1 ADC step 8 bits --> 0.287 volts
+#define ADC_BATTERY_VOLTAGE_PER_ADC_STEP 0.272 // this value was found experimentaly, to beter represent the real value
 #define ADC_BATTERY_VOLTAGE_K 73 // 0.272 << 8
 
-#if BATTERY_LI_ION_CELLS_NUMBER == 7
-#define COMMUNICATIONS_BATTERY_VOLTAGE 24
-#define ADC_BATTERY_VOLTAGE_MAX 108 // 29.4V (7S * 4.2V)
-#define ADC_BATTERY_VOLTAGE_MED 5632 // 24V: 88 << 6
-#define ADC_BATTERY_VOLTAGE_MIN 77 // 29.4V <(7S * 3.0V)
-#elif BATTERY_LI_ION_CELLS_NUMBER == 10
-#define COMMUNICATIONS_BATTERY_VOLTAGE 36
-#define ADC_BATTERY_VOLTAGE_MAX 162
-#define ADC_BATTERY_VOLTAGE_MED 8448
-#define ADC_BATTERY_VOLTAGE_MIN 115
-#elif BATTERY_LI_ION_CELLS_NUMBER == 13
-#define COMMUNICATIONS_BATTERY_VOLTAGE 48
-#define ADC_BATTERY_VOLTAGE_MAX 216
-#define ADC_BATTERY_VOLTAGE_MED 11264
-#define ADC_BATTERY_VOLTAGE_MIN 154
-#endif
-
-//#define BATTERY_OVER_VOLTAGE_PROTECTION
+#define COMMUNICATIONS_BATTERY_VOLTAGE	((uint8_t) (BATTERY_LI_ION_CELLS_NUMBER * 3.45)) // example: 7S battery, should be = 24
+#define ADC_BATTERY_VOLTAGE_MAX 	((uint8_t) ((BATTERY_LI_ION_CELLS_NUMBER * LI_ION_CELL_VOLTS_MAX) / ADC_BATTERY_VOLTAGE_PER_ADC_STEP))
+#define ADC_BATTERY_VOLTAGE_MED 	((uint8_t) (COMMUNICATIONS_BATTERY_VOLTAGE / ADC_BATTERY_VOLTAGE_PER_ADC_STEP))
+#define ADC_BATTERY_VOLTAGE_MIN 	((uint8_t) ((BATTERY_LI_ION_CELLS_NUMBER * LI_ION_CELL_VOLTS_MIN) / ADC_BATTERY_VOLTAGE_PER_ADC_STEP))
 
 // Considering the follow voltage values for each li-ion battery cell
 // State of charge 		| voltage
@@ -177,5 +165,6 @@
 #define BATTERY_PACK_VOLTS_40	(LI_ION_CELL_VOLTS_40 * BATTERY_LI_ION_CELLS_NUMBER) * 256
 #define BATTERY_PACK_VOLTS_20	(LI_ION_CELL_VOLTS_20 * BATTERY_LI_ION_CELLS_NUMBER) * 256
 #define BATTERY_PACK_VOLTS_0	(LI_ION_CELL_VOLTS_0 * BATTERY_LI_ION_CELLS_NUMBER) * 256
+// *************************************************************************** //
 
 #endif // _MAIN_H_

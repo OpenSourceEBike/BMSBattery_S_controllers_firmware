@@ -963,16 +963,7 @@ void do_battery_voltage_protection (void)
   ui16_adc_battery_voltage_accumulated += ((uint16_t) ui8_adc_read_battery_voltage ());
   ui8_adc_battery_voltage_filtered = ui16_adc_battery_voltage_accumulated >> 6;
 
-  if (ui8_adc_battery_voltage_filtered > ADC_BATTERY_VOLTAGE_MAX)
-  {
-#ifdef BATTERY_OVER_VOLTAGE_PROTECTION
-    // motor will stop and battery symbol on LCD will be empty and flashing | same as low level error
-    motor_controller_set_state (MOTOR_CONTROLLER_STATE_UNDER_VOLTAGE);
-    motor_disable_PWM ();
-    motor_controller_set_error (MOTOR_CONTROLLER_ERROR_91_BATTERY_UNDER_VOLTAGE);
-#endif
-  }
-  else if (ui8_adc_battery_voltage_filtered < ADC_BATTERY_VOLTAGE_MIN)
+  if (ui8_adc_battery_voltage_filtered < ADC_BATTERY_VOLTAGE_MIN)
   {
     // motor will stop and battery symbol on LCD will be empty and flashing
     motor_controller_set_state (MOTOR_CONTROLLER_STATE_UNDER_VOLTAGE);
