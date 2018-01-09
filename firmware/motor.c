@@ -325,7 +325,7 @@ uint16_t ui16_target_current_10b = 0;
 uint16_t ui16_adc_battery_voltage_accumulated = (uint16_t) ADC_BATTERY_VOLTAGE_MED;
 uint8_t ui8_adc_battery_voltage_filtered;
 
-uint16_t ui16_adc_motor_current_accumulated_10b = ADC_MOTOR_CURRENT_MAX_MED_10B;
+uint16_t ui16_adc_motor_current_accumulated_10b;
 uint16_t ui16_adc_motor_current_filtered_10b;
 
 uint8_t ui8_motor_controller_error = MOTOR_CONTROLLER_ERROR_EMPTY;
@@ -826,6 +826,9 @@ void motor_init (void)
   EXTI_SetExtIntSensitivity(EXTI_PORT_GPIOD,
 			    EXTI_SENSITIVITY_FALL_LOW);
   /***************************************************************************************/
+
+  // initialize the value of ui16_adc_motor_current_accumulated_10b
+  ui16_adc_motor_current_accumulated_10b = ui16_motor_total_current_offset_10b << 4;
 
   motor_set_current_max (ADC_MOTOR_CURRENT_MAX);
   motor_set_regen_current_max (4);
