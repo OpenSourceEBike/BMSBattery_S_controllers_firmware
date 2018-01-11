@@ -23,7 +23,7 @@ void EXTI_PORTA_IRQHandler(void) __interrupt(EXTI_PORTA_IRQHANDLER)
   if (brake_is_set())
   {
     motor_controller_set_state (MOTOR_CONTROLLER_STATE_BRAKE);
-    motor_set_regen_current_max (ADC_MOTOR_REGEN_CURRENT_MAX); // enable strong ebrake/regen at 15 amps
+    motor_set_regen_current_max (ADC_MOTOR_REGEN_CURRENT_MAX); // enable strong ebrake/regen
     motor_set_pwm_duty_cycle_target (0);
     ebike_app_cruise_control_stop ();
   }

@@ -87,14 +87,18 @@ int main (void)
   adc_init ();
   eeprom_init ();
   motor_init ();
-  pas_init ();
+  pas1_init ();
+#if defined(EBIKE_REGEN_EBRAKE_LIKE_COAST_BRAKES)
+  pas2_init ();
+#endif
   wheel_speed_sensor_init ();
   enableInterrupts ();
 
   while (1)
   {
 #ifdef DEBUG_UART
-//    printf ("%d, %d, %d, %d\n", ui16_motor_get_motor_speed_erps (), ui8_duty_cycle, ui8_motor_commutation_type, ui8_angle_correction);
+//    printf ("%d,%d,%d,%d\n", ui16_motor_get_motor_speed_erps (), ui8_duty_cycle, ui8_motor_commutation_type, ui8_angle_correction);
+    printf ("%d,%d,%d,%d\n", motor_controller_state_is_set (MOTOR_CONTROLLER_STATE_BRAKE), ui8_debug, ui8_duty_cycle_target, ui8_duty_cycle);
 #endif
 
     // because of continue; at the end of each if code block that will stop the while (1) loop there,

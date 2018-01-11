@@ -38,7 +38,8 @@
  *
  * PA4                | in  | brake
  * PB4  (ADC_AIN4)    | in  | throttle
- * PD0                | in  | PAS
+ * PD0                | in  | PAS1
+ * PB7                | in  | PAS2
  * PC5                | in  | wheel speed
  *
  *
@@ -96,8 +97,11 @@
 #define THROTTLE__PIN             GPIO_PIN_4
 #define THROTTLE__PORT            GPIOB
 
-#define PAS__PIN                  GPIO_PIN_0
-#define PAS__PORT                 GPIOD
+#define PAS1__PIN                 GPIO_PIN_0
+#define PAS1__PORT                GPIOD
+
+#define PAS2__PIN                 GPIO_PIN_7
+#define PAS2__PORT                GPIOB
 
 #define WHEEL_SPEED_SENSOR__PIN   GPIO_PIN_5
 #define WHEEL_SPEED_SENSOR__PORT  GPIOC

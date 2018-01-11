@@ -49,6 +49,12 @@ extern uint16_t ui16_PWM_cycles_counter_total;
 extern int8_t i8_motor_current_filtered_10b;
 extern uint8_t ui8_pwm_duty_cycle_duty_cycle_controller;
 
+extern uint16_t ui16_target_current_10b;
+extern volatile uint8_t ui8_pas2_direction;
+extern volatile uint8_t ui8_pas2_regen_current;
+extern uint8_t ui8_adc_target_motor_regen_current_max;
+extern volatile uint8_t ui8_debug;
+
 /***************************************************************************************/
 // Motor interface
 void hall_sensor_init (void); // must be called before using the motor
@@ -77,6 +83,7 @@ void motor_controller_set_error (uint8_t ui8_error);
 void motor_controller_clear_error (void);
 uint8_t motor_controller_get_error (void);
 void motor_set_pwm_duty_cycle (uint8_t ui8_value);
+void motor_reset_regen_ebrake_like_coast_brakes (void);
 /***************************************************************************************/
 
 #endif /* _MOTOR_H_ */
