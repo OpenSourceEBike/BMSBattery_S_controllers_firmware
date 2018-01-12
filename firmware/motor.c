@@ -310,7 +310,7 @@ uint8_t ui8_adc_id_current = 0;
 
 uint8_t ui8_adc_target_motor_current_max;
 int8_t i8_motor_current_filtered_10b;
-uint8_t ui8_adc_target_motor_regen_current_max;
+volatile uint8_t ui8_adc_target_motor_regen_current_max;
 
 uint8_t ui8_adc_motor_total_current;
 uint8_t ui8_motor_total_current_offset;
@@ -331,7 +331,6 @@ uint16_t ui16_adc_motor_current_filtered_10b;
 uint8_t ui8_motor_controller_error = MOTOR_CONTROLLER_ERROR_EMPTY;
 
 volatile uint8_t ui8_duty_cycle = 0;
-volatile uint8_t ui8_debug = 0;
 uint8_t ui8_duty_cycle_target;
 uint16_t ui16_duty_cycle_ramp_up_inverse_step;
 uint16_t ui16_duty_cycle_ramp_down_inverse_step;
@@ -354,6 +353,7 @@ uint8_t ui8_pas2_state;
 uint8_t ui8_pas2_state_old;
 volatile uint8_t ui8_pas2_counter = 0;
 volatile uint8_t ui8_pas2_direction = 0;
+volatile uint8_t ui8_pas2_regen_count = 0;
 volatile uint8_t ui8_pas2_regen_current = 0;
 
 uint8_t ui8_wheel_speed_sensor_state;
@@ -569,7 +569,7 @@ void TIM1_UPD_OVF_TRG_BRK_IRQHandler(void) __interrupt(TIM1_UPD_OVF_TRG_BRK_IRQH
   // - limit motor max current
   // - limit motor max regen current
   // - ramp up/down PWM duty_cycle value
-ui8_debug = 0;
+
   // verify motor max current limit
   ui8_adc_motor_total_current = UI8_ADC_MOTOR_TOTAL_CURRENT;
   if (ui8_adc_motor_total_current > ui8_adc_target_motor_current_max)  // motor max current, reduce duty_cycle
@@ -577,7 +577,6 @@ ui8_debug = 0;
     if (ui8_duty_cycle > 0)
     {
       ui8_duty_cycle--;
-ui8_debug = 1;
     }
   }
   // verify if there is regen current > 0 (if there is happening regen) and
@@ -589,7 +588,6 @@ ui8_debug = 1;
     if (ui8_duty_cycle < 255)
     {
       ui8_duty_cycle++;
-ui8_debug = 2;
     }
   }
   // verify motor max regen current limit
@@ -598,7 +596,6 @@ ui8_debug = 2;
     if (ui8_duty_cycle < 255)
     {
       ui8_duty_cycle++;
-ui8_debug = 3;
     }
   }
   else // no motor current limits, adjust duty_cycle to duty_cycle_target, including ramping
@@ -609,7 +606,6 @@ ui8_debug = 3;
       {
 	ui16_counter_duty_cycle_ramp_up = 0;
 	ui8_duty_cycle++;
-ui8_debug = 4;
       }
     }
     else if (ui8_duty_cycle_target < ui8_duty_cycle)
@@ -618,7 +614,6 @@ ui8_debug = 4;
       {
 	ui16_counter_duty_cycle_ramp_down = 0;
 	ui8_duty_cycle--;
-ui8_debug = 5;
       }
     }
   }
@@ -774,29 +769,35 @@ ui8_debug = 5;
 
     if (ui8_pas2_direction) // rotating backwards
     {
-      if (ui8_pas2_regen_current < 5)
+      if (ui8_pas2_regen_count < 5)
       {
-	ui8_pas2_regen_current++;
+	// we are starting brake or increase the rate
+	ui8_pas2_regen_count++;
+	ui8_pas2_regen_current += ADC_MOTOR_REGEN_CURRENT_MAX_1_5;
 
-	motor_set_regen_current_max (ui8_pas2_regen_current * ((uint8_t) ADC_MOTOR_REGEN_CURRENT_MAX_1_5));
-//	motor_set_regen_current_max (ADC_MOTOR_REGEN_CURRENT_MAX);
+	ui8_motor_controller_state |= MOTOR_CONTROLLER_STATE_BRAKE_LIKE_COAST_BRAKES;  // enable brake like coast brakes state
+	ui8_adc_target_motor_regen_current_max = ui8_motor_total_current_offset - ui8_pas2_regen_current; // update motor regen_current_max
+	ui8_duty_cycle_target = 0; // target 0 PWM duty_cycle and the motor will stop/block
+	ebike_app_cruise_control_stop ();
+
+	ui16_throttle_value_accumulated = 0;
       }
-
-      motor_controller_set_state (MOTOR_CONTROLLER_STATE_BRAKE);
-      ui8_duty_cycle_target = 0;
     }
     else // rotating forwards
     {
-      if (ui8_pas2_regen_current > 0)
+      if (ui8_pas2_regen_count > 0)
       {
-	ui8_pas2_regen_current--;
+	// we are still brake but reducing the rate, let's reduce one step the regen current
+	ui8_pas2_regen_count--;
+	ui8_pas2_regen_current -= ADC_MOTOR_REGEN_CURRENT_MAX_1_5;
+	ui8_adc_target_motor_regen_current_max = ui8_motor_total_current_offset - ui8_pas2_regen_current; // update motor regen_current_max
 
-//	motor_set_regen_current_max (ui8_pas2_regen_current * ((uint8_t) ADC_MOTOR_REGEN_CURRENT_MAX_1_5));
-	motor_set_regen_current_max (0);
-      }
-      else
-      {
-	motor_controller_reset_state (MOTOR_CONTROLLER_STATE_BRAKE);
+	if (ui8_pas2_regen_count == 0)
+	{
+	  // we are stop braking
+	  ui8_motor_controller_state &= ~MOTOR_CONTROLLER_STATE_BRAKE_LIKE_COAST_BRAKES; // disable brake like coast brakes state, this will make throttle to setup the new value for target PWM duty_cycle
+	  ui8_adc_target_motor_regen_current_max = ui8_motor_total_current_offset - ((uint8_t) ADC_MOTOR_REGEN_CURRENT_MIN); // disable ebrake/regen
+	}
       }
     }
   }
@@ -857,8 +858,10 @@ void motor_reset_regen_ebrake_like_coast_brakes (void)
 {
   ui8_pas2_counter = 0;
   ui8_pas2_direction = 0;
+  ui8_pas2_regen_count = 0;
   ui8_pas2_regen_current = 0;
-  motor_set_regen_current_max (0);
+  motor_set_regen_current_max (ADC_MOTOR_REGEN_CURRENT_MIN); // disable ebrake/regen
+  motor_controller_reset_state (MOTOR_CONTROLLER_STATE_BRAKE_LIKE_COAST_BRAKES);
 }
 #endif
 
@@ -908,10 +911,10 @@ void motor_init (void)
   /***************************************************************************************/
 
   // initialize the value of ui16_adc_motor_current_accumulated_10b
-  ui16_adc_motor_current_accumulated_10b = ui16_motor_total_current_offset_10b << 4;
+  ui16_adc_motor_current_accumulated_10b = ui16_motor_total_current_offset_10b << 2;
 
   motor_set_current_max (ADC_MOTOR_CURRENT_MAX);
-  motor_set_regen_current_max (4);
+  motor_set_regen_current_max (ADC_MOTOR_REGEN_CURRENT_MIN);
   motor_set_pwm_duty_cycle_ramp_up_inverse_step (PWM_DUTY_CYCLE_RAMP_UP_INVERSE_STEP); // each step = 64us
   motor_set_pwm_duty_cycle_ramp_down_inverse_step (PWM_DUTY_CYCLE_RAMP_DOWN_INVERSE_STEP); // each step = 64us
 }
@@ -1030,7 +1033,8 @@ uint8_t motor_current_controller (void)
   // limit max output value
   if (i16_output > MOTOR_CURRENT_CONTROLLER_OUTPUT_MAX) i16_output = MOTOR_CURRENT_CONTROLLER_OUTPUT_MAX;
   else if (i16_output < (-MOTOR_CURRENT_CONTROLLER_OUTPUT_MAX)) i16_output = -MOTOR_CURRENT_CONTROLLER_OUTPUT_MAX;
-  i16_output >>= 5; // divide to 64, avoid using floats
+//  i16_output >>= 5; // divide to 64, avoid using floats
+  i16_output >>= 3;
 
   i16_output = ui8_duty_cycle + i16_output;
   if (i16_output > PWM_DUTY_CYCLE_MAX) i16_output = PWM_DUTY_CYCLE_MAX;
@@ -1061,8 +1065,7 @@ void do_motor_controller_mode (void)
   uint8_t ui8_pwm_duty_cycle_current_controller;
   uint8_t ui8_pwm_duty_cycle;
 
-//  ui8_pwm_duty_cycle_speed_controller = motor_speed_controller ();
-ui8_pwm_duty_cycle_speed_controller = 255;
+  ui8_pwm_duty_cycle_speed_controller = motor_speed_controller ();
 
 #if defined (EBIKE_THROTTLE_TYPE_THROTTLE_PAS_PWM_DUTY_CYCLE)
   ui8_pwm_duty_cycle = ui8_min (ui8_pwm_duty_cycle_duty_cycle_controller, ui8_pwm_duty_cycle_speed_controller);
@@ -1072,9 +1075,17 @@ ui8_pwm_duty_cycle_speed_controller = 255;
   ui8_pwm_duty_cycle = ui8_min (ui8_pwm_duty_cycle_current_controller, ui8_pwm_duty_cycle_speed_controller);
 #endif
 
+ui8_pwm_duty_cycle = ui8_pwm_duty_cycle_current_controller;
+
   // set PWM duty_cycle target value only if we are not braking
-  if (!motor_controller_state_is_set (MOTOR_CONTROLLER_STATE_BRAKE))
+  if (motor_controller_state_is_set (MOTOR_CONTROLLER_STATE_BRAKE |
+				      MOTOR_CONTROLLER_STATE_BRAKE_LIKE_COAST_BRAKES))
   {
+    motor_set_pwm_duty_cycle_target (0); // target 0 PWM duty_cycle and the motor will stop/block
+  }
+  else
+  {
+ui8_pwm_duty_cycle = ui8_throttle_value_filtered1;
     motor_set_pwm_duty_cycle_target (ui8_pwm_duty_cycle);
   }
 }
@@ -1165,9 +1176,9 @@ void do_motor_state_machine (void)
 void calc_motor_current_filtered (void)
 {
   // low pass filter the current readed value, to avoid possible fast spikes/noise
-  ui16_adc_motor_current_accumulated_10b -= ui16_adc_motor_current_accumulated_10b >> 4;
+  ui16_adc_motor_current_accumulated_10b -= ui16_adc_motor_current_accumulated_10b >> 2;
   ui16_adc_motor_current_accumulated_10b += ui16_adc_read_motor_total_current_10b ();
-  ui16_adc_motor_current_filtered_10b = ui16_adc_motor_current_accumulated_10b >> 4;
+  ui16_adc_motor_current_filtered_10b = ui16_adc_motor_current_accumulated_10b >> 2;
   i8_motor_current_filtered_10b = ui16_adc_motor_current_filtered_10b - ui16_motor_total_current_offset_10b;
 }
 

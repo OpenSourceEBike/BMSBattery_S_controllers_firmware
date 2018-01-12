@@ -22,12 +22,13 @@
 #define MOTOR_STATE_COOL 	3
 #define MOTOR_STATE_RUNNING 	4
 
-#define MOTOR_CONTROLLER_STATE_OK		1
-#define MOTOR_CONTROLLER_STATE_BRAKE		2
-#define MOTOR_CONTROLLER_STATE_OVER_CURRENT	4
-#define MOTOR_CONTROLLER_STATE_UNDER_VOLTAGE	8
-#define MOTOR_CONTROLLER_STATE_THROTTLE_ERROR	16
-#define MOTOR_CONTROLLER_STATE_MOTOR_BLOCKED	32
+#define MOTOR_CONTROLLER_STATE_OK			1
+#define MOTOR_CONTROLLER_STATE_BRAKE			2
+#define MOTOR_CONTROLLER_STATE_BRAKE_LIKE_COAST_BRAKES	4
+#define MOTOR_CONTROLLER_STATE_OVER_CURRENT		8
+#define MOTOR_CONTROLLER_STATE_UNDER_VOLTAGE		16
+#define MOTOR_CONTROLLER_STATE_THROTTLE_ERROR		32
+#define MOTOR_CONTROLLER_STATE_MOTOR_BLOCKED		64
 
 #define MOTOR_CONTROLLER_ERROR_EMPTY			0x0
 #define MOTOR_CONTROLLER_ERROR_01_THROTTLE		0x22
@@ -48,12 +49,8 @@ extern volatile uint8_t ui8_duty_cycle;
 extern uint16_t ui16_PWM_cycles_counter_total;
 extern int8_t i8_motor_current_filtered_10b;
 extern uint8_t ui8_pwm_duty_cycle_duty_cycle_controller;
-
+extern volatile uint8_t ui8_adc_target_motor_regen_current_max;
 extern uint16_t ui16_target_current_10b;
-extern volatile uint8_t ui8_pas2_direction;
-extern volatile uint8_t ui8_pas2_regen_current;
-extern uint8_t ui8_adc_target_motor_regen_current_max;
-extern volatile uint8_t ui8_debug;
 
 /***************************************************************************************/
 // Motor interface

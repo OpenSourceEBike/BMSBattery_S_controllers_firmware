@@ -49,8 +49,9 @@ uint8_t ui8_state_machine = 0;
 uint8_t ui8_adc_throttle_value;
 uint8_t ui8_adc_throttle_value_cruise_control;
 uint8_t ui8_throttle_value;
-uint16_t ui16_throttle_value_accumulated = 0;
+volatile uint16_t ui16_throttle_value_accumulated = 0;
 uint8_t ui8_throttle_value_filtered;
+uint8_t ui8_throttle_value_filtered1;
 uint8_t ui8_is_throotle_released;
 
 volatile uint16_t ui16_pas1_pwm_cycles_ticks = (uint16_t) PAS_ABSOLUTE_MIN_CADENCE_PWM_CYCLE_TICKS;
@@ -157,7 +158,7 @@ uint8_t ebike_app_cruise_control_is_set (void)
   return (ui8_cruise_state ? 1: 0);
 }
 
-void ebike_app_cruise_control_stop (void)
+volatile void ebike_app_cruise_control_stop (void)
 {
   ui8_cruise_state = 0;
 }
@@ -229,8 +230,9 @@ void communications_controller (void)
   // - B8 = 100, LCD shows 750 watts
   // each unit of B8 = 0.25A
   i8_motor_current_filtered_10b = motor_get_current_filtered_10b ();
+  i8_motor_current_filtered_10b -= 1; // try to avoid LCD display about 25W when motor is not running
   if (i8_motor_current_filtered_10b < 0) { i8_motor_current_filtered_10b = 0; } // limit to be only positive value, LCD don't accept regen current value
-  ui8_tx_buffer [8] = ((uint8_t) (i8_motor_current_filtered_10b)) << 1;
+  ui8_tx_buffer [8] = (uint8_t) (i8_motor_current_filtered_10b);
   // B9: motor temperature
   ui8_tx_buffer [9] = 0;
   // B10 and B11: 0
@@ -731,9 +733,14 @@ void ebike_throotle_type_torque_sensor (void)
   ui8_temp = (uint8_t) f_temp;
 #endif
 
+ui8_throttle_value_filtered1 = ui8_temp;
+
 #if defined(EBIKE_REGEN_EBRAKE_LIKE_COAST_BRAKES)
-  // if user is applying torque on torque sensor, means he doesn't want to brake, so reset
-//  if (ui8_temp > 0) { motor_reset_regen_ebrake_like_coast_brakes (); }
+  // if user is applying torque on torque sensor, means he doesn't want to brake anymore
+  if (ui8_temp > 0 && (motor_controller_state_is_set (MOTOR_CONTROLLER_STATE_BRAKE_LIKE_COAST_BRAKES)))
+  {
+    motor_reset_regen_ebrake_like_coast_brakes ();
+  }
 #endif
 
   ui16_target_current_10b = (uint16_t) (map ((uint32_t) ui8_temp,
@@ -771,11 +778,10 @@ void read_throotle (void)
   // map throttle value from 0 up to 255
   ui8_throttle_value = (uint8_t) (map (ui8_adc_throttle_value, ADC_THROTTLE_MIN_VALUE, ADC_THROTTLE_MAX_VALUE, 0, 255));
 
-//  // low pass filter the torque sensor to smooth the signal
-//  ui16_throttle_value_accumulated -= ui16_throttle_value_accumulated >> 2;
-//  ui16_throttle_value_accumulated += ((uint16_t) ui8_throttle_value);
-//  ui8_throttle_value_filtered = ui16_throttle_value_accumulated >> 2;
-ui8_throttle_value_filtered = ui8_throttle_value;
+  // low pass filter the torque sensor to smooth the signal
+  ui16_throttle_value_accumulated -= ui16_throttle_value_accumulated >> 3;
+  ui16_throttle_value_accumulated += ((uint16_t) ui8_throttle_value);
+  ui8_throttle_value_filtered = ui16_throttle_value_accumulated >> 3;
 
   // setup ui8_is_throotle_released flag
   ui8_is_throotle_released = (ui8_throttle_value ? 0 : 1);

@@ -11,7 +11,7 @@
 
 #include "config.h"
 
-#define DEBUG_UART
+//#define DEBUG_UART
 
 #define MOTOR_TYPE_Q85 1
 #define MOTOR_TYPE_Q100 2
@@ -48,6 +48,9 @@
 #define EBIKE_THROTTLE_TYPE EBIKE_THROTTLE_TYPE_TORQUE_SENSOR
 #define ADC_MOTOR_REGEN_CURRENT_MAX_1_5 (ADC_MOTOR_REGEN_CURRENT_MAX / 5)
 #endif
+
+// this is needed so motor will reduce his speed when tart PWM duty_cycle = 0
+#define ADC_MOTOR_REGEN_CURRENT_MIN 1
 
 // Phase current: max of +-15.5 amps
 // 512 --> 15.5 amps
@@ -98,7 +101,8 @@
 #define MOTOR_SPEED_CONTROLLER_OUTPUT_MAX 8160 // PWM max duty_cycle << 5
 
 #define MOTOR_CURRENT_CONTROLLER_KP 10
-#define MOTOR_CURRENT_CONTROLLER_OUTPUT_MAX 16320
+//#define MOTOR_CURRENT_CONTROLLER_OUTPUT_MAX 16320
+#define MOTOR_CURRENT_CONTROLLER_OUTPUT_MAX 2040
 
 #define MOTOR_PWM_TICKS_PER_MS 16
 

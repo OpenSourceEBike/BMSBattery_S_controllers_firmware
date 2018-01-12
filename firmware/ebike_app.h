@@ -30,9 +30,12 @@ extern volatile uint8_t ui8_wheel_speed_sensor_is_disconnected;
 
 extern uint8_t ui8_throttle_value;
 extern uint8_t ui8_adc_throttle_value;
+extern uint8_t ui8_throttle_value_filtered1;
+
+extern volatile uint16_t ui16_throttle_value_accumulated;
 
 void ebike_app_controller (void);
-void ebike_app_cruise_control_stop (void);
+volatile void ebike_app_cruise_control_stop (void);
 uint8_t ebike_app_get_adc_throttle_value_cruise_control (void);
 struc_lcd_configuration_variables *ebike_app_get_lcd_configuration_variables (void);
 uint8_t ebike_app_is_throttle_released (void);
