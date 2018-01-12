@@ -175,8 +175,8 @@ uint32_t PI_control (uint16_t ist, uint16_t soll)
   float float_p;
   static float float_i;
   float_p=((float)soll - (float)ist)*P_FACTOR;
-  if (float_p>3)float_p=5;
-  if (float_p<-3)float_p=-5;
+  if (float_p>3)float_p=3;
+  if (float_p<-3)float_p=-3;
   float_i+=((float)soll - (float)ist)*I_FACTOR;
   if (float_i>255)float_i=255;
   if (float_i<0)float_i=0;
