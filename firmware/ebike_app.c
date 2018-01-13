@@ -39,7 +39,7 @@ uint8_t ui8_i;
 uint8_t ui8_crc;
 uint16_t ui16_wheel_period_ms;
 uint16_t ui16_battery_volts;
-uint16_t ui16_battery_soc;
+uint8_t ui8_battery_soc;
 uint8_t ui16_error;
 uint8_t ui8_rx_buffer[13];
 uint8_t ui8_rx_counter = 0;
@@ -181,19 +181,19 @@ void communications_controller (void)
   else { ui16_wheel_period_ms = (3600.0 * f_wheel_perimeter) / f_wheel_speed; }
 
   // calc battery pack state of charge (SOC)
-  ui16_battery_volts = motor_get_ADC_battery_voltage_filtered () * ADC_BATTERY_VOLTAGE_K;
-  if (ui16_battery_volts > BATTERY_PACK_VOLTS_100) { ui16_battery_soc = 16; } // 4 bars | full
-  else if (ui16_battery_volts > BATTERY_PACK_VOLTS_80) { ui16_battery_soc = 12; } // 3 bars
-  else if (ui16_battery_volts > BATTERY_PACK_VOLTS_40) { ui16_battery_soc = 8; } // 2 bars
-  else if (ui16_battery_volts > BATTERY_PACK_VOLTS_20) { ui16_battery_soc = 4; } // 1 bar
-  else { ui16_battery_soc = 3; } // empty
+  ui16_battery_volts = ((uint16_t) motor_get_ADC_battery_voltage_filtered ()) * ((uint16_t) ADC_BATTERY_VOLTAGE_K);
+  if (ui16_battery_volts > ((uint16_t) BATTERY_PACK_VOLTS_100)) { ui8_battery_soc = 16; } // 4 bars | full
+  else if (ui16_battery_volts > ((uint16_t) BATTERY_PACK_VOLTS_80)) { ui8_battery_soc = 12; } // 3 bars
+  else if (ui16_battery_volts > ((uint16_t) BATTERY_PACK_VOLTS_40)) { ui8_battery_soc = 8; } // 2 bars
+  else if (ui16_battery_volts > ((uint16_t) BATTERY_PACK_VOLTS_20)) { ui8_battery_soc = 4; } // 1 bar
+  else { ui8_battery_soc = 3; } // empty
 
   // prepare error
   ui16_error = motor_controller_get_error (); // get the error value
   // if battery under voltage, signal instead on LCD battery symbol
   if (ui16_error == MOTOR_CONTROLLER_ERROR_91_BATTERY_UNDER_VOLTAGE)
   {
-    ui16_battery_soc = 1; // empty flashing
+    ui8_battery_soc = 1; // empty flashing
     ui16_error = 0;
   }
 
@@ -208,7 +208,7 @@ void communications_controller (void)
   // B0: start package (?)
   ui8_tx_buffer [0] = 65;
   // B1: battery level
-  ui8_tx_buffer [1] = ui16_battery_soc;
+  ui8_tx_buffer [1] = ui8_battery_soc;
   // B2: 24V controller
   ui8_tx_buffer [2] = (uint8_t) COMMUNICATIONS_BATTERY_VOLTAGE;
   // B3: speed, wheel rotation period, ms; period(ms)=B3*256+B4;
