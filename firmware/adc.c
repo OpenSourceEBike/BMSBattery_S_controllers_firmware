@@ -68,6 +68,7 @@ void adc_init (void)
     ui16_motor_total_current_offset_10b += ui16_adc_read_motor_total_current_10b ();
   }
   ui16_motor_total_current_offset_10b >>= 4;
+  ui16_motor_total_current_offset_10b -= 4;
   ui8_motor_total_current_offset = ui16_motor_total_current_offset_10b >> 2;
 }
 
