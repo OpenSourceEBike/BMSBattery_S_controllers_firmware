@@ -64,6 +64,7 @@ uint16_t ui16_PAS = 32000;		//cadence in timetics
 uint8_t ui8_PAS_Flag = 0; 		//flag for PAS interrupt
 uint8_t ui8_SPEED_Flag = 0; 		//flag for SPEED interrupt
 
+
 uint8_t ui8_assistlevel_global = 3;// for debugging of display communication
 
 /////////////////////////////////////////////////////////////////////////////////////////////
@@ -181,7 +182,7 @@ int main (void)
     {
 	ui16_SPEED=ui16_SPEED_Counter; 	//save recent speed
 	ui16_SPEED_Counter=0;		//reset speed counter
-	ui8_SPEED_Flag =0; 			//reset interrupt flag
+	ui8_SPEED_Flag =0; //reset interrupt flag
 
 	//printf("SPEEDtic\n");
     }

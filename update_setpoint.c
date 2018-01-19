@@ -2,6 +2,8 @@
  * OpenSource EBike firmware
  *
  * Copyright (C) Stancecoke, 2017.
+ * What's missing: LCD3 support, PAS direction detection
+ * not tested yet: switch to higher PWM frequency, erps limitation, speed_limitation with external sensor
  *
  * Released under the GPL License, Version 3
  */
@@ -44,6 +46,8 @@ uint32_t ui32_erps_filtered; //filtered value of erps
 uint16_t ui16_erps_limit_lower=(uint16_t)((float)GEAR_RATIO*(float)limit*10000.0/((float)wheel_circumference*36.0));
 uint16_t ui16_erps_limit_higher=(uint16_t)((float)GEAR_RATIO*(float)(limit+2)*10000.0/((float)wheel_circumference*36.0));
 
+uint16_t ui16_erps_max=PWM_CYCLES_SECOND/30; //limit erps to have minimum 30 points on the sine curve for proper commutation
+
 uint16_t update_setpoint (uint16_t speed, uint16_t PAS, uint16_t sumtorque, uint16_t setpoint_old)
 {
   ui16_BatteryCurrent_accumulated -= ui16_BatteryCurrent_accumulated>>3;
@@ -57,7 +61,7 @@ uint16_t update_setpoint (uint16_t speed, uint16_t PAS, uint16_t sumtorque, uint
 
   ui8_regen_throttle = map (ui8_adc_read_regen_throttle () , ADC_THROTTLE_MIN_VALUE, ADC_THROTTLE_MAX_VALUE, 0, SETPOINT_MAX_VALUE); //map throttle to limits
 
-  ui32_SPEED_km_h=(wheel_circumference*PWM_CYCLES_SECOND*36L)/(10000L*(uint32_t)speed);			//calculate speed in km/h conversion fr	om sec to hour --> *3600, conversion from mm to km --> /1000000, tic frequency 15625 Hz
+  ui32_SPEED_km_h=(wheel_circumference*PWM_CYCLES_SECOND*36L)/(10L*(uint32_t)speed);			//calculate speed in m/h conversion fr	om sec to hour --> *3600, conversion from mm to km --> /1000000, tic frequency 15625 Hz
   if(ui16_SPEED_Counter>40000){ui32_SPEED_km_h=0;}     //if wheel isn't turning, reset speed
 
   //check if regen is wanted
@@ -84,6 +88,14 @@ uint16_t update_setpoint (uint16_t speed, uint16_t PAS, uint16_t sumtorque, uint
                   if (ui32_setpoint>255){ui32_setpoint=255;}
       printf("you are braking!\r\n");
   }
+
+  //limit max erps
+  else if (ui32_erps_filtered>ui16_erps_max){
+              ui32_setpoint= PI_control(ui32_erps_filtered, ui16_erps_max);//limit the erps to maximum value to have minimum 30 points of sine table for proper commutation
+                    if (ui32_setpoint<30){ui32_setpoint=0;}
+                    if (ui32_setpoint>255){ui32_setpoint=255;}
+        printf("erps too high!\r\n");
+    }
 
   //check if pedals are turning
 #ifndef THROTTLE
@@ -120,7 +132,14 @@ uint16_t update_setpoint (uint16_t speed, uint16_t PAS, uint16_t sumtorque, uint
 #if defined(THROTTLE)  || defined(THROTTLE_AND_PAS)
   float_temp=(float)sumtorque*(float)(BATTERY_CURRENT_MAX_VALUE+current_cal_b)/255.0-(float)current_cal_b; //calculate current target
 
+#ifdef SPEEDSENSOR_INTERNAL
   uint32_current_target = CheckSpeed ((uint16_t)float_temp, (uint16_t) ui32_erps_filtered); //limit speed
+#endif
+
+#ifdef SPEEDSENSOR_EXTERNAL
+  uint32_current_target = CheckSpeed ((uint16_t)float_temp, (uint16_t) ui32_SPEED_km_h); //limit speed
+#endif
+
   ui32_setpoint= PI_control(ui16_BatteryCurrent, (uint16_t) uint32_current_target);
   if (ui32_setpoint<25)ui32_setpoint=0;
   if (ui32_setpoint>255)ui32_setpoint=255;
@@ -184,6 +203,7 @@ uint32_t PI_control (uint16_t ist, uint16_t soll)
   return ((uint32_t)(float_p+float_i));
 }
 
+#ifdef SPEEDSENSOR_INTERNAL
 uint32_t CheckSpeed (uint16_t current_target, uint16_t erps)
 {
   //printf("Speed %d, %d\r\n", erps, ui16_erps_limit_lower);
@@ -201,5 +221,24 @@ uint32_t CheckSpeed (uint16_t current_target, uint16_t erps)
   }
     return ((uint32_t)current_target);
   }
+#endif
 
+#ifdef SPEEDSENSOR_EXTERNAL
+uint32_t CheckSpeed (uint16_t current_target, uint16_t speed)
+{
+  //printf("Speed %d, %d\r\n", erps, ui16_erps_limit_lower);
+  //ramp down motor power if you are riding too fast and speed liming is active
+  if (speed>limit*1000 && ui8_cheat_state!=4){
 
+	if (speed>(limit+2)*1000){ //if you are riding much too fast, stop motor immediately
+	    current_target=-1*current_cal_b;
+	   // printf("Speed much too high! %d, %d\r\n", erps,((limit+2)*GEAR_RATIO));
+	}
+	else {
+	    current_target=(uint16_t)(((uint32_t)current_target+current_cal_b)*((limit+2)*1000)-speed)/2000-current_cal_b; 	//ramp down the motor power within 2 km/h, if you are riding too fast
+	    //printf("Speed too high!\r\n");
+	}
+  }
+    return ((uint32_t)current_target);
+  }
+#endif

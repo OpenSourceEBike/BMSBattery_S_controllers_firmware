@@ -42,45 +42,7 @@ uint8_t battery_percent_fromcapacity=11; //hier nur als Konstante um Batterie no
 #include "display_kingmeter.h"
 #endif
 
-#if (DISPLAY_TYPE & DISPLAY_TYPE_BAFANG)
-#include "display_bafang.h"
-#endif
 
-
-
-
-
-
-
-#if (DISPLAY_TYPE & DISPLAY_TYPE_BAFANG)            // For Bafang BBS0x displays
-BAFANG_t BF;                                     // Context of the Bafang object
-#if HARDWARE_REV < 20
-#include <SoftwareSerial.h>
-static SoftwareSerial mySerial(10, 11);             // RX (YELLOW cable), TX (GREEN cable)
-SoftwareSerial* displaySerial =& mySerial;
-#else
-HardwareSerial* displaySerial=&Serial2;
-#endif
-#endif
-
-#if (DISPLAY_TYPE & DISPLAY_TYPE_BMS)||(DISPLAY_TYPE & DISPLAY_TYPE_BMS3)
-#if HARDWARE_REV < 20
-#include <SoftwareSerial.h>                         // For BMS Battery S-LCD and S-LCD3
-static SoftwareSerial mySerial(10, 11);             // RX , TX
-SoftwareSerial* displaySerial=&mySerial;
-#else
-HardwareSerial* displaySerial=&Serial2;
-#endif
-#if (DISPLAY_TYPE & DISPLAY_TYPE_BMS)
-byte slcd_received[]= {0,0,0,0,0,0};
-#else
-byte slcd_received[]= {0,0,0,0,0,0,0,0,0,0,0,0,0};
-#endif
-byte slcd_receivecounter=0;
-boolean slcd_lighton=false;                //backlight switched on?
-byte slcd_zerocounter=0;
-unsigned long slcd_last_transmission=millis(); //last time Slcd sent data--> still on?
-#endif
 
 #if (DISPLAY_TYPE & DISPLAY_TYPE_KINGMETER)         // For King-Meter J-LCD, SW-LCD, KM5s-LCD, EBS-LCD2
 KINGMETER_t KM;                                     // Context of the King-Meter object
@@ -162,51 +124,6 @@ void kingmeter_update(void)
 }
 #endif
 
-#if (DISPLAY_TYPE & DISPLAY_TYPE_BAFANG)
-void bafang_update(void)
-{
-    Bafang_Service(&BF);
-    /* Apply Rx parameters */
-
-    #ifdef SUPPORT_LIGHTS_SWITCH
-    if(BF.Rx.Headlight == false)
-    {
-        digitalWrite(lights_pin, 0);
-    }
-    else
-    {
-        digitalWrite(lights_pin, 1);
-    }
-    #endif
-
-    if(BF.Rx.PushAssist == true)
-    {
-        throttle_stat = 200;
-    }
-    else
-    {
-        throttle_stat = 0;
-        poti_stat     = map(BF.Rx.AssistLevel, 0, 9, 0,1023);
-    }
-
-
-    /* Shutdown in case we received no message in the last 3s */
-
-    if((millis() - BF.LastRx) > 3000)
-    {
-        poti_stat     = 0;
-        throttle_stat = 0;
-        #if HARDWARE_REV >=2
-        save_shutdown();
-        #endif
-    }
-}
-#endif
-
-
-
-
-
 
 
 void display_init()
@@ -216,9 +133,6 @@ void display_init()
     KingMeter_Init(&KM);
 #endif
 
-#if (DISPLAY_TYPE & DISPLAY_TYPE_BAFANG)
-    Bafang_Init(&BF, displaySerial);
-#endif
 
 }
 
@@ -229,17 +143,6 @@ void display_update()
     kingmeter_update();
 #endif
 
-#if (DISPLAY_TYPE & DISPLAY_TYPE_BAFANG)
-    bafang_update();
-#endif
 
-#if (DISPLAY_TYPE & DISPLAY_TYPE_BMS)
-    slcd_update(map(battery_percent_fromcapacity,0,100,0,16),wheel_time,0);
-#endif
-
-
-#if (DISPLAY_TYPE & DISPLAY_TYPE_BMS3)
-    slcd3_update(map(battery_percent_fromcapacity,0,100,0,16),wheel_time, 0, max(power/9.75,0), (byte)0x20*(!brake_stat));
-#endif
 }
 
