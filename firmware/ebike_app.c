@@ -777,5 +777,5 @@ void read_throotle (void)
   ui8_throttle_value_filtered = ui16_throttle_value_accumulated >> 2;
 
   // setup ui8_is_throotle_released flag
-  ui8_is_throotle_released = (ui8_throttle_value ? 0 : 1);
+  ui8_is_throotle_released = ((ui8_throttle_value > ((uint8_t) ADC_THROTTLE_MIN_VALUE)) ? 0 : 1);
 }
