@@ -48,6 +48,7 @@ extern volatile uint8_t ui8_duty_cycle;
 extern uint16_t ui16_PWM_cycles_counter_total;
 extern int8_t i8_motor_current_filtered_10b;
 extern uint8_t ui8_pwm_duty_cycle_duty_cycle_controller;
+extern uint8_t ui8_throttle_value_filtered;
 
 /***************************************************************************************/
 // Motor interface

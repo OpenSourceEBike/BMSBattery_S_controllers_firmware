@@ -365,7 +365,7 @@ void do_motor_controller_mode (void);
 
 void motor_controller (void)
 {
-  do_motor_state_machine ();
+//  do_motor_state_machine ();
   calc_motor_current_filtered ();
   do_battery_voltage_protection ();
   do_motor_controller_mode ();
@@ -977,24 +977,10 @@ void do_battery_voltage_protection (void)
 
 void do_motor_controller_mode (void)
 {
-  uint8_t ui8_pwm_duty_cycle_speed_controller;
-  uint8_t ui8_pwm_duty_cycle_current_controller;
-  uint8_t ui8_pwm_duty_cycle;
-
-  ui8_pwm_duty_cycle_speed_controller = motor_speed_controller ();
-
-#if defined (EBIKE_THROTTLE_TYPE_THROTTLE_PAS_PWM_DUTY_CYCLE)
-  ui8_pwm_duty_cycle = ui8_min (ui8_pwm_duty_cycle_duty_cycle_controller, ui8_pwm_duty_cycle_speed_controller);
-
-#elif defined (EBIKE_THROTTLE_TYPE_THROTTLE_PAS_CURRENT_SPEED)
-  ui8_pwm_duty_cycle_current_controller = motor_current_controller ();
-  ui8_pwm_duty_cycle = ui8_min (ui8_pwm_duty_cycle_current_controller, ui8_pwm_duty_cycle_speed_controller);
-#endif
-
   // set PWM duty_cycle target value only if we are not braking
   if (!motor_controller_state_is_set (MOTOR_CONTROLLER_STATE_BRAKE))
   {
-    motor_set_pwm_duty_cycle_target (ui8_pwm_duty_cycle);
+    motor_set_pwm_duty_cycle_target (ui8_throttle_value_filtered);
   }
 }
 
