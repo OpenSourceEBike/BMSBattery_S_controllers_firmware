@@ -55,7 +55,7 @@ void adc_init (void)
     //while (TIM2_GetCounter () < ui16_counter) ; // delay
     adc_trigger ();
 
-    printf("%d, %d, %d\r\n", ui8_adc_read_phase_B_current (), ui16_adc_read_motor_total_current (), ui8_adc_read_throttle ());
+    printf("ACD init");
   }
 
  /* // read and average a few values of ADC

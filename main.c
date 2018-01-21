@@ -105,6 +105,11 @@ void TIM2_UPD_OVF_TRG_BRK_IRQHandler(void) __interrupt(TIM2_UPD_OVF_TRG_BRK_IRQH
 void UART2_IRQHandler(void) __interrupt(UART2_IRQHANDLER);
 #endif
 
+#ifdef DISPLAY_TYPE_KT_LCD3
+// UART2 receivce handler
+void UART2_IRQHandler(void) __interrupt(UART2_IRQHANDLER);
+#endif
+
 /////////////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -157,7 +162,7 @@ int main (void)
   for(a = 0; a < NUMBER_OF_PAS_MAGS;a++) {// array init
    ui16_torque[a]=0;
   }
-//printf("Torquearray initialized\n");
+  printf("System initialized\n");
   while (1)
   {
     static uint32_t ui32_counter = 0;
@@ -176,6 +181,15 @@ int main (void)
         }
 #endif
 
+#ifdef DISPLAY_TYPE_KT_LCD3
+    // Update display after message received occurrence
+    if (ui8_msg_received)
+        {
+	ui8_msg_received=0;
+	//printf("%d\n", ui16_SPEED);
+	check_message(); //Display aktualisieren aus Code vom Forumscontroller
+        }
+#endif
 
     // Update speed after speed interrupt occurrence
     if (ui8_SPEED_Flag == 1)
@@ -186,9 +200,9 @@ int main (void)
 
 	//printf("SPEEDtic\n");
     }
-    if (ui16_SPEED_Counter>56000L)
+    if (ui16_SPEED_Counter>64000L)
         {
-    	ui16_SPEED=56000L; 	//Set Display to 0 km/h
+    	ui16_SPEED=64000L; 	//Set Display to 0 km/h
 
         }
 //in case of THROTTLEANDPAS or THORQUE_SIMULATION, process the PAS routine
@@ -325,6 +339,8 @@ if(ui8_cheat_state==3) //second step, make sure the brake is hold according to d
 #endif
 
      pwm_set_duty_cycle ((uint8_t)ui16_setpoint);
+
+	  //pwm_set_duty_cycle ((uint8_t)ui16_sum_torque);
 
 
 

@@ -19,10 +19,11 @@ Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301  USA
 #ifndef DISPLAY_H
 #define DISPLAY_H
 
-//#include "Arduino.h"
+#include "config.h"
 
 void display_init();
 void display_update();
+void check_message();
 //void display_debug(HardwareSerial* localSerial);
 
 //void display_show_important_info(const char *str, int duration_secs);
@@ -34,10 +35,7 @@ void display_show_welcome_msg_temp();
 void display_prev_view();
 void display_next_view();
 
-#if (DISPLAY_TYPE & DISPLAY_TYPE_16X2_SERIAL)
-void display_16x_serial_enable_backlight();
-void display_16x_serial_disable_backlight();
-#endif
+
 
 //definitions for different screen mode
 typedef enum {DISPLAY_MODE_TEXT,
@@ -47,26 +45,7 @@ typedef enum {DISPLAY_MODE_TEXT,
              } display_mode_type;
 
 typedef enum {DISPLAY_VIEW_MAIN=0,
-#if (DISPLAY_TYPE & DISPLAY_TYPE_NOKIA)&&(defined(DV_GRAPHIC))
-              DISPLAY_VIEW_GRAPHIC,
-#endif
-#if (DISPLAY_TYPE & DISPLAY_TYPE_16X2)
-#if defined(DV_TIME)
-              DISPLAY_VIEW_TIME,
-#endif
-#if defined(DV_BATTERY)
-              DISPLAY_VIEW_BATTERY,
-#endif
-#endif
-#if (defined(SUPPORT_BMP085) || defined(SUPPORT_DSPC01) || defined(SUPPORT_TEMP_SENSOR))&&defined(DV_ENVIRONMENT)
-              DISPLAY_VIEW_ENVIRONMENT,
-#endif
-#if defined(DV_HUMAN)
-              DISPLAY_VIEW_HUMAN,
-#endif
-#if defined(DV_ODOMETER)
-              DISPLAY_VIEW_ODOMETER,
-#endif
+
               _DISPLAY_VIEW_END
              } display_view_type;
 
@@ -80,5 +59,18 @@ extern uint8_t battery_percent_fromvoltage;
 extern uint8_t battery_percent_fromcapacity;
 extern uint32_t wheel_time;
 extern float current_display;
+
+#ifdef DISPLAY_TYPE_KT_LCD3
+typedef struct _lcd_configuration_variables
+{
+  uint8_t ui8_assist_level;
+  uint8_t ui8_motor_characteristic;
+  uint8_t ui8_wheel_size;
+  uint8_t ui8_max_speed;
+  uint8_t ui8_power_assist_control_mode;
+  uint8_t ui8_controller_max_current;
+} struc_lcd_configuration_variables;
+
+#endif
 
 #endif
