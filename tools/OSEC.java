@@ -54,6 +54,8 @@ public class OSEC extends JFrame {
 	private JTextField txtBatteryCurcalb;
 	private JLabel lblDiplayType;
 	private final ButtonGroup buttonGroup = new ButtonGroup();
+	private final ButtonGroup MotorSpeed = new ButtonGroup();
+	private final ButtonGroup Speedsensor = new ButtonGroup();
 	private JTextField Assist_Level_1;
 	private JTextField Assist_Level_2;
 	private JTextField Assist_Level_3;
@@ -69,6 +71,11 @@ public class OSEC extends JFrame {
 	private JTextField i_factor;
 	private JTextField GearRatio;
 	private JTextField txtMaxregencurrent;
+	private JRadioButton rdbtnNormal;
+	private JRadioButton rdbtnHigh;
+	private JLabel lblSpeedSensor;
+	private JRadioButton rdbtnInternal;
+	private JRadioButton rdbtnExternal;
 	
 	
 
@@ -93,7 +100,7 @@ public class OSEC extends JFrame {
 	 */
 	public OSEC() {
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		setBounds(100, 100, 500, 706);
+		setBounds(100, 100, 600, 706);
 		contentPane = new JPanel();
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
 		setContentPane(contentPane);
@@ -147,12 +154,12 @@ public class OSEC extends JFrame {
 		txtSpeedlimit.setColumns(10);
 		
 		lblSupportFactor = new JLabel("Assist factor");
-		lblSupportFactor.setBounds(295, 230, 88, 14);
+		lblSupportFactor.setBounds(352, 227, 88, 14);
 		contentPane.add(lblSupportFactor);
 		
 		txtSupportfactor = new JTextField();
 		txtSupportfactor.setText("64");
-		txtSupportfactor.setBounds(382, 227, 86, 20);
+		txtSupportfactor.setBounds(476, 227, 86, 20);
 		contentPane.add(txtSupportfactor);
 		txtSupportfactor.setColumns(10);
 		
@@ -207,53 +214,53 @@ public class OSEC extends JFrame {
 		contentPane.add(lblBatteryCurrentCal_1);
 		
 		JLabel lblAssistLevel = new JLabel("Assist Level 1");
-		lblAssistLevel.setBounds(295, 95, 114, 14);
+		lblAssistLevel.setBounds(352, 92, 114, 14);
 		contentPane.add(lblAssistLevel);
 		
 		Assist_Level_1 = new JTextField();
 		Assist_Level_1.setText("20");
 		Assist_Level_1.setColumns(10);
-		Assist_Level_1.setBounds(382, 92, 86, 20);
+		Assist_Level_1.setBounds(476, 92, 86, 20);
 		contentPane.add(Assist_Level_1);
 		
 		JLabel lblAssistLevel_1 = new JLabel("Assist Level 2");
-		lblAssistLevel_1.setBounds(295, 122, 114, 14);
+		lblAssistLevel_1.setBounds(352, 119, 114, 14);
 		contentPane.add(lblAssistLevel_1);
 		
 		Assist_Level_2 = new JTextField();
 		Assist_Level_2.setText("40");
 		Assist_Level_2.setColumns(10);
-		Assist_Level_2.setBounds(382, 119, 86, 20);
+		Assist_Level_2.setBounds(476, 119, 86, 20);
 		contentPane.add(Assist_Level_2);
 		
 		JLabel lblAssistLevel_2 = new JLabel("Assist Level 3");
-		lblAssistLevel_2.setBounds(295, 149, 114, 14);
+		lblAssistLevel_2.setBounds(352, 146, 114, 14);
 		contentPane.add(lblAssistLevel_2);
 		
 		Assist_Level_3 = new JTextField();
 		Assist_Level_3.setText("60");
 		Assist_Level_3.setColumns(10);
-		Assist_Level_3.setBounds(382, 146, 86, 20);
+		Assist_Level_3.setBounds(476, 146, 86, 20);
 		contentPane.add(Assist_Level_3);
 		
 		Assist_Level_4 = new JTextField();
 		Assist_Level_4.setText("80");
 		Assist_Level_4.setColumns(10);
-		Assist_Level_4.setBounds(382, 173, 86, 20);
+		Assist_Level_4.setBounds(476, 173, 86, 20);
 		contentPane.add(Assist_Level_4);
 		
 		lblAssistLevel_3 = new JLabel("Assist Level 4");
-		lblAssistLevel_3.setBounds(295, 176, 114, 14);
+		lblAssistLevel_3.setBounds(352, 177, 114, 14);
 		contentPane.add(lblAssistLevel_3);
 		
 		lblAssistLevel_4 = new JLabel("Assist Level 5");
-		lblAssistLevel_4.setBounds(295, 204, 114, 14);
+		lblAssistLevel_4.setBounds(352, 201, 114, 14);
 		contentPane.add(lblAssistLevel_4);
 		
 		Assist_Level_5 = new JTextField();
 		Assist_Level_5.setText("100");
 		Assist_Level_5.setColumns(10);
-		Assist_Level_5.setBounds(382, 201, 86, 20);
+		Assist_Level_5.setBounds(476, 201, 86, 20);
 		contentPane.add(Assist_Level_5);
 		
 		JList list = new JList();
@@ -261,33 +268,33 @@ public class OSEC extends JFrame {
 		contentPane.add(list);
 		
 		JLabel lblCheattime = new JLabel("Cheat-time 1");
-		lblCheattime.setBounds(295, 257, 114, 14);
+		lblCheattime.setBounds(352, 254, 114, 14);
 		contentPane.add(lblCheattime);
 		
 		Cheat_Time_1 = new JTextField();
 		Cheat_Time_1.setText("50");
 		Cheat_Time_1.setColumns(10);
-		Cheat_Time_1.setBounds(382, 254, 86, 20);
+		Cheat_Time_1.setBounds(476, 254, 86, 20);
 		contentPane.add(Cheat_Time_1);
 		
 		JLabel lblCheattime_1 = new JLabel("Cheat-time 2");
-		lblCheattime_1.setBounds(295, 291, 114, 14);
+		lblCheattime_1.setBounds(352, 288, 114, 14);
 		contentPane.add(lblCheattime_1);
 		
 		Cheat_Time_2 = new JTextField();
 		Cheat_Time_2.setText("50");
 		Cheat_Time_2.setColumns(10);
-		Cheat_Time_2.setBounds(382, 288, 86, 20);
+		Cheat_Time_2.setBounds(476, 288, 86, 20);
 		contentPane.add(Cheat_Time_2);
 		
 		JLabel lblCheattime_2 = new JLabel("Cheat-time 3");
-		lblCheattime_2.setBounds(295, 322, 114, 14);
+		lblCheattime_2.setBounds(352, 319, 114, 14);
 		contentPane.add(lblCheattime_2);
 		
 		Cheat_Time_3 = new JTextField();
 		Cheat_Time_3.setText("50");
 		Cheat_Time_3.setColumns(10);
-		Cheat_Time_3.setBounds(382, 319, 86, 20);
+		Cheat_Time_3.setBounds(476, 319, 86, 20);
 		contentPane.add(Cheat_Time_3);
 		
 		lblHttpsopensourceebikefirmwarebitbucketio = new JButton("https://opensourceebikefirmware.bitbucket.io/");
@@ -307,7 +314,7 @@ public class OSEC extends JFrame {
 			}
 		});
 		lblHttpsopensourceebikefirmwarebitbucketio.setForeground(Color.BLUE);
-		lblHttpsopensourceebikefirmwarebitbucketio.setBounds(68, 627, 309, 29);
+		lblHttpsopensourceebikefirmwarebitbucketio.setBounds(122, 627, 309, 29);
 		contentPane.add(lblHttpsopensourceebikefirmwarebitbucketio);
 		
 		lblOpenSourceFirmware = new JLabel("Open Source Firmware for E-Bike Controller");
@@ -344,13 +351,13 @@ public class OSEC extends JFrame {
 		txtUndervoltage.setColumns(10);
 		
 		JLabel lblRampEnd = new JLabel("Ramp end");
-		lblRampEnd.setBounds(295, 353, 67, 14);
+		lblRampEnd.setBounds(352, 350, 67, 14);
 		contentPane.add(lblRampEnd);
 		
 		ramp_end = new JTextField();
 		ramp_end.setText("977");
 		ramp_end.setColumns(10);
-		ramp_end.setBounds(382, 350, 86, 20);
+		ramp_end.setBounds(476, 350, 86, 20);
 		contentPane.add(ramp_end);
 		
 		JLabel lblUndervoltageLimit = new JLabel("Undervoltage limit");
@@ -358,23 +365,23 @@ public class OSEC extends JFrame {
 		contentPane.add(lblUndervoltageLimit);
 		
 		JLabel lblPfactor = new JLabel("Gain P");
-		lblPfactor.setBounds(295, 384, 67, 14);
+		lblPfactor.setBounds(352, 381, 67, 14);
 		contentPane.add(lblPfactor);
 		
 		p_factor = new JTextField();
 		p_factor.setText("0.5");
 		p_factor.setColumns(10);
-		p_factor.setBounds(382, 381, 86, 20);
+		p_factor.setBounds(476, 381, 86, 20);
 		contentPane.add(p_factor);
 		
 		JLabel lblIfactor = new JLabel("Gain I");
-		lblIfactor.setBounds(295, 415, 67, 14);
+		lblIfactor.setBounds(352, 412, 67, 14);
 		contentPane.add(lblIfactor);
 		
 		i_factor = new JTextField();
 		i_factor.setText("0.2");
 		i_factor.setColumns(10);
-		i_factor.setBounds(382, 412, 86, 20);
+		i_factor.setBounds(476, 412, 86, 20);
 		contentPane.add(i_factor);
 		
 		JLabel lblGearRatio = new JLabel("Gear Ratio");
@@ -394,13 +401,13 @@ public class OSEC extends JFrame {
 		
 		JRadioButton rdbtnThrottlePas = new JRadioButton("Throttle and PAS");
 		Ridingmode.add(rdbtnThrottlePas);
-		rdbtnThrottlePas.setBounds(136, 530, 149, 23);
+		rdbtnThrottlePas.setBounds(136, 530, 131, 23);
 		contentPane.add(rdbtnThrottlePas);
 		
 		JRadioButton rdbtnTorqueSensor = new JRadioButton("Torquesensor");
 		rdbtnTorqueSensor.setSelected(true);
 		Ridingmode.add(rdbtnTorqueSensor);
-		rdbtnTorqueSensor.setBounds(136, 556, 144, 23);
+		rdbtnTorqueSensor.setBounds(136, 556, 131, 23);
 		contentPane.add(rdbtnTorqueSensor);
 		
 		JRadioButton rdbtnTorquesimulation = new JRadioButton("Torque-Simulation");
@@ -429,6 +436,45 @@ public class OSEC extends JFrame {
 		buttonGroup.add(rdbtnKingmeterJlcd);
 		rdbtnKingmeterJlcd.setBounds(5, 532, 131, 23);
 		contentPane.add(rdbtnKingmeterJlcd);
+		
+		JRadioButton rdbtnKtlcd = new JRadioButton("KT-LCD3");
+		buttonGroup.add(rdbtnKtlcd);
+		rdbtnKtlcd.setBounds(5, 556, 131, 23);
+		contentPane.add(rdbtnKtlcd);
+		
+		JLabel lblMotorSpeed = new JLabel("Motor Speed");
+		lblMotorSpeed.setFont(new Font("Tahoma", Font.BOLD, 12));
+		lblMotorSpeed.setBounds(277, 487, 86, 14);
+		contentPane.add(lblMotorSpeed);
+		
+		JRadioButton rdbtnNormal = new JRadioButton("Normal");
+		rdbtnNormal.setSelected(true);
+		MotorSpeed.add(rdbtnNormal);
+		rdbtnNormal.setBounds(277, 505, 101, 23);
+		contentPane.add(rdbtnNormal);
+		
+		JRadioButton rdbtnHigh = new JRadioButton("High");
+		MotorSpeed.add(rdbtnHigh);
+		rdbtnHigh.setBounds(277, 529, 101, 23);
+		contentPane.add(rdbtnHigh);
+		
+		lblSpeedSensor = new JLabel("Speed sensor");
+		lblSpeedSensor.setFont(new Font("Tahoma", Font.BOLD, 12));
+		lblSpeedSensor.setBounds(277, 556, 86, 14);
+		contentPane.add(lblSpeedSensor);
+		
+		JRadioButton rdbtnInternal = new JRadioButton("Internal");
+		rdbtnInternal.setSelected(true);
+		Speedsensor.add(rdbtnInternal);
+		rdbtnInternal.setBounds(277, 577, 101, 23);
+		contentPane.add(rdbtnInternal);
+		
+		JRadioButton rdbtnExternal = new JRadioButton("External");
+		Speedsensor.add(rdbtnExternal);
+		rdbtnExternal.setBounds(277, 599, 101, 23);
+		contentPane.add(rdbtnExternal);
+		
+		
 		
 		JButton btnWriteoptionsbyte = new JButton("Write Option Bytes");
 		btnWriteoptionsbyte.setFont(new Font("Tahoma", Font.BOLD, 12));
@@ -461,7 +507,7 @@ public class OSEC extends JFrame {
 				}
 			}
 		});
-		btnWriteoptionsbyte.setBounds(295, 541, 167, 51);
+		btnWriteoptionsbyte.setBounds(382, 541, 167, 51);
 		contentPane.add(btnWriteoptionsbyte);
 		
 		btnWriteConfiguration = new JButton("Write Configuration");
@@ -549,6 +595,21 @@ public class OSEC extends JFrame {
 			            pWriter.println(text_to_save); 		                
 		    		}
 		    		
+		    		if (rdbtnHigh.isSelected()){ 
+			            text_to_save = "#define PWM_CYCLES_SECOND 20833L";
+			            pWriter.println(text_to_save); 		                
+		    		}
+		    		
+		    		if (rdbtnNormal.isSelected()){ 
+			            text_to_save = "#define PWM_CYCLES_SECOND 15625L";
+			            pWriter.println(text_to_save); 		                
+		    		}
+		    		
+		    		if (rdbtnKtlcd.isSelected()){ 
+			            text_to_save = "#define DISPLAY_TYPE_KT_LCD3";
+			            pWriter.println(text_to_save); 		                
+		    		}
+		    		
 		    		if (rdbtnKingmeterJlcd.isSelected()){ 
 			            text_to_save = "#define DISPLAY_TYPE_KINGMETER_618U (1<<4) // King-Meter 618U protocol (KM5s, EBS-LCD2, J-LCD, SW-LCD)";
 			            pWriter.println(text_to_save); 		
@@ -556,6 +617,16 @@ public class OSEC extends JFrame {
 			            pWriter.println(text_to_save);
 			            text_to_save = "#define DISPLAY_TYPE DISPLAY_TYPE_KINGMETER  // Set your display type here. CHANGES ONLY HERE!";
 			            pWriter.println(text_to_save);
+		    		}
+		    		
+		    		if (rdbtnInternal.isSelected()){ 
+			            text_to_save = "#define SPEEDSENSOR_INTERNAL";
+			            pWriter.println(text_to_save); 		                
+		    		}
+		    		
+		    		if (rdbtnExternal.isSelected()){ 
+			            text_to_save = "#define SPEEDSENSOR_EXTERNAL";
+			            pWriter.println(text_to_save); 		                
 		    		}
 		            pWriter.println("\r\n#endif /* CONFIG_H_ */"); 
 		            
@@ -578,11 +649,10 @@ public class OSEC extends JFrame {
 		});
 		btnWriteConfiguration.setFont(new Font("Tahoma", Font.BOLD, 12));
 		btnWriteConfiguration.setForeground(Color.BLUE);
-		btnWriteConfiguration.setBounds(295, 471, 167, 58);
+		btnWriteConfiguration.setBounds(382, 471, 167, 58);
 		contentPane.add(btnWriteConfiguration);
 		
 
-		
 		
 	}
 }
