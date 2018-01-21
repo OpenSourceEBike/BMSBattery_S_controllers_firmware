@@ -76,6 +76,7 @@ public class OSEC extends JFrame {
 	private JLabel lblSpeedSensor;
 	private JRadioButton rdbtnInternal;
 	private JRadioButton rdbtnExternal;
+	private JTextField CellsNumber;
 	
 	
 
@@ -393,6 +394,16 @@ public class OSEC extends JFrame {
 		GearRatio.setColumns(10);
 		GearRatio.setBounds(150, 443, 86, 20);
 		contentPane.add(GearRatio);
+		
+		JLabel lblNumberSerialCells = new JLabel("Serial cells");
+		lblNumberSerialCells.setBounds(352, 440, 101, 14);
+		contentPane.add(lblNumberSerialCells);
+		
+		CellsNumber = new JTextField();
+		CellsNumber.setText("10");
+		CellsNumber.setColumns(10);
+		CellsNumber.setBounds(476, 440, 86, 20);
+		contentPane.add(CellsNumber);
 				
 		JRadioButton rdbtnThrottle = new JRadioButton("Throttle");
 		Ridingmode.add(rdbtnThrottle);
@@ -576,7 +587,9 @@ public class OSEC extends JFrame {
 		            text_to_save = "#define I_FACTOR " + i_factor.getText();
 		            pWriter.println(text_to_save); 
 		            text_to_save = "#define GEAR_RATIO " + GearRatio.getText()+"L";
-		            pWriter.println(text_to_save); 		            
+		            pWriter.println(text_to_save); 	
+		            text_to_save = "#define BATTERY_LI_ION_CELLS_NUMBER " + CellsNumber.getText();
+		            pWriter.println(text_to_save); 	
 		            
 		    		if (rdbtnTorqueSensor.isSelected()){ 
 			            text_to_save = "#define TORQUESENSOR";
@@ -651,6 +664,8 @@ public class OSEC extends JFrame {
 		btnWriteConfiguration.setForeground(Color.BLUE);
 		btnWriteConfiguration.setBounds(382, 471, 167, 58);
 		contentPane.add(btnWriteConfiguration);
+		
+
 		
 
 		
