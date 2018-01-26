@@ -30,6 +30,7 @@ Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301  USA
 #include "adc.h"
 #include "brake.h"
 #include "interrupts.h"
+#include "update_setpoint.h"
 
 display_view_type display_view;
 
@@ -44,7 +45,7 @@ uint8_t battery_percent_fromcapacity=11; //hier nur als Konstante um Batterie no
 uint8_t ui8_tx_buffer[12];
 uint8_t ui8_j;
 uint8_t ui8_crc;
-uint16_t ui16_wheel_period_ms =1000;
+uint16_t ui16_wheel_period_ms =4500;
 uint16_t ui16_battery_volts= 36;
 uint8_t ui8_battery_soc = 12;
 uint8_t ui16_error;
@@ -176,7 +177,22 @@ void display_update()
   //if (ebike_app_cruise_control_is_set ()) { ui8_moving_indication |= (1 << 3); }
   //if (throttle_is_set ()) { ui8_moving_indication |= (1 << 1); }
   //if (pas_is_set ()) { ui8_moving_indication |= (1 << 4); }
-  ui16_wheel_period_ms = ui16_SPEED>>4;  //only for PWM frequency 15625 ~ 16000
+
+
+#ifdef SPEEDSENSOR_EXTERNAL
+  if(ui16_SPEED>65000){ui16_wheel_period_ms=4500;}
+  else{
+  ui16_wheel_period_ms = (uint16_t) ((float)ui16_SPEED/((float)PWM_CYCLES_SECOND/1000.0)); //must be /1000 devided in /125/8 for better resolution
+  }
+#endif
+
+#ifdef SPEEDSENSOR_INTERNAL
+  if(ui32_erps_filtered==0){ui16_wheel_period_ms=4500;}
+    else{
+  ui16_wheel_period_ms=(uint16_t)(1000.0*(float)GEAR_RATIO/(float)ui32_erps_filtered);
+    }
+#endif
+
   // calc battery pack state of charge (SOC)
   ui16_battery_volts = ((uint16_t) ui8_adc_read_battery_voltage()) * ((uint16_t) ADC_BATTERY_VOLTAGE_K);
   if (ui16_battery_volts > ((uint16_t) BATTERY_PACK_VOLTS_80)) { ui8_battery_soc = 16; } // 4 bars | full
@@ -209,7 +225,7 @@ ui8_tx_buffer [0] = 65;
   // each unit of B8 = 0.25A
 
 
-  ui8_tx_buffer [8] = (uint8_t) ((ui16_BatteryCurrent+current_cal_b)>>1);
+  ui8_tx_buffer [8] =  (uint8_t)(((ui16_BatteryCurrent+current_cal_b+1)<<2)/current_cal_a);
   // B9: motor temperature
   ui8_tx_buffer [9] = 0;
   // B10 and B11: 0

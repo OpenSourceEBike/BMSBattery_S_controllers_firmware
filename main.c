@@ -58,7 +58,7 @@ uint8_t ui8_cheat_counter = 0; 			//counter for cheat procedure
 
 uint8_t ui8_adc_read_throttle_busy = 0;
 uint16_t ui16_SPEED_Counter = 0; 	//time tics for speed measurement
-uint16_t ui16_SPEED = 56001; 		//speed in timetics
+uint16_t ui16_SPEED = 65500; 		//speed in timetics
 uint16_t ui16_PAS_Counter = 0; 		//time tics for cadence measurement
 uint16_t ui16_PAS = 32000;		//cadence in timetics
 uint8_t ui8_PAS_Flag = 0; 		//flag for PAS interrupt
@@ -202,7 +202,7 @@ int main (void)
     }
     if (ui16_SPEED_Counter>64000L)
         {
-    	ui16_SPEED=64000L; 	//Set Display to 0 km/h
+    	ui16_SPEED=65500L; 	//Set Display to 0 km/h
 
         }
 //in case of THROTTLEANDPAS or THORQUE_SIMULATION, process the PAS routine

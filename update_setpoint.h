@@ -19,6 +19,7 @@ uint16_t update_setpoint (uint16_t speed, uint16_t PAS, uint16_t sumtorque, uint
 uint32_t PI_control (uint16_t ist, uint16_t soll);
 uint32_t CheckSpeed (uint16_t current_target, uint16_t speed);
 extern uint32_t ui32_SPEED_km_h;
+extern uint32_t ui32_erps_filtered;
 
 
 #endif /* _SPEED_H */
