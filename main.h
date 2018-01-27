@@ -19,9 +19,6 @@
 
 
 #define SETPOINT_MAX_VALUE 255		//maximum value for setpoint, taken from map function
-
-#define NUMBER_OF_PAS_MAGS 16 //16 for sensor from BMSBattery, 32 for Sempu-Sensor
-
 #define ADC_MOTOR_TOTAL_CURRENT_ZERO_AMPS 81 // 1.59V; 325 (10bits) = 81 (8bits)
 #define ADC_MOTOR_TOTAL_CURRENT_MAX 20 // 20 (8bits) ~ 2 Amps
 #define ADC_MOTOR_TOTAL_CURRENT_MAX_POSITIVE 90 // +2A
@@ -90,6 +87,7 @@ extern uint8_t ui8_adc_read_throttle_busy;
 extern uint16_t ui16_SPEED_Counter; 	//Counter for bike speed
 extern uint16_t ui16_SPEED; 		//Speed duration of one wheel revolution (tics * 64us)
 extern uint16_t ui16_PAS_Counter;	//Counter for cadence
+extern uint16_t ui16_PAS_High_Counter;
 extern uint8_t ui8_PAS_Flag;		//Flag for PAS Interrupt detected
 extern uint8_t ui8_SPEED_Flag;		//Flag for PAS Interrupt detected
 extern uint8_t ui8_slowloop_flag;	//Flag for slow loop timing

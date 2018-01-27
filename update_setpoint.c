@@ -103,7 +103,7 @@ uint16_t update_setpoint (uint16_t speed, uint16_t PAS, uint16_t sumtorque, uint
             ui32_setpoint= PI_control(ui16_BatteryCurrent, -1*current_cal_b);//Curret target = 0 A, this is to keep the integral part of the PI-control up to date
                   if (ui32_setpoint<30){ui32_setpoint=0;}
                   if (ui32_setpoint>255){ui32_setpoint=255;}
-      printf("you are not pedaling!\r\n");
+     // printf("you are not pedaling!\r\n");
   }
 #endif
 
@@ -144,7 +144,7 @@ uint16_t update_setpoint (uint16_t speed, uint16_t PAS, uint16_t sumtorque, uint
   if (ui32_setpoint<25)ui32_setpoint=0;
   if (ui32_setpoint>255)ui32_setpoint=255;
 
-  //printf("%d, %d, %d, %d\r\n", ui16_motor_speed_erps, ui8_regen_throttle, ui16_BatteryCurrent, (uint16_t) uint32_current_target);
+  //printf("%d, %d, %d, %d\r\n", ui16_motor_speed_erps, ui8_BatteryVoltage, ui16_BatteryCurrent, (uint16_t) uint32_current_target);
   //printf("setpoint %lu, Voltage %d, a %d, b %d, DCmax %d, erps %d\n", ui32_setpoint, ui8_BatteryVoltage, ui16_a, ui16_b, ui16_dutycycle_max, ui16_motor_speed_erps);
 #endif
 
@@ -172,7 +172,7 @@ uint16_t update_setpoint (uint16_t speed, uint16_t PAS, uint16_t sumtorque, uint
     if (ui32_setpoint<30)ui32_setpoint=0;
     if (ui32_setpoint>255)ui32_setpoint=255;
 
-    printf("%lu, %d, %d, %d\r\n", ui32_setpoint, PAS>>3, ui16_BatteryCurrent, (uint16_t) uint32_current_target);
+    //printf("%lu, %d, %d, %d\r\n", ui32_setpoint, PAS>>3, ui16_BatteryCurrent, (uint16_t) uint32_current_target);
 #endif
 
  if (!uint_PWM_Enable) //enable PWM if disabled

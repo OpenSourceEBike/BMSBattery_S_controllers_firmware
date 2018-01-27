@@ -60,6 +60,8 @@ uint8_t ui8_adc_read_throttle_busy = 0;
 uint16_t ui16_SPEED_Counter = 0; 	//time tics for speed measurement
 uint16_t ui16_SPEED = 65500; 		//speed in timetics
 uint16_t ui16_PAS_Counter = 0; 		//time tics for cadence measurement
+uint16_t ui16_PAS_High_Counter = 1;	//time tics for direction detection
+uint16_t ui16_PAS_High=1;		//number of High readings on PAS
 uint16_t ui16_PAS = 32000;		//cadence in timetics
 uint8_t ui8_PAS_Flag = 0; 		//flag for PAS interrupt
 uint8_t ui8_SPEED_Flag = 0; 		//flag for SPEED interrupt
@@ -223,8 +225,26 @@ int main (void)
     if (ui8_PAS_Flag == 1)
     {
       ui16_PAS=ui16_PAS_Counter; 		//save recent cadence
-      //printf("PAStic %d\n", ui16_PAS_Counter);
-      ui16_PAS_Counter=0;			//reset PAS Counter
+      ui16_PAS_High=ui16_PAS_High_Counter;
+      //ui16_PAS_High= (uint16_t)(((float)ui16_PAS/(float)ui16_PAS_High)*1000.0);
+      //printf("%d,%d,%d\r\n", (uint16_t)(((float)ui16_PAS/(float)ui16_PAS_High)*1000.0),ui16_PAS_Counter,ui16_PAS_High);
+#ifdef PAS_DIRECTION_RIGHT
+      if((float)ui16_PAS/(float)ui16_PAS_High<PAS_THRESHOLD || ui16_PAS_Counter >timeout<<2){
+	  ui16_PAS_Counter=timeout+1;
+	  ui16_PAS_High_Counter=(uint16_t)(((float)ui16_PAS_Counter/(PAS_THRESHOLD-0.1)));//reset PAS Counter
+	  }
+#endif
+#ifdef PAS_DIRECTION_LEFT
+      if((float)ui16_PAS/(float)ui16_PAS_High>PAS_THRESHOLD || ui16_PAS_Counter >timeout<<2){
+     	  ui16_PAS_Counter=timeout+1;
+     	  ui16_PAS_High_Counter=(uint16_t)(((float)ui16_PAS_Counter/(PAS_THRESHOLD+0.1)));//reset PAS Counter
+     	  }
+#endif
+      else{
+	ui16_PAS_Counter=1;
+	ui16_PAS_High_Counter=1;//reset PAS Counter
+      }
+
 
       ui8_PAS_Flag =0; 			//reset interrupt flag
 

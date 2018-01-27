@@ -8,7 +8,7 @@
 #ifndef CONFIG_H_
 #define CONFIG_H_
 
-#define NUMBER_OF_PAS_MAGS 16
+#define NUMBER_OF_PAS_MAGS 8
 #define limit 25
 #define timeout 3125
 #define wheel_circumference 2000L
@@ -34,9 +34,11 @@
 #define I_FACTOR 0.2
 #define GEAR_RATIO 116L
 #define BATTERY_LI_ION_CELLS_NUMBER 10
-#define THROTTLE
+#define TORQUE_SIMULATION
 #define PWM_CYCLES_SECOND 15625L
 #define DISPLAY_TYPE_KT_LCD3
 #define SPEEDSENSOR_INTERNAL
+#define PAS_THRESHOLD 1.7
+#define PAS_DIRECTION_RIGHT
 
 #endif /* CONFIG_H_ */
