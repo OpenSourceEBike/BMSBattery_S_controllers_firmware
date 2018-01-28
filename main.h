@@ -94,6 +94,7 @@ extern uint8_t ui8_slowloop_flag;	//Flag for slow loop timing
 extern uint8_t ui8_assistlevel_global;
 extern uint8_t ui8_msg_received;
 extern uint8_t ui8_cheat_state;
+extern uint8_t PAS_dir;			//flag for pasdirection
 
 
 #endif
