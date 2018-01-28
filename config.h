@@ -40,5 +40,6 @@
 #define SPEEDSENSOR_INTERNAL
 #define PAS_THRESHOLD 1.7
 #define PAS_DIRECTION 0
+#define DIAGNOSTICS
 
 #endif /* CONFIG_H_ */

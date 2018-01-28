@@ -370,7 +370,9 @@ if(ui8_cheat_state==3) //second step, make sure the brake is hold according to d
 	  ui8_veryslowloop_counter=0;
       //getchar1 ();
 
-
+#ifdef DIAGNOSTICS
+	  printf("%d, %d, %d\r\n", ui16_setpoint, (uint16_t)(((float)ui16_PAS/(float)ui16_PAS_High)*1000.0), ui16_BatteryCurrent);
+#endif
 	  //printf("erps %d, motorstate %d, cyclecountertotal %d\r\n", ui16_motor_speed_erps, ui8_motor_state, ui16_PWM_cycles_counter_total);
 
       //printf("cheatstate, %d, km/h %lu, Voltage, %d, setpoint %d, erps %d, current %d, correction_value, %d\n", ui8_cheat_state, ui32_SPEED_km_h, ui8_BatteryVoltage, ui16_setpoint, ui16_motor_speed_erps, ui16_BatteryCurrent, ui8_position_correction_value);

@@ -243,9 +243,9 @@ ui8_tx_buffer [0] = 65;
   // send the package over UART
   for (ui8_j = 0; ui8_j <= 11; ui8_j++)
   {
-
+#ifndef DIAGNOSTICS
     putchar (ui8_tx_buffer [ui8_j]);
-
+#endif
   }
 }
 
