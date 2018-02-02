@@ -64,6 +64,8 @@ uint16_t update_setpoint (uint16_t speed, uint16_t PAS, uint16_t sumtorque, uint
   ui32_SPEED_km_h=(wheel_circumference*PWM_CYCLES_SECOND*36L)/(10L*(uint32_t)speed);			//calculate speed in m/h conversion fr	om sec to hour --> *3600, conversion from mm to km --> /1000000, tic frequency 15625 Hz
   if(ui16_SPEED_Counter>40000){ui32_SPEED_km_h=0;}     //if wheel isn't turning, reset speed
 
+
+#ifdef REGEN
   //check if regen is wanted
   if(ui8_regen_throttle>5){
   float_temp=(float)ui8_regen_throttle*(float)(REGEN_CURRENT_MAX_VALUE+current_cal_b)/255.0-(float)current_cal_b;
@@ -72,6 +74,7 @@ uint16_t update_setpoint (uint16_t speed, uint16_t PAS, uint16_t sumtorque, uint
   if (ui32_setpoint>255)ui32_setpoint=255;
   //printf("%lu, %d, %d, %d\r\n", ui32_setpoint, ui8_regen_throttle, ui16_BatteryCurrent, (uint16_t) float_temp);
   }
+#endif
   //check for undervoltage
   else if(ui8_BatteryVoltage<BATTERY_VOLTAGE_MIN_VALUE){
 
