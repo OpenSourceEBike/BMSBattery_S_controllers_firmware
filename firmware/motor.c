@@ -788,16 +788,11 @@ void TIM1_UPD_OVF_TRG_BRK_IRQHandler(void) __interrupt(TIM1_UPD_OVF_TRG_BRK_IRQH
       if (ui8_pas2_regen_count > 0)
       {
 	// we are still brake but reducing the rate, let's reduce one step the regen current
-	ui8_pas2_regen_count--;
-	ui8_pas2_regen_current -= ADC_MOTOR_REGEN_CURRENT_MAX_1_5;
-	ui8_adc_target_motor_regen_current_max = ui8_motor_total_current_offset - ui8_pas2_regen_current; // update motor regen_current_max
-
-	if (ui8_pas2_regen_count == 0)
-	{
-	  // we are stop braking
-	  ui8_motor_controller_state &= ~MOTOR_CONTROLLER_STATE_BRAKE_LIKE_COAST_BRAKES; // disable brake like coast brakes state, this will make throttle to setup the new value for target PWM duty_cycle
-	  ui8_adc_target_motor_regen_current_max = ui8_motor_total_current_offset - ((uint8_t) ADC_MOTOR_REGEN_CURRENT_MIN); // disable ebrake/regen
-	}
+	ui8_pas2_regen_count = 0;
+	ui8_pas2_regen_current = 0;
+	ui8_duty_cycle_target = ui8_duty_cycle;
+	ui8_motor_controller_state &= ~MOTOR_CONTROLLER_STATE_BRAKE_LIKE_COAST_BRAKES; // disable brake like coast brakes state, this will make throttle to setup the new value for target PWM duty_cycle
+	ui8_adc_target_motor_regen_current_max = ui8_motor_total_current_offset - ((uint8_t) ADC_MOTOR_REGEN_CURRENT_MIN); // disable ebrake/regen
       }
     }
   }

@@ -724,7 +724,8 @@ void ebike_throotle_type_torque_sensor (void)
     break;
   }
 
-  f_temp = (float) (((float) (ui8_throttle_value_filtered >> 1)) * f_temp); // here, we use (assist level / 2)
+//  f_temp = (float) (((float) (ui8_throttle_value_filtered >> 1)) * f_temp); // here, we use (assist level / 2)
+  f_temp = (float) (((float) (ui8_throttle_value_filtered)) * f_temp * 2.5); // here, we use (assist level / 2)
 
 #if defined (EBIKE_THROTTLE_TYPE_TORQUE_SENSOR_HUMAN_POWER)
   // calc humam power on the crank using as input the pedal torque sensor value and pedal cadence
