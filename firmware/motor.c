@@ -368,7 +368,7 @@ void motor_controller (void)
   do_motor_state_machine ();
   calc_motor_current_filtered ();
   do_battery_voltage_protection ();
-  do_motor_controller_mode ();
+//  do_motor_controller_mode ();
 }
 
 // runs every 64us (PWM frequency)
@@ -831,7 +831,7 @@ void motor_init (void)
   ui16_adc_motor_current_accumulated_10b = ui16_motor_total_current_offset_10b << 3;
 
   motor_set_current_max (ADC_MOTOR_CURRENT_MAX);
-  motor_set_regen_current_max (4);
+  motor_set_regen_current_max (ADC_MOTOR_REGEN_CURRENT_MAX);
   motor_set_pwm_duty_cycle_ramp_up_inverse_step (PWM_DUTY_CYCLE_RAMP_UP_INVERSE_STEP); // each step = 64us
   motor_set_pwm_duty_cycle_ramp_down_inverse_step (PWM_DUTY_CYCLE_RAMP_DOWN_INVERSE_STEP); // each step = 64us
 }
@@ -977,25 +977,8 @@ void do_battery_voltage_protection (void)
 
 void do_motor_controller_mode (void)
 {
-  uint8_t ui8_pwm_duty_cycle_speed_controller;
-  uint8_t ui8_pwm_duty_cycle_current_controller;
-  uint8_t ui8_pwm_duty_cycle;
-
-  ui8_pwm_duty_cycle_speed_controller = motor_speed_controller ();
-
-#if defined (EBIKE_THROTTLE_TYPE_THROTTLE_PAS_PWM_DUTY_CYCLE)
-  ui8_pwm_duty_cycle = ui8_min (ui8_pwm_duty_cycle_duty_cycle_controller, ui8_pwm_duty_cycle_speed_controller);
-
-#elif defined (EBIKE_THROTTLE_TYPE_THROTTLE_PAS_CURRENT_SPEED)
-  ui8_pwm_duty_cycle_current_controller = motor_current_controller ();
-  ui8_pwm_duty_cycle = ui8_min (ui8_pwm_duty_cycle_current_controller, ui8_pwm_duty_cycle_speed_controller);
-#endif
-
-  // set PWM duty_cycle target value only if we are not braking
-  if (!motor_controller_state_is_set (MOTOR_CONTROLLER_STATE_BRAKE))
-  {
-    motor_set_pwm_duty_cycle_target (ui8_pwm_duty_cycle);
-  }
+  // if MOTOR_OVER_SPEED_ERPS, then limit for this value and not user defined ui16_target_erps
+//  if (ui16_target_erps > MOTOR_OVER_SPEED_ERPS) { ui16_target_erps = MOTOR_OVER_SPEED_ERPS; }
 }
 
 uint8_t motor_get_ADC_battery_voltage_filtered (void)

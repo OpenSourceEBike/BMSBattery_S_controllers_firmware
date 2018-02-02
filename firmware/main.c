@@ -89,6 +89,7 @@ int main (void)
   motor_init ();
   pas_init ();
   wheel_speed_sensor_init ();
+  ebike_app_init ();
   enableInterrupts ();
 
   while (1)

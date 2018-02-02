@@ -11,8 +11,21 @@
 
 #include "main.h"
 
+typedef struct pi_controller_state
+{
+  uint8_t ui8_control_value;
+  uint8_t ui8_target_value;
+  int16_t ui16_output_value;
+  uint8_t ui8_kp_dividend;
+  uint8_t ui8_kp_divisor;
+  uint8_t ui8_ki_dividend;
+  uint8_t ui8_ki_divisor;
+  int16_t i16_i_term;
+} struct_pi_controller_state;
+
 int32_t map (int32_t x, int32_t in_min, int32_t in_max, int32_t out_min, int32_t out_max);
 uint8_t ui8_max (uint8_t value_a, uint8_t value_b);
 uint8_t ui8_min (uint8_t value_a, uint8_t value_b);
+void pi_controller (struct_pi_controller_state *pi_controller_state);
 
 #endif /* _UTILS_H */

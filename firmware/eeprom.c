@@ -45,7 +45,7 @@ void eeprom_init (void)
 
 void eeprom_read_values_to_variables (void)
 {
-  struc_lcd_configuration_variables *p_lcd_configuration_variables = ebike_app_get_lcd_configuration_variables ();
+  struct_lcd_configuration_variables *p_lcd_configuration_variables = ebike_app_get_lcd_configuration_variables ();
 
   p_lcd_configuration_variables->ui8_assist_level = FLASH_ReadByte (ADDRESS_ASSIST_LEVEL);
   p_lcd_configuration_variables->ui8_motor_characteristic = FLASH_ReadByte (ADDRESS_MOTOR_CHARACTARISTIC);
@@ -57,7 +57,7 @@ void eeprom_read_values_to_variables (void)
 
 void eeprom_write_if_values_changed (void)
 {
-  struc_lcd_configuration_variables *p_lcd_configuration_variables = ebike_app_get_lcd_configuration_variables ();
+  struct_lcd_configuration_variables *p_lcd_configuration_variables = ebike_app_get_lcd_configuration_variables ();
   static uint8_t array_values [7];
 
   // see if the values differ from the ones on EEPROM and if so, write all of them to EEPROM
