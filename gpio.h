@@ -104,6 +104,9 @@
 #define THROTTLE__PIN             GPIO_PIN_4
 #define THROTTLE__PORT            GPIOB
 
+#define REGEN_THROTTLE__PIN       GPIO_PIN_7
+#define REGEN_THROTTLE__PORT      GPIOB
+
 #define PAS__PIN                  GPIO_PIN_0
 #define PAS__PORT                 GPIOD
 

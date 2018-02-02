@@ -141,7 +141,7 @@ uint16_t update_setpoint (uint16_t speed, uint16_t PAS, uint16_t sumtorque, uint
 #endif
 
   ui32_setpoint= PI_control(ui16_BatteryCurrent, (uint16_t) uint32_current_target);
-  if (ui32_setpoint<25)ui32_setpoint=0;
+  if (ui32_setpoint<10)ui32_setpoint=0;
   if (ui32_setpoint>255)ui32_setpoint=255;
 
   //printf("%d, %d, %d, %d\r\n", ui16_motor_speed_erps, ui8_BatteryVoltage, ui16_BatteryCurrent, (uint16_t) uint32_current_target);
@@ -212,11 +212,11 @@ uint32_t CheckSpeed (uint16_t current_target, uint16_t erps)
 
 	if (erps>ui16_erps_limit_higher){ //if you are riding much too fast, stop motor immediately
 	    current_target=-1*current_cal_b;
-	   // printf("Speed much too high! %d, %d\r\n", erps,((limit+2)*GEAR_RATIO));
+	   printf("Speed much too high! %d, %d\r\n", erps,((limit+2)*GEAR_RATIO));
 	}
 	else {
 	    current_target=((current_target+current_cal_b)*(ui16_erps_limit_higher-erps))/(ui16_erps_limit_higher-ui16_erps_limit_lower)-current_cal_b; 	//ramp down the motor power within 2 km/h, if you are riding too fast
-	    //printf("Speed too high!\r\n");
+	   printf("Speed too high!\r\n");
 	}
   }
     return ((uint32_t)current_target);
