@@ -64,10 +64,16 @@ uint16_t update_setpoint (uint16_t speed, uint16_t PAS, uint16_t sumtorque, uint
   ui32_SPEED_km_h=(wheel_circumference*PWM_CYCLES_SECOND*36L)/(10L*(uint32_t)speed);			//calculate speed in m/h conversion fr	om sec to hour --> *3600, conversion from mm to km --> /1000000, tic frequency 15625 Hz
   if(ui16_SPEED_Counter>40000){ui32_SPEED_km_h=0;}     //if wheel isn't turning, reset speed
 
-
+  //check if rider is braking
+  if (brake_is_set()){
+            ui32_setpoint= PI_control(ui16_BatteryCurrent, -1*current_cal_b);//Curret target = 0 A, this is to keep the integral part of the PI-control up to date
+                  if (ui32_setpoint<30){ui32_setpoint=0;}
+                  if (ui32_setpoint>255){ui32_setpoint=255;}
+      printf("you are braking!\r\n");
+  }
 #ifdef REGEN
   //check if regen is wanted
-  if(ui8_regen_throttle>5){
+  else if(ui8_regen_throttle>5){
   float_temp=(float)ui8_regen_throttle*(float)(REGEN_CURRENT_MAX_VALUE+current_cal_b)/255.0-(float)current_cal_b;
   ui32_setpoint= PI_control(ui16_BatteryCurrent, (uint16_t) float_temp);
   if (ui32_setpoint<3)ui32_setpoint=0;
@@ -84,13 +90,7 @@ uint16_t update_setpoint (uint16_t speed, uint16_t PAS, uint16_t sumtorque, uint
       printf("Low voltage! %d\n",ui8_BatteryVoltage);
     }
 
-  //check if rider is braking
-  else if (brake_is_set()){
-            ui32_setpoint= PI_control(ui16_BatteryCurrent, -1*current_cal_b);//Curret target = 0 A, this is to keep the integral part of the PI-control up to date
-                  if (ui32_setpoint<30){ui32_setpoint=0;}
-                  if (ui32_setpoint>255){ui32_setpoint=255;}
-      printf("you are braking!\r\n");
-  }
+
 
   //limit max erps
   else if (ui32_erps_filtered>ui16_erps_max){
