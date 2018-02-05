@@ -69,7 +69,6 @@ void motor_controller_set_state (uint8_t state);
 void motor_controller_reset_state (uint8_t state);
 uint8_t motor_controller_get_state (void);
 uint8_t motor_controller_state_is_set (uint8_t state);
-uint8_t motor_get_ADC_battery_voltage_filtered (void);
 void motor_controller_set_target_speed_erps (uint16_t ui16_erps);
 void motor_controller_set_speed_erps_max (uint16_t ui16_erps);
 uint16_t motor_controller_get_target_speed_erps_max (void);

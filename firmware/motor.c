@@ -322,9 +322,6 @@ uint16_t ui16_target_erps = 0;
 volatile uint16_t ui16_target_erps_max = MOTOR_OVER_SPEED_ERPS;
 uint16_t ui16_target_current_10b = 0;
 
-uint16_t ui16_adc_battery_voltage_accumulated = (uint16_t) ADC_BATTERY_VOLTAGE_MED;
-uint8_t ui8_adc_battery_voltage_filtered;
-
 uint16_t ui16_adc_motor_current_accumulated_10b;
 uint16_t ui16_adc_motor_current_filtered_10b;
 
@@ -356,19 +353,14 @@ uint16_t ui16_wheel_speed_sensor_counter;
 uint8_t ui8_pwm_duty_cycle_duty_cycle_controller;
 
 // functions prototypes
-void do_battery_voltage_protection (void);
 uint8_t motor_current_controller (void);
-uint8_t motor_speed_controller (void);
 void do_motor_state_machine (void);
 void calc_motor_current_filtered (void);
-void do_motor_controller_mode (void);
 
 void motor_controller (void)
 {
   do_motor_state_machine ();
   calc_motor_current_filtered ();
-  do_battery_voltage_protection ();
-//  do_motor_controller_mode ();
 }
 
 // runs every 64us (PWM frequency)
@@ -899,38 +891,6 @@ void motor_controller_set_target_current_10b (uint16_t ui16_current)
 }
 
 // call every 100ms
-uint8_t motor_speed_controller (void)
-{
-  int16_t i16_error;
-  int16_t i16_output;
-  int16_t i16_motor_speed_erps;
-
-  if (ui16_target_erps < 5)
-  {
-    return 0;
-  }
-
-  i16_motor_speed_erps = (int16_t) ui16_motor_get_motor_speed_erps ();
-
-  // if MOTOR_OVER_SPEED_ERPS, then limit for this value and not user defined ui16_target_erps
-  if (ui16_target_erps > MOTOR_OVER_SPEED_ERPS) { i16_error = MOTOR_OVER_SPEED_ERPS - i16_motor_speed_erps; }
-  else { i16_error = ui16_target_erps - i16_motor_speed_erps; }
-
-  i16_output = i16_error * MOTOR_SPEED_CONTROLLER_KP;
-
-  // limit max output value
-  if (i16_output > MOTOR_SPEED_CONTROLLER_OUTPUT_MAX) i16_output = MOTOR_SPEED_CONTROLLER_OUTPUT_MAX;
-  else if (i16_output < (-MOTOR_SPEED_CONTROLLER_OUTPUT_MAX)) i16_output = -MOTOR_SPEED_CONTROLLER_OUTPUT_MAX;
-  i16_output >>= 5; // divide to 64, as MOTOR_SPEED_CONTROLLER_KP is 64x; avoid using floats
-
-  i16_output = ui8_duty_cycle + i16_output;
-  if (i16_output > PWM_DUTY_CYCLE_MAX) i16_output = PWM_DUTY_CYCLE_MAX;
-  if (i16_output < 0) i16_output = 0;
-
-  return (uint8_t) i16_output;
-}
-
-// call every 100ms
 uint8_t motor_current_controller (void)
 {
   int16_t i16_error;
@@ -957,33 +917,6 @@ uint8_t motor_current_controller (void)
   if (i16_output < 0) i16_output = 0;
 
   return (uint8_t) i16_output;
-}
-
-void do_battery_voltage_protection (void)
-{
-  // low pass filter the voltage readed value, to avoid possible fast spikes/noise
-  ui16_adc_battery_voltage_accumulated -= ui16_adc_battery_voltage_accumulated >> 6;
-  ui16_adc_battery_voltage_accumulated += ((uint16_t) ui8_adc_read_battery_voltage ());
-  ui8_adc_battery_voltage_filtered = ui16_adc_battery_voltage_accumulated >> 6;
-
-  if (ui8_adc_battery_voltage_filtered < ((uint8_t) ADC_BATTERY_VOLTAGE_MIN))
-  {
-    // motor will stop and battery symbol on LCD will be empty and flashing
-    motor_controller_set_state (MOTOR_CONTROLLER_STATE_UNDER_VOLTAGE);
-    motor_disable_PWM ();
-    motor_controller_set_error (MOTOR_CONTROLLER_ERROR_91_BATTERY_UNDER_VOLTAGE);
-  }
-}
-
-void do_motor_controller_mode (void)
-{
-  // if MOTOR_OVER_SPEED_ERPS, then limit for this value and not user defined ui16_target_erps
-//  if (ui16_target_erps > MOTOR_OVER_SPEED_ERPS) { ui16_target_erps = MOTOR_OVER_SPEED_ERPS; }
-}
-
-uint8_t motor_get_ADC_battery_voltage_filtered (void)
-{
-  return ui8_adc_battery_voltage_filtered;
 }
 
 void motor_controller_set_error (uint8_t error)

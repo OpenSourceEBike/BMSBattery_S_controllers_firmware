@@ -66,6 +66,9 @@ uint8_t ui8_wheel_speed_max = 0;
 
 struct_pi_controller_state wheel_speed_pi_controller_state;
 
+uint16_t ui16_adc_battery_voltage_accumulated = (uint16_t) ADC_BATTERY_VOLTAGE_MED;
+uint8_t ui8_adc_battery_voltage_filtered;
+
 // function prototypes
 void communications_controller (void);
 uint8_t ebike_app_cruise_control (uint8_t ui8_value);
@@ -77,6 +80,8 @@ void ebike_throotle_type_torque_sensor (void);
 void read_throotle (void);
 void read_pas_cadence_and_direction (void);
 uint8_t pas_is_set (void);
+void read_battery_voltage_and_protect (void);
+uint8_t ebike_app_get_ADC_battery_voltage_filtered (void);
 
 void ebike_app_init (void)
 {
@@ -90,6 +95,9 @@ void ebike_app_init (void)
 
 void ebike_app_controller (void)
 {
+  // reads battery voltage and also protects for undervoltage
+  read_battery_voltage_and_protect ();
+
   // calc wheel speed and save the value on global variable ui8_wheel_speed
   calc_wheel_speed ();
 
@@ -195,7 +203,7 @@ void communications_controller (void)
   else { ui16_wheel_period_ms = (3600.0 * f_wheel_perimeter) / f_wheel_speed; }
 
   // calc battery pack state of charge (SOC)
-  ui16_battery_volts = ((uint16_t) motor_get_ADC_battery_voltage_filtered ()) * ((uint16_t) ADC_BATTERY_VOLTAGE_K);
+  ui16_battery_volts = ((uint16_t) ebike_app_get_ADC_battery_voltage_filtered ()) * ((uint16_t) ADC_BATTERY_VOLTAGE_K);
   if (ui16_battery_volts > ((uint16_t) BATTERY_PACK_VOLTS_80)) { ui8_battery_soc = 16; } // 4 bars | full
   else if (ui16_battery_volts > ((uint16_t) BATTERY_PACK_VOLTS_60)) { ui8_battery_soc = 12; } // 3 bars
   else if (ui16_battery_volts > ((uint16_t) BATTERY_PACK_VOLTS_40)) { ui8_battery_soc = 8; } // 2 bars
@@ -843,4 +851,25 @@ void read_throotle (void)
 
   // setup ui8_is_throotle_released flag
   ui8_is_throotle_released = ((ui8_throttle_value > ((uint8_t) ADC_THROTTLE_MIN_VALUE)) ? 0 : 1);
+}
+
+void read_battery_voltage_and_protect (void)
+{
+  // low pass filter the voltage readed value, to avoid possible fast spikes/noise
+  ui16_adc_battery_voltage_accumulated -= ui16_adc_battery_voltage_accumulated >> 6;
+  ui16_adc_battery_voltage_accumulated += ((uint16_t) ui8_adc_read_battery_voltage ());
+  ui8_adc_battery_voltage_filtered = ui16_adc_battery_voltage_accumulated >> 6;
+
+  if (ui8_adc_battery_voltage_filtered < ((uint8_t) ADC_BATTERY_VOLTAGE_MIN))
+  {
+    // motor will stop and battery symbol on LCD will be empty and flashing
+    motor_controller_set_state (MOTOR_CONTROLLER_STATE_UNDER_VOLTAGE);
+    motor_disable_PWM ();
+    motor_controller_set_error (MOTOR_CONTROLLER_ERROR_91_BATTERY_UNDER_VOLTAGE);
+  }
+}
+
+uint8_t ebike_app_get_ADC_battery_voltage_filtered (void)
+{
+  return ui8_adc_battery_voltage_filtered;
 }
