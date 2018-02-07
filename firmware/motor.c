@@ -344,9 +344,9 @@ uint16_t ui16_pas_counter = (uint16_t) PAS_ABSOLUTE_MIN_CADENCE_PWM_CYCLE_TICKS;
 uint16_t ui16_pas_on_time_counter;
 uint16_t ui16_pas_off_time_counter;
 
-uint8_t ui8_wheel_speed_sensor_state;
-uint8_t ui8_wheel_speed_sensor_state_old;
-uint16_t ui16_wheel_speed_sensor_counter;
+uint8_t ui8_wheel_speed_sensor_state = 1;
+uint8_t ui8_wheel_speed_sensor_state_old = 1;
+uint16_t ui16_wheel_speed_sensor_counter = 0;
 
 uint8_t ui8_pwm_duty_cycle_duty_cycle_controller;
 
@@ -726,8 +726,8 @@ void TIM1_UPD_OVF_TRG_BRK_IRQHandler(void) __interrupt(TIM1_UPD_OVF_TRG_BRK_IRQH
   ui16_wheel_speed_sensor_counter++;
 
   // detect wheel speed sensor signal changes
-  if ((WHEEL_SPEED_SENSOR__PORT->IDR & WHEEL_SPEED_SENSOR__PIN) == 0) { ui8_wheel_speed_sensor_state = 0; }
-  else { ui8_wheel_speed_sensor_state = 1; }
+  if (WHEEL_SPEED_SENSOR__PORT->IDR & WHEEL_SPEED_SENSOR__PIN) { ui8_wheel_speed_sensor_state = 1; }
+  else { ui8_wheel_speed_sensor_state = 0; }
 
   if (ui8_wheel_speed_sensor_state != ui8_wheel_speed_sensor_state_old) // wheel speed sensor signal did change
   {

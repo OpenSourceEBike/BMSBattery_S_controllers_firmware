@@ -58,7 +58,7 @@ volatile uint8_t ui8_pas_direction = 0;
 uint8_t ui8_pas_cadence_rpm = 0;
 
 volatile uint16_t ui16_wheel_speed_sensor_pwm_cycles_ticks = (uint16_t) WHEEL_SPEED_SENSOR_MAX_PWM_CYCLE_TICKS;
-volatile uint8_t ui8_wheel_speed_sensor_is_disconnected;
+volatile uint8_t ui8_wheel_speed_sensor_is_disconnected = 1; // must start with this value to have correct value at start up
 
 uint16_t ui16_motor_controller_max_current_10b;
 
@@ -662,12 +662,10 @@ void ebike_throotle_type_throotle_pas (void)
   motor_set_pwm_duty_cycle_target (ui8_temp);
 
 #elif defined (EBIKE_THROTTLE_TYPE_THROTTLE_PAS_CURRENT_SPEED)
-  uint8_t ui8_throttle_pas_target_value;
   uint8_t ui8_temp;
-  int8_t i8_temp;
-  int8_t i8_motor_current;
   float f_temp;
-  int16_t i16_temp;
+  uint8_t ui8_throttle_pas_target_value;
+  int8_t i8_motor_current;
   int16_t i16_motor_current_pi_controller_output;
   int16_t i16_wheel_speed_pi_controller_output;
 
@@ -748,10 +746,13 @@ void ebike_throotle_type_throotle_pas (void)
 
 void ebike_throotle_type_torque_sensor (void)
 {
+  uint8_t ui8_temp;
   uint16_t ui16_target_current_10b;
   uint16_t ui16_temp;
   float f_temp;
-  uint16_t ui16_target_speed_erps;
+  int8_t i8_motor_current;
+  int16_t i16_motor_current_pi_controller_output;
+  int16_t i16_wheel_speed_pi_controller_output;
 
   f_temp = (float) (((float) (ui8_throttle_value_filtered >> 1)) * f_get_assist_level ());
 
@@ -766,26 +767,53 @@ void ebike_throotle_type_torque_sensor (void)
 			   (uint32_t) 0, // min input value
 			   (uint32_t) 255, // max input value
 			   (uint32_t) 0, // min output motor current value
-			   (uint32_t) ui16_motor_controller_max_current_10b));  // max output motor current value
-  motor_controller_set_target_current_10b (ui16_target_current_10b);
+			   (uint32_t) ui16_motor_controller_max_current_10b >> 2));  // max output motor current value
 
-  // if LCD P3 = 0, control also the speed
+  // PI controller for motor current
+  i8_motor_current = i16_motor_get_current_filtered_10b ();
+  if (i8_motor_current < 0) { i8_motor_current = 0; } // cast negative values to zero, because we are not here to control regen current
+  motor_current_pi_controller_state.ui8_current_value = ((uint8_t) i8_motor_current) >> 2;
+  motor_current_pi_controller_state.ui8_target_value = ui16_target_current_10b;
+  pi_controller (&motor_current_pi_controller_state);
+
+  // LCD P3 = 1, control / limit speed to max value
   if (lcd_configuration_variables.ui8_power_assist_control_mode)
   {
-    // set target motor speed to the value defined on the LCD
-    // (due to motor configurations on the motor controller, this will only put a limit to the max permited speed!)
-    motor_controller_set_target_speed_erps (motor_controller_get_target_speed_erps_max ());
+    // do the PI controller for speed
+    wheel_speed_pi_controller_state.ui8_current_value = ui8_ebike_app_get_wheel_speed ();
+    wheel_speed_pi_controller_state.ui8_target_value = ui8_wheel_speed_max;
+    pi_controller (&wheel_speed_pi_controller_state);
   }
-  else
+  else // LCD P3 = 0, control also the speed depending on ui8_throttle_pas_target_value
   {
-    // humam power will setup motor speed
-    // map humam power value to motor speed value
-    ui16_target_speed_erps = (uint16_t) (map ((uint32_t) ui16_temp,
-		  (uint32_t) 0,
-		  (uint32_t) 255,
-		  (uint32_t) 0, // motor speed min value
-		  (uint32_t) motor_controller_get_target_speed_erps_max ())); // motor speed from max value, defined on the LCD
-    motor_controller_set_target_speed_erps (ui16_target_speed_erps);
+    // map to wheel speed
+    ui8_temp = (uint8_t) (map ((uint32_t) ui16_temp,
+  		   (uint32_t) 0,
+  		   (uint32_t) 255,
+  		   (uint32_t) 0,
+  		   (uint32_t) ui8_wheel_speed_max));
+
+    // PI controller for wheel speed
+    wheel_speed_pi_controller_state.ui8_current_value = ui8_ebike_app_get_wheel_speed ();
+    wheel_speed_pi_controller_state.ui8_target_value = ui8_temp;
+    pi_controller (&wheel_speed_pi_controller_state);
+  }
+
+  // set PWM duty_cycle target value only if we are not braking
+  if (!motor_controller_state_is_set (MOTOR_CONTROLLER_STATE_BRAKE))
+  {
+    // limit the values
+    i16_motor_current_pi_controller_output = motor_current_pi_controller_state.i16_controller_output_value;
+    i16_wheel_speed_pi_controller_output = wheel_speed_pi_controller_state.i16_controller_output_value;
+    if (i16_motor_current_pi_controller_output > 255) { i16_motor_current_pi_controller_output = 255; }
+    if (i16_motor_current_pi_controller_output < 0) { i16_motor_current_pi_controller_output = 0; }
+    if (i16_wheel_speed_pi_controller_output > 255) { i16_wheel_speed_pi_controller_output = 255; }
+    if (i16_wheel_speed_pi_controller_output < 0) { i16_wheel_speed_pi_controller_output = 0; }
+
+    // now use the lowest value from the PI controllers outputs
+    ui8_temp = ui8_min ((uint8_t) i16_motor_current_pi_controller_output, (uint8_t) i16_wheel_speed_pi_controller_output);
+
+    motor_set_pwm_duty_cycle_target (ui8_temp);
   }
 }
 
