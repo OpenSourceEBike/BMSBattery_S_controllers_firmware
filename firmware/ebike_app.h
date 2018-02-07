@@ -12,6 +12,12 @@
 #include <stdint.h>
 #include "main.h"
 
+#define EBIKE_APP_STATE_MOTOR_COAST 	0
+#define EBIKE_APP_STATE_MOTOR_STOP 	1
+#define EBIKE_APP_STATE_MOTOR_STARTUP 	2
+#define EBIKE_APP_STATE_MOTOR_COOL 	3
+#define EBIKE_APP_STATE_MOTOR_RUNNING 	4
+
 typedef struct _lcd_configuration_variables
 {
   uint8_t ui8_assist_level;
@@ -24,6 +30,8 @@ typedef struct _lcd_configuration_variables
 
 extern volatile uint16_t ui16_pas_pwm_cycles_ticks;
 extern volatile uint8_t ui8_pas_direction;
+
+extern volatile uint8_t ui8_ebike_app_state;
 
 extern volatile uint16_t ui16_wheel_speed_sensor_pwm_cycles_ticks;
 extern volatile uint8_t ui8_wheel_speed_sensor_is_disconnected;

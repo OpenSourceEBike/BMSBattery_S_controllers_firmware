@@ -16,12 +16,6 @@
 #define SINEWAVE_INTERPOLATION_60_DEGREES 	2
 #define SINEWAVE_INTERPOLATION_360_DEGREES 	3
 
-#define MOTOR_STATE_COAST 	0
-#define MOTOR_STATE_STOP 	1
-#define MOTOR_STATE_STARTUP 	2
-#define MOTOR_STATE_COOL 	3
-#define MOTOR_STATE_RUNNING 	4
-
 #define MOTOR_CONTROLLER_STATE_OK		1
 #define MOTOR_CONTROLLER_STATE_BRAKE		2
 #define MOTOR_CONTROLLER_STATE_OVER_CURRENT	4
@@ -46,7 +40,7 @@ extern volatile uint8_t ui8_duty_cycle;
 extern uint8_t ui8_duty_cycle_target;
 extern volatile uint8_t ui8_duty_cycle;
 extern uint16_t ui16_PWM_cycles_counter_total;
-extern int8_t i8_motor_current_filtered_10b;
+extern int16_t i16_motor_current_filtered_10b;
 extern uint8_t ui8_pwm_duty_cycle_duty_cycle_controller;
 
 /***************************************************************************************/
@@ -58,7 +52,7 @@ void motor_enable_PWM (void);
 void motor_disable_PWM (void);
 void motor_set_pwm_duty_cycle_target (uint8_t value);
 void motor_set_current_max (uint8_t value); // steps of 0.5A each step
-int8_t motor_get_current_filtered_10b (void); // steps of 0.125A each step
+int16_t i16_motor_get_current_filtered_10b (void); // steps of 0.125A each step
 void motor_set_regen_current_max (uint8_t value); // steps of 0.5A each step
 void motor_set_pwm_duty_cycle_ramp_up_inverse_step (uint16_t value); // each step = 64us
 void motor_set_pwm_duty_cycle_ramp_down_inverse_step (uint16_t value); // each step = 64us
@@ -77,6 +71,9 @@ void motor_controller_set_error (uint8_t ui8_error);
 void motor_controller_clear_error (void);
 uint8_t motor_controller_get_error (void);
 void motor_set_pwm_duty_cycle (uint8_t ui8_value);
+void motor_set_pwm_duty_cycle_target (uint8_t ui8_value);
+uint8_t motor_get_pwm_duty_cycle_target (void);
+int8_t motor_get_current_filtered_10b (void);
 /***************************************************************************************/
 
 #endif /* _MOTOR_H_ */

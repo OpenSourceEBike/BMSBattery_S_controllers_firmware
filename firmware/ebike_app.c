@@ -64,10 +64,14 @@ uint16_t ui16_motor_controller_max_current_10b;
 
 uint8_t ui8_wheel_speed_max = 0;
 
+struct_pi_controller_state motor_current_pi_controller_state;
 struct_pi_controller_state wheel_speed_pi_controller_state;
 
 uint16_t ui16_adc_battery_voltage_accumulated = (uint16_t) ADC_BATTERY_VOLTAGE_MED;
 uint8_t ui8_adc_battery_voltage_filtered;
+
+volatile uint8_t ui8_ebike_app_state = EBIKE_APP_STATE_MOTOR_STOP;
+uint8_t ui8_motor_startup_counter;
 
 // function prototypes
 void communications_controller (void);
@@ -82,9 +86,18 @@ void read_pas_cadence_and_direction (void);
 uint8_t pas_is_set (void);
 void read_battery_voltage_and_protect (void);
 uint8_t ebike_app_get_ADC_battery_voltage_filtered (void);
+void ebike_app_state_machine (void);
+float f_get_assist_level ();
 
 void ebike_app_init (void)
 {
+  // init variables for motor current controller
+  motor_current_pi_controller_state.ui8_kp_dividend = MOTOR_CURRENT_PI_CONTROLLER_KP_DIVIDEND;
+  motor_current_pi_controller_state.ui8_kp_divisor = MOTOR_CURRENT_PI_CONTROLLER_KP_DIVISOR;
+  motor_current_pi_controller_state.ui8_ki_dividend = MOTOR_CURRENT_PI_CONTROLLER_KI_DIVIDEND;
+  motor_current_pi_controller_state.ui8_ki_divisor = MOTOR_CURRENT_PI_CONTROLLER_KI_DIVISOR;
+  motor_current_pi_controller_state.i16_i_term = 0;
+
   // init variables for wheel speed controller
   wheel_speed_pi_controller_state.ui8_kp_dividend = WHEEL_SPEED_PI_CONTROLLER_KP_DIVIDEND;
   wheel_speed_pi_controller_state.ui8_kp_divisor = WHEEL_SPEED_PI_CONTROLLER_KP_DIVISOR;
@@ -108,9 +121,6 @@ void ebike_app_controller (void)
   // read PAS cadence to global variable: ui8_pas_cadence_rps
   read_pas_cadence_and_direction ();
 
-  // send and received information to/from the LCD as also setup the configuration variables
-  communications_controller ();
-
   // control the motor using specific algorithm
 #if (EBIKE_THROTTLE_TYPE == EBIKE_THROTTLE_TYPE_THROTTLE_PAS)
   ebike_throotle_type_throotle_pas ();
@@ -119,6 +129,69 @@ void ebike_app_controller (void)
 #else
 #error
 #endif
+
+  // execute the state machine after previous getting data from inputs like wheel speed, throttle, etc
+  ebike_app_state_machine ();
+
+  // send and received information to/from the LCD as also setup the configuration variables
+  communications_controller ();
+}
+
+void ebike_app_state_machine (void)
+{
+  uint16_t ui16_motor_speed_erps;
+
+  ui16_motor_speed_erps = ui16_motor_get_motor_speed_erps ();
+  switch (ui8_ebike_app_state)
+  {
+    case EBIKE_APP_STATE_MOTOR_STOP:
+    if ((ui16_motor_speed_erps < 5) && (!ebike_app_is_throttle_released ()))
+    {
+      ui8_motor_startup_counter = 0;
+      ui8_ebike_app_state = EBIKE_APP_STATE_MOTOR_STARTUP;
+    }
+    else if (ui16_motor_speed_erps > 4)
+    {
+      ui8_ebike_app_state = EBIKE_APP_STATE_MOTOR_RUNNING;
+    }
+    break;
+
+    case EBIKE_APP_STATE_MOTOR_STARTUP:
+    if (ui8_motor_startup_counter++ > 19) // 20 * 100ms; 2.5 seconds max time
+    {
+      motor_controller_set_state (MOTOR_CONTROLLER_STATE_MOTOR_BLOCKED);
+      motor_disable_PWM ();
+      ebike_app_cruise_control_stop ();
+      ui8_ebike_app_state = EBIKE_APP_STATE_MOTOR_COOL;
+      ui8_motor_startup_counter = 0;
+    }
+
+    if (ui16_motor_speed_erps > 4)
+    {
+      ui8_ebike_app_state = EBIKE_APP_STATE_MOTOR_RUNNING;
+    }
+    break;
+
+    case EBIKE_APP_STATE_MOTOR_RUNNING:
+    // do nothing
+    break;
+
+    // wait for the power mosfets cool down and for user release the throttle
+    case EBIKE_APP_STATE_MOTOR_COOL:
+    if (ui8_motor_startup_counter++ > 10) // 1 second timeout
+    {
+      ui8_motor_startup_counter = 11;
+      if (ebike_app_is_throttle_released ())
+      {
+	// TODO: make next code as calls of functions on motor.c
+	ui8_duty_cycle = 0;
+	ui8_duty_cycle_target = 0;
+	motor_controller_reset_state (MOTOR_CONTROLLER_STATE_MOTOR_BLOCKED);
+        ui8_ebike_app_state = EBIKE_APP_STATE_MOTOR_STOP;
+      }
+    }
+    break;
+  }
 }
 
 // cruise control will save throttle value and use it even if user releases throttle
@@ -192,7 +265,7 @@ uint8_t throttle_is_set (void)
 void communications_controller (void)
 {
   uint8_t ui8_moving_indication = 0;
-  int8_t i8_motor_current_filtered_10b = 0;
+  int16_t i16_motor_current_filtered_10b = 0;
 
   /********************************************************************************************/
   // Prepare and send packate to LCD
@@ -250,10 +323,10 @@ void communications_controller (void)
   // - B8 = 250, LCD shows 1875 watts
   // - B8 = 100, LCD shows 750 watts
   // each unit of B8 = 0.25A
-  i8_motor_current_filtered_10b = motor_get_current_filtered_10b ();
-  i8_motor_current_filtered_10b -= 1; // try to avoid LCD display about 25W when motor is not running
-  if (i8_motor_current_filtered_10b < 0) { i8_motor_current_filtered_10b = 0; } // limit to be only positive value, LCD don't accept regen current value
-  ui8_tx_buffer [8] = (uint8_t) (i8_motor_current_filtered_10b);
+  i16_motor_current_filtered_10b = i16_motor_get_current_filtered_10b ();
+  i16_motor_current_filtered_10b -= 1; // try to avoid LCD display about 25W when motor is not running
+  if (i16_motor_current_filtered_10b < 0) { i16_motor_current_filtered_10b = 0; } // limit to be only positive value, LCD don't accept regen current value
+  ui8_tx_buffer [8] = (uint8_t) (i16_motor_current_filtered_10b);
   // B9: motor temperature
   ui8_tx_buffer [9] = 0;
   // B10 and B11: 0
@@ -523,7 +596,7 @@ uint8_t ebike_app_is_throttle_released (void)
 
 uint8_t ui8_ebike_app_get_wheel_speed (void)
 {
-  return f_wheel_speed;
+  return ((uint8_t) f_wheel_speed);
 }
 
 void calc_wheel_speed (void)
@@ -580,52 +653,23 @@ void ebike_throotle_type_throotle_pas (void)
   // (due to motor configurations on the motor controller, this will only put a limit to the max permited speed!)
   motor_controller_set_target_speed_erps (motor_controller_get_target_speed_erps_max ());
 
-  // scale with assist level value
-  switch (lcd_configuration_variables.ui8_assist_level)
-  {
-    case 0:
-    f_temp = ASSIST_LEVEL_0;
-    break;
-
-    case 1:
-    f_temp = ASSIST_LEVEL_1;
-    break;
-
-    case 2:
-    f_temp = ASSIST_LEVEL_2;
-    break;
-
-    case 3:
-    f_temp = ASSIST_LEVEL_3;
-    break;
-
-    case 4:
-    f_temp = ASSIST_LEVEL_4;
-    break;
-
-    case 5:
-    f_temp = ASSIST_LEVEL_5;
-    break;
-
-    default:
-    f_temp = ASSIST_LEVEL_5;
-    break;
-  }
-
-  f_temp = (float) (((float) ui8_throttle_value_filtered) * f_temp);
+  f_temp = (float) (((float) ui8_throttle_value_filtered) * f_get_assist_level ());
   ui8_temp = (uint8_t) (map ((uint32_t) f_temp,
   			 (uint32_t) 0,
   			 (uint32_t) 255,
   			 (uint32_t) 0,
   			 (uint32_t) PWM_DUTY_CYCLE_MAX));
-  ui8_pwm_duty_cycle_duty_cycle_controller = ui8_temp;
+  motor_set_pwm_duty_cycle_target (ui8_temp);
 
 #elif defined (EBIKE_THROTTLE_TYPE_THROTTLE_PAS_CURRENT_SPEED)
+  uint8_t ui8_throttle_pas_target_value;
   uint8_t ui8_temp;
-  uint16_t ui16_temp;
+  int8_t i8_temp;
+  int8_t i8_motor_current;
   float f_temp;
-  uint16_t ui16_target_speed_erps;
   int16_t i16_temp;
+  int16_t i16_motor_current_pi_controller_output;
+  int16_t i16_wheel_speed_pi_controller_output;
 
   // map ui8_pas_cadence_rpm to 0 - 255
   ui8_temp = (uint8_t) (map ((uint32_t) ui8_pas_cadence_rpm,
@@ -638,122 +682,67 @@ void ebike_throotle_type_throotle_pas (void)
   ui8_temp = ui8_max (ui8_throttle_value_filtered, ui8_temp); // use the max value from throotle or pas cadence
 #endif
 
-  // scale with assist level value
-  switch (lcd_configuration_variables.ui8_assist_level)
-  {
-    case 0:
-    f_temp = ASSIST_LEVEL_0;
-    break;
-
-    case 1:
-    f_temp = ASSIST_LEVEL_1;
-    break;
-
-    case 2:
-    f_temp = ASSIST_LEVEL_2;
-    break;
-
-    case 3:
-    f_temp = ASSIST_LEVEL_3;
-    break;
-
-    case 4:
-    f_temp = ASSIST_LEVEL_4;
-    break;
-
-    case 5:
-    f_temp = ASSIST_LEVEL_5;
-    break;
-
-    default:
-    f_temp = ASSIST_LEVEL_5;
-    break;
-  }
-
-  f_temp = (float) (((float) ui8_temp) * f_temp);
+  f_temp = (float) (((float) ui8_temp) * f_get_assist_level ());
 
 #if !defined(EBIKE_THROTTLE_TYPE_THROTTLE_PAS_ASSIST_LEVEL_PAS_ONLY)
-  ui8_temp = (uint8_t) f_temp;
+  ui8_throttle_pas_target_value = (uint8_t) f_temp;
 #else
-  ui8_temp = ui8_max (ui8_throttle_value_filtered, (uint8_t) f_temp); // use the max value from throotle or (pas cadence * assist level)
+  ui8_throttle_pas_target_value = ui8_max (ui8_throttle_value_filtered, (uint8_t) f_temp); // use the max value from throotle or (pas cadence * assist level)
 #endif
 
-  // map to wheel speed
-//  ui8_temp = (uint8_t) (map ((uint32_t) ui8_temp,
-ui8_temp = (uint8_t) (map ((uint32_t) ui8_throttle_value_filtered,
+  // map to motor controller current
+  ui8_temp = (uint16_t) (map ((uint32_t) ui8_throttle_pas_target_value,
 		   (uint32_t) 0,
 		   (uint32_t) 255,
 		   (uint32_t) 0,
-		   (uint32_t) ui8_wheel_speed_max));
+		   (uint32_t) ui16_motor_controller_max_current_10b >> 2));
 
-  wheel_speed_pi_controller_state.ui8_target_value = ui8_temp;
-  wheel_speed_pi_controller_state.ui8_control_value = ui8_ebike_app_get_wheel_speed ();
-  pi_controller (&wheel_speed_pi_controller_state);
+  // PI controller for motor current
+  i8_motor_current = i16_motor_get_current_filtered_10b ();
+  if (i8_motor_current < 0) { i8_motor_current = 0; } // cast negative values to zero, because we are not here to control regen current
+  motor_current_pi_controller_state.ui8_current_value = ((uint8_t) i8_motor_current) >> 2;
+  motor_current_pi_controller_state.ui8_target_value = ui8_temp;
+  pi_controller (&motor_current_pi_controller_state);
 
+  // LCD P3 = 1, control / limit speed to max value
+  if (lcd_configuration_variables.ui8_power_assist_control_mode)
+  {
+    // do the PI controller for speed
+    wheel_speed_pi_controller_state.ui8_current_value = ui8_ebike_app_get_wheel_speed ();
+    wheel_speed_pi_controller_state.ui8_target_value = ui8_wheel_speed_max;
+    pi_controller (&wheel_speed_pi_controller_state);
+  }
+  else // LCD P3 = 0, control also the speed depending on ui8_throttle_pas_target_value
+  {
+    // map to wheel speed
+    ui8_temp = (uint8_t) (map ((uint32_t) ui8_throttle_pas_target_value,
+  		   (uint32_t) 0,
+  		   (uint32_t) 255,
+  		   (uint32_t) 0,
+  		   (uint32_t) ui8_wheel_speed_max));
 
-
-
-//  // set PWM duty_cycle target value only if we are not braking
-//  if (!motor_controller_state_is_set (MOTOR_CONTROLLER_STATE_BRAKE))
-//  {
-//      i16_temp = ((int16_t) ui8_duty_cycle_target) + wheel_speed_pi_controller_state.ui16_output_value;
-//      if (i16_temp > 255) { i16_temp = 255; }
-//      if (i16_temp < 0) { i16_temp = 0; }
-//
-//printf (",%d\n", i16_temp);
-//    motor_set_pwm_duty_cycle_target ((uint8_t) i16_temp);
-//  }
+    // PI controller for wheel speed
+    wheel_speed_pi_controller_state.ui8_current_value = ui8_ebike_app_get_wheel_speed ();
+    wheel_speed_pi_controller_state.ui8_target_value = ui8_temp;
+    pi_controller (&wheel_speed_pi_controller_state);
+  }
 
   // set PWM duty_cycle target value only if we are not braking
   if (!motor_controller_state_is_set (MOTOR_CONTROLLER_STATE_BRAKE))
   {
-    i16_temp = ((int16_t) ui8_duty_cycle_target) + wheel_speed_pi_controller_state.ui16_output_value;
-    if (i16_temp > 255) { i16_temp = 255; }
-    if (i16_temp < 0) { i16_temp = 0; }
+    // limit the values
+    i16_motor_current_pi_controller_output = motor_current_pi_controller_state.i16_controller_output_value;
+    i16_wheel_speed_pi_controller_output = wheel_speed_pi_controller_state.i16_controller_output_value;
+    if (i16_motor_current_pi_controller_output > 255) { i16_motor_current_pi_controller_output = 255; }
+    if (i16_motor_current_pi_controller_output < 0) { i16_motor_current_pi_controller_output = 0; }
+    if (i16_wheel_speed_pi_controller_output > 255) { i16_wheel_speed_pi_controller_output = 255; }
+    if (i16_wheel_speed_pi_controller_output < 0) { i16_wheel_speed_pi_controller_output = 0; }
 
-    motor_set_pwm_duty_cycle_target ((uint8_t) i16_temp);
+    // now use the lowest value from the PI controllers outputs
+    ui8_temp = ui8_min ((uint8_t) i16_motor_current_pi_controller_output, (uint8_t) i16_wheel_speed_pi_controller_output);
+
+    motor_set_pwm_duty_cycle_target (ui8_temp);
   }
-
-
-//
-//#if defined (EBIKE_THROTTLE_TYPE_THROTTLE_PAS_PWM_DUTY_CYCLE)
-//  ui8_pwm_duty_cycle = ui8_min (ui8_pwm_duty_cycle_duty_cycle_controller, ui8_pwm_duty_cycle_speed_controller);
-//
-//#elif defined (EBIKE_THROTTLE_TYPE_THROTTLE_PAS_CURRENT_SPEED)
-//  ui8_pwm_duty_cycle_current_controller = motor_current_controller ();
-//  ui8_pwm_duty_cycle = ui8_min (ui8_pwm_duty_cycle_current_controller, ui8_pwm_duty_cycle_speed_controller);
-//#endif
-
-
-
-
-
-//  // map to motor controller current
-//  ui16_temp = (uint16_t) (map ((uint32_t) ui8_temp,
-//		   (uint32_t) 0,
-//		   (uint32_t) 255,
-//		   (uint32_t) 0,
-//		   (uint32_t) ui16_motor_controller_max_current_10b));
-//  motor_controller_set_target_current_10b (ui16_temp);
-//
-//  // if LCD P3 = 0, control also the speed
-//  if (lcd_configuration_variables.ui8_power_assist_control_mode)
-//  {
-//    // set target motor speed to the value defined on the LCD
-//    // (due to motor configurations on the motor controller, this will only put a limit to the max permited speed!)
-//    motor_controller_set_target_speed_erps (motor_controller_get_target_speed_erps_max ());
-//  }
-//  else
-//  {
-//    // PAS cadence will setup motor speed
-//    // map PAS candence value to motor speed value
-//    ui16_target_speed_erps = (uint16_t) (map ((uint32_t) ui8_temp,
-//		  (uint32_t) 0,
-//		  (uint32_t) 255,
-//		  (uint32_t) 0, // motor speed min value
-//		  (uint32_t) motor_controller_get_target_speed_erps_max ())); // motor speed from max value, defined on the LCD
-//    motor_controller_set_target_speed_erps (ui16_target_speed_erps);
-//  }
 #endif
 }
 
@@ -764,38 +753,7 @@ void ebike_throotle_type_torque_sensor (void)
   float f_temp;
   uint16_t ui16_target_speed_erps;
 
-  switch (lcd_configuration_variables.ui8_assist_level)
-  {
-    case 0:
-    f_temp = ASSIST_LEVEL_0;
-    break;
-
-    case 1:
-    f_temp = ASSIST_LEVEL_1;
-    break;
-
-    case 2:
-    f_temp = ASSIST_LEVEL_2;
-    break;
-
-    case 3:
-    f_temp = ASSIST_LEVEL_3;
-    break;
-
-    case 4:
-    f_temp = ASSIST_LEVEL_4;
-    break;
-
-    case 5:
-    f_temp = ASSIST_LEVEL_5;
-    break;
-
-    default:
-    f_temp = ASSIST_LEVEL_5;
-    break;
-  }
-
-  f_temp = (float) (((float) (ui8_throttle_value_filtered >> 1)) * f_temp);
+  f_temp = (float) (((float) (ui8_throttle_value_filtered >> 1)) * f_get_assist_level ());
 
 #if defined (EBIKE_THROTTLE_TYPE_TORQUE_SENSOR_HUMAN_POWER)
   // calc humam power on the crank using as input the pedal torque sensor value and pedal cadence
@@ -872,4 +830,42 @@ void read_battery_voltage_and_protect (void)
 uint8_t ebike_app_get_ADC_battery_voltage_filtered (void)
 {
   return ui8_adc_battery_voltage_filtered;
+}
+
+float f_get_assist_level ()
+{
+  float f_temp;
+
+  switch (lcd_configuration_variables.ui8_assist_level)
+  {
+    case 0:
+    f_temp = ASSIST_LEVEL_0;
+    break;
+
+    case 1:
+    f_temp = ASSIST_LEVEL_1;
+    break;
+
+    case 2:
+    f_temp = ASSIST_LEVEL_2;
+    break;
+
+    case 3:
+    f_temp = ASSIST_LEVEL_3;
+    break;
+
+    case 4:
+    f_temp = ASSIST_LEVEL_4;
+    break;
+
+    case 5:
+    f_temp = ASSIST_LEVEL_5;
+    break;
+
+    default:
+    f_temp = ASSIST_LEVEL_5;
+    break;
+  }
+
+  return f_temp;
 }
