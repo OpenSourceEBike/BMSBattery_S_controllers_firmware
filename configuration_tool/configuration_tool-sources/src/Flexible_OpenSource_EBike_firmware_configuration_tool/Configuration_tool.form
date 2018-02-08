@@ -86,7 +86,7 @@
                                   <Component id="jSeparator4" alignment="1" min="-2" pref="437" max="-2" attributes="0"/>
                                   <Component id="torque_sensor_control_algorithm_output" alignment="1" min="-2" pref="437" max="-2" attributes="0"/>
                                   <Component id="throttle_control_algorithm_output" alignment="1" min="-2" pref="437" max="-2" attributes="0"/>
-                                  <Component id="throotle_type" alignment="1" min="-2" pref="437" max="-2" attributes="0"/>
+                                  <Component id="throttle_type" alignment="1" min="-2" pref="437" max="-2" attributes="0"/>
                                   <Group type="103" groupAlignment="0" max="-2" attributes="0">
                                       <Group type="102" alignment="0" attributes="0">
                                           <Group type="103" groupAlignment="1" max="-2" attributes="0">
@@ -193,7 +193,7 @@
                           <Component id="LABEL_throttle_type_HELP" alignment="3" min="-2" max="-2" attributes="0"/>
                       </Group>
                       <EmptySpace min="-2" pref="6" max="-2" attributes="0"/>
-                      <Component id="throotle_type" min="-2" max="-2" attributes="0"/>
+                      <Component id="throttle_type" min="-2" max="-2" attributes="0"/>
                       <EmptySpace min="-2" pref="15" max="-2" attributes="0"/>
                       <Group type="103" groupAlignment="3" attributes="0">
                           <Component id="LABEL_throttle_control_algorithm_output" alignment="3" min="-2" max="-2" attributes="0"/>
@@ -364,7 +364,7 @@
                 <Property name="text" type="java.lang.String" value="Throttle type"/>
               </Properties>
             </Component>
-            <Component class="javax.swing.JComboBox" name="throotle_type">
+            <Component class="javax.swing.JComboBox" name="throttle_type">
               <Properties>
                 <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
                   <Font name="Ubuntu" size="18" style="0"/>
@@ -377,7 +377,7 @@
                 </Property>
               </Properties>
               <Events>
-                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="throotle_typeActionPerformed"/>
+                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="throttle_typeActionPerformed"/>
               </Events>
               <AuxValues>
                 <AuxValue name="JavaCodeGenerator_TypeParameters" type="java.lang.String" value="&lt;String&gt;"/>

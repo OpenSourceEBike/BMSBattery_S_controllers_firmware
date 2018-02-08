@@ -64,7 +64,7 @@ public class Configuration_tool extends javax.swing.JFrame {
         jPanel1 = new javax.swing.JPanel();
         LABEL_throttle_type = new javax.swing.JLabel();
         jLabel1 = new javax.swing.JLabel();
-        throotle_type = new javax.swing.JComboBox<>();
+        throttle_type = new javax.swing.JComboBox<>();
         pas_number_of_magnets = new javax.swing.JTextField();
         LABEL_pas_number_of_magnets = new javax.swing.JLabel();
         torque_sensor_control_algorithm_output = new javax.swing.JComboBox<>();
@@ -156,11 +156,11 @@ public class Configuration_tool extends javax.swing.JFrame {
         jLabel1.setFont(new java.awt.Font("Ubuntu", 1, 24)); // NOI18N
         jLabel1.setText("Throttle type");
 
-        throotle_type.setFont(new java.awt.Font("Ubuntu", 0, 18)); // NOI18N
-        throotle_type.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "throttle and/or PAS", "torque sensor" }));
-        throotle_type.addActionListener(new java.awt.event.ActionListener() {
+        throttle_type.setFont(new java.awt.Font("Ubuntu", 0, 18)); // NOI18N
+        throttle_type.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "throttle and/or PAS", "torque sensor" }));
+        throttle_type.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                throotle_typeActionPerformed(evt);
+                throttle_typeActionPerformed(evt);
             }
         });
 
@@ -590,7 +590,7 @@ public class Configuration_tool extends javax.swing.JFrame {
                             .add(jSeparator4, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 437, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                             .add(torque_sensor_control_algorithm_output, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 437, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                             .add(throttle_control_algorithm_output, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 437, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                            .add(throotle_type, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 437, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                            .add(throttle_type, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 437, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                             .add(jPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING, false)
                                 .add(jPanel1Layout.createSequentialGroup()
                                     .add(jPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.TRAILING, false)
@@ -682,7 +682,7 @@ public class Configuration_tool extends javax.swing.JFrame {
                     .add(LABEL_throttle_type)
                     .add(LABEL_throttle_type_HELP, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
                 .add(6, 6, 6)
-                .add(throotle_type, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                .add(throttle_type, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                 .add(15, 15, 15)
                 .add(jPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
                     .add(LABEL_throttle_control_algorithm_output)
@@ -834,8 +834,8 @@ public class Configuration_tool extends javax.swing.JFrame {
         setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
 
-    private void throotle_typeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_throotle_typeActionPerformed
-       if ("throttle and/or PAS".equals(throotle_type.getSelectedItem())){
+    private void throttle_typeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_throttle_typeActionPerformed
+       if ("throttle and/or PAS".equals(throttle_type.getSelectedItem())){
             LABEL_throttle_control_algorithm_output.setVisible(true);
             throttle_control_algorithm_output.setVisible(true);
             LABEL_pas_number_of_magnets.setVisible(true);
@@ -852,7 +852,7 @@ public class Configuration_tool extends javax.swing.JFrame {
             LABEL_torque_sensor_control_algorithm_output.setVisible(false);
             torque_sensor_control_algorithm_output.setVisible(false);       
             LABEL_torque_sensor_control_algorithm_output_HELP.setVisible(false);
-       } else if ("torque sensor".equals(throotle_type.getSelectedItem())) {
+       } else if ("torque sensor".equals(throttle_type.getSelectedItem())) {
             LABEL_torque_sensor_control_algorithm_output.setVisible(true);
             torque_sensor_control_algorithm_output.setVisible(true);   
             LABEL_torque_sensor_control_algorithm_output_HELP.setVisible(true);
@@ -870,7 +870,7 @@ public class Configuration_tool extends javax.swing.JFrame {
             LABEL_pas_rotation_direction_HELP.setVisible(false);
             LABEL_pedal_max_cadence_in_rpm_HELP.setVisible(false);
        }
-    }//GEN-LAST:event_throotle_typeActionPerformed
+    }//GEN-LAST:event_throttle_typeActionPerformed
 
     private void throttle_control_algorithm_outputActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_throttle_control_algorithm_outputActionPerformed
         // TODO add your handling code here:
@@ -1031,7 +1031,7 @@ public class Configuration_tool extends javax.swing.JFrame {
             
             String TextToSave = null;
                     
-            if (throotle_type.getSelectedItem().equals("throttle and/or PAS")) {
+            if (throttle_type.getSelectedItem().equals("throttle and/or PAS")) {
                 TextToSave = "#define EBIKE_THROTTLE_TYPE EBIKE_THROTTLE_TYPE_THROTTLE_PAS";
             }
             else {
@@ -1380,8 +1380,8 @@ public class Configuration_tool extends javax.swing.JFrame {
     private javax.swing.JTextField pedal_max_cadence_in_rpm;
     private javax.swing.JTextField pwm_duty_cycle_ramp_down_step;
     private javax.swing.JTextField pwm_duty_cycle_ramp_up_step;
-    private javax.swing.JComboBox<String> throotle_type;
     private javax.swing.JComboBox<String> throttle_control_algorithm_output;
+    private javax.swing.JComboBox<String> throttle_type;
     private javax.swing.JComboBox<String> torque_sensor_control_algorithm_output;
     // End of variables declaration//GEN-END:variables
     
