@@ -666,8 +666,6 @@ void ebike_throttle_type_throttle_pas (void)
   float f_temp;
   uint8_t ui8_throttle_pas_target_value;
   int8_t i8_motor_current;
-  int16_t i16_motor_current_pi_controller_output;
-  int16_t i16_wheel_speed_pi_controller_output;
 
   // map ui8_pas_cadence_rpm to 0 - 255
   ui8_temp = (uint8_t) (map ((uint32_t) ui8_pas_cadence_rpm,
@@ -728,18 +726,10 @@ void ebike_throttle_type_throttle_pas (void)
   // set PWM duty_cycle target value only if we are not braking
   if (!motor_controller_state_is_set (MOTOR_CONTROLLER_STATE_BRAKE))
   {
-    // limit the values
-    i16_motor_current_pi_controller_output = motor_current_pi_controller_state.i16_controller_output_value;
-    i16_wheel_speed_pi_controller_output = wheel_speed_pi_controller_state.i16_controller_output_value;
-    if (i16_motor_current_pi_controller_output > 255) { i16_motor_current_pi_controller_output = 255; }
-    if (i16_motor_current_pi_controller_output < 0) { i16_motor_current_pi_controller_output = 0; }
-    if (i16_wheel_speed_pi_controller_output > 255) { i16_wheel_speed_pi_controller_output = 255; }
-    if (i16_wheel_speed_pi_controller_output < 0) { i16_wheel_speed_pi_controller_output = 0; }
-
     // now use the lowest value from the PI controllers outputs
-    ui8_temp = ui8_min ((uint8_t) i16_motor_current_pi_controller_output, (uint8_t) i16_wheel_speed_pi_controller_output);
-
-    motor_set_pwm_duty_cycle_target (ui8_temp);
+    motor_set_pwm_duty_cycle_target (ui8_min (
+	motor_current_pi_controller_state.ui8_controller_output_value,
+	wheel_speed_pi_controller_state.ui8_controller_output_value));
   }
 #endif
 }
@@ -751,8 +741,6 @@ void ebike_throttle_type_torque_sensor (void)
   uint16_t ui16_temp;
   float f_temp;
   int8_t i8_motor_current;
-  int16_t i16_motor_current_pi_controller_output;
-  int16_t i16_wheel_speed_pi_controller_output;
 
   f_temp = (float) (((float) (ui8_throttle_value_filtered >> 1)) * f_get_assist_level ());
 
@@ -802,18 +790,10 @@ void ebike_throttle_type_torque_sensor (void)
   // set PWM duty_cycle target value only if we are not braking
   if (!motor_controller_state_is_set (MOTOR_CONTROLLER_STATE_BRAKE))
   {
-    // limit the values
-    i16_motor_current_pi_controller_output = motor_current_pi_controller_state.i16_controller_output_value;
-    i16_wheel_speed_pi_controller_output = wheel_speed_pi_controller_state.i16_controller_output_value;
-    if (i16_motor_current_pi_controller_output > 255) { i16_motor_current_pi_controller_output = 255; }
-    if (i16_motor_current_pi_controller_output < 0) { i16_motor_current_pi_controller_output = 0; }
-    if (i16_wheel_speed_pi_controller_output > 255) { i16_wheel_speed_pi_controller_output = 255; }
-    if (i16_wheel_speed_pi_controller_output < 0) { i16_wheel_speed_pi_controller_output = 0; }
-
     // now use the lowest value from the PI controllers outputs
-    ui8_temp = ui8_min ((uint8_t) i16_motor_current_pi_controller_output, (uint8_t) i16_wheel_speed_pi_controller_output);
-
-    motor_set_pwm_duty_cycle_target (ui8_temp);
+    motor_set_pwm_duty_cycle_target (ui8_min (
+      motor_current_pi_controller_state.ui8_controller_output_value,
+      wheel_speed_pi_controller_state.ui8_controller_output_value));
   }
 }
 

@@ -15,7 +15,7 @@ typedef struct pi_controller_state
 {
   uint8_t ui8_current_value;
   uint8_t ui8_target_value;
-  int16_t i16_controller_output_value;
+  uint8_t ui8_controller_output_value;
   uint8_t ui8_kp_dividend;
   uint8_t ui8_kp_divisor;
   uint8_t ui8_ki_dividend;

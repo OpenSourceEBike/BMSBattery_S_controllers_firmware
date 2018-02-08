@@ -42,19 +42,21 @@ uint8_t ui8_max (uint8_t value_a, uint8_t value_b)
 
 void pi_controller (struct_pi_controller_state *pi_controller)
 {
-  static int16_t i16_error;
+  int16_t i16_error;
   static int16_t i16_p_term;
+  int16_t i16_temp;
 
   i16_error = pi_controller->ui8_target_value - pi_controller->ui8_current_value; // 255-0 or 0-255 --> [-255 ; 255]
   i16_p_term = (i16_error * pi_controller->ui8_kp_dividend) >> pi_controller->ui8_kp_divisor;
 
-  // reset integral term while target value = 0
-  if (pi_controller->ui8_target_value == 0) { pi_controller->i16_i_term = 0; }
   pi_controller->i16_i_term += (i16_error * pi_controller->ui8_ki_dividend) >> pi_controller->ui8_ki_divisor;
   if (pi_controller->i16_i_term > 255) { pi_controller->i16_i_term = 255; }
   if (pi_controller->i16_i_term < -254) { pi_controller->i16_i_term = -254; }
 
-  pi_controller->i16_controller_output_value = i16_p_term + pi_controller->i16_i_term;
-  if (pi_controller->i16_controller_output_value > 255) { pi_controller->i16_controller_output_value = 255; }
-  if (pi_controller->i16_controller_output_value < -254) { pi_controller->i16_controller_output_value = -254; }
+  i16_temp = i16_p_term + pi_controller->i16_i_term;
+  // limit to [0 ; 255] as duty_cycle that will be controlled can't have other values than that ones
+  if (i16_temp > 255) { i16_temp = 255; }
+  if (i16_temp < 0) { i16_temp = 0; }
+  pi_controller->ui8_controller_output_value = (uint8_t) i16_temp;
+
 }
