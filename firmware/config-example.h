@@ -10,7 +10,7 @@
 #define CONFIG_H_
 
 // This file is the firmware configuration for the following hardware combination:
-// - throotle and PAS; using motor current/torque and/or wheel speed controller
+// - throttle and PAS; using motor current/torque and/or wheel speed controller
 // - PAS with 8 magnets and with configured max cadence of 90 RPM
 // - LCD3
 // - battery pack Li-ion 24V
@@ -23,11 +23,11 @@
 // *************************************************************************** //
 // THROOTLE
 //
-// choose between throotle and/or pas or torque sensor
+// choose between throttle and/or pas or torque sensor
 #define EBIKE_THROTTLE_TYPE	EBIKE_THROTTLE_TYPE_THROTTLE_PAS
 //#define EBIKE_THROTTLE_TYPE	EBIKE_THROTTLE_TYPE_TORQUE_SENSOR
 
-// next, choose one of the both (only apply to throotle and/or PAS)
+// next, choose one of the both (only apply to throttle and/or PAS)
 //#define EBIKE_THROTTLE_TYPE_THROTTLE_PAS_PWM_DUTY_CYCLE // direct PWM duty_cycle control
 #define EBIKE_THROTTLE_TYPE_THROTTLE_PAS_CURRENT_SPEED // control using motor current/torque and/or wheel speed
 

@@ -51,7 +51,7 @@ uint8_t ui8_adc_throttle_value_cruise_control;
 uint8_t ui8_throttle_value;
 uint16_t ui16_throttle_value_accumulated = 0;
 uint8_t ui8_throttle_value_filtered;
-uint8_t ui8_is_throotle_released;
+uint8_t ui8_is_throttle_released;
 
 volatile uint16_t ui16_pas_pwm_cycles_ticks = (uint16_t) PAS_ABSOLUTE_MIN_CADENCE_PWM_CYCLE_TICKS;
 volatile uint8_t ui8_pas_direction = 0;
@@ -79,9 +79,9 @@ uint8_t ebike_app_cruise_control (uint8_t ui8_value);
 void set_speed_erps_max_to_motor_controller (struct_lcd_configuration_variables *lcd_configuration_variables);
 void set_motor_controller_max_current (uint8_t ui8_controller_max_current);
 void calc_wheel_speed (void);
-void ebike_throotle_type_throotle_pas (void);
-void ebike_throotle_type_torque_sensor (void);
-void read_throotle (void);
+void ebike_throttle_type_throttle_pas (void);
+void ebike_throttle_type_torque_sensor (void);
+void read_throttle (void);
 void read_pas_cadence_and_direction (void);
 uint8_t pas_is_set (void);
 void read_battery_voltage_and_protect (void);
@@ -115,17 +115,17 @@ void ebike_app_controller (void)
   calc_wheel_speed ();
 
   // map throttle value from 0 up to 255 to global variable: ui8_throttle_value
-  // setup ui8_is_throotle_released flag
-  read_throotle ();
+  // setup ui8_is_throttle_released flag
+  read_throttle ();
 
   // read PAS cadence to global variable: ui8_pas_cadence_rps
   read_pas_cadence_and_direction ();
 
   // control the motor using specific algorithm
 #if (EBIKE_THROTTLE_TYPE == EBIKE_THROTTLE_TYPE_THROTTLE_PAS)
-  ebike_throotle_type_throotle_pas ();
+  ebike_throttle_type_throttle_pas ();
 #elif (EBIKE_THROTTLE_TYPE == EBIKE_THROTTLE_TYPE_TORQUE_SENSOR)
-  ebike_throotle_type_torque_sensor ();
+  ebike_throttle_type_torque_sensor ();
 #else
 #error
 #endif
@@ -591,7 +591,7 @@ uint8_t ebike_app_get_adc_throttle_value_cruise_control (void)
 
 uint8_t ebike_app_is_throttle_released (void)
 {
-  return ui8_is_throotle_released;
+  return ui8_is_throttle_released;
 }
 
 uint8_t ui8_ebike_app_get_wheel_speed (void)
@@ -643,7 +643,7 @@ uint8_t pas_is_set (void)
   return (ui8_pas_cadence_rpm) ? 1: 0;
 }
 
-void ebike_throotle_type_throotle_pas (void)
+void ebike_throttle_type_throttle_pas (void)
 {
 #if defined (EBIKE_THROTTLE_TYPE_THROTTLE_PAS_PWM_DUTY_CYCLE)
   uint8_t ui8_temp;
@@ -677,7 +677,7 @@ void ebike_throotle_type_throotle_pas (void)
 		 (uint32_t) 255));
 
 #if !defined(EBIKE_THROTTLE_TYPE_THROTTLE_PAS_ASSIST_LEVEL_PAS_ONLY)
-  ui8_temp = ui8_max (ui8_throttle_value_filtered, ui8_temp); // use the max value from throotle or pas cadence
+  ui8_temp = ui8_max (ui8_throttle_value_filtered, ui8_temp); // use the max value from throttle or pas cadence
 #endif
 
   f_temp = (float) (((float) ui8_temp) * f_get_assist_level ());
@@ -685,7 +685,7 @@ void ebike_throotle_type_throotle_pas (void)
 #if !defined(EBIKE_THROTTLE_TYPE_THROTTLE_PAS_ASSIST_LEVEL_PAS_ONLY)
   ui8_throttle_pas_target_value = (uint8_t) f_temp;
 #else
-  ui8_throttle_pas_target_value = ui8_max (ui8_throttle_value_filtered, (uint8_t) f_temp); // use the max value from throotle or (pas cadence * assist level)
+  ui8_throttle_pas_target_value = ui8_max (ui8_throttle_value_filtered, (uint8_t) f_temp); // use the max value from throttle or (pas cadence * assist level)
 #endif
 
   // map to motor controller current
@@ -744,7 +744,7 @@ void ebike_throotle_type_throotle_pas (void)
 #endif
 }
 
-void ebike_throotle_type_torque_sensor (void)
+void ebike_throttle_type_torque_sensor (void)
 {
   uint8_t ui8_temp;
   uint16_t ui16_target_current_10b;
@@ -817,7 +817,7 @@ void ebike_throotle_type_torque_sensor (void)
   }
 }
 
-void read_throotle (void)
+void read_throttle (void)
 {
   // read torque sensor signal
   ui8_adc_throttle_value = ui8_adc_read_throttle ();
@@ -835,8 +835,8 @@ void read_throotle (void)
   ui16_throttle_value_accumulated += ((uint16_t) ui8_throttle_value);
   ui8_throttle_value_filtered = ui16_throttle_value_accumulated >> 2;
 
-  // setup ui8_is_throotle_released flag
-  ui8_is_throotle_released = ((ui8_throttle_value > ((uint8_t) ADC_THROTTLE_MIN_VALUE)) ? 0 : 1);
+  // setup ui8_is_throttle_released flag
+  ui8_is_throttle_released = ((ui8_throttle_value > ((uint8_t) ADC_THROTTLE_MIN_VALUE)) ? 0 : 1);
 }
 
 void read_battery_voltage_and_protect (void)
