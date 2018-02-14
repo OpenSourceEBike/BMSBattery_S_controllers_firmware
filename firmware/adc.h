@@ -20,6 +20,7 @@
 #define UI8_ADC_BATTERY_VOLTAGE 			(*(uint8_t*)(0x53F2))
 #define UI8_ADC_MOTOR_TOTAL_CURRENT			(*(uint8_t*)(0x53F0))
 #define UI8_ADC_PHASE_B_CURRENT 			(*(uint8_t*)(0x53EA))
+#define UI8_ADC_THROTTLE 				(*(uint8_t*)(0x53E8))
 
 extern uint8_t adc_throttle_busy_flag;
 extern uint8_t ui8_BatteryVoltage;

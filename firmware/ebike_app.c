@@ -108,6 +108,9 @@ void ebike_app_init (void)
 
 void ebike_app_controller (void)
 {
+  uint8_t ui8_temp;
+  uint8_t ui8_temp2;
+
   // reads battery voltage and also protects for undervoltage
   read_battery_voltage_and_protect ();
 
@@ -135,6 +138,29 @@ void ebike_app_controller (void)
 
   // send and received information to/from the LCD as also setup the configuration variables
   communications_controller ();
+
+//  printf ("%d,%d,%d\n", UI8_ADC_THROTTLE, ui8_pas_state, ui8_pas_cadence_rpm);
+
+  ui8_temp = (uint8_t) (map (
+		  ui8_torque_sensor_throttle_processed_value,
+		  (uint8_t) ADC_THROTTLE_MIN_VALUE,
+		  (uint8_t) ADC_THROTTLE_MAX_VALUE,
+		  (uint8_t) THROTTLE_MIN_VALUE,
+		  (uint8_t) THROTTLE_MAX_VALUE));
+
+  ui8_temp2 = (uint8_t) (map (
+      UI8_ADC_THROTTLE,
+		(uint8_t) ADC_THROTTLE_MIN_VALUE,
+		(uint8_t) ADC_THROTTLE_MAX_VALUE,
+		(uint8_t) THROTTLE_MIN_VALUE,
+		(uint8_t) THROTTLE_MAX_VALUE));
+  if (ui8_pas_cadence_rpm < 15)
+  {
+      ui8_temp = ui8_temp2;
+  }
+
+  printf ("%d,%d,%d\n", ui8_pas_cadence_rpm, ui8_temp2, ui8_temp);
+
 }
 
 void ebike_app_state_machine (void)

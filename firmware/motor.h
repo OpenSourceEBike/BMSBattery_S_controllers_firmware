@@ -42,6 +42,8 @@ extern volatile uint8_t ui8_duty_cycle;
 extern uint16_t ui16_PWM_cycles_counter_total;
 extern int16_t i16_motor_current_filtered_10b;
 extern uint8_t ui8_pwm_duty_cycle_duty_cycle_controller;
+extern uint8_t ui8_pas_state;
+extern volatile uint8_t ui8_torque_sensor_throttle_processed_value;
 
 /***************************************************************************************/
 // Motor interface
