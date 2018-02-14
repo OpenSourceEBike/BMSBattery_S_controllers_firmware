@@ -82,6 +82,7 @@ void calc_wheel_speed (void);
 void ebike_throttle_type_throttle_pas (void);
 void ebike_throttle_type_torque_sensor (void);
 void read_throttle (void);
+void read_torque_sensor_throttle (void);
 void read_pas_cadence_and_direction (void);
 uint8_t pas_is_set (void);
 void read_battery_voltage_and_protect (void);
@@ -108,21 +109,25 @@ void ebike_app_init (void)
 
 void ebike_app_controller (void)
 {
-  uint8_t ui8_temp;
-  uint8_t ui8_temp2;
-
   // reads battery voltage and also protects for undervoltage
   read_battery_voltage_and_protect ();
 
   // calc wheel speed and save the value on global variable ui8_wheel_speed
   calc_wheel_speed ();
 
+  // NOTE: PAS reading must be done before torque sensor reading!
+  // read PAS cadence to global variable: ui8_pas_cadence_rps
+  read_pas_cadence_and_direction ();
+
+#if (EBIKE_THROTTLE_TYPE == EBIKE_THROTTLE_TYPE_THROTTLE_PAS)
   // map throttle value from 0 up to 255 to global variable: ui8_throttle_value
   // setup ui8_is_throttle_released flag
   read_throttle ();
-
-  // read PAS cadence to global variable: ui8_pas_cadence_rps
-  read_pas_cadence_and_direction ();
+#elif (EBIKE_THROTTLE_TYPE == EBIKE_THROTTLE_TYPE_TORQUE_SENSOR)
+  read_torque_sensor_throttle ();
+#else
+#error
+#endif
 
   // control the motor using specific algorithm
 #if (EBIKE_THROTTLE_TYPE == EBIKE_THROTTLE_TYPE_THROTTLE_PAS)
@@ -138,29 +143,6 @@ void ebike_app_controller (void)
 
   // send and received information to/from the LCD as also setup the configuration variables
   communications_controller ();
-
-//  printf ("%d,%d,%d\n", UI8_ADC_THROTTLE, ui8_pas_state, ui8_pas_cadence_rpm);
-
-  ui8_temp = (uint8_t) (map (
-		  ui8_torque_sensor_throttle_processed_value,
-		  (uint8_t) ADC_THROTTLE_MIN_VALUE,
-		  (uint8_t) ADC_THROTTLE_MAX_VALUE,
-		  (uint8_t) THROTTLE_MIN_VALUE,
-		  (uint8_t) THROTTLE_MAX_VALUE));
-
-  ui8_temp2 = (uint8_t) (map (
-      UI8_ADC_THROTTLE,
-		(uint8_t) ADC_THROTTLE_MIN_VALUE,
-		(uint8_t) ADC_THROTTLE_MAX_VALUE,
-		(uint8_t) THROTTLE_MIN_VALUE,
-		(uint8_t) THROTTLE_MAX_VALUE));
-  if (ui8_pas_cadence_rpm < 15)
-  {
-      ui8_temp = ui8_temp2;
-  }
-
-  printf ("%d,%d,%d\n", ui8_pas_cadence_rpm, ui8_temp2, ui8_temp);
-
 }
 
 void ebike_app_state_machine (void)
@@ -192,7 +174,8 @@ void ebike_app_state_machine (void)
       ui8_motor_startup_counter = 0;
     }
 
-    if (ui16_motor_speed_erps > 4)
+    // motor is running...
+    if (ui16_motor_speed_erps > 5)
     {
       ui8_ebike_app_state = EBIKE_APP_STATE_MOTOR_RUNNING;
     }
@@ -212,6 +195,11 @@ void ebike_app_state_machine (void)
 	// TODO: make next code as calls of functions on motor.c
 	ui8_duty_cycle = 0;
 	ui8_duty_cycle_target = 0;
+
+	// reseting PI controllers so the I term is zero otherwise the motor will start after releasing throttle
+	pi_controller_reset (&motor_current_pi_controller_state);
+	pi_controller_reset (&wheel_speed_pi_controller_state);
+
 	motor_controller_reset_state (MOTOR_CONTROLLER_STATE_MOTOR_BLOCKED);
         ui8_ebike_app_state = EBIKE_APP_STATE_MOTOR_STOP;
       }
@@ -768,7 +756,8 @@ void ebike_throttle_type_torque_sensor (void)
   float f_temp;
   int8_t i8_motor_current;
 
-  f_temp = (float) (((float) (ui8_throttle_value_filtered >> 1)) * f_get_assist_level ());
+  // divide the torque sensor throttle value by 4 as it is very sensitive and multiply by assist level
+  f_temp = (float) ((ui8_throttle_value_filtered >> 2) * lcd_configuration_variables.ui8_assist_level);
 
 #if defined (EBIKE_THROTTLE_TYPE_TORQUE_SENSOR_HUMAN_POWER)
   // calc humam power on the crank using as input the pedal torque sensor value and pedal cadence
@@ -777,7 +766,7 @@ void ebike_throttle_type_torque_sensor (void)
   ui16_temp = (uint16_t) f_temp;
 #endif
 
-  ui16_target_current_10b = (uint16_t) (map ((uint32_t) ui16_temp, // human power value
+  ui16_target_current_10b = (uint16_t) (map ((uint32_t) ui16_temp,
 			   (uint32_t) 0, // min input value
 			   (uint32_t) 255, // max input value
 			   (uint32_t) 0, // min output motor current value
@@ -821,6 +810,12 @@ void ebike_throttle_type_torque_sensor (void)
       motor_current_pi_controller_state.ui8_controller_output_value,
       wheel_speed_pi_controller_state.ui8_controller_output_value));
   }
+  else
+  {
+    // keep reseting PI controllers so the I term will not increase while we are braking!
+    pi_controller_reset (&motor_current_pi_controller_state);
+    pi_controller_reset (&wheel_speed_pi_controller_state);
+  }
 }
 
 void read_throttle (void)
@@ -843,6 +838,26 @@ void read_throttle (void)
 
   // setup ui8_is_throttle_released flag
   ui8_is_throttle_released = ((ui8_throttle_value > ((uint8_t) ADC_THROTTLE_MIN_VALUE)) ? 0 : 1);
+}
+
+void read_torque_sensor_throttle (void)
+{
+  read_throttle (); // so we get regular processing of throttle signal
+
+  // if cadence is over 15 RPM, use the processed torque sensor value, otherwise, use ui8_throttle_value_filtered
+  if (ui8_pas_cadence_rpm <= 15)
+  {
+    ui8_throttle_value_filtered = ui8_throttle_value;
+  }
+  else
+  {
+    ui8_throttle_value_filtered = (uint8_t) (map (
+	  ui8_torque_sensor_throttle_processed_value,
+	  (uint8_t) ADC_THROTTLE_MIN_VALUE,
+	  (uint8_t) ADC_THROTTLE_MAX_VALUE,
+	  (uint8_t) THROTTLE_MIN_VALUE,
+	  (uint8_t) THROTTLE_MAX_VALUE));
+  }
 }
 
 void read_battery_voltage_and_protect (void)
@@ -902,4 +917,20 @@ float f_get_assist_level ()
   }
 
   return f_temp;
+}
+
+
+void ebike_app_set_state (uint8_t ui8_state)
+{
+  ui8_ebike_app_state |= ui8_state;
+}
+
+void ebike_app_reset_state (uint8_t ui8_state)
+{
+  ui8_ebike_app_state &= ~ui8_state;
+}
+
+uint8_t ebike_app_state_is_set (uint8_t ui8_state)
+{
+  return ui8_ebike_app_state & ui8_state;
 }

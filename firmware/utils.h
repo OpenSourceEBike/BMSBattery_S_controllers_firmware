@@ -27,5 +27,6 @@ int32_t map (int32_t x, int32_t in_min, int32_t in_max, int32_t out_min, int32_t
 uint8_t ui8_max (uint8_t value_a, uint8_t value_b);
 uint8_t ui8_min (uint8_t value_a, uint8_t value_b);
 void pi_controller (struct_pi_controller_state *pi_controller_state);
+void pi_controller_reset (struct_pi_controller_state *pi_controller);
 
 #endif /* _UTILS_H */

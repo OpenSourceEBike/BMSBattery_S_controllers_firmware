@@ -11,7 +11,7 @@
 
 #include "config.h"
 
-#define DEBUG_UART
+//#define DEBUG_UART
 
 #define MOTOR_TYPE_Q85 1
 #define MOTOR_TYPE_Q100 2

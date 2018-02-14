@@ -43,7 +43,7 @@ uint8_t ui8_max (uint8_t value_a, uint8_t value_b)
 void pi_controller (struct_pi_controller_state *pi_controller)
 {
   int16_t i16_error;
-  static int16_t i16_p_term;
+  int16_t i16_p_term;
   int16_t i16_temp;
 
   i16_error = pi_controller->ui8_target_value - pi_controller->ui8_current_value; // 255-0 or 0-255 --> [-255 ; 255]
@@ -58,5 +58,9 @@ void pi_controller (struct_pi_controller_state *pi_controller)
   if (i16_temp > 255) { i16_temp = 255; }
   if (i16_temp < 0) { i16_temp = 0; }
   pi_controller->ui8_controller_output_value = (uint8_t) i16_temp;
+}
 
+void pi_controller_reset (struct_pi_controller_state *pi_controller)
+{
+  pi_controller->i16_i_term = 0;
 }

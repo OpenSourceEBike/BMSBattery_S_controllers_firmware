@@ -105,16 +105,17 @@ int main (void)
     {
       ui16_motor_controller_counter = ui16_TIM2_counter;
       motor_controller ();
-      continue;
-    }
-
-    ui16_TIM2_counter = TIM2_GetCounter ();
-    if ((ui16_TIM2_counter - ui16_ebike_app_controller_counter) > 781) // every 150ms
-    {
-      ui16_ebike_app_controller_counter = ui16_TIM2_counter;
       ebike_app_controller ();
       continue;
     }
+//
+//    ui16_TIM2_counter = TIM2_GetCounter ();
+//    if ((ui16_TIM2_counter - ui16_ebike_app_controller_counter) > 781) // every 100ms
+//    {
+//      ui16_ebike_app_controller_counter = ui16_TIM2_counter;
+//      ebike_app_controller ();
+//      continue;
+//    }
   }
 
   return 0;
