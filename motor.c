@@ -114,11 +114,11 @@ debug_pin_set ();
             }
       // update motor state based on motor speed
 #if MOTOR_TYPE == MOTOR_TYPE_Q85
-      if (ui16_motor_speed_erps > 1000)
+      if (ui16_motor_speed_erps > 50)
       {
 	ui8_motor_state = MOTOR_STATE_RUNNING_INTERPOLATION_360_DEGREES;
       }
-      else if (ui16_motor_speed_erps > 5)
+      else if (ui16_motor_speed_erps > 10)
       {
 	ui8_motor_state = MOTOR_STATE_RUNNING_INTERPOLATION_60_DEGREES;
       }
