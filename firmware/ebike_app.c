@@ -33,6 +33,7 @@ volatile struct_lcd_configuration_variables lcd_configuration_variables;
 uint8_t ui8_received_package_flag = 0;
 volatile float f_controller_max_current;
 float f_wheel_speed;
+uint8_t ui8_wheel_speed;
 float f_wheel_perimeter = 2.0625; // 26'' wheel
 uint8_t ui8_tx_buffer[12];
 uint8_t ui8_i;
@@ -71,7 +72,14 @@ uint16_t ui16_adc_battery_voltage_accumulated = (uint16_t) ADC_BATTERY_VOLTAGE_M
 uint8_t ui8_adc_battery_voltage_filtered;
 
 volatile uint8_t ui8_ebike_app_state = EBIKE_APP_STATE_MOTOR_STOP;
-uint8_t ui8_motor_startup_counter;
+
+uint8_t ui8_ebike_app_error = EBIKE_APP_ERROR_EMPTY;
+
+uint8_t ui8_motor_startup_counter = 0;
+uint8_t ui8_motor_cool_counter = 0;
+
+uint8_t ui8_rtst_state_machine = 0;
+uint8_t ui8_rtst_counter = 0;
 
 // function prototypes
 void communications_controller (void);
@@ -139,7 +147,7 @@ void ebike_app_controller (void)
 #endif
 
   // execute the state machine after previous getting data from inputs like wheel speed, throttle, etc
-  ebike_app_state_machine ();
+//  ebike_app_state_machine ();
 
   // send and received information to/from the LCD as also setup the configuration variables
   communications_controller ();
@@ -153,31 +161,43 @@ void ebike_app_state_machine (void)
   switch (ui8_ebike_app_state)
   {
     case EBIKE_APP_STATE_MOTOR_STOP:
-    if ((ui16_motor_speed_erps < 5) && (!ebike_app_is_throttle_released ()))
+    if ((ui16_motor_speed_erps < 5) &&
+	(!ebike_app_is_throttle_released ()) &&
+	(!motor_controller_state_is_set (MOTOR_CONTROLLER_STATE_BRAKE)))
     {
-      ui8_motor_startup_counter = 0;
       ui8_ebike_app_state = EBIKE_APP_STATE_MOTOR_STARTUP;
     }
     else if (ui16_motor_speed_erps > 4)
     {
       ui8_ebike_app_state = EBIKE_APP_STATE_MOTOR_RUNNING;
     }
+
+    ui8_motor_startup_counter = 0;
+    ui8_motor_cool_counter = 0;
     break;
 
     case EBIKE_APP_STATE_MOTOR_STARTUP:
-    if (ui8_motor_startup_counter++ > 19) // 20 * 100ms; 2.5 seconds max time
+    if (ui8_motor_startup_counter++ >= 20) // 20 * 100ms; 2 seconds max time
     {
       motor_controller_set_state (MOTOR_CONTROLLER_STATE_MOTOR_BLOCKED);
       motor_disable_PWM ();
+      ebike_app_set_error (EBIKE_APP_ERROR_06_SHORT_CIRCUIT);
       ebike_app_cruise_control_stop ();
       ui8_ebike_app_state = EBIKE_APP_STATE_MOTOR_COOL;
-      ui8_motor_startup_counter = 0;
+      break;
     }
 
     // motor is running...
     if (ui16_motor_speed_erps > 5)
     {
       ui8_ebike_app_state = EBIKE_APP_STATE_MOTOR_RUNNING;
+    }
+
+    // we are braking and that stops the motor...
+    if (motor_controller_state_is_set (MOTOR_CONTROLLER_STATE_BRAKE))
+    {
+      ui8_ebike_app_state = EBIKE_APP_STATE_MOTOR_STOP;
+      ui8_motor_startup_counter = 0;
     }
     break;
 
@@ -187,10 +207,9 @@ void ebike_app_state_machine (void)
 
     // wait for the power mosfets cool down and for user release the throttle
     case EBIKE_APP_STATE_MOTOR_COOL:
-    if (ui8_motor_startup_counter++ > 10) // 1 second timeout
+    if (ebike_app_is_throttle_released ())
     {
-      ui8_motor_startup_counter = 11;
-      if (ebike_app_is_throttle_released ())
+      if (ui8_motor_cool_counter++ >= 100) // 10 seconds timeout
       {
 	// TODO: make next code as calls of functions on motor.c
 	ui8_duty_cycle = 0;
@@ -201,8 +220,13 @@ void ebike_app_state_machine (void)
 	pi_controller_reset (&wheel_speed_pi_controller_state);
 
 	motor_controller_reset_state (MOTOR_CONTROLLER_STATE_MOTOR_BLOCKED);
-        ui8_ebike_app_state = EBIKE_APP_STATE_MOTOR_STOP;
+	ebike_app_clear_error ();
+	ui8_ebike_app_state = EBIKE_APP_STATE_MOTOR_STOP;
       }
+    }
+    else
+    {
+      ui8_motor_cool_counter = 0;
     }
     break;
   }
@@ -298,9 +322,9 @@ void communications_controller (void)
   else { ui8_battery_soc = 3; } // empty
 
   // prepare error
-  ui16_error = motor_controller_get_error (); // get the error value
+  ui16_error = ebike_app_get_error (); // get the error value
   // if battery under voltage, signal instead on LCD battery symbol
-  if (ui16_error == MOTOR_CONTROLLER_ERROR_91_BATTERY_UNDER_VOLTAGE)
+  if (ui16_error == EBIKE_APP_ERROR_91_BATTERY_UNDER_VOLTAGE)
   {
     ui8_battery_soc = 1; // empty flashing
     ui16_error = 0;
@@ -379,10 +403,13 @@ void communications_controller (void)
     }
 
     // see if CRC is ok
-    if (((ui8_crc ^ 10) == ui8_rx_buffer [7]) 	|| // some versions of CRC LCD5 (??)
-	((ui8_crc ^ 5) == ui8_rx_buffer [7]) 	|| // CRC LCD3 (tested with KT36/48SVPR, from PSWpower)
-	((ui8_crc ^ 9) == ui8_rx_buffer [7]) 	|| // CRC LCD5
-	((ui8_crc ^ 2) == ui8_rx_buffer [7])) 	   // CRC LCD3
+//    if (((ui8_crc ^ 10) == ui8_rx_buffer [7]) 	|| // some versions of CRC LCD5 (??)
+//	((ui8_crc ^ 5) == ui8_rx_buffer [7]) 	|| // CRC LCD3 (tested with KT36/48SVPR, from PSWpower)
+//	((ui8_crc ^ 9) == ui8_rx_buffer [7]) 	|| // CRC LCD5
+//	((ui8_crc ^ 2) == ui8_rx_buffer [7])) 	   // CRC LCD3
+
+    // seems we are calculating wrongly the CRC, for now we can ignore it and it still works in the end
+    if (1)
     {
       lcd_configuration_variables.ui8_assist_level = ui8_rx_buffer [3] & 7;
       lcd_configuration_variables.ui8_motor_characteristic = ui8_rx_buffer [5];
@@ -610,7 +637,7 @@ uint8_t ebike_app_is_throttle_released (void)
 
 uint8_t ui8_ebike_app_get_wheel_speed (void)
 {
-  return ((uint8_t) f_wheel_speed);
+  return ui8_wheel_speed;
 }
 
 void calc_wheel_speed (void)
@@ -633,6 +660,8 @@ void calc_wheel_speed (void)
     f_wheel_speed *= f_wheel_perimeter; // meters per second
     f_wheel_speed *= 3.6; // kms per hour
   }
+
+  ui8_wheel_speed = ((uint8_t) f_wheel_speed);
 }
 
 void read_pas_cadence_and_direction (void)
@@ -782,10 +811,8 @@ void ebike_throttle_type_torque_sensor (void)
   // LCD P3 = 1, control / limit speed to max value
   if (lcd_configuration_variables.ui8_power_assist_control_mode)
   {
-    // do the PI controller for speed
-    wheel_speed_pi_controller_state.ui8_current_value = ui8_ebike_app_get_wheel_speed ();
-    wheel_speed_pi_controller_state.ui8_target_value = ui8_wheel_speed_max;
-    pi_controller (&wheel_speed_pi_controller_state);
+    // do not comtrol the speed here, so put output value = 255
+    wheel_speed_pi_controller_state.ui8_controller_output_value = 255;
   }
   else // LCD P3 = 0, control also the speed depending on ui8_throttle_pas_target_value
   {
@@ -842,10 +869,60 @@ void read_throttle (void)
 
 void read_torque_sensor_throttle (void)
 {
+  static uint8_t ui8_startup_phase;
+
   read_throttle (); // so we get regular processing of throttle signal
 
-  // if cadence is over 15 RPM, use the processed torque sensor value, otherwise, use ui8_throttle_value_filtered
-  if (ui8_pas_cadence_rpm <= 15)
+  // calc startup phase
+  switch (ui8_rtst_state_machine)
+  {
+    // ebike is stopped, wait for throttle signal
+    case 0:
+    ui8_startup_phase = 1;
+
+    if ((!ebike_app_is_throttle_released ()) &&
+	(!brake_is_set()))
+    {
+      ui8_rtst_state_machine = 1;
+    }
+    break;
+
+    // now count 5 seconds
+    case 1:
+    if (ui8_rtst_counter++ > 50) // 5 seconds
+    {
+      ui8_rtst_counter = 0;
+      ui8_startup_phase = 0;
+      ui8_rtst_state_machine = 2;
+    }
+
+    // ebike is not moving, let's return to begin
+    if (ui8_wheel_speed == 0)
+    {
+      ui8_rtst_counter = 0;
+      ui8_rtst_state_machine = 0;
+    }
+    break;
+
+    // wait on this state and reset to start when ebike stops
+    case 2:
+    if (ui8_wheel_speed == 0)
+    {
+      ui8_rtst_state_machine = 0;
+    }
+    break;
+
+    default:
+    break;
+  }
+
+  // if user doesn't pedal, disable throttle signal
+  if ((ui8_startup_phase == 0) && (ui8_pas_cadence_rpm == 0))
+  {
+    ui8_throttle_value_filtered = 0;
+  }
+  // use ui8_throttle if cadence is lower than 15 RPM, otherwise, use the processed torque sensor value
+  else if (ui8_pas_cadence_rpm <= 15)
   {
     ui8_throttle_value_filtered = ui8_throttle_value;
   }
@@ -872,7 +949,7 @@ void read_battery_voltage_and_protect (void)
     // motor will stop and battery symbol on LCD will be empty and flashing
     motor_controller_set_state (MOTOR_CONTROLLER_STATE_UNDER_VOLTAGE);
     motor_disable_PWM ();
-    motor_controller_set_error (MOTOR_CONTROLLER_ERROR_91_BATTERY_UNDER_VOLTAGE);
+    ebike_app_set_error (EBIKE_APP_ERROR_91_BATTERY_UNDER_VOLTAGE);
   }
 }
 
@@ -922,15 +999,20 @@ float f_get_assist_level ()
 
 void ebike_app_set_state (uint8_t ui8_state)
 {
-  ui8_ebike_app_state |= ui8_state;
+  ui8_ebike_app_state = ui8_state;
 }
 
-void ebike_app_reset_state (uint8_t ui8_state)
+void ebike_app_set_error (uint8_t error)
 {
-  ui8_ebike_app_state &= ~ui8_state;
+  ui8_ebike_app_error = error;
 }
 
-uint8_t ebike_app_state_is_set (uint8_t ui8_state)
+void ebike_app_clear_error (void)
 {
-  return ui8_ebike_app_state & ui8_state;
+  ui8_ebike_app_error = 0;
+}
+
+uint8_t ebike_app_get_error (void)
+{
+  return ui8_ebike_app_error;
 }

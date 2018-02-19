@@ -299,7 +299,7 @@ volatile uint8_t ui8_angle_correction = 127;
 uint8_t ui8_interpolation_angle = 0;
 
 uint8_t ui8_motor_commutation_type = BLOCK_COMMUTATION;
-uint8_t ui8_motor_controller_state = MOTOR_CONTROLLER_STATE_OK;
+volatile uint8_t ui8_motor_controller_state = MOTOR_CONTROLLER_STATE_OK;
 
 uint8_t ui8_hall_sensors = 0;
 uint8_t ui8_hall_sensors_last = 0;
@@ -322,8 +322,6 @@ uint16_t ui16_target_current_10b = 0;
 
 uint16_t ui16_adc_motor_current_accumulated_10b;
 uint16_t ui16_adc_motor_current_filtered_10b;
-
-uint8_t ui8_motor_controller_error = MOTOR_CONTROLLER_ERROR_EMPTY;
 
 volatile uint8_t ui8_duty_cycle = 0;
 uint8_t ui8_duty_cycle_target;
@@ -714,10 +712,10 @@ void TIM1_UPD_OVF_TRG_BRK_IRQHandler(void) __interrupt(TIM1_UPD_OVF_TRG_BRK_IRQH
       ui16_pas_on_time_counter = 0;
     }
 
-    //
+    // filter the torque signal, by saving the max value of each one pedal rotation
     ui8_torque_sensor_throttle_value = UI8_ADC_THROTTLE;
     ui8_torque_sensor_pas_signal_change_counter++;
-    if (ui8_torque_sensor_pas_signal_change_counter > (PAS_NUMBER_MAGNETS << 1)) // ui8_pas_signal_change_counter = PAS_NUMBER_MAGNETS means 0.5*1 pedal rotation
+    if (ui8_torque_sensor_pas_signal_change_counter > (PAS_NUMBER_MAGNETS << 1)) // PAS_NUMBER_MAGNETS*2 means a full pedal rotation
     {
       ui8_torque_sensor_pas_signal_change_counter = 1; // this is the first cycle
       ui8_torque_sensor_throttle_processed_value = ui8_torque_sensor_throttle_max_value; // store the max value on the output variable of this algorithm
@@ -941,21 +939,6 @@ uint8_t motor_current_controller (void)
   return (uint8_t) i16_output;
 }
 
-void motor_controller_set_error (uint8_t error)
-{
-  ui8_motor_controller_error = error;
-}
-
-void motor_controller_clear_error (void)
-{
-  ui8_motor_controller_error = 0;
-}
-
-uint8_t motor_controller_get_error (void)
-{
-  return ui8_motor_controller_error;
-}
-
 void motor_set_pwm_duty_cycle (uint8_t ui8_value)
 {
   if (ui8_value > PWM_DUTY_CYCLE_MAX) { ui8_value = PWM_DUTY_CYCLE_MAX; }
@@ -985,5 +968,5 @@ void EXTI_PORTD_IRQHandler(void) __interrupt(EXTI_PORTD_IRQHANDLER)
   // motor will stop and error symbol on LCD will be shown
   motor_controller_set_state (MOTOR_CONTROLLER_STATE_OVER_CURRENT);
   motor_disable_PWM ();
-  motor_controller_set_error (MOTOR_CONTROLLER_ERROR_06_SHORT_CIRCUIT);
+  ebike_app_set_error (EBIKE_APP_ERROR_06_SHORT_CIRCUIT);
 }

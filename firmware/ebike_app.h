@@ -15,8 +15,17 @@
 #define EBIKE_APP_STATE_MOTOR_COAST 	0
 #define EBIKE_APP_STATE_MOTOR_STOP 	1
 #define EBIKE_APP_STATE_MOTOR_STARTUP 	2
-#define EBIKE_APP_STATE_MOTOR_COOL 	4
-#define EBIKE_APP_STATE_MOTOR_RUNNING 	8
+#define EBIKE_APP_STATE_MOTOR_COOL 	3
+#define EBIKE_APP_STATE_MOTOR_RUNNING 	4
+
+#define EBIKE_APP_ERROR_EMPTY				0x0
+#define EBIKE_APP_ERROR_01_THROTTLE			0x22
+#define EBIKE_APP_ERROR_02				0x23
+#define EBIKE_APP_ERROR_03				0x24
+#define EBIKE_APP_ERROR_04				0x26
+#define EBIKE_APP_ERROR_05				0x28
+#define EBIKE_APP_ERROR_06_SHORT_CIRCUIT		0x21
+#define EBIKE_APP_ERROR_91_BATTERY_UNDER_VOLTAGE	0x91
 
 typedef struct _lcd_configuration_variables
 {
@@ -47,7 +56,8 @@ struct_lcd_configuration_variables *ebike_app_get_lcd_configuration_variables (v
 uint8_t ebike_app_is_throttle_released (void);
 uint8_t ui8_ebike_app_get_wheel_speed (void);
 void ebike_app_set_state (uint8_t ui8_state);
-void ebike_app_reset_state (uint8_t ui8_state);
-uint8_t ebike_app_state_is_set (uint8_t ui8_state);
+void ebike_app_set_error (uint8_t error);
+void ebike_app_clear_error (void);
+uint8_t ebike_app_get_error (void);
 
 #endif /* _EBIKE_APP_H_ */
