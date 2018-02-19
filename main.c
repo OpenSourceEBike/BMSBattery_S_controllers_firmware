@@ -58,7 +58,7 @@ uint8_t ui8_cheat_counter = 0; 			//counter for cheat procedure
 
 uint8_t ui8_adc_read_throttle_busy = 0;
 uint16_t ui16_SPEED_Counter = 0; 	//time tics for speed measurement
-uint16_t ui16_SPEED = 65500; 		//speed in timetics
+uint16_t ui16_SPEED = 64000; 		//speed in timetics
 uint16_t ui16_PAS_Counter = 0; 		//time tics for cadence measurement
 uint16_t ui16_PAS_High_Counter = 1;	//time tics for direction detection
 uint16_t ui16_PAS_High=1;		//number of High readings on PAS
@@ -202,12 +202,12 @@ int main (void)
 	ui16_SPEED=ui16_SPEED_Counter; 	//save recent speed
 	ui16_SPEED_Counter=0;		//reset speed counter
 	ui8_SPEED_Flag =0; //reset interrupt flag
-
+	//printf("%d\r\n", ui16_SPEED);
 	//printf("SPEEDtic\n");
     }
     if (ui16_SPEED_Counter>64000L)
         {
-    	ui16_SPEED=65500L; 	//Set Display to 0 km/h
+    	ui16_SPEED=64000; 	//Set Display to 0 km/h
 
         }
 //in case of THROTTLEANDPAS or THORQUE_SIMULATION, process the PAS routine
@@ -249,6 +249,7 @@ int main (void)
       ui8_PAS_Flag =0; 			//reset interrupt flag
 
       ui8_temp = ui8_adc_read_throttle (); //read in recent torque value
+      //putchar (ui8_temp);
       ui16_torque[ui8_torque_index]= (uint8_t) map (ui8_temp , ADC_THROTTLE_MIN_VALUE, ADC_THROTTLE_MAX_VALUE, 0, SETPOINT_MAX_VALUE); //map throttle to limits
       ui16_sum_torque = 0;
       for(a = 0; a < NUMBER_OF_PAS_MAGS; a++) {			// sum up array content

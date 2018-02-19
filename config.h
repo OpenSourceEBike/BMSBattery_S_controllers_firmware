@@ -11,12 +11,12 @@
 #define NUMBER_OF_PAS_MAGS 16
 #define limit 25
 #define timeout 3125
-#define wheel_circumference 2000L
+#define wheel_circumference 2200L
 #define fummelfaktor 64L
 #define ADC_THROTTLE_MIN_VALUE 43
 #define ADC_THROTTLE_MAX_VALUE 182
 #define BATTERY_VOLTAGE_MIN_VALUE 127
-#define BATTERY_CURRENT_MAX_VALUE 350L
+#define BATTERY_CURRENT_MAX_VALUE 371L
 #define REGEN_CURRENT_MAX_VALUE 282L
 #define MOTOR_ROTOR_DELTA_PHASE_ANGLE_RIGHT 214
 #define current_cal_a 10
@@ -35,10 +35,10 @@
 #define GEAR_RATIO 64L
 #define BATTERY_LI_ION_CELLS_NUMBER 10
 #define PAS_THRESHOLD 1.7
-#define THROTTLE
+#define TORQUE_SIMULATION
 #define PWM_CYCLES_SECOND 15625L
 #define DISPLAY_TYPE_KT_LCD3
-#define SPEEDSENSOR_INTERNAL
+#define SPEEDSENSOR_EXTERNAL
 #define PAS_DIRECTION 0
 
 #endif /* CONFIG_H_ */
