@@ -25,7 +25,7 @@
 
 extern uint8_t ui8_motor_commutation_type;
 extern volatile uint8_t ui8_angle_correction;
-extern uint8_t ui8_adc_motor_total_current;
+extern volatile uint8_t ui8_adc_motor_total_current;
 extern uint8_t ui8_motor_total_current_offset;
 extern volatile uint8_t ui8_duty_cycle;
 extern uint8_t ui8_duty_cycle_target;

@@ -310,7 +310,7 @@ uint8_t ui8_adc_target_motor_current_max;
 int16_t i16_motor_current_filtered_10b;
 uint8_t ui8_adc_target_motor_regen_current_max;
 
-uint8_t ui8_adc_motor_total_current;
+volatile uint8_t ui8_adc_motor_total_current;
 uint8_t ui8_motor_total_current_offset;
 uint16_t ui16_motor_total_current_offset_10b;
 
@@ -567,34 +567,33 @@ debug_pin_reset ();
   // - ramp up/down PWM duty_cycle value
 
   // verify motor max current limit
-//  ui8_adc_motor_total_current = UI8_ADC_MOTOR_TOTAL_CURRENT;
-//  if (ui8_adc_motor_total_current > ui8_adc_target_motor_current_max)  // motor max current, reduce duty_cycle
-//  {
-//    if (ui8_duty_cycle > 0)
-//    {
-//      ui8_duty_cycle--;
-//    }
-//  }
-//  // verify if there is regen current > 0 (if there is happening regen) and
-//  // if battery voltage is over or equal to absolute battery max voltage, and if so
-//  // reduce regen current
-//  else if ((ui8_adc_motor_total_current < ui8_motor_total_current_offset) &&
-//      (UI8_ADC_BATTERY_VOLTAGE >= ((uint8_t) ADC_BATTERY_VOLTAGE_MAX)))
-//  {
-//    if (ui8_duty_cycle < 255)
-//    {
-//      ui8_duty_cycle++;
-//    }
-//  }
-//  // verify motor max regen current limit
-//  else if (ui8_adc_motor_total_current < ui8_adc_target_motor_regen_current_max)
-//  {
-//    if (ui8_duty_cycle < 255)
-//    {
-//      ui8_duty_cycle++;
-//    }
-//  }
-//  else // no motor current limits, adjust duty_cycle to duty_cycle_target, including ramping
+  if (ui8_adc_motor_total_current > ui8_adc_target_motor_current_max)  // motor max current, reduce duty_cycle
+  {
+    if (ui8_duty_cycle > 0)
+    {
+      ui8_duty_cycle--;
+    }
+  }
+  // verify if there is regen current > 0 (if there is happening regen) and
+  // if battery voltage is over or equal to absolute battery max voltage, and if so
+  // reduce regen current
+  else if ((ui8_adc_motor_total_current < ui8_motor_total_current_offset) &&
+      (UI8_ADC_BATTERY_VOLTAGE >= ((uint8_t) ADC_BATTERY_VOLTAGE_MAX)))
+  {
+    if (ui8_duty_cycle < 255)
+    {
+      ui8_duty_cycle++;
+    }
+  }
+  // verify motor max regen current limit
+  else if (ui8_adc_motor_total_current < ui8_adc_target_motor_regen_current_max)
+  {
+    if (ui8_duty_cycle < 255)
+    {
+      ui8_duty_cycle++;
+    }
+  }
+  else // no motor current limits, adjust duty_cycle to duty_cycle_target, including ramping
   {
     if (ui8_duty_cycle_target > ui8_duty_cycle)
     {
@@ -967,7 +966,8 @@ void calc_motor_current_filtered (void)
 {
   // low pass filter the current readed value, to avoid possible fast spikes/noise
   ui16_adc_motor_current_accumulated_10b -= ui16_adc_motor_current_accumulated_10b >> 3;
-  ui16_adc_motor_current_accumulated_10b += ui16_adc_read_motor_total_current_10b ();
+//  ui16_adc_motor_current_accumulated_10b += ui16_adc_read_motor_total_current_10b ();
+  ui16_adc_motor_current_accumulated_10b += ((uint16_t) ui8_adc_motor_total_current) << 2;
   ui16_adc_motor_current_filtered_10b = ui16_adc_motor_current_accumulated_10b >> 3;
 
   // i8_motor_current_filtered_10b has sign, negative value will be regen current
