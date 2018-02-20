@@ -17,8 +17,12 @@
 #define ADC1_CHANNEL_BATTERY_VOLTAGE			ADC1_CHANNEL_9
 #define ADC1_CHANNEL_THROTTLE				ADC1_CHANNEL_4
 
+//phase_B_current --> ADC_AIN5
+// 0x53E0 + 2*5 = 0x53EA
+
 #define UI8_ADC_BATTERY_VOLTAGE 			(*(uint8_t*)(0x53F2))
-#define UI8_ADC_MOTOR_TOTAL_CURRENT			(*(uint8_t*)(0x53F0))
+#define UI8_ADC_MOTOR_TOTAL_CURRENT_FILTERED		(*(uint8_t*)(0x53F0))
+#define UI8_ADC_MOTOR_TOTAL_CURRENT			(*(uint8_t*)(0x53EC))
 #define UI8_ADC_PHASE_B_CURRENT 			(*(uint8_t*)(0x53EA))
 #define UI8_ADC_THROTTLE 				(*(uint8_t*)(0x53E8))
 

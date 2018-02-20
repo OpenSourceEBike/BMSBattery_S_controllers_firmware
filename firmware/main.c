@@ -63,7 +63,7 @@ void EXTI_PORTA_IRQHandler(void) __interrupt(EXTI_PORTA_IRQHANDLER);
 void EXTI_PORTD_IRQHandler(void) __interrupt(EXTI_PORTD_IRQHANDLER);
 
 // Timer1/PWM period interrupt
-void TIM1_UPD_OVF_TRG_BRK_IRQHandler(void) __interrupt(TIM1_UPD_OVF_TRG_BRK_IRQHANDLER);
+void TIM1_CAP_COM_IRQHandler(void) __interrupt(TIM1_CAP_COM_IRQHANDLER);
 
 // UART2 Receive interrupt
 void UART2_IRQHandler(void) __interrupt(UART2_IRQHANDLER);
@@ -95,7 +95,7 @@ int main (void)
   while (1)
   {
 #ifdef DEBUG_UART
-//    printf ("%d,%d,%d,%d\n", ui16_motor_get_motor_speed_erps (), ui8_duty_cycle, ui8_motor_commutation_type, ui8_angle_correction);
+    printf ("%d,%d,%d\n", ui8_duty_cycle, ui8_adc_motor_total_current, UI8_ADC_MOTOR_TOTAL_CURRENT_FILTERED);
 #endif
 
     // because of continue; at the end of each if code block that will stop the while (1) loop there,

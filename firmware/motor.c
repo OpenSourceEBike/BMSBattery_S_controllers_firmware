@@ -363,14 +363,26 @@ void motor_controller (void)
 }
 
 // runs every 64us (PWM frequency)
-void TIM1_UPD_OVF_TRG_BRK_IRQHandler(void) __interrupt(TIM1_UPD_OVF_TRG_BRK_IRQHANDLER)
+void TIM1_CAP_COM_IRQHandler(void) __interrupt(TIM1_CAP_COM_IRQHANDLER)
 {
   uint8_t ui8_temp;
 
+  // disable scan mode
+  ADC1->CR2 &= (uint8_t)(~ADC1_CR2_SCAN);
+  // clear EOC flag first (selected also channel 6)
+  ADC1->CSR = 0x06;
+  // start ADC1 conversion
+  ADC1->CR1 |= ADC1_CR1_ADON;
+debug_pin_set ();
+  while (!(ADC1->CSR & ADC1_FLAG_EOC)) ;
+  ui8_adc_motor_total_current = ADC1->DRH;
+debug_pin_reset ();
+
   /****************************************************************************/
   // trigger ADC conversion of all channels (scan conversion, buffered)
-  ADC1->CSR &= 0x09; // clear EOC flag first (selected also channel 9)
-  ADC1->CR1 |= ADC1_CR1_ADON; // Start ADC1 conversion
+  ADC1->CR2 |= ADC1_CR2_SCAN; // enable scan mode
+  ADC1->CSR = 0x09; // clear EOC flag first (selected also channel 9)
+  ADC1->CR1 |= ADC1_CR1_ADON; // start ADC1 conversion
   /****************************************************************************/
 
   /****************************************************************************/
@@ -555,34 +567,34 @@ void TIM1_UPD_OVF_TRG_BRK_IRQHandler(void) __interrupt(TIM1_UPD_OVF_TRG_BRK_IRQH
   // - ramp up/down PWM duty_cycle value
 
   // verify motor max current limit
-  ui8_adc_motor_total_current = UI8_ADC_MOTOR_TOTAL_CURRENT;
-  if (ui8_adc_motor_total_current > ui8_adc_target_motor_current_max)  // motor max current, reduce duty_cycle
-  {
-    if (ui8_duty_cycle > 0)
-    {
-      ui8_duty_cycle--;
-    }
-  }
-  // verify if there is regen current > 0 (if there is happening regen) and
-  // if battery voltage is over or equal to absolute battery max voltage, and if so
-  // reduce regen current
-  else if ((ui8_adc_motor_total_current < ui8_motor_total_current_offset) &&
-      (UI8_ADC_BATTERY_VOLTAGE >= ((uint8_t) ADC_BATTERY_VOLTAGE_MAX)))
-  {
-    if (ui8_duty_cycle < 255)
-    {
-      ui8_duty_cycle++;
-    }
-  }
-  // verify motor max regen current limit
-  else if (ui8_adc_motor_total_current < ui8_adc_target_motor_regen_current_max)
-  {
-    if (ui8_duty_cycle < 255)
-    {
-      ui8_duty_cycle++;
-    }
-  }
-  else // no motor current limits, adjust duty_cycle to duty_cycle_target, including ramping
+//  ui8_adc_motor_total_current = UI8_ADC_MOTOR_TOTAL_CURRENT;
+//  if (ui8_adc_motor_total_current > ui8_adc_target_motor_current_max)  // motor max current, reduce duty_cycle
+//  {
+//    if (ui8_duty_cycle > 0)
+//    {
+//      ui8_duty_cycle--;
+//    }
+//  }
+//  // verify if there is regen current > 0 (if there is happening regen) and
+//  // if battery voltage is over or equal to absolute battery max voltage, and if so
+//  // reduce regen current
+//  else if ((ui8_adc_motor_total_current < ui8_motor_total_current_offset) &&
+//      (UI8_ADC_BATTERY_VOLTAGE >= ((uint8_t) ADC_BATTERY_VOLTAGE_MAX)))
+//  {
+//    if (ui8_duty_cycle < 255)
+//    {
+//      ui8_duty_cycle++;
+//    }
+//  }
+//  // verify motor max regen current limit
+//  else if (ui8_adc_motor_total_current < ui8_adc_target_motor_regen_current_max)
+//  {
+//    if (ui8_duty_cycle < 255)
+//    {
+//      ui8_duty_cycle++;
+//    }
+//  }
+//  else // no motor current limits, adjust duty_cycle to duty_cycle_target, including ramping
   {
     if (ui8_duty_cycle_target > ui8_duty_cycle)
     {
@@ -790,7 +802,7 @@ void TIM1_UPD_OVF_TRG_BRK_IRQHandler(void) __interrupt(TIM1_UPD_OVF_TRG_BRK_IRQH
 
   /****************************************************************************/
   // clears the TIM1 interrupt TIM1_IT_UPDATE pending bit
-  TIM1->SR1 = (uint8_t)(~(uint8_t)TIM1_IT_UPDATE);
+  TIM1->SR1 = (uint8_t)(~(uint8_t)TIM1_IT_CC4);
   /****************************************************************************/
 }
 

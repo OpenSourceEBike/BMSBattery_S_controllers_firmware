@@ -8,6 +8,7 @@
 
 #include <stdint.h>
 #include <stdio.h>
+#include "interrupts.h"
 #include "stm8s_tim1.h"
 #include "gpio.h"
 #include "pwm.h"
@@ -61,6 +62,12 @@ void pwm_init_bipolar_4q (void)
 	       TIM1_OCIDLESTATE_RESET,
 	       TIM1_OCNIDLESTATE_SET);
 
+  TIM1_OC4Init(TIM1_OCMODE_PWM1,
+	       TIM1_OUTPUTSTATE_DISABLE,
+	       285, // timming for interrupt firing (hand adjusted)
+	       TIM1_OCPOLARITY_HIGH,
+	       TIM1_OCIDLESTATE_RESET);
+
   // break, dead time and lock configuration
   TIM1_BDTRConfig(TIM1_OSSISTATE_ENABLE,
 		  TIM1_LOCKLEVEL_OFF,
@@ -70,8 +77,7 @@ void pwm_init_bipolar_4q (void)
 		  TIM1_BREAKPOLARITY_LOW,
 		  TIM1_AUTOMATICOUTPUT_DISABLE);
 
-  TIM1_ITConfig(TIM1_IT_UPDATE, ENABLE);
+  TIM1_ITConfig(TIM1_IT_CC4, ENABLE);
   TIM1_Cmd(ENABLE); // TIM1 counter enable
   TIM1_CtrlPWMOutputs(ENABLE);
 }
-
