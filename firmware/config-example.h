@@ -78,8 +78,8 @@
 // Choose your controller max current and max regen current
 //
 // S06S controller holds 15 amps as max current
-#define ADC_MOTOR_CURRENT_MAX		30 // each unit = 0.5A; 30 = 15A
-#define ADC_MOTOR_REGEN_CURRENT_MAX	30 // each unit = 0.5A; 30 = 15A but the brake/regen must be only for a few seconds!!
+#define ADC_MOTOR_CURRENT_MAX		60 // each unit = 0.25A; 60 = 15A
+#define ADC_MOTOR_REGEN_CURRENT_MAX	30 // each unit = 0.25A; 30 = 7.5A but the brake/regen must be only for a few seconds!!
 
 // Choose PWM ramp up/down step (higher value will make the motor acceleration slower)
 //

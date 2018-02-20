@@ -554,8 +554,8 @@ debug_pin_reset ();
       // read here the phase B current: FOC Id current
       ui8_adc_id_current = UI8_ADC_PHASE_B_CURRENT;
 
-      if (ui8_adc_id_current > 127) { ui8_angle_correction++; }
-      else if (ui8_adc_id_current < 125) { ui8_angle_correction--; }
+      if (ui8_adc_id_current > ADC_PHASE_B_CURRENT_ZERO_AMPS_FOC_MAX) { ui8_angle_correction++; }
+      else if (ui8_adc_id_current < ADC_PHASE_B_CURRENT_ZERO_AMPS_FOC_MIN) { ui8_angle_correction--; }
     }
   }
   /****************************************************************************/
@@ -919,35 +919,6 @@ uint16_t motor_controller_get_target_speed_erps_max (void)
 void motor_controller_set_target_current_10b (uint16_t ui16_current)
 {
   ui16_target_current_10b = ui16_current;
-}
-
-// call every 100ms
-uint8_t motor_current_controller (void)
-{
-  int16_t i16_error;
-  int16_t i16_output;
-  int16_t i16_motor_current;
-
-  i16_motor_current = i16_motor_current_filtered_10b;
-  // make sure current is not negative, we are here not to control negative/regen current
-  if (i16_motor_current < 0)
-  {
-    i16_motor_current = 0;
-  }
-
-  i16_error = ((int16_t) ui16_target_current_10b) - i16_motor_current;
-  i16_output = i16_error * MOTOR_CURRENT_CONTROLLER_KP;
-
-  // limit max output value
-  if (i16_output > MOTOR_CURRENT_CONTROLLER_OUTPUT_MAX) i16_output = MOTOR_CURRENT_CONTROLLER_OUTPUT_MAX;
-  else if (i16_output < (-MOTOR_CURRENT_CONTROLLER_OUTPUT_MAX)) i16_output = -MOTOR_CURRENT_CONTROLLER_OUTPUT_MAX;
-  i16_output >>= 5; // divide to 64, avoid using floats
-
-  i16_output = ui8_duty_cycle + i16_output;
-  if (i16_output > PWM_DUTY_CYCLE_MAX) i16_output = PWM_DUTY_CYCLE_MAX;
-  if (i16_output < 0) i16_output = 0;
-
-  return (uint8_t) i16_output;
 }
 
 void motor_set_pwm_duty_cycle (uint8_t ui8_value)
