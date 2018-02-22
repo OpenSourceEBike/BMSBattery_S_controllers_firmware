@@ -71,8 +71,8 @@
 //#define BATTERY_LI_ION_CELLS_NUMBER	10 // 10S = 36V battery pack
 //#define BATTERY_LI_ION_CELLS_NUMBER	13 // 13S = 48V battery pack
 
-#define ADC_BATTERY_CURRENT_MAX		10 // each unit = 0.25A
-#define ADC_BATTERY_REGEN_CURRENT_MAX	5 // each unit = 0.25A
+#define ADC_BATTERY_CURRENT_MAX		10 // each unit = 0.35A
+#define ADC_BATTERY_REGEN_CURRENT_MAX	5 // each unit = 0.35A
 // *************************************************************************** //
 
 // *************************************************************************** //

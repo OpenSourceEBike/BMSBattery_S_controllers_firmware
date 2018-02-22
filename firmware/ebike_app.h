@@ -50,7 +50,7 @@ extern uint8_t ui8_adc_throttle_value;
 
 extern uint8_t ui8_adc_battery_current_offset;
 extern uint16_t ui16_adc_battery_current_offset_10b;
-extern volatile int16_t i16_battery_current_filtered;
+extern int16_t i16_battery_current_filtered;
 extern volatile uint8_t ui8_adc_target_battery_current_max;
 extern volatile uint8_t ui8_adc_target_battery_regen_current_max;
 

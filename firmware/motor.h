@@ -25,13 +25,12 @@
 
 extern uint8_t ui8_motor_commutation_type;
 extern volatile uint8_t ui8_angle_correction;
-extern volatile uint8_t ui8_adc_motor_current;
+extern volatile uint8_t ui8_adc_battery_current;
 extern uint8_t ui8_adc_motor_current_offset;
 extern volatile uint8_t ui8_duty_cycle;
 extern uint8_t ui8_duty_cycle_target;
 extern volatile uint8_t ui8_duty_cycle;
 extern uint16_t ui16_PWM_cycles_counter_total;
-extern int16_t i16_motor_current_filtered;
 extern uint8_t ui8_pwm_duty_cycle_duty_cycle_controller;
 extern uint8_t ui8_pas_state;
 extern volatile uint8_t ui8_torque_sensor_throttle_processed_value;
@@ -45,7 +44,6 @@ void motor_enable_PWM (void);
 void motor_disable_PWM (void);
 void motor_set_pwm_duty_cycle_target (uint8_t value);
 void motor_set_current_max (uint8_t value); // steps of 0.25A each step
-int16_t i16_motor_get_current (void); // steps of 0.25A each step
 void motor_set_regen_current_max (uint8_t value); // steps of 0.25A each step
 void motor_set_pwm_duty_cycle_ramp_up_inverse_step (uint16_t value); // each step = 64us
 void motor_set_pwm_duty_cycle_ramp_down_inverse_step (uint16_t value); // each step = 64us
