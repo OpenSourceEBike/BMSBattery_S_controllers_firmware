@@ -99,7 +99,7 @@ int main (void)
 #endif
 
     // because of continue; at the end of each if code block that will stop the while (1) loop there,
-    // the first if block code will have the higher priority over the others
+    // the first if block code will have the higher priority over any others
     ui16_TIM2_counter = TIM2_GetCounter ();
     if ((ui16_TIM2_counter - ui16_motor_controller_counter) > 781) // every 100ms
     {
@@ -108,14 +108,6 @@ int main (void)
       ebike_app_controller ();
       continue;
     }
-//
-//    ui16_TIM2_counter = TIM2_GetCounter ();
-//    if ((ui16_TIM2_counter - ui16_ebike_app_controller_counter) > 781) // every 100ms
-//    {
-//      ui16_ebike_app_controller_counter = ui16_TIM2_counter;
-//      ebike_app_controller ();
-//      continue;
-//    }
   }
 
   return 0;

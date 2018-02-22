@@ -13,6 +13,7 @@
 #include "stm8s_adc1.h"
 #include "stm8s_tim2.h"
 #include "adc.h"
+#include "ebike_app.h"
 
 void adc_trigger (void);
 
@@ -23,11 +24,11 @@ void adc_init (void)
 
   //init GPIO for the used ADC pins
   GPIO_Init(GPIOB,
-	    (THROTTLE__PIN || CURRENT_PHASE_B__PIN || CURRENT_MOTOR_TOTAL__PIN),
+	    (THROTTLE__PIN || PHASE_B_CURRENT__PIN || MOTOR_CURRENT__PIN),
 	    GPIO_MODE_IN_FL_NO_IT);
 
   GPIO_Init(GPIOE,
-	    (CURRENT_MOTOR_TOTAL_FILTERED__PIN),
+	    (BATTERY_CURRENT__PIN),
 	    GPIO_MODE_IN_FL_NO_IT);
 
   //de-Init ADC peripheral
@@ -47,7 +48,7 @@ void adc_init (void)
   ADC1_Cmd (ENABLE);
 
   //********************************************************************************
-  // next code is for "calibrating" the offset value of ADC motor total current
+  // next code is for "calibrating" the offset value of ADC battery current
   // read and discard few samples of ADC, to make sure the next samples are ok
   for (ui8_i = 0; ui8_i < 4; ui8_i++)
   {
@@ -55,21 +56,34 @@ void adc_init (void)
     while (TIM2_GetCounter () < ui16_counter) ; // delay ~10ms
     adc_trigger ();
     while (!ADC1_GetFlagStatus (ADC1_FLAG_EOC)) ; // wait for end of conversion
-    ui8_motor_total_current_offset = ui8_adc_read_motor_total_current ();
+    ui8_adc_motor_current_offset = ui8_adc_read_battery_current ();
   }
 
-  // read and average a few values of ADC
-  ui16_motor_total_current_offset_10b = 0;
+  // read and average a few values of ADC battery current
+  ui16_adc_battery_current_offset_10b = 0;
   for (ui8_i = 0; ui8_i < 16; ui8_i++)
   {
     ui16_counter = TIM2_GetCounter () + 78; // delay ~10ms
     adc_trigger ();
     while (!ADC1_GetFlagStatus (ADC1_FLAG_EOC)) ; // wait for end of conversion
-    ui16_motor_total_current_offset_10b += ui16_adc_read_motor_total_current_10b ();
+    ui16_adc_battery_current_offset_10b += ui16_adc_read_battery_current_10b ();
   }
-  ui16_motor_total_current_offset_10b >>= 4;
-  ui16_motor_total_current_offset_10b -= 4;
-  ui8_motor_total_current_offset = ui16_motor_total_current_offset_10b >> 2;
+  ui16_adc_battery_current_offset_10b >>= 4;
+  ui16_adc_battery_current_offset_10b -= 4;
+  ui8_adc_battery_current_offset = ui16_adc_battery_current_offset_10b >> 2;
+
+  // read and average a few values of ADC motor current
+  ui16_adc_motor_current_offset = 0;
+  for (ui8_i = 0; ui8_i < 16; ui8_i++)
+  {
+    ui16_counter = TIM2_GetCounter () + 78; // delay ~10ms
+    adc_trigger ();
+    while (!ADC1_GetFlagStatus (ADC1_FLAG_EOC)) ; // wait for end of conversion
+    ui16_adc_motor_current_offset += ui8_adc_read_motor_current ();
+  }
+  ui16_adc_motor_current_offset >>= 4;
+  ui16_adc_motor_current_offset -= 4;
+  ui8_adc_motor_current_offset = ui16_adc_motor_current_offset;
 }
 
 void adc_trigger (void)
@@ -109,19 +123,36 @@ uint8_t ui8_adc_read_throttle (void)
   return *(uint8_t*)(0x53E8);
 }
 
-uint8_t ui8_adc_read_motor_total_current (void)
+uint8_t ui8_adc_read_battery_current (void)
 {
 // 0x53E0 + 2*8 = 0x53F0
   return *(uint8_t*)(0x53F0);
 }
 
-uint16_t ui16_adc_read_motor_total_current_10b (void)
+uint16_t ui16_adc_read_battery_current_10b (void)
 {
   uint16_t temph;
   uint8_t templ;
 
   templ = *(uint8_t*)(0x53F1);
   temph = *(uint8_t*)(0x53F0);
+
+  return ((uint16_t) temph) << 2 | ((uint16_t) templ);
+}
+
+uint8_t ui8_adc_read_motor_current (void)
+{
+// 0x53E0 + 2*6 = 0x53EC
+  return *(uint8_t*)(0x53EC);
+}
+
+uint16_t ui16_adc_read_motor_current_10b (void)
+{
+  uint16_t temph;
+  uint8_t templ;
+
+  templ = *(uint8_t*)(0x53ED);
+  temph = *(uint8_t*)(0x53EC);
 
   return ((uint16_t) temph) << 2 | ((uint16_t) templ);
 }

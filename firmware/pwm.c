@@ -62,6 +62,8 @@ void pwm_init_bipolar_4q (void)
 	       TIM1_OCIDLESTATE_RESET,
 	       TIM1_OCNIDLESTATE_SET);
 
+  // OC4 is being used only to fire interrupt at a specific time (middle of DC link current pulses)
+  // OC4 is always ssyncronized with PWM
   TIM1_OC4Init(TIM1_OCMODE_PWM1,
 	       TIM1_OUTPUTSTATE_DISABLE,
 	       285, // timming for interrupt firing (hand adjusted)

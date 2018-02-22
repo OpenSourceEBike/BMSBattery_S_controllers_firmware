@@ -61,7 +61,7 @@ uint8_t ui8_pas_cadence_rpm = 0;
 volatile uint16_t ui16_wheel_speed_sensor_pwm_cycles_ticks = (uint16_t) WHEEL_SPEED_SENSOR_MAX_PWM_CYCLE_TICKS;
 volatile uint8_t ui8_wheel_speed_sensor_is_disconnected = 1; // must start with this value to have correct value at start up
 
-uint16_t ui16_motor_controller_max_current_10b;
+uint8_t ui8_motor_controller_max_current;
 
 uint8_t ui8_wheel_speed_max = 0;
 
@@ -81,6 +81,13 @@ uint8_t ui8_motor_cool_counter = 0;
 uint8_t ui8_rtst_state_machine = 0;
 uint8_t ui8_rtst_counter = 0;
 
+volatile int16_t i16_battery_current_filtered = 0;
+uint8_t ui8_adc_battery_current_offset;
+uint16_t ui16_adc_battery_current_offset_10b;
+
+volatile uint8_t ui8_adc_target_battery_current_max;
+volatile uint8_t ui8_adc_target_battery_regen_current_max;
+
 // function prototypes
 void communications_controller (void);
 uint8_t ebike_app_cruise_control (uint8_t ui8_value);
@@ -97,9 +104,14 @@ void read_battery_voltage_and_protect (void);
 uint8_t ebike_app_get_ADC_battery_voltage_filtered (void);
 void ebike_app_state_machine (void);
 float f_get_assist_level ();
+void ebike_app_battery_set_current_max (uint8_t ui8_value);
+void ebike_app_battery_set_regen_current_max (uint8_t ui8_value);
 
 void ebike_app_init (void)
 {
+  ebike_app_battery_set_current_max (ADC_BATTERY_CURRENT_MAX);
+  ebike_app_battery_set_regen_current_max (ADC_BATTERY_REGEN_CURRENT_MAX);
+
   // init variables for motor current controller
   motor_current_pi_controller_state.ui8_kp_dividend = MOTOR_CURRENT_PI_CONTROLLER_KP_DIVIDEND;
   motor_current_pi_controller_state.ui8_kp_divisor = MOTOR_CURRENT_PI_CONTROLLER_KP_DIVISOR;
@@ -361,7 +373,7 @@ void communications_controller (void)
   // - B8 = 250, LCD shows 1875 watts
   // - B8 = 100, LCD shows 750 watts
   // each unit of B8 = 0.25A
-  i16_motor_current_filtered_10b = i16_motor_get_current_filtered_10b ();
+  i16_motor_current_filtered_10b = ui8_adc_read_battery_current ();
   i16_motor_current_filtered_10b -= 1; // try to avoid LCD display about 25W when motor is not running
   if (i16_motor_current_filtered_10b < 0) { i16_motor_current_filtered_10b = 0; } // limit to be only positive value, LCD don't accept regen current value
   ui8_tx_buffer [8] = (uint8_t) (i16_motor_current_filtered_10b);
@@ -617,7 +629,7 @@ void set_motor_controller_max_current (uint8_t ui8_controller_max_current)
     break;
   }
 
-  ui16_motor_controller_max_current_10b = (uint16_t) (((float) ADC_MOTOR_CURRENT_MAX_10B) * f_controller_max_current);
+  ui8_motor_controller_max_current = (uint8_t) (((float) ADC_MOTOR_CURRENT_MAX) * f_controller_max_current);
 }
 
 struct_lcd_configuration_variables *ebike_app_get_lcd_configuration_variables (void)
@@ -734,12 +746,12 @@ void ebike_throttle_type_throttle_pas (void)
 		   (uint32_t) 0,
 		   (uint32_t) 255,
 		   (uint32_t) 0,
-		   (uint32_t) ui16_motor_controller_max_current_10b >> 2));
+		   (uint32_t) ui8_motor_controller_max_current >> 2));
 
   // PI controller for motor current
-  i8_motor_current = i16_motor_get_current_filtered_10b ();
+  i8_motor_current = i16_motor_get_current ();
   if (i8_motor_current < 0) { i8_motor_current = 0; } // cast negative values to zero, because we are not here to control regen current
-  motor_current_pi_controller_state.ui8_current_value = ((uint8_t) i8_motor_current) >> 2;
+  motor_current_pi_controller_state.ui8_current_value = (uint8_t) i8_motor_current;
   motor_current_pi_controller_state.ui8_target_value = ui8_temp;
   pi_controller (&motor_current_pi_controller_state);
 
@@ -780,8 +792,7 @@ void ebike_throttle_type_throttle_pas (void)
 void ebike_throttle_type_torque_sensor (void)
 {
   uint8_t ui8_temp;
-  uint16_t ui16_target_current_10b;
-  uint16_t ui16_temp;
+  uint8_t ui8_target_current;
   float f_temp;
   int16_t i16_motor_current;
 
@@ -792,20 +803,20 @@ void ebike_throttle_type_torque_sensor (void)
   // calc humam power on the crank using as input the pedal torque sensor value and pedal cadence
   ui16_temp = (uint16_t) (f_temp * ((float) ((float) ui8_pas_cadence_rpm / ((float) PAS_MAX_CADENCE_RPM))));
 #else
-  ui16_temp = (uint16_t) f_temp;
+  ui8_temp = (uint8_t) f_temp;
 #endif
 
-  ui16_target_current_10b = (uint16_t) (map ((uint32_t) ui16_temp,
+  ui8_target_current = (uint16_t) (map ((uint32_t) ui8_temp,
 			   (uint32_t) 0, // min input value
 			   (uint32_t) 255, // max input value
 			   (uint32_t) 0, // min output motor current value
-			   (uint32_t) ui16_motor_controller_max_current_10b >> 2));  // max output motor current value
+			   (uint32_t) ui8_motor_controller_max_current));  // max output motor current value
 
   // PI controller for motor current
-  i16_motor_current = i16_motor_get_current_filtered_10b ();
+  i16_motor_current = i16_motor_get_current ();
   if (i16_motor_current < 0) { i16_motor_current = 0; } // cast negative values to zero, because we are not here to control regen current
-  motor_current_pi_controller_state.ui8_current_value = (uint8_t) (((uint16_t) i16_motor_current) >> 2);
-  motor_current_pi_controller_state.ui8_target_value = ui16_target_current_10b;
+  motor_current_pi_controller_state.ui8_current_value = i16_motor_current;
+  motor_current_pi_controller_state.ui8_target_value = ui8_target_current;
   pi_controller (&motor_current_pi_controller_state);
 
   // LCD P3 = 1, control / limit speed to max value
@@ -817,7 +828,7 @@ void ebike_throttle_type_torque_sensor (void)
   else // LCD P3 = 0, control also the speed depending on ui8_throttle_pas_target_value
   {
     // map to wheel speed
-    ui8_temp = (uint8_t) (map ((uint32_t) ui16_temp,
+    ui8_temp = (uint8_t) (map ((uint32_t) ui8_temp,
   		   (uint32_t) 0,
   		   (uint32_t) 255,
   		   (uint32_t) 0,
@@ -1015,4 +1026,14 @@ void ebike_app_clear_error (void)
 uint8_t ebike_app_get_error (void)
 {
   return ui8_ebike_app_error;
+}
+
+void ebike_app_battery_set_current_max (uint8_t ui8_value)
+{
+  ui8_adc_target_battery_current_max = ui8_adc_battery_current_offset + ui8_value;
+}
+
+void ebike_app_battery_set_regen_current_max (uint8_t ui8_value)
+{
+  ui8_adc_target_battery_regen_current_max = ui8_adc_battery_current_offset - ui8_value;
 }

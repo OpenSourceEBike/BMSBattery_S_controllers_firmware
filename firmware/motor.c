@@ -307,12 +307,12 @@ uint8_t ui8_hall_sensors_last = 0;
 uint8_t ui8_adc_id_current = 0;
 
 uint8_t ui8_adc_target_motor_current_max;
-int16_t i16_motor_current_filtered_10b;
+int16_t i16_motor_current_filtered;
 uint8_t ui8_adc_target_motor_regen_current_max;
 
-volatile uint8_t ui8_adc_motor_total_current;
-uint8_t ui8_motor_total_current_offset;
-uint16_t ui16_motor_total_current_offset_10b;
+volatile uint8_t ui8_adc_motor_current;
+uint8_t ui8_adc_motor_current_offset;
+uint16_t ui16_adc_motor_current_offset;
 
 uint8_t ui8_half_erps_flag = 0;
 
@@ -320,8 +320,8 @@ uint16_t ui16_target_erps = 0;
 volatile uint16_t ui16_target_erps_max = MOTOR_OVER_SPEED_ERPS;
 uint16_t ui16_target_current_10b = 0;
 
-uint16_t ui16_adc_motor_current_accumulated_10b;
-uint16_t ui16_adc_motor_current_filtered_10b;
+uint16_t ui16_adc_motor_current_accumulated;
+uint16_t ui16_adc_motor_current_filtered;
 
 volatile uint8_t ui8_duty_cycle = 0;
 uint8_t ui8_duty_cycle_target;
@@ -367,16 +367,17 @@ void TIM1_CAP_COM_IRQHandler(void) __interrupt(TIM1_CAP_COM_IRQHANDLER)
 {
   uint8_t ui8_temp;
 
+  /****************************************************************************/
+  // read motor current ADC value
   // disable scan mode
   ADC1->CR2 &= (uint8_t)(~ADC1_CR2_SCAN);
   // clear EOC flag first (selected also channel 6)
   ADC1->CSR = 0x06;
   // start ADC1 conversion
   ADC1->CR1 |= ADC1_CR1_ADON;
-debug_pin_set ();
   while (!(ADC1->CSR & ADC1_FLAG_EOC)) ;
-  ui8_adc_motor_total_current = ADC1->DRH;
-debug_pin_reset ();
+  ui8_adc_motor_current = ADC1->DRH;
+  /****************************************************************************/
 
   /****************************************************************************/
   // trigger ADC conversion of all channels (scan conversion, buffered)
@@ -552,7 +553,7 @@ debug_pin_reset ();
     if (ui16_motor_speed_erps > MOTOR_ROTOR_ERPS_START_INTERPOLATION_60_DEGREES)
     {
       // read here the phase B current: FOC Id current
-      ui8_adc_id_current = UI8_ADC_PHASE_B_CURRENT;
+      ui8_adc_id_current = UI8_ADC_MOTOR_PHASE_B_CURRENT;
 
       if (ui8_adc_id_current > ADC_PHASE_B_CURRENT_ZERO_AMPS_FOC_MAX) { ui8_angle_correction++; }
       else if (ui8_adc_id_current < ADC_PHASE_B_CURRENT_ZERO_AMPS_FOC_MIN) { ui8_angle_correction--; }
@@ -562,12 +563,15 @@ debug_pin_reset ();
 
   /****************************************************************************/
   // PWM duty_cycle controller:
+  // - limit battery overvoltage
+  // - limit battery max current
   // - limit motor max current
+  // - limit battery max regen current
   // - limit motor max regen current
   // - ramp up/down PWM duty_cycle value
 
-  // verify motor max current limit
-  if (ui8_adc_motor_total_current > ui8_adc_target_motor_current_max)  // motor max current, reduce duty_cycle
+  if ((UI8_ADC_BATTERY_CURRENT > ui8_adc_target_battery_current_max) || // battery max current, reduce duty_cycle
+      (ui8_adc_motor_current > ui8_adc_target_motor_current_max)) // motor max current, reduce duty_cycle
   {
     if (ui8_duty_cycle > 0)
     {
@@ -576,24 +580,21 @@ debug_pin_reset ();
   }
   // verify if there is regen current > 0 (if there is happening regen) and
   // if battery voltage is over or equal to absolute battery max voltage, and if so
-  // reduce regen current
-  else if ((ui8_adc_motor_total_current < ui8_motor_total_current_offset) &&
-      (UI8_ADC_BATTERY_VOLTAGE >= ((uint8_t) ADC_BATTERY_VOLTAGE_MAX)))
+  // reduce regen current -- the idea is to avoid overcharge the battery
+  else if (((ui8_adc_motor_current < ui8_adc_motor_current_offset) &&
+      (UI8_ADC_BATTERY_VOLTAGE >= ((uint8_t) ADC_BATTERY_VOLTAGE_MAX))) ||
+      // verify battery max regen current limit
+      (UI8_ADC_BATTERY_CURRENT < ui8_adc_target_battery_regen_current_max) ||
+      // verify motor max regen current limit
+      (ui8_adc_motor_current < ui8_adc_target_motor_regen_current_max))
+
   {
     if (ui8_duty_cycle < 255)
     {
       ui8_duty_cycle++;
     }
   }
-  // verify motor max regen current limit
-  else if (ui8_adc_motor_total_current < ui8_adc_target_motor_regen_current_max)
-  {
-    if (ui8_duty_cycle < 255)
-    {
-      ui8_duty_cycle++;
-    }
-  }
-  else // no motor current limits, adjust duty_cycle to duty_cycle_target, including ramping
+  else // nothing to limit, so, adjust duty_cycle to duty_cycle_target, including ramping
   {
     if (ui8_duty_cycle_target > ui8_duty_cycle)
     {
@@ -851,7 +852,7 @@ void motor_init (void)
   /***************************************************************************************/
 
   // initialize the value of ui16_adc_motor_current_accumulated_10b
-  ui16_adc_motor_current_accumulated_10b = ui16_motor_total_current_offset_10b << 3;
+  ui16_adc_motor_current_accumulated = ui16_adc_motor_current_offset << 3;
 
   motor_set_current_max (ADC_MOTOR_CURRENT_MAX);
   motor_set_regen_current_max (ADC_MOTOR_REGEN_CURRENT_MAX);
@@ -873,12 +874,12 @@ uint8_t motor_get_pwm_duty_cycle_target (void)
 
 void motor_set_current_max (uint8_t ui8_value)
 {
-  ui8_adc_target_motor_current_max = ui8_motor_total_current_offset + ui8_value;
+  ui8_adc_target_motor_current_max = ui8_adc_motor_current_offset + ui8_value;
 }
 
 void motor_set_regen_current_max (uint8_t ui8_value)
 {
-  ui8_adc_target_motor_regen_current_max = ui8_motor_total_current_offset - ui8_value;
+  ui8_adc_target_motor_regen_current_max = ui8_adc_motor_current_offset - ui8_value;
 }
 
 void motor_set_pwm_duty_cycle_ramp_up_inverse_step (uint16_t ui16_value)
@@ -928,21 +929,20 @@ void motor_set_pwm_duty_cycle (uint8_t ui8_value)
   ui8_duty_cycle = ui8_value;
 }
 
-int16_t i16_motor_get_current_filtered_10b (void)
+int16_t i16_motor_get_current (void)
 {
-  return i16_motor_current_filtered_10b;
+  return i16_motor_current_filtered;
 }
 
 void calc_motor_current_filtered (void)
 {
   // low pass filter the current readed value, to avoid possible fast spikes/noise
-  ui16_adc_motor_current_accumulated_10b -= ui16_adc_motor_current_accumulated_10b >> 3;
-//  ui16_adc_motor_current_accumulated_10b += ui16_adc_read_motor_total_current_10b ();
-  ui16_adc_motor_current_accumulated_10b += ((uint16_t) ui8_adc_motor_total_current) << 2;
-  ui16_adc_motor_current_filtered_10b = ui16_adc_motor_current_accumulated_10b >> 3;
+  ui16_adc_motor_current_accumulated -= ui16_adc_motor_current_accumulated >> 3;
+  ui16_adc_motor_current_accumulated += ui8_adc_motor_current;
+  ui16_adc_motor_current_filtered = ui16_adc_motor_current_accumulated >> 3;
 
-  // i8_motor_current_filtered_10b has sign, negative value will be regen current
-  i16_motor_current_filtered_10b = ui16_adc_motor_current_filtered_10b - ui16_motor_total_current_offset_10b;
+  // i16_motor_current_filtered has sign, negative value will be regen current
+  i16_motor_current_filtered = ui16_adc_motor_current_filtered - ui8_adc_motor_current_offset;
 }
 
 // motor overcurrent interrupt

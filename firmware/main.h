@@ -52,8 +52,6 @@
 
 #define ADC_PHASE_B_CURRENT_FACTOR 333 // 0.1 / 0.030A * 0.707 = 3.3
 
-#define ADC_MOTOR_CURRENT_MAX_10B (ADC_MOTOR_CURRENT_MAX << 2)
-
 #if defined (DO_SINEWAVE_INTERPOLATION_360_DEGREES)
 // This value is ERPS speed after which a transition happens from sinewave 60 degrees to have
 // interpolation 360 degrees and must be found experimentally but a value of 100 may be good
