@@ -102,12 +102,12 @@ void read_throttle (void);
 void read_torque_sensor_throttle (void);
 void read_pas_cadence_and_direction (void);
 uint8_t pas_is_set (void);
-void read_battery_voltage_and_protect (void);
-uint8_t ebike_app_get_ADC_battery_voltage_filtered (void);
+void read_battery_voltage (void);
 void ebike_app_state_machine (void);
 float f_get_assist_level ();
 void ebike_app_battery_set_current_max (uint8_t ui8_value);
 void ebike_app_battery_set_regen_current_max (uint8_t ui8_value);
+uint8_t ebike_app_get_ADC_battery_voltage_filtered (void);
 void calc_battery_current_filtered (void);
 
 void ebike_app_init (void)
@@ -136,7 +136,7 @@ void ebike_app_init (void)
 void ebike_app_controller (void)
 {
   // reads battery voltage and also protects for undervoltage
-  read_battery_voltage_and_protect ();
+  read_battery_voltage ();
 
   // calc battery current filtered and save the value on global variable i16_battery_current_filtered
   calc_battery_current_filtered ();
@@ -954,20 +954,12 @@ void read_torque_sensor_throttle (void)
   }
 }
 
-void read_battery_voltage_and_protect (void)
+void read_battery_voltage (void)
 {
   // low pass filter the voltage readed value, to avoid possible fast spikes/noise
   ui16_adc_battery_voltage_accumulated -= ui16_adc_battery_voltage_accumulated >> 6;
   ui16_adc_battery_voltage_accumulated += ((uint16_t) ui8_adc_read_battery_voltage ());
   ui8_adc_battery_voltage_filtered = ui16_adc_battery_voltage_accumulated >> 6;
-
-  if (ui8_adc_battery_voltage_filtered < ((uint8_t) ADC_BATTERY_VOLTAGE_MIN))
-  {
-    // motor will stop and battery symbol on LCD will be empty and flashing
-    motor_controller_set_state (MOTOR_CONTROLLER_STATE_UNDER_VOLTAGE);
-    motor_disable_PWM ();
-    ebike_app_set_error (EBIKE_APP_ERROR_91_BATTERY_UNDER_VOLTAGE);
-  }
 }
 
 uint8_t ebike_app_get_ADC_battery_voltage_filtered (void)

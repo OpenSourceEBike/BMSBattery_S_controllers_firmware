@@ -551,16 +551,18 @@ void TIM1_CAP_COM_IRQHandler(void) __interrupt(TIM1_CAP_COM_IRQHANDLER)
   /****************************************************************************/
   // PWM duty_cycle controller:
   // - limit battery overvoltage
+  // - limit battery undervoltage
   // - limit battery max current
-  // - limit motor max current
   // - limit battery max regen current
+  // - limit motor max current
   // - limit motor max regen current
   // - limit motor max ERPS
   // - ramp up/down PWM duty_cycle value
 
   if ((UI8_ADC_BATTERY_CURRENT > ui8_adc_target_battery_current_max) || // battery max current, reduce duty_cycle
       (ui8_adc_battery_current > ui8_adc_target_motor_current_max) || // motor max current, reduce duty_cycle
-      (ui16_motor_speed_erps > MOTOR_OVER_SPEED_ERPS)) // verify motor rotation ERPS
+      (ui16_motor_speed_erps > MOTOR_OVER_SPEED_ERPS) || // motor speed over max ERPS, reduce duty_cycle
+      (UI8_ADC_BATTERY_VOLTAGE < ((uint8_t) ADC_BATTERY_VOLTAGE_MIN))) // battery voltage under min voltage, reduce duty_cycle
   {
     if (ui8_duty_cycle > 0)
     {
