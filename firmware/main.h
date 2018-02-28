@@ -161,31 +161,33 @@
 // 29.8V --> 110 (8bits ADC)
 // 22.1V --> 81 (8bits ADC)
 // 1 ADC step 8 bits --> 0.287 volts
-#define ADC_BATTERY_VOLTAGE_PER_ADC_STEP 0.272 // this value was found experimentaly, to beter represent the real value
-#define ADC_BATTERY_VOLTAGE_K 73 // 0.272 << 8
+//#define ADC_BATTERY_VOLTAGE_PER_ADC_STEP 0.272 // S06S controller | this value was found experimentaly, to beter represent the real value
+#define ADC_BATTERY_VOLTAGE_PER_ADC_STEP 0.262 // S12S controller | this value was found experimentaly, to beter represent the real value
+//#define ADC_BATTERY_VOLTAGE_K 73 // S06S | 0.272 << 8
+#define ADC_BATTERY_VOLTAGE_K 67 // S12S | 0.262 << 8
 
-#define COMMUNICATIONS_BATTERY_VOLTAGE	(BATTERY_LI_ION_CELLS_NUMBER * 3.45) // example: 7S battery, should be = 24
-#define ADC_BATTERY_VOLTAGE_MAX 	((BATTERY_LI_ION_CELLS_NUMBER * LI_ION_CELL_VOLTS_MAX) / ADC_BATTERY_VOLTAGE_PER_ADC_STEP)
+#define COMMUNICATIONS_BATTERY_VOLTAGE	(uint8_t) (((float) BATTERY_LI_ION_CELLS_NUMBER) * 3.45) // example: 7S battery, should be = 24
+#define ADC_BATTERY_VOLTAGE_MAX 	(uint8_t) ((((float) BATTERY_LI_ION_CELLS_NUMBER) * LI_ION_CELL_VOLTS_MAX) / ADC_BATTERY_VOLTAGE_PER_ADC_STEP)
 #define ADC_BATTERY_VOLTAGE_MED 	((COMMUNICATIONS_BATTERY_VOLTAGE / ADC_BATTERY_VOLTAGE_PER_ADC_STEP)) << 6
-#define ADC_BATTERY_VOLTAGE_MIN 	((BATTERY_LI_ION_CELLS_NUMBER * LI_ION_CELL_VOLTS_MIN) / ADC_BATTERY_VOLTAGE_PER_ADC_STEP)
+#define ADC_BATTERY_VOLTAGE_MIN 	(uint8_t) ((((float) BATTERY_LI_ION_CELLS_NUMBER) * LI_ION_CELL_VOLTS_MIN) / ADC_BATTERY_VOLTAGE_PER_ADC_STEP)
 
 // Considering the follow voltage values for each li-ion battery cell
 // State of charge 		| voltage
-#define LI_ION_CELL_VOLTS_MAX 	4.20
-#define LI_ION_CELL_VOLTS_100 	4.20
-#define LI_ION_CELL_VOLTS_80 	4.02
-#define LI_ION_CELL_VOLTS_60 	3.87
-#define LI_ION_CELL_VOLTS_40 	3.80
-#define LI_ION_CELL_VOLTS_20 	3.73
-#define LI_ION_CELL_VOLTS_0 	3.27
-#define LI_ION_CELL_VOLTS_MIN 	3.10
+#define LI_ION_CELL_VOLTS_MAX 	((float) 4.25)
+#define LI_ION_CELL_VOLTS_100 	((float) 4.20)
+#define LI_ION_CELL_VOLTS_80 	((float) 4.02)
+#define LI_ION_CELL_VOLTS_60 	((float) 3.87)
+#define LI_ION_CELL_VOLTS_40 	((float) 3.80)
+#define LI_ION_CELL_VOLTS_20 	((float) 3.73)
+#define LI_ION_CELL_VOLTS_0 	((float) 3.27)
+#define LI_ION_CELL_VOLTS_MIN 	((float) 3.10)
 
-#define BATTERY_PACK_VOLTS_100	(LI_ION_CELL_VOLTS_100 * BATTERY_LI_ION_CELLS_NUMBER) * 256
-#define BATTERY_PACK_VOLTS_80 	(LI_ION_CELL_VOLTS_80 * BATTERY_LI_ION_CELLS_NUMBER) * 256
-#define BATTERY_PACK_VOLTS_60	(LI_ION_CELL_VOLTS_60 * BATTERY_LI_ION_CELLS_NUMBER) * 256
-#define BATTERY_PACK_VOLTS_40	(LI_ION_CELL_VOLTS_40 * BATTERY_LI_ION_CELLS_NUMBER) * 256
-#define BATTERY_PACK_VOLTS_20	(LI_ION_CELL_VOLTS_20 * BATTERY_LI_ION_CELLS_NUMBER) * 256
-#define BATTERY_PACK_VOLTS_0	(LI_ION_CELL_VOLTS_0 * BATTERY_LI_ION_CELLS_NUMBER) * 256
+#define BATTERY_PACK_VOLTS_100	(uint16_t) (LI_ION_CELL_VOLTS_100 * ((float) BATTERY_LI_ION_CELLS_NUMBER)) * ((float) 256)
+#define BATTERY_PACK_VOLTS_80 	(uint16_t) (LI_ION_CELL_VOLTS_80  * ((float) BATTERY_LI_ION_CELLS_NUMBER)) * ((float) 256)
+#define BATTERY_PACK_VOLTS_60	(uint16_t) (LI_ION_CELL_VOLTS_60  * ((float) BATTERY_LI_ION_CELLS_NUMBER)) * ((float) 256)
+#define BATTERY_PACK_VOLTS_40	(uint16_t) (LI_ION_CELL_VOLTS_40  * ((float) BATTERY_LI_ION_CELLS_NUMBER)) * ((float) 256)
+#define BATTERY_PACK_VOLTS_20	(uint16_t) (LI_ION_CELL_VOLTS_20  * ((float) BATTERY_LI_ION_CELLS_NUMBER)) * ((float) 256)
+#define BATTERY_PACK_VOLTS_0	(uint16_t) (LI_ION_CELL_VOLTS_0   * ((float) BATTERY_LI_ION_CELLS_NUMBER)) * ((float) 2569
 // *************************************************************************** //
 
 #endif // _MAIN_H_
