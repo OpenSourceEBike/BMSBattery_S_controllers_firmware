@@ -309,7 +309,7 @@ uint8_t ui8_adc_id_current = 0;
 uint8_t ui8_adc_target_motor_current_max;
 uint8_t ui8_adc_target_motor_regen_current_max;
 
-volatile uint8_t ui8_adc_battery_current;
+volatile uint8_t ui8_adc_motor_current;
 uint8_t ui8_adc_motor_current_offset;
 uint16_t ui16_adc_motor_current_offset;
 
@@ -363,7 +363,7 @@ void TIM1_CAP_COM_IRQHandler(void) __interrupt(TIM1_CAP_COM_IRQHANDLER)
   // start ADC1 conversion
   ADC1->CR1 |= ADC1_CR1_ADON;
   while (!(ADC1->CSR & ADC1_FLAG_EOC)) ;
-  ui8_adc_battery_current = ADC1->DRH;
+  ui8_adc_motor_current = ADC1->DRH;
   /****************************************************************************/
 
   /****************************************************************************/
@@ -560,7 +560,7 @@ void TIM1_CAP_COM_IRQHandler(void) __interrupt(TIM1_CAP_COM_IRQHANDLER)
   // - ramp up/down PWM duty_cycle value
 
   if ((UI8_ADC_BATTERY_CURRENT > ui8_adc_target_battery_current_max) || // battery max current, reduce duty_cycle
-      (ui8_adc_battery_current > ui8_adc_target_motor_current_max) || // motor max current, reduce duty_cycle
+      (ui8_adc_motor_current > ui8_adc_target_motor_current_max) || // motor max current, reduce duty_cycle
       (ui16_motor_speed_erps > MOTOR_OVER_SPEED_ERPS) || // motor speed over max ERPS, reduce duty_cycle
       (UI8_ADC_BATTERY_VOLTAGE < ((uint8_t) ADC_BATTERY_VOLTAGE_MIN))) // battery voltage under min voltage, reduce duty_cycle
   {
@@ -569,13 +569,9 @@ void TIM1_CAP_COM_IRQHandler(void) __interrupt(TIM1_CAP_COM_IRQHANDLER)
       ui8_duty_cycle--;
     }
   }
-  // verify if there is regen current > 0 (if there is happening regen) and
-  // if battery voltage is over or equal to absolute battery max voltage, and if so
-  // reduce regen current -- the idea is to avoid overcharge the battery
-  else if (((ui8_adc_battery_current < ui8_adc_motor_current_offset) &&
-      (UI8_ADC_BATTERY_VOLTAGE >= ((uint8_t) ADC_BATTERY_VOLTAGE_MAX))) ||
+  else if ((UI8_ADC_BATTERY_VOLTAGE > ((uint8_t) ADC_BATTERY_VOLTAGE_MAX)) || // verify battery max voltage limit
       (UI8_ADC_BATTERY_CURRENT < ui8_adc_target_battery_regen_current_max) || // verify battery max regen current limit
-      (ui8_adc_battery_current < ui8_adc_target_motor_regen_current_max)) // verify motor max regen current limit
+      (ui8_adc_motor_current < ui8_adc_target_motor_regen_current_max)) // verify motor max regen current limit
   {
     if (ui8_duty_cycle < 255)
     {
@@ -840,7 +836,7 @@ void motor_init (void)
   /***************************************************************************************/
 
   motor_set_current_max (ADC_MOTOR_CURRENT_MAX);
-  motor_set_regen_current_max (ADC_MOTOR_REGEN_CURRENT_MAX);
+  motor_set_regen_current_max (2);
   motor_set_pwm_duty_cycle_ramp_up_inverse_step (PWM_DUTY_CYCLE_RAMP_UP_INVERSE_STEP); // each step = 64us
   motor_set_pwm_duty_cycle_ramp_down_inverse_step (PWM_DUTY_CYCLE_RAMP_DOWN_INVERSE_STEP); // each step = 64us
 }

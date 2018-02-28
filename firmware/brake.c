@@ -32,7 +32,7 @@ void EXTI_PORTA_IRQHandler(void) __interrupt(EXTI_PORTA_IRQHANDLER)
   {
     ebike_app_set_state (EBIKE_APP_STATE_MOTOR_STOP);
     motor_controller_reset_state (MOTOR_CONTROLLER_STATE_BRAKE);
-    motor_set_regen_current_max (0); // disable ebrake/regen
+    motor_set_regen_current_max (2); // disable ebrake/regen
   }
 }
 

@@ -30,8 +30,8 @@
 
 // Choose your controller type
 //
-#define CONTROLLER_TYPE CONTROLLER_TYPE_S06S
-//#define CONTROLLER_TYPE CONTROLLER_TYPE_S12S
+//#define CONTROLLER_TYPE CONTROLLER_TYPE_S06S
+#define CONTROLLER_TYPE CONTROLLER_TYPE_S12S
 
 // *************************************************************************** //
 // Throotle and PAS
@@ -111,13 +111,8 @@
 #define WHEEL_SPEED_PI_CONTROLLER_KI_DIVISOR	5
 #endif
 
-
-#define MOTOR_SPEED_CONTROLLER_OUTPUT_MAX 8160 // PWM max duty_cycle << 5
-
 #define MOTOR_CURRENT_CONTROLLER_KP 10
 #define MOTOR_CURRENT_CONTROLLER_OUTPUT_MAX 16320
-
-#define MOTOR_PWM_TICKS_PER_MS 16
 
 // TORQUE SENSOR
 #if (EBIKE_THROTTLE_TYPE == EBIKE_THROTTLE_TYPE_THROTTLE_PAS)
