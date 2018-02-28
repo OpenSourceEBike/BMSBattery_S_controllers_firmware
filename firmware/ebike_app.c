@@ -50,13 +50,13 @@ uint8_t ui8_state_machine = 0;
 uint8_t ui8_adc_throttle_value;
 uint8_t ui8_adc_throttle_value_cruise_control;
 uint8_t ui8_throttle_value;
-uint16_t ui16_throttle_value_accumulated = 0;
+volatile uint16_t ui16_throttle_value_accumulated = 0;
 uint8_t ui8_throttle_value_filtered;
 uint8_t ui8_is_throttle_released;
 
-volatile uint16_t ui16_pas_pwm_cycles_ticks = (uint16_t) PAS_ABSOLUTE_MIN_CADENCE_PWM_CYCLE_TICKS;
-volatile uint8_t ui8_pas_direction = 0;
-uint8_t ui8_pas_cadence_rpm = 0;
+volatile uint16_t ui16_pas1_pwm_cycles_ticks = (uint16_t) PAS_ABSOLUTE_MIN_CADENCE_PWM_CYCLE_TICKS;
+volatile uint8_t ui8_pas1_direction = 0;
+uint8_t ui8_pas1_cadence_rpm = 0;
 
 volatile uint16_t ui16_wheel_speed_sensor_pwm_cycles_ticks = (uint16_t) WHEEL_SPEED_SENSOR_MAX_PWM_CYCLE_TICKS;
 volatile uint8_t ui8_wheel_speed_sensor_is_disconnected = 1; // must start with this value to have correct value at start up
@@ -113,7 +113,7 @@ void calc_battery_current_filtered (void);
 void ebike_app_init (void)
 {
   ebike_app_battery_set_current_max (ADC_BATTERY_CURRENT_MAX);
-  ebike_app_battery_set_regen_current_max (2);
+  ebike_app_battery_set_regen_current_max (0);
 
   // initialize at the zero value
   ui16_adc_battery_current_accumulated = (uint16_t) ui8_adc_battery_current_offset;
@@ -696,23 +696,23 @@ void calc_wheel_speed (void)
 void read_pas_cadence_and_direction (void)
 {
   // cadence in RPM =  60 / (ui16_pas_timer2_ticks * PAS_NUMBER_MAGNETS * 0.000064)
-  if (ui16_pas_pwm_cycles_ticks >= ((uint16_t) PAS_ABSOLUTE_MIN_CADENCE_PWM_CYCLE_TICKS)) { ui8_pas_cadence_rpm = 0; }
+  if (ui16_pas1_pwm_cycles_ticks >= ((uint16_t) PAS_ABSOLUTE_MIN_CADENCE_PWM_CYCLE_TICKS)) { ui8_pas1_cadence_rpm = 0; }
   else
   {
-    ui8_pas_cadence_rpm = (uint8_t) (60 / (((float) ui16_pas_pwm_cycles_ticks) * ((float) PAS_NUMBER_MAGNETS) * 0.000064));
+    ui8_pas1_cadence_rpm = (uint8_t) (60 / (((float) ui16_pas1_pwm_cycles_ticks) * ((float) PAS_NUMBER_MAGNETS) * 0.000064));
 
-    if (ui8_pas_cadence_rpm > ((uint8_t) PAS_MAX_CADENCE_RPM))
+    if (ui8_pas1_cadence_rpm > ((uint8_t) PAS_MAX_CADENCE_RPM))
     {
-      ui8_pas_cadence_rpm = ((uint8_t) PAS_MAX_CADENCE_RPM);
+      ui8_pas1_cadence_rpm = ((uint8_t) PAS_MAX_CADENCE_RPM);
     }
   }
 
-  if (ui8_pas_direction) { ui8_pas_cadence_rpm = 0; }
+  if (ui8_pas1_direction) { ui8_pas1_cadence_rpm = 0; }
 }
 
 uint8_t pas_is_set (void)
 {
-  return (ui8_pas_cadence_rpm) ? 1: 0;
+  return (ui8_pas1_cadence_rpm) ? 1: 0;
 }
 
 void ebike_throttle_type_throttle_pas (void)
@@ -734,8 +734,8 @@ void ebike_throttle_type_throttle_pas (void)
   float f_temp;
   uint8_t ui8_target_current;
 
-  // map ui8_pas_cadence_rpm to 0 - 255
-  ui8_temp = (uint8_t) (map ((uint32_t) ui8_pas_cadence_rpm,
+  // map ui8_pas1_cadence_rpm to 0 - 255
+  ui8_temp = (uint8_t) (map ((uint32_t) ui8_pas1_cadence_rpm,
 		 (uint32_t) 0,
 		 (uint32_t) PAS_MAX_CADENCE_RPM,
 		 (uint32_t) 0,
@@ -815,9 +815,17 @@ void ebike_throttle_type_torque_sensor (void)
 
 #if defined (EBIKE_THROTTLE_TYPE_TORQUE_SENSOR_HUMAN_POWER)
   // calc humam power on the crank using as input the pedal torque sensor value and pedal cadence
-  ui16_temp = (uint16_t) (f_temp * ((float) ((float) ui8_pas_cadence_rpm / ((float) PAS_MAX_CADENCE_RPM))));
+  ui16_temp = (uint16_t) (f_temp * ((float) ((float) ui8_pas1_cadence_rpm / ((float) PAS_MAX_CADENCE_RPM))));
 #else
   ui8_temp = (uint8_t) f_temp;
+#endif
+
+#if defined(EBIKE_REGEN_EBRAKE_LIKE_COAST_BRAKES)
+  // if user is applying torque on torque sensor, means he doesn't want to brake anymore
+  if (ui8_temp > 0 && (motor_controller_state_is_set (MOTOR_CONTROLLER_STATE_BRAKE_LIKE_COAST_BRAKES)))
+  {
+    motor_reset_regen_ebrake_like_coast_brakes ();
+  }
 #endif
 
   ui8_target_current = (uint16_t) (map ((uint32_t) ui8_temp,
@@ -942,12 +950,12 @@ void read_torque_sensor_throttle (void)
   }
 
   // if user doesn't pedal, disable throttle signal
-  if ((ui8_startup_phase == 0) && (ui8_pas_cadence_rpm == 0))
+  if ((ui8_startup_phase == 0) && (ui8_pas1_cadence_rpm == 0))
   {
     ui8_throttle_value_filtered = 0;
   }
   // use ui8_throttle if cadence is lower than 15 RPM, otherwise, use the processed torque sensor value
-  else if (ui8_pas_cadence_rpm <= 15)
+  else if (ui8_pas1_cadence_rpm <= 15)
   {
     ui8_throttle_value_filtered = ui8_throttle_value;
   }

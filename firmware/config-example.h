@@ -46,6 +46,8 @@
 // if your motor accelerates while rotating backwards the pedals instead of rotating forward, select the other option
 #define PAS_DIRECTION PAS_DIRECTION_LEFT
 //#define PAS_DIRECTION PAS_DIRECTION_RIGHT
+
+#define EBIKE_REGEN_EBRAKE_LIKE_COAST_BRAKES
 // *************************************************************************** //
 
 // *************************************************************************** //
@@ -72,7 +74,7 @@
 //#define BATTERY_LI_ION_CELLS_NUMBER	13 // 13S = 48V battery pack
 
 #define ADC_BATTERY_CURRENT_MAX		10 // each unit = 0.35A
-#define ADC_BATTERY_REGEN_CURRENT_MAX	5 // each unit = 0.35A
+#define ADC_BATTERY_REGEN_CURRENT_MAX	5 // CAN'T be more than 66 units!! each unit = 0.35A
 // *************************************************************************** //
 
 // *************************************************************************** //
@@ -82,7 +84,7 @@
 //
 // S06S controller holds 15 amps as max current
 #define ADC_MOTOR_CURRENT_MAX		60 // each unit = 0.25A; 60 = 15A | measured (on S06S) that ADC_MOTOR_CURRENT_MAX = 60 is almost equal to peak 15 amps of phase B current
-#define ADC_MOTOR_REGEN_CURRENT_MAX	30 // each unit = 0.25A; 30 = 7.5A but the brake/regen must be only for a few seconds!!
+#define ADC_MOTOR_REGEN_CURRENT_MAX	30 // CAN'T be more than 66 units!! each unit = 0.25A; 30 = 7.5A but the brake/regen must be only for a few seconds!!
 
 // Choose PWM ramp up/down step (higher value will make the motor acceleration slower)
 //

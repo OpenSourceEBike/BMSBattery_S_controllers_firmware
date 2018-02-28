@@ -40,6 +40,13 @@
 #define EBIKE_THROTTLE_TYPE_TORQUE_SENSOR		2
 // *************************************************************************** //
 
+// enable to get Regen ebrake like coast brakes, read more here:
+// https://opensourceebikefirmware.bitbucket.io/development/Various--2017.12.01_-_Regen_ebrake_like_coast_brakes.html
+#if defined(EBIKE_REGEN_EBRAKE_LIKE_COAST_BRAKES)
+#undef EBIKE_THROTTLE_TYPE
+#define EBIKE_THROTTLE_TYPE EBIKE_THROTTLE_TYPE_TORQUE_SENSOR
+#define ADC_BATTERY_REGEN_CURRENT_MAX_1_5 (ADC_BATTERY_REGEN_CURRENT_MAX / 5)
+#endif
 
 // Phase current: max of +-15.5 amps
 // 512 --> 15.5 amps
