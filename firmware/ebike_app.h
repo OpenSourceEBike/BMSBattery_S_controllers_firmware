@@ -66,5 +66,6 @@ void ebike_app_set_error (uint8_t error);
 void ebike_app_clear_error (void);
 uint8_t ebike_app_get_error (void);
 void ebike_app_battery_set_regen_current_max (uint8_t ui8_value);
+void battery_protect_over_voltage (void);
 
 #endif /* _EBIKE_APP_H_ */

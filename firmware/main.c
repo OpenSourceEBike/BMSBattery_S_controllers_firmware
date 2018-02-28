@@ -83,6 +83,7 @@ int main (void)
   pwm_init_bipolar_4q ();
   hall_sensor_init ();
   adc_init ();
+  battery_protect_over_voltage (); // will stop the motor
   eeprom_init ();
   motor_init ();
   pas_init ();

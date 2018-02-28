@@ -45,10 +45,10 @@
 // 512 --> 15.5 amps
 // 1 ADC increment --> 0.030A
 // RMS value --> max value * 0.707
-//#define ADC_PHASE_B_CURRENT_ZERO_AMPS_FOC_MAX 127 // for phase B current sensor that outputs 2.5V at zero amps (ACS711)
-//#define ADC_PHASE_B_CURRENT_ZERO_AMPS_FOC_MIN 125 // for phase B current sensor that outputs 2.5V at zero amps (ACS711)
-#define ADC_PHASE_B_CURRENT_ZERO_AMPS_FOC_MAX 102 // for phase B current sensor that outputs 2.5V at zero amps (ACS712)
-#define ADC_PHASE_B_CURRENT_ZERO_AMPS_FOC_MIN 100 // for phase B current sensor that outputs 2.5V at zero amps (ACS712)
+#define ADC_PHASE_B_CURRENT_ZERO_AMPS_FOC_MAX 127 // for phase B current sensor that outputs 2.5V at zero amps (ACS711)
+#define ADC_PHASE_B_CURRENT_ZERO_AMPS_FOC_MIN 125 // for phase B current sensor that outputs 2.5V at zero amps (ACS711)
+//#define ADC_PHASE_B_CURRENT_ZERO_AMPS_FOC_MAX 102 // for phase B current sensor that outputs 2.0V at zero amps (ACS712)
+//#define ADC_PHASE_B_CURRENT_ZERO_AMPS_FOC_MIN 100 // for phase B current sensor that outputs 2.0V at zero amps (ACS712)
 
 #define ADC_PHASE_B_CURRENT_FACTOR 333 // 0.1 / 0.030A * 0.707 = 3.3
 

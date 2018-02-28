@@ -353,10 +353,18 @@ void communications_controller (void)
 
   // prepare moving indication info
   ui8_moving_indication = 0;
-  if (brake_is_set ()) { ui8_moving_indication |= (1 << 5); }
+  if (brake_is_set ()) { ui8_moving_indication = (1 << 5); }
   if (ebike_app_cruise_control_is_set ()) { ui8_moving_indication |= (1 << 3); }
   if (throttle_is_set ()) { ui8_moving_indication |= (1 << 1); }
   if (pas_is_set ()) { ui8_moving_indication |= (1 << 4); }
+
+  // if battery over voltage, signal instead on LCD with battery symbol flashing and brake signal
+  if (motor_controller_state_is_set(MOTOR_CONTROLLER_STATE_OVER_VOLTAGE))
+  {
+    ui8_battery_soc = 2; // border flashing
+    ui16_error = 0;
+    ui8_moving_indication = (1 << 5);
+  }
 
   // preparing the package
   // B0: start package (?)
@@ -960,6 +968,8 @@ void read_battery_voltage (void)
   ui16_adc_battery_voltage_accumulated -= ui16_adc_battery_voltage_accumulated >> 6;
   ui16_adc_battery_voltage_accumulated += ((uint16_t) ui8_adc_read_battery_voltage ());
   ui8_adc_battery_voltage_filtered = ui16_adc_battery_voltage_accumulated >> 6;
+
+
 }
 
 uint8_t ebike_app_get_ADC_battery_voltage_filtered (void)
@@ -1045,4 +1055,14 @@ void calc_battery_current_filtered (void)
 
   // i16_battery_current_filtered has sign, negative value will be regen current
   i16_battery_current_filtered = ui16_adc_battery_current_filtered - ui8_adc_battery_current_offset;
+}
+
+void battery_protect_over_voltage (void)
+{
+  if (UI8_ADC_BATTERY_VOLTAGE > ((uint8_t) ADC_BATTERY_VOLTAGE_MAX)) // verify battery max voltage limit
+  {
+    // motor will stop
+    motor_controller_set_state (MOTOR_CONTROLLER_STATE_OVER_VOLTAGE);
+    motor_disable_PWM ();
+  }
 }

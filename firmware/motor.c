@@ -918,3 +918,5 @@ void EXTI_PORTD_IRQHandler(void) __interrupt(EXTI_PORTD_IRQHANDLER)
   motor_disable_PWM ();
   ebike_app_set_error (EBIKE_APP_ERROR_06_SHORT_CIRCUIT);
 }
+
+
