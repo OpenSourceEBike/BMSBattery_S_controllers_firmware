@@ -390,10 +390,10 @@ void communications_controller (void)
   // - B8 = 250, LCD shows 1875 watts
   // - B8 = 100, LCD shows 750 watts
   // each unit of B8 = 0.25A
-  i16_motor_current_filtered_10b = ui8_adc_read_battery_current ();
+  i16_motor_current_filtered_10b = ui8_adc_read_battery_current () - ui8_adc_battery_current_offset;
   i16_motor_current_filtered_10b -= 1; // try to avoid LCD display about 25W when motor is not running
   if (i16_motor_current_filtered_10b < 0) { i16_motor_current_filtered_10b = 0; } // limit to be only positive value, LCD don't accept regen current value
-  ui8_tx_buffer [8] = (uint8_t) (i16_motor_current_filtered_10b);
+  ui8_tx_buffer [8] = ((uint8_t) (i16_motor_current_filtered_10b) << 1);
   // B9: motor temperature
   ui8_tx_buffer [9] = 0;
   // B10 and B11: 0
