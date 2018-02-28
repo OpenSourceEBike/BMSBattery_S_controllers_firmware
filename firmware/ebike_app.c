@@ -113,7 +113,7 @@ void calc_battery_current_filtered (void);
 void ebike_app_init (void)
 {
   ebike_app_battery_set_current_max (ADC_BATTERY_CURRENT_MAX);
-  ebike_app_battery_set_regen_current_max (ADC_BATTERY_REGEN_CURRENT_MAX);
+  ebike_app_battery_set_regen_current_max (2);
 
   // initialize at the zero value
   ui16_adc_battery_current_accumulated = (uint16_t) ui8_adc_battery_current_offset;
