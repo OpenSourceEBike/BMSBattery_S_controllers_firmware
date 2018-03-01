@@ -307,7 +307,7 @@ uint8_t ui8_hall_sensors_last = 0;
 uint8_t ui8_adc_id_current = 0;
 
 uint8_t ui8_adc_target_motor_current_max;
-uint8_t ui8_adc_target_motor_regen_current_max;
+volatile uint8_t ui8_adc_target_motor_regen_current_max;
 
 volatile uint8_t ui8_adc_motor_current;
 uint8_t ui8_adc_motor_current_offset;
@@ -332,11 +332,19 @@ uint16_t ui16_value;
 
 uint8_t ui8_first_time_run_flag = 1;
 
-uint8_t ui8_pas_state;
-uint8_t ui8_pas_state_old;
-uint16_t ui16_pas_counter = (uint16_t) PAS_ABSOLUTE_MIN_CADENCE_PWM_CYCLE_TICKS;
-uint16_t ui16_pas_on_time_counter;
-uint16_t ui16_pas_off_time_counter;
+uint8_t ui8_pas1_state;
+uint8_t ui8_pas1_state_old;
+uint16_t ui16_pas1_counter = (uint16_t) PAS_ABSOLUTE_MIN_CADENCE_PWM_CYCLE_TICKS;
+uint16_t ui16_pas1_on_time_counter;
+uint16_t ui16_pas1_off_time_counter;
+
+uint8_t ui8_pas2_state;
+uint8_t ui8_pas2_state_old;
+volatile uint8_t ui8_pas2_counter = 0;
+volatile uint8_t ui8_pas2_direction = 0;
+volatile uint8_t ui8_pas2_regen_count = 0;
+volatile uint8_t ui8_pas2_regen_count_last = 0;
+volatile uint8_t ui8_pas2_regen_current = 0;
 
 volatile uint8_t ui8_torque_sensor_throttle_processed_value = 0;
 uint8_t ui8_torque_sensor_pas_signal_change_counter = 0;
@@ -666,52 +674,52 @@ void TIM1_CAP_COM_IRQHandler(void) __interrupt(TIM1_CAP_COM_IRQHANDLER)
   /****************************************************************************/
 
   /****************************************************************************/
-  // calc PAS timming between each positive pulses, in PWM cycles ticks
-  // calc PAS on and off timming of each pulse, in PWM cycles ticks
-  ui16_pas_counter++;
+  // calc PAS1 timming between each positive pulses, in PWM cycles ticks
+  // calc PAS1 on and off timming of each pulse, in PWM cycles ticks
+  ui16_pas1_counter++;
 
   // detect PAS signal changes
-  if ((PAS__PORT->IDR & PAS__PIN) == 0)
+  if ((PAS1__PORT->IDR & PAS1__PIN) == 0)
   {
-    ui8_pas_state = 0;
-    ui16_pas_off_time_counter++;
+    ui8_pas1_state = 0;
+    ui16_pas1_off_time_counter++;
   }
   else
   {
-    ui8_pas_state = 1;
-    ui16_pas_on_time_counter++;
+    ui8_pas1_state = 1;
+    ui16_pas1_on_time_counter++;
   }
 
-  if (ui8_pas_state != ui8_pas_state_old) // PAS signal did change
+  if (ui8_pas1_state != ui8_pas1_state_old) // PAS signal did change
   {
-    ui8_pas_state_old = ui8_pas_state;
+    ui8_pas1_state_old = ui8_pas1_state;
 
-    if (ui8_pas_state == 1) // consider only when PAS signal transition from 0 to 1
+    if (ui8_pas1_state == 1) // consider only when PAS signal transition from 0 to 1
     {
       // limit PAS cadence to be less than PAS_ABSOLUTE_MAX_CADENCE_PWM_CYCLE_TICKS
-      if (ui16_pas_counter < ((uint16_t) PAS_ABSOLUTE_MAX_CADENCE_PWM_CYCLE_TICKS)) { ui16_pas_counter = PAS_ABSOLUTE_MAX_CADENCE_PWM_CYCLE_TICKS; }
+      if (ui16_pas1_counter < ((uint16_t) PAS_ABSOLUTE_MAX_CADENCE_PWM_CYCLE_TICKS)) { ui16_pas1_counter = PAS_ABSOLUTE_MAX_CADENCE_PWM_CYCLE_TICKS; }
 
-      ui16_pas_pwm_cycles_ticks = ui16_pas_counter;
-      ui16_pas_counter = 0;
+      ui16_pas1_pwm_cycles_ticks = ui16_pas1_counter;
+      ui16_pas1_counter = 0;
     }
     else
     {
 #if (PAS_DIRECTION == PAS_DIRECTION_RIGHT)
-      if (ui16_pas_on_time_counter > ui16_pas_off_time_counter)
+      if (ui16_pas1_on_time_counter > ui16_pas1_off_time_counter)
 #else
-      if (ui16_pas_on_time_counter <= ui16_pas_off_time_counter)
+      if (ui16_pas1_on_time_counter <= ui16_pas1_off_time_counter)
 #endif
-      { ui8_pas_direction = 1; }
-      else { ui8_pas_direction = 0; }
+      { ui8_pas1_direction = 1; }
+      else { ui8_pas1_direction = 0; }
 
-      ui16_pas_off_time_counter = 0;
-      ui16_pas_on_time_counter = 0;
+      ui16_pas1_off_time_counter = 0;
+      ui16_pas1_on_time_counter = 0;
     }
 
     // filter the torque signal, by saving the max value of each one pedal rotation
     ui8_torque_sensor_throttle_value = UI8_ADC_THROTTLE;
     ui8_torque_sensor_pas_signal_change_counter++;
-    if (ui8_torque_sensor_pas_signal_change_counter > (PAS_NUMBER_MAGNETS << 1)) // PAS_NUMBER_MAGNETS*2 means a full pedal rotation
+    if (ui8_torque_sensor_pas_signal_change_counter > PAS_NUMBER_MAGNETS_X2) // PAS_NUMBER_MAGNETS*2 means a full pedal rotation
     {
       ui8_torque_sensor_pas_signal_change_counter = 1; // this is the first cycle
       ui8_torque_sensor_throttle_processed_value = ui8_torque_sensor_throttle_max_value; // store the max value on the output variable of this algorithm
@@ -725,21 +733,89 @@ void TIM1_CAP_COM_IRQHandler(void) __interrupt(TIM1_CAP_COM_IRQHANDLER)
 	ui8_torque_sensor_throttle_max_value = ui8_torque_sensor_throttle_value;
       }
     }
-
   }
 
   // limit min PAS cadence
-  if (ui16_pas_counter > ((uint16_t) PAS_ABSOLUTE_MIN_CADENCE_PWM_CYCLE_TICKS))
+  if (ui16_pas1_counter > ((uint16_t) PAS_ABSOLUTE_MIN_CADENCE_PWM_CYCLE_TICKS))
   {
-    ui16_pas_pwm_cycles_ticks = (uint16_t) PAS_ABSOLUTE_MIN_CADENCE_PWM_CYCLE_TICKS;
-    ui16_pas_counter = 0;
-    ui16_pas_on_time_counter = 0;
-    ui16_pas_off_time_counter = 0;
-    ui8_pas_direction = 1;
-
+    ui16_pas1_pwm_cycles_ticks = (uint16_t) PAS_ABSOLUTE_MIN_CADENCE_PWM_CYCLE_TICKS;
+    ui16_pas1_counter = 0;
+    ui16_pas1_on_time_counter = 0;
+    ui16_pas1_off_time_counter = 0;
+    ui8_pas1_direction = 1;
     ui8_torque_sensor_throttle_processed_value = 0;
   }
   /****************************************************************************/
+
+#if defined(EBIKE_REGEN_EBRAKE_LIKE_COAST_BRAKES)
+  /****************************************************************************/
+  // detect pedal rotating backwards and configure regen current
+
+  // detect PAS2 signal changes
+  if (!(PAS2__PORT->IDR & PAS2__PIN)) { ui8_pas2_state = 0; }
+  else { ui8_pas2_state = 1; }
+
+  if (ui8_pas2_state != ui8_pas2_state_old) // PAS2 signal did change
+  {
+    ui8_pas2_state_old = ui8_pas2_state;
+
+    if (PAS1__PORT->IDR & PAS1__PIN)
+    {
+      ui8_pas2_counter++;
+      if (ui8_pas2_counter > 1)
+      {
+	ui8_pas2_counter = 1;
+	ui8_pas2_direction = 1;
+      }
+    }
+    else
+    { // we are rotating pedals forward
+      ui8_pas2_counter = 0;
+      ui8_pas2_direction = 0;
+    }
+
+    if (ui8_pas2_direction) // rotating backwards
+    {
+      if (ui8_pas2_regen_count < 5)
+      {
+	// we are starting brake or increase the rate
+	ui8_pas2_regen_count++;
+	ui8_pas2_regen_current += ADC_BATTERY_REGEN_CURRENT_MAX_1_5;
+
+	ui8_motor_controller_state |= MOTOR_CONTROLLER_STATE_BRAKE_LIKE_COAST_BRAKES;  // enable brake like coast brakes state
+	ui8_adc_target_battery_regen_current_max = ui8_adc_battery_current_offset - ui8_pas2_regen_current; // update battery regen current_max
+	ui8_adc_target_motor_regen_current_max = ui8_adc_motor_current_offset - ADC_MOTOR_REGEN_CURRENT_MAX; // keep motor at max regen current
+	ui8_duty_cycle_target = 0; // target 0 PWM duty_cycle and the motor will stop/block
+	ebike_app_cruise_control_stop ();
+
+	ui16_throttle_value_accumulated = 0;
+      }
+    }
+    else // rotating forwards
+    {
+      if (ui8_pas2_regen_count > 0)
+      {
+	// we are still brake but reducing the rate, let's reduce one step the regen current
+	ui8_pas2_regen_count--;
+	ui8_pas2_regen_current -= ADC_BATTERY_REGEN_CURRENT_MAX_1_5;
+	ui8_adc_target_battery_regen_current_max = ui8_adc_battery_current_offset - ui8_pas2_regen_current; // apply new value for ebrake/regen
+
+	if (ui8_pas2_regen_count == 0) { ui8_pas2_regen_count_last = 1; }
+      }
+
+      if (ui8_pas2_regen_count_last)
+      {
+	// we rotated backwards all the steps: stop braking
+	ui8_pas2_regen_count_last = 0;
+	ui8_pas2_regen_current = 0;
+	ui8_duty_cycle_target = ui8_duty_cycle;
+	ui8_motor_controller_state &= ~MOTOR_CONTROLLER_STATE_BRAKE_LIKE_COAST_BRAKES; // disable brake like coast brakes state, this will make throttle to setup the new value for target PWM duty_cycle
+	ui8_adc_target_battery_regen_current_max = ui8_adc_battery_current_offset; // disable ebrake/regen
+      }
+    }
+  }
+  /****************************************************************************/
+#endif
 
   /****************************************************************************/
   // calc wheel speed sensor timming between each positive pulses, in PWM cycles ticks
@@ -836,7 +912,7 @@ void motor_init (void)
   /***************************************************************************************/
 
   motor_set_current_max (ADC_MOTOR_CURRENT_MAX);
-  motor_set_regen_current_max (2);
+  motor_set_regen_current_max (0);
   motor_set_pwm_duty_cycle_ramp_up_inverse_step (PWM_DUTY_CYCLE_RAMP_UP_INVERSE_STEP); // each step = 64us
   motor_set_pwm_duty_cycle_ramp_down_inverse_step (PWM_DUTY_CYCLE_RAMP_DOWN_INVERSE_STEP); // each step = 64us
 }
@@ -908,6 +984,18 @@ void motor_set_pwm_duty_cycle (uint8_t ui8_value)
   if (ui8_value > PWM_DUTY_CYCLE_MAX) { ui8_value = PWM_DUTY_CYCLE_MAX; }
 
   ui8_duty_cycle = ui8_value;
+}
+
+void motor_reset_regen_ebrake_like_coast_brakes (void)
+{
+  ui8_pas2_counter = 0;
+  ui8_pas2_direction = 0;
+  ui8_pas2_regen_count = 0;
+  ui8_pas2_regen_count_last = 0;
+  ui8_pas2_regen_current = 0;
+  motor_set_regen_current_max (0);
+  ebike_app_battery_set_regen_current_max (0);
+  motor_controller_reset_state (MOTOR_CONTROLLER_STATE_BRAKE_LIKE_COAST_BRAKES);
 }
 
 // motor overcurrent interrupt

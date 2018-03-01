@@ -83,10 +83,11 @@ int main (void)
   pwm_init_bipolar_4q ();
   hall_sensor_init ();
   adc_init ();
-  battery_protect_over_voltage (); // will stop the motor
+  battery_protect_over_voltage (); // will stop the motor if battery over voltage
   eeprom_init ();
   motor_init ();
-  pas_init ();
+  pas1_init ();
+  pas2_init ();
   wheel_speed_sensor_init ();
   ebike_app_init ();
   enableInterrupts ();
@@ -94,7 +95,7 @@ int main (void)
   while (1)
   {
 #ifdef DEBUG_UART
-//    printf ("%d,%d,%d\n", ui8_duty_cycle, ui8_adc_motor_total_current, UI8_ADC_MOTOR_TOTAL_CURRENT_FILTERED);
+//    printf ("%d,%d,%d\n", ui8_duty_cycle, ui8_adc_motor_current, ui8_adc_target_motor_regen_current_max);
 #endif
 
     // because of continue; at the end of each if code block that will stop the while (1) loop there,

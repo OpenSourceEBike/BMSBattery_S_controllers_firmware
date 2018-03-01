@@ -30,8 +30,8 @@
 
 // Choose your controller type
 //
-//#define CONTROLLER_TYPE CONTROLLER_TYPE_S06S
-#define CONTROLLER_TYPE CONTROLLER_TYPE_S12S
+#define CONTROLLER_TYPE CONTROLLER_TYPE_S06S
+//#define CONTROLLER_TYPE CONTROLLER_TYPE_S12S
 
 // *************************************************************************** //
 // Throotle and PAS
@@ -40,6 +40,13 @@
 #define EBIKE_THROTTLE_TYPE_TORQUE_SENSOR		2
 // *************************************************************************** //
 
+// enable to get Regen ebrake like coast brakes, read more here:
+// https://opensourceebikefirmware.bitbucket.io/development/Various--2017.12.01_-_Regen_ebrake_like_coast_brakes.html
+#if defined(EBIKE_REGEN_EBRAKE_LIKE_COAST_BRAKES)
+#undef EBIKE_THROTTLE_TYPE
+#define EBIKE_THROTTLE_TYPE EBIKE_THROTTLE_TYPE_TORQUE_SENSOR
+#define ADC_BATTERY_REGEN_CURRENT_MAX_1_5 (ADC_BATTERY_REGEN_CURRENT_MAX / 5)
+#endif
 
 // Phase current: max of +-15.5 amps
 // 512 --> 15.5 amps
@@ -136,6 +143,8 @@
 // (1/(150RPM/60)) / (PAS_NUMBER_MAGNETS * 0.000064)
 #define PAS_ABSOLUTE_MAX_CADENCE_PWM_CYCLE_TICKS  (6250 / PAS_NUMBER_MAGNETS) // max hard limit to 150RPM PAS cadence
 #define PAS_ABSOLUTE_MIN_CADENCE_PWM_CYCLE_TICKS  (156250 / PAS_NUMBER_MAGNETS) // min hard limit to 6RPM PAS cadence
+
+#define PAS_NUMBER_MAGNETS_X2 (PAS_NUMBER_MAGNETS * 2)
 // *************************************************************************** //
 
 // *************************************************************************** //

@@ -16,13 +16,14 @@
 #define SINEWAVE_INTERPOLATION_60_DEGREES 	2
 #define SINEWAVE_INTERPOLATION_360_DEGREES 	3
 
-#define MOTOR_CONTROLLER_STATE_OK		1
-#define MOTOR_CONTROLLER_STATE_BRAKE		2
-#define MOTOR_CONTROLLER_STATE_OVER_CURRENT	4
-#define MOTOR_CONTROLLER_STATE_UNDER_VOLTAGE	8
-#define MOTOR_CONTROLLER_STATE_OVER_VOLTAGE	16
-#define MOTOR_CONTROLLER_STATE_THROTTLE_ERROR	32
-#define MOTOR_CONTROLLER_STATE_MOTOR_BLOCKED	64
+#define MOTOR_CONTROLLER_STATE_OK			1
+#define MOTOR_CONTROLLER_STATE_BRAKE			2
+#define MOTOR_CONTROLLER_STATE_BRAKE_LIKE_COAST_BRAKES	4
+#define MOTOR_CONTROLLER_STATE_OVER_CURRENT		8
+#define MOTOR_CONTROLLER_STATE_UNDER_VOLTAGE		16
+#define MOTOR_CONTROLLER_STATE_OVER_VOLTAGE		32
+#define MOTOR_CONTROLLER_STATE_THROTTLE_ERROR		64
+#define MOTOR_CONTROLLER_STATE_MOTOR_BLOCKED		128
 
 extern uint8_t ui8_motor_commutation_type;
 extern volatile uint8_t ui8_angle_correction;
@@ -35,6 +36,7 @@ extern uint16_t ui16_PWM_cycles_counter_total;
 extern uint8_t ui8_pwm_duty_cycle_duty_cycle_controller;
 extern uint8_t ui8_pas_state;
 extern volatile uint8_t ui8_torque_sensor_throttle_processed_value;
+extern volatile uint8_t ui8_adc_target_motor_regen_current_max;
 
 /***************************************************************************************/
 // Motor interface
@@ -66,6 +68,7 @@ void motor_set_pwm_duty_cycle (uint8_t ui8_value);
 void motor_set_pwm_duty_cycle_target (uint8_t ui8_value);
 uint8_t motor_get_pwm_duty_cycle_target (void);
 int8_t motor_get_current_filtered_10b (void);
+void motor_reset_regen_ebrake_like_coast_brakes (void);
 /***************************************************************************************/
 
 #endif /* _MOTOR_H_ */
