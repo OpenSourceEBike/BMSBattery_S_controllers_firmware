@@ -820,7 +820,7 @@ void ebike_throttle_type_torque_sensor (void)
   ui8_temp = (uint8_t) f_temp;
 #endif
 
-#if defined(EBIKE_REGEN_EBRAKE_LIKE_COAST_BRAKES)
+#if defined (EBIKE_REGEN_EBRAKE_LIKE_COAST_BRAKES)
   // if user is applying torque on torque sensor, means he doesn't want to brake anymore
   if (ui8_temp > 0 && (motor_controller_state_is_set (MOTOR_CONTROLLER_STATE_BRAKE_LIKE_COAST_BRAKES)))
   {

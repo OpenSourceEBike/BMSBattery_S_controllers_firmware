@@ -35,7 +35,9 @@ void EXTI_PORTA_IRQHandler(void) __interrupt(EXTI_PORTA_IRQHANDLER)
     ebike_app_battery_set_regen_current_max (0);
     ebike_app_set_state (EBIKE_APP_STATE_MOTOR_STOP);
     motor_controller_reset_state (MOTOR_CONTROLLER_STATE_BRAKE);
+#if defined (EBIKE_REGEN_EBRAKE_LIKE_COAST_BRAKES)
     motor_reset_regen_ebrake_like_coast_brakes ();
+#endif
   }
 }
 

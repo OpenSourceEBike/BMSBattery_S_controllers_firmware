@@ -30,8 +30,8 @@
 
 // Choose your controller type
 //
-//#define CONTROLLER_TYPE CONTROLLER_TYPE_S06S
-#define CONTROLLER_TYPE CONTROLLER_TYPE_S12S
+#define CONTROLLER_TYPE CONTROLLER_TYPE_S06S
+//#define CONTROLLER_TYPE CONTROLLER_TYPE_S12S
 
 // *************************************************************************** //
 // Throotle and PAS
@@ -143,6 +143,8 @@
 // (1/(150RPM/60)) / (PAS_NUMBER_MAGNETS * 0.000064)
 #define PAS_ABSOLUTE_MAX_CADENCE_PWM_CYCLE_TICKS  (6250 / PAS_NUMBER_MAGNETS) // max hard limit to 150RPM PAS cadence
 #define PAS_ABSOLUTE_MIN_CADENCE_PWM_CYCLE_TICKS  (156250 / PAS_NUMBER_MAGNETS) // min hard limit to 6RPM PAS cadence
+
+#define PAS_NUMBER_MAGNETS_X2 (PAS_NUMBER_MAGNETS * 2)
 // *************************************************************************** //
 
 // *************************************************************************** //

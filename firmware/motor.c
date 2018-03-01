@@ -715,6 +715,24 @@ void TIM1_CAP_COM_IRQHandler(void) __interrupt(TIM1_CAP_COM_IRQHANDLER)
       ui16_pas1_off_time_counter = 0;
       ui16_pas1_on_time_counter = 0;
     }
+
+    // filter the torque signal, by saving the max value of each one pedal rotation
+    ui8_torque_sensor_throttle_value = UI8_ADC_THROTTLE;
+    ui8_torque_sensor_pas_signal_change_counter++;
+    if (ui8_torque_sensor_pas_signal_change_counter > PAS_NUMBER_MAGNETS_X2) // PAS_NUMBER_MAGNETS*2 means a full pedal rotation
+    {
+      ui8_torque_sensor_pas_signal_change_counter = 1; // this is the first cycle
+      ui8_torque_sensor_throttle_processed_value = ui8_torque_sensor_throttle_max_value; // store the max value on the output variable of this algorithm
+      ui8_torque_sensor_throttle_max_value = 0; // reset the max value
+    }
+    else
+    {
+      // store the max value
+      if (ui8_torque_sensor_throttle_value > ui8_torque_sensor_throttle_max_value)
+      {
+	ui8_torque_sensor_throttle_max_value = ui8_torque_sensor_throttle_value;
+      }
+    }
   }
 
   // limit min PAS cadence
@@ -725,9 +743,11 @@ void TIM1_CAP_COM_IRQHandler(void) __interrupt(TIM1_CAP_COM_IRQHANDLER)
     ui16_pas1_on_time_counter = 0;
     ui16_pas1_off_time_counter = 0;
     ui8_pas1_direction = 1;
+    ui8_torque_sensor_throttle_processed_value = 0;
   }
   /****************************************************************************/
 
+#if defined(EBIKE_REGEN_EBRAKE_LIKE_COAST_BRAKES)
   /****************************************************************************/
   // detect pedal rotating backwards and configure regen current
 
@@ -795,6 +815,7 @@ void TIM1_CAP_COM_IRQHandler(void) __interrupt(TIM1_CAP_COM_IRQHANDLER)
     }
   }
   /****************************************************************************/
+#endif
 
   /****************************************************************************/
   // calc wheel speed sensor timming between each positive pulses, in PWM cycles ticks

@@ -47,7 +47,9 @@
 #define PAS_DIRECTION PAS_DIRECTION_LEFT
 //#define PAS_DIRECTION PAS_DIRECTION_RIGHT
 
-#define EBIKE_REGEN_EBRAKE_LIKE_COAST_BRAKES
+// this is an advsanced feature, please read bout it here:
+// https://opensourceebikefirmware.bitbucket.io/development/Various--2017.12.01_-_Regen_ebrake_like_coast_brakes.html
+//#define EBIKE_REGEN_EBRAKE_LIKE_COAST_BRAKES
 // *************************************************************************** //
 
 // *************************************************************************** //
