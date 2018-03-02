@@ -21,6 +21,8 @@ void adc_init (void)
 {
   uint8_t ui8_i;
   uint16_t ui16_counter;
+  uint16_t ui16_adc_battery_current_offset;
+  uint16_t ui16_adc_motor_current_offset;
 
   //init GPIO for the used ADC pins
   GPIO_Init(GPIOB,
@@ -60,17 +62,17 @@ void adc_init (void)
   }
 
   // read and average a few values of ADC battery current
-  ui16_adc_battery_current_offset_10b = 0;
+  ui16_adc_battery_current_offset = 0;
   for (ui8_i = 0; ui8_i < 16; ui8_i++)
   {
     ui16_counter = TIM2_GetCounter () + 78; // delay ~10ms
     adc_trigger ();
     while (!ADC1_GetFlagStatus (ADC1_FLAG_EOC)) ; // wait for end of conversion
-    ui16_adc_battery_current_offset_10b += ui16_adc_read_battery_current_10b ();
+    ui16_adc_battery_current_offset += ui8_adc_read_battery_current ();
   }
-  ui16_adc_battery_current_offset_10b >>= 4;
-  ui16_adc_battery_current_offset_10b -= 4;
-  ui8_adc_battery_current_offset = ui16_adc_battery_current_offset_10b >> 2;
+  ui16_adc_battery_current_offset >>= 4;
+  ui16_adc_battery_current_offset -= 4;
+  ui8_adc_battery_current_offset = ui16_adc_battery_current_offset;
 
   // read and average a few values of ADC motor current
   ui16_adc_motor_current_offset = 0;

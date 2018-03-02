@@ -50,10 +50,14 @@ extern uint8_t ui8_adc_throttle_value;
 extern volatile uint16_t ui16_throttle_value_accumulated;
 
 extern uint8_t ui8_adc_battery_current_offset;
-extern uint16_t ui16_adc_battery_current_offset_10b;
 extern int16_t i16_battery_current_filtered;
 extern volatile uint8_t ui8_adc_target_battery_current_max;
 extern volatile uint8_t ui8_adc_target_battery_regen_current_max;
+
+extern uint8_t ui8_adc_battery_current_filter_array [8];
+extern uint8_t ui8_adc_battery_current_filter_array_index;
+extern uint16_t ui16_adc_battery_current_filter_total;
+extern volatile uint8_t ui8_adc_battery_current_filtered;
 
 void ebike_app_init (void);
 void ebike_app_controller (void);

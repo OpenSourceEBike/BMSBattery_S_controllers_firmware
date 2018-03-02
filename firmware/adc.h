@@ -29,7 +29,6 @@
 extern uint8_t adc_throttle_busy_flag;
 extern uint8_t ui8_adc_throttle_value;
 extern uint8_t ui8_adc_motor_current_offset;
-extern uint16_t ui16_adc_motor_current_offset;
 
 void adc_init (void);
 inline void adc_trigger (void);

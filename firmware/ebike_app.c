@@ -82,13 +82,17 @@ uint8_t ui8_rtst_state_machine = 0;
 uint8_t ui8_rtst_counter = 0;
 
 uint16_t ui16_adc_battery_current_accumulated;
-uint16_t ui16_adc_battery_current_filtered;
+uint8_t _ui8_adc_battery_current_filtered;
 int16_t i16_battery_current_filtered = 0;
 uint8_t ui8_adc_battery_current_offset;
-uint16_t ui16_adc_battery_current_offset_10b;
 
 volatile uint8_t ui8_adc_target_battery_current_max;
 volatile uint8_t ui8_adc_target_battery_regen_current_max;
+
+uint8_t ui8_adc_battery_current_filter_array [8];
+uint8_t ui8_adc_battery_current_filter_array_index = 0;
+uint16_t ui16_adc_battery_current_filter_total = 0;
+volatile uint8_t ui8_adc_battery_current_filtered;
 
 // function prototypes
 void communications_controller (void);
@@ -112,8 +116,12 @@ void calc_battery_current_filtered (void);
 
 void ebike_app_init (void)
 {
-  ebike_app_battery_set_current_max (ADC_BATTERY_CURRENT_MAX);
-  ebike_app_battery_set_regen_current_max (0);
+  uint8_t ui8_index;
+
+  for (ui8_index = 0; ui8_index < 8; ui8_index++)
+  {
+    ui8_adc_battery_current_filter_array [ui8_index] = ui8_adc_battery_current_offset;
+  }
 
   // initialize at the zero value
   ui16_adc_battery_current_accumulated = (uint16_t) ui8_adc_battery_current_offset;
@@ -131,6 +139,9 @@ void ebike_app_init (void)
   wheel_speed_pi_controller_state.ui8_ki_dividend = WHEEL_SPEED_PI_CONTROLLER_KI_DIVIDEND;
   wheel_speed_pi_controller_state.ui8_ki_divisor = WHEEL_SPEED_PI_CONTROLLER_KI_DIVISOR;
   wheel_speed_pi_controller_state.i16_i_term = 0;
+
+  ebike_app_battery_set_current_max (ADC_BATTERY_CURRENT_MAX);
+  ebike_app_battery_set_regen_current_max (0);
 }
 
 void ebike_app_controller (void)
@@ -324,7 +335,7 @@ uint8_t throttle_is_set (void)
 void communications_controller (void)
 {
   uint8_t ui8_moving_indication = 0;
-  int16_t i16_motor_current_filtered_10b = 0;
+  int16_t _i16_battery_current_filtered = 0;
 
   /********************************************************************************************/
   // Prepare and send packate to LCD
@@ -390,10 +401,10 @@ void communications_controller (void)
   // - B8 = 250, LCD shows 1875 watts
   // - B8 = 100, LCD shows 750 watts
   // each unit of B8 = 0.25A
-  i16_motor_current_filtered_10b = ui8_adc_read_battery_current () - ui8_adc_battery_current_offset;
-  i16_motor_current_filtered_10b -= 1; // try to avoid LCD display about 25W when motor is not running
-  if (i16_motor_current_filtered_10b < 0) { i16_motor_current_filtered_10b = 0; } // limit to be only positive value, LCD don't accept regen current value
-  ui8_tx_buffer [8] = ((uint8_t) (i16_motor_current_filtered_10b) << 1);
+  _i16_battery_current_filtered = i16_battery_current_filtered;
+  _i16_battery_current_filtered -= 1; // try to avoid LCD display about 25W when motor is not running
+  if (_i16_battery_current_filtered < 0) { _i16_battery_current_filtered = 0; } // limit to be only positive value, LCD don't accept regen current value
+  ui8_tx_buffer [8] = ((uint8_t) (_i16_battery_current_filtered) << 1);
   // B9: motor temperature
   ui8_tx_buffer [9] = 0;
   // B10 and B11: 0
@@ -1058,11 +1069,11 @@ void calc_battery_current_filtered (void)
 {
   // low pass filter the current readed value, to avoid possible fast spikes/noise
   ui16_adc_battery_current_accumulated -= ui16_adc_battery_current_accumulated >> 3;
-  ui16_adc_battery_current_accumulated += UI8_ADC_BATTERY_CURRENT;
-  ui16_adc_battery_current_filtered = ui16_adc_battery_current_accumulated >> 3;
+  ui16_adc_battery_current_accumulated += ui8_adc_battery_current_filtered;
+  _ui8_adc_battery_current_filtered = (uint8_t) (ui16_adc_battery_current_accumulated >> 3);
 
   // i16_battery_current_filtered has sign, negative value will be regen current
-  i16_battery_current_filtered = ui16_adc_battery_current_filtered - ui8_adc_battery_current_offset;
+  i16_battery_current_filtered = ((uint16_t) _ui8_adc_battery_current_filtered) - ((uint16_t) ui8_adc_battery_current_offset);
 }
 
 void battery_protect_over_voltage (void)
