@@ -91,7 +91,7 @@ volatile uint8_t ui8_adc_target_battery_regen_current_max;
 
 uint8_t ui8_adc_battery_current_filter_array [8];
 uint8_t ui8_adc_battery_current_filter_array_index = 0;
-uint16_t ui16_adc_battery_current_filter_total = 0;
+uint16_t ui16_adc_battery_current_filter_total;
 volatile uint8_t ui8_adc_battery_current_filtered;
 
 // function prototypes
@@ -118,13 +118,15 @@ void ebike_app_init (void)
 {
   uint8_t ui8_index;
 
+  // initialize to needed values...
   for (ui8_index = 0; ui8_index < 8; ui8_index++)
   {
     ui8_adc_battery_current_filter_array [ui8_index] = ui8_adc_battery_current_offset;
   }
+  ui16_adc_battery_current_filter_total = ((uint16_t) ui8_adc_battery_current_offset) << 3; // MUST initialize with the correct offset value!!
 
   // initialize at the zero value
-  ui16_adc_battery_current_accumulated = (uint16_t) ui8_adc_battery_current_offset;
+  ui16_adc_battery_current_accumulated = ((uint16_t) ui8_adc_battery_current_offset) << 3;
 
   // init variables for motor current controller
   battery_current_pi_controller_state.ui8_kp_dividend = MOTOR_CURRENT_PI_CONTROLLER_KP_DIVIDEND;

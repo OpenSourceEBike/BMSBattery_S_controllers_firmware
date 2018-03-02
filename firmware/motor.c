@@ -352,7 +352,7 @@ uint8_t ui8_pwm_duty_cycle_duty_cycle_controller;
 
 uint8_t ui8_adc_motor_current_filter_array [8];
 uint8_t ui8_adc_motor_current_filter_array_index = 0;
-uint16_t ui16_adc_motor_current_filter_total = 0;
+uint16_t ui16_adc_motor_current_filter_total;
 uint8_t ui8_adc_target_motor_current_max;
 volatile uint8_t ui8_adc_motor_current_filtered;
 volatile uint8_t ui8_adc_target_motor_regen_current_max;
@@ -932,10 +932,12 @@ void motor_init (void)
 			    EXTI_SENSITIVITY_FALL_LOW);
   /***************************************************************************************/
 
+  // initialize to needed values...
   for (ui8_index = 0; ui8_index < 8; ui8_index++)
   {
-    ui8_adc_motor_current_filter_array [ui8_index] = 0;
+    ui8_adc_motor_current_filter_array [ui8_index] = ui8_adc_motor_current_offset;
   }
+  ui16_adc_motor_current_filter_total = ((uint16_t) ui8_adc_motor_current_offset) << 3; // MUST initialize with the correct offset value!!
 
   motor_set_current_max (ADC_MOTOR_CURRENT_MAX);
   motor_set_regen_current_max (0);
