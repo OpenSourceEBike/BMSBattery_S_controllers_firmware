@@ -67,7 +67,7 @@ uint16_t update_setpoint (uint16_t speed, uint16_t PAS, uint16_t sumtorque, uint
 
 
   //check if regen is wanted
-  if(ui8_regen_throttle>5){
+  if(ui8_regen_throttle>10){
   float_temp=(float)ui8_regen_throttle*(float)(REGEN_CURRENT_MAX_VALUE+current_cal_b)/255.0-(float)current_cal_b;
   ui32_setpoint= PI_control(ui16_BatteryCurrent, (uint16_t) float_temp);
   if (ui32_setpoint<3)ui32_setpoint=0;
@@ -186,7 +186,7 @@ uint16_t update_setpoint (uint16_t speed, uint16_t PAS, uint16_t sumtorque, uint
     if (ui32_setpoint<30)ui32_setpoint=0;
     if (ui32_setpoint>255)ui32_setpoint=255;
 
-  // printf("%lu, %d, %d, %d\r\n", ui32_setpoint, PAS>>3, ui16_BatteryCurrent, (uint16_t) uint32_current_target);
+   //printf("%lu, %d, %d, %d\r\n", ui32_setpoint, ui8_position_correction_value, ui16_BatteryCurrent, (uint16_t) uint32_current_target);
 #endif
 
  if (!uint_PWM_Enable) //enable PWM if disabled

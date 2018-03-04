@@ -249,7 +249,7 @@ int main (void)
       ui8_PAS_Flag =0; 			//reset interrupt flag
 
       ui8_temp = ui8_adc_read_throttle (); //read in recent torque value
-      //putchar (ui8_temp);
+      putchar (ui8_temp);
       ui16_torque[ui8_torque_index]= (uint8_t) map (ui8_temp , ADC_THROTTLE_MIN_VALUE, ADC_THROTTLE_MAX_VALUE, 0, SETPOINT_MAX_VALUE); //map throttle to limits
       ui16_sum_torque = 0;
       for(a = 0; a < NUMBER_OF_PAS_MAGS; a++) {			// sum up array content
