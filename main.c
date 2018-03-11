@@ -62,7 +62,7 @@ uint16_t ui16_SPEED = 64000; 		//speed in timetics
 uint16_t ui16_PAS_Counter = 0; 		//time tics for cadence measurement
 uint16_t ui16_PAS_High_Counter = 1;	//time tics for direction detection
 uint16_t ui16_PAS_High=1;		//number of High readings on PAS
-uint8_t PAS_dir=2;			//PAS direction flag
+uint8_t PAS_dir=0;			//PAS direction flag
 uint8_t PAS_act=3;			//recent PAS direction reading
 uint8_t PAS_old=4;			//last PAS direction reading
 uint16_t ui16_PAS = 32000;		//cadence in timetics
@@ -208,7 +208,7 @@ int main (void)
     if (ui16_SPEED_Counter>64000L)
         {
     	ui16_SPEED=64000; 	//Set Display to 0 km/h
-
+    	PAS_act=0;		//Set PAS indicator to 0 to avoid motor startig, if pushing backwards from standstill
         }
 //in case of THROTTLEANDPAS or THORQUE_SIMULATION, process the PAS routine
 #if defined(THROTTLE_AND_PAS)
@@ -229,17 +229,30 @@ int main (void)
     {
       ui16_PAS=ui16_PAS_Counter; 		//save recent cadence
       ui16_PAS_High=ui16_PAS_High_Counter;
-      //ui16_PAS_High= (uint16_t)(((float)ui16_PAS/(float)ui16_PAS_High)*1000.0);
-      //printf("%d,%d,%d\r\n", (uint16_t)(((float)ui16_PAS/(float)ui16_PAS_High)*1000.0),ui16_PAS_Counter,ui16_PAS_High);
 
 
 
+#if (PAS_DIRECTION)
+      if((float)ui16_PAS/(float)ui16_PAS_High>PAS_THRESHOLD){
+	  if (PAS_act<7) {PAS_act++;}
+      }
+      else{
+	  if (PAS_act>0) {PAS_act--;}
+      }
+#endif
 
-      if((float)ui16_PAS/(float)ui16_PAS_High>PAS_THRESHOLD){PAS_act=1;} //calculate PAS direction
-      else{PAS_act=0;}
+#if (!PAS_DIRECTION)
+      if((float)ui16_PAS/(float)ui16_PAS_High<PAS_THRESHOLD){
 
-      if (PAS_act==PAS_old){PAS_dir=PAS_act;} //set direction only if two readings are in same direction
-      PAS_old=PAS_act;
+	  if (PAS_act<7) {PAS_act++;}
+      }
+      else{
+	  if (PAS_act>0) {PAS_act--;}
+      }
+#endif
+
+      if (PAS_act>3){PAS_dir=1;} //set direction only if enough pulses in the right direction are detected.
+      else{PAS_dir=0;}
 
       ui16_PAS_Counter=1;
       ui16_PAS_High_Counter=1;//reset PAS Counter
@@ -249,14 +262,16 @@ int main (void)
       ui8_PAS_Flag =0; 			//reset interrupt flag
 
       ui8_temp = ui8_adc_read_throttle (); //read in recent torque value
-      putchar (ui8_temp);
+
       ui16_torque[ui8_torque_index]= (uint8_t) map (ui8_temp , ADC_THROTTLE_MIN_VALUE, ADC_THROTTLE_MAX_VALUE, 0, SETPOINT_MAX_VALUE); //map throttle to limits
       ui16_sum_torque = 0;
       for(a = 0; a < NUMBER_OF_PAS_MAGS; a++) {			// sum up array content
 	   ui16_sum_torque+= ui16_torque[a];
 	   }
+
       ui8_torque_index++;
       if (ui8_torque_index>NUMBER_OF_PAS_MAGS-1){ui8_torque_index=0;} //reset index counter
+      printf("%d,%d,%d,%d,%d\r\n",ui8_temp, ui16_sum_torque, ui16_PAS, ui16_PAS_High, PAS_act);
     }
 
 

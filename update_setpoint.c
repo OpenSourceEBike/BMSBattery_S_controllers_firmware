@@ -72,7 +72,7 @@ uint16_t update_setpoint (uint16_t speed, uint16_t PAS, uint16_t sumtorque, uint
   ui32_setpoint= PI_control(ui16_BatteryCurrent, (uint16_t) float_temp);
   if (ui32_setpoint<3)ui32_setpoint=0;
   if (ui32_setpoint>255)ui32_setpoint=255;
-  //printf("%lu, %d, %d, %d\r\n", ui32_setpoint, ui8_regen_throttle, ui16_BatteryCurrent, (uint16_t) float_temp);
+  //printf("R, %lu, %d, %d, %d\r\n", ui32_setpoint, ui8_regen_throttle, ui16_BatteryCurrent, (uint16_t) float_temp);
   }
   //check for undervoltage
   else if(ui8_BatteryVoltage<BATTERY_VOLTAGE_MIN_VALUE){
@@ -101,10 +101,11 @@ uint16_t update_setpoint (uint16_t speed, uint16_t PAS, uint16_t sumtorque, uint
 
   //check if pedals are turning
 #ifndef THROTTLE
-  else if (ui16_PAS_Counter>timeout|| PAS_dir!=PAS_DIRECTION){
+  else if (ui16_PAS_Counter>timeout || !PAS_dir){
             ui32_setpoint= PI_control(ui16_BatteryCurrent, -1*current_cal_b);//Curret target = 0 A, this is to keep the integral part of the PI-control up to date
                   if (ui32_setpoint<30){ui32_setpoint=0;}
                   if (ui32_setpoint>255){ui32_setpoint=255;}
+     //printf("P, %lu, %d, %d, %d\r\n", ui32_setpoint, sumtorque, ui16_BatteryCurrent, (uint16_t) -1*current_cal_b);
      // printf("you are not pedaling!\r\n");
   }
 #endif
@@ -129,10 +130,10 @@ uint16_t update_setpoint (uint16_t speed, uint16_t PAS, uint16_t sumtorque, uint
 #ifdef SPEEDSENSOR_EXTERNAL
   uint32_current_target = CheckSpeed ((uint16_t)uint32_current_target, (uint16_t) ui32_SPEED_km_h); //limit speed
 #endif
-      ui32_setpoint= PI_control(ui16_BatteryCurrent, uint32_current_target);
+      ui32_setpoint= PI_control(ui16_BatteryCurrent, (uint16_t)uint32_current_target);
       if (ui32_setpoint<30)ui32_setpoint=0;
       if (ui32_setpoint>255)ui32_setpoint=255;
-
+      //printf("T, %lu, %d, %d, %d\r\n", ui32_setpoint, sumtorque, ui16_BatteryCurrent, (uint16_t) uint32_current_target);
       //printf("%lu, %d, %d, %d\r\n", ui32_setpoint, PAS>>3, ui16_BatteryCurrent, (uint16_t) uint32_current_target);
 
 #endif
@@ -213,7 +214,7 @@ uint32_t PI_control (uint16_t ist, uint16_t soll)
   float_i+=((float)soll - (float)ist)*I_FACTOR;
   if (float_i>255)float_i=255;
   if (float_i<0)float_i=0;
-  //printf("soll %d, ist %d, P-Anteil %d,I-Anteil %d\r\n", soll, ist, (int16_t)float_p, (int16_t)float_i);
+  //printf("%d, %d, %d, %d\r\n", soll, ist, (int16_t)float_p, (int16_t)float_i);
   return ((uint32_t)(float_p+float_i));
 }
 

@@ -10,9 +10,9 @@
 
 #define NUMBER_OF_PAS_MAGS 16
 #define limit 25
-#define timeout 3125
+#define timeout 6125
 #define wheel_circumference 2200L
-#define fummelfaktor 64L
+#define fummelfaktor 32L
 #define ADC_THROTTLE_MIN_VALUE 43
 #define ADC_THROTTLE_MAX_VALUE 182
 #define BATTERY_VOLTAGE_MIN_VALUE 127
