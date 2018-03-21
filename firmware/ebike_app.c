@@ -353,7 +353,8 @@ void communications_controller (void)
 
   // prepare moving indication info
   ui8_moving_indication = 0;
-  if (brake_is_set ()) { ui8_moving_indication = (1 << 5); }
+  if (motor_controller_state_is_set (MOTOR_CONTROLLER_STATE_BRAKE) ||
+      motor_controller_state_is_set (MOTOR_CONTROLLER_STATE_BRAKE_LIKE_COAST_BRAKES)) { ui8_moving_indication = (1 << 5); }
   if (ebike_app_cruise_control_is_set ()) { ui8_moving_indication |= (1 << 3); }
   if (throttle_is_set ()) { ui8_moving_indication |= (1 << 1); }
   if (pas_is_set ()) { ui8_moving_indication |= (1 << 4); }
@@ -587,7 +588,9 @@ void set_speed_erps_max_to_motor_controller (struct_lcd_configuration_variables 
   ui32_temp = ((uint32_t) lcd_configuration_variables->ui8_max_speed) * 1000; // in meters/hour
   ui32_temp *= ((uint32_t) (lcd_configuration_variables->ui8_motor_characteristic >> 1));
   f_temp = 3600.0 * f_wheel_perimeter;
-  f_temp = ((float) ui32_temp) / f_temp;
+  // avoid 0 division
+  if (f_temp != 0) { f_temp = ((float) ui32_temp) / f_temp; }
+  else { f_temp = ((float) ui32_temp); }
   motor_controller_set_speed_erps_max ((uint16_t) f_temp);
 }
 
@@ -680,12 +683,15 @@ void calc_wheel_speed (void)
     ui32_temp = ((uint32_t) (lcd_configuration_variables.ui8_motor_characteristic >> 1)) * 1000;
     ui32_temp1 = ((uint32_t) ui16_motor_get_motor_speed_erps ()) * 3600;
     f_wheel_speed = ((float) ui32_temp1) * f_wheel_perimeter;
-    f_wheel_speed /= (float) ui32_temp;
+    // avoid 0 division
+    if (ui32_temp > 0) { f_wheel_speed /= (float) ui32_temp; }
   }
   else
   {
     // calc wheel speed in km/h, from external wheel speed sensor
-    f_wheel_speed = ((float) PWM_CYCLES_SECOND) / ((float) ui16_wheel_speed_sensor_pwm_cycles_ticks); // rps
+    // avoid 0 division
+    if (ui16_wheel_speed_sensor_pwm_cycles_ticks > 0) { f_wheel_speed = ((float) PWM_CYCLES_SECOND) / ((float) ui16_wheel_speed_sensor_pwm_cycles_ticks); } // rps
+    else { f_wheel_speed = (float) PWM_CYCLES_SECOND; }
     f_wheel_speed *= f_wheel_perimeter; // meters per second
     f_wheel_speed *= 3.6; // kms per hour
   }
@@ -695,11 +701,16 @@ void calc_wheel_speed (void)
 
 void read_pas_cadence_and_direction (void)
 {
+  float f_temp;
+
   // cadence in RPM =  60 / (ui16_pas_timer2_ticks * PAS_NUMBER_MAGNETS * 0.000064)
   if (ui16_pas1_pwm_cycles_ticks >= ((uint16_t) PAS_ABSOLUTE_MIN_CADENCE_PWM_CYCLE_TICKS)) { ui8_pas1_cadence_rpm = 0; }
   else
   {
-    ui8_pas1_cadence_rpm = (uint8_t) (60 / (((float) ui16_pas1_pwm_cycles_ticks) * ((float) PAS_NUMBER_MAGNETS) * 0.000064));
+    f_temp = ((float) ui16_pas1_pwm_cycles_ticks) * ((float) PAS_NUMBER_MAGNETS) * 0.000064;
+    // avoid division by 0
+    if (f_temp != 0) { ui8_pas1_cadence_rpm = (uint8_t) (60.0 / f_temp); }
+    else { ui8_pas1_cadence_rpm = 60; }
 
     if (ui8_pas1_cadence_rpm > ((uint8_t) PAS_MAX_CADENCE_RPM))
     {
@@ -863,7 +874,8 @@ void ebike_throttle_type_torque_sensor (void)
   }
 
   // set PWM duty_cycle target value only if we are not braking
-  if (!motor_controller_state_is_set (MOTOR_CONTROLLER_STATE_BRAKE))
+  if ((!motor_controller_state_is_set (MOTOR_CONTROLLER_STATE_BRAKE)) &&
+      (!motor_controller_state_is_set (MOTOR_CONTROLLER_STATE_BRAKE_LIKE_COAST_BRAKES)))
   {
     // now use the lowest value from the PI controllers outputs
     motor_set_pwm_duty_cycle_target (ui8_min (
@@ -976,8 +988,6 @@ void read_battery_voltage (void)
   ui16_adc_battery_voltage_accumulated -= ui16_adc_battery_voltage_accumulated >> 6;
   ui16_adc_battery_voltage_accumulated += ((uint16_t) ui8_adc_read_battery_voltage ());
   ui8_adc_battery_voltage_filtered = ui16_adc_battery_voltage_accumulated >> 6;
-
-
 }
 
 uint8_t ebike_app_get_ADC_battery_voltage_filtered (void)

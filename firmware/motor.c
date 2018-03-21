@@ -286,9 +286,9 @@ uint8_t ui8_svm_table [SVM_TABLE_LEN] =
     122
 };
 
-uint16_t ui16_PWM_cycles_counter = 0;
-uint16_t ui16_PWM_cycles_counter_6 = 0;
-uint16_t ui16_PWM_cycles_counter_total = 0;
+uint16_t ui16_PWM_cycles_counter = 1;
+uint16_t ui16_PWM_cycles_counter_6 = 1;
+uint16_t ui16_PWM_cycles_counter_total = 0xffff;
 
 uint16_t ui16_motor_speed_erps = 0;
 uint8_t ui8_sinewave_table_index = 0;
@@ -408,9 +408,12 @@ void TIM1_CAP_COM_IRQHandler(void) __interrupt(TIM1_CAP_COM_IRQHANDLER)
       {
 	ui8_half_erps_flag = 0;
 	ui16_PWM_cycles_counter_total = ui16_PWM_cycles_counter;
-	ui16_PWM_cycles_counter = 0;
+	ui16_PWM_cycles_counter = 1;
+
 	// this division takes 4.4us and without the cast (uint16_t) PWM_CYCLES_SECOND, would take 111us!! Verified on 2017.11.20
-	ui16_motor_speed_erps = ((uint16_t) PWM_CYCLES_SECOND) / ui16_PWM_cycles_counter_total;
+	// avoid division by 0
+	if (ui16_PWM_cycles_counter_total > 0) { ui16_motor_speed_erps = ((uint16_t) PWM_CYCLES_SECOND) / ui16_PWM_cycles_counter_total; }
+	else { ui16_motor_speed_erps = ((uint16_t) PWM_CYCLES_SECOND); }
       }
       // update motor commutation state based on motor speed
 #ifdef DO_SINEWAVE_INTERPOLATION_360_DEGREES
@@ -488,7 +491,7 @@ void TIM1_CAP_COM_IRQHandler(void) __interrupt(TIM1_CAP_COM_IRQHANDLER)
       break;
     }
 
-    ui16_PWM_cycles_counter_6 = 0;
+    ui16_PWM_cycles_counter_6 = 1;
   }
   /****************************************************************************/
 
@@ -501,8 +504,8 @@ void TIM1_CAP_COM_IRQHandler(void) __interrupt(TIM1_CAP_COM_IRQHANDLER)
   }
   else // happens when motor is stopped or near zero speed
   {
-    ui16_PWM_cycles_counter = 0;
-    ui16_PWM_cycles_counter_6 = 0;
+    ui16_PWM_cycles_counter = 1; // don't put to 0 to avoid 0 divisions
+    ui16_PWM_cycles_counter_6 = 1;
     ui8_half_erps_flag = 0;
     ui16_motor_speed_erps = 0;
     ui16_PWM_cycles_counter_total = 0xffff;
@@ -522,6 +525,8 @@ void TIM1_CAP_COM_IRQHandler(void) __interrupt(TIM1_CAP_COM_IRQHANDLER)
   // calculate the interpolation angle (and it doesn't work when motor starts and at very low speeds)
   if (ui8_motor_commutation_type == SINEWAVE_INTERPOLATION_60_DEGREES)
   {
+    // division by 0: ui16_PWM_cycles_counter_total should never be 0
+    // TODO: verifiy if (ui16_PWM_cycles_counter_6 << 8) do not overflow
     ui8_interpolation_angle = (ui16_PWM_cycles_counter_6 << 8) / ui16_PWM_cycles_counter_total; // this operations take 4.4us
     ui8_motor_rotor_angle = ui8_motor_rotor_absolute_angle + ui8_interpolation_angle;
     ui8_sinewave_table_index = ui8_motor_rotor_angle + ui8_angle_correction;
@@ -550,8 +555,18 @@ void TIM1_CAP_COM_IRQHandler(void) __interrupt(TIM1_CAP_COM_IRQHANDLER)
       // read here the phase B current: FOC Id current
       ui8_adc_id_current = UI8_ADC_MOTOR_PHASE_B_CURRENT;
 
-      if (ui8_adc_id_current > ADC_PHASE_B_CURRENT_ZERO_AMPS_FOC_MAX) { ui8_angle_correction++; }
-      else if (ui8_adc_id_current < ADC_PHASE_B_CURRENT_ZERO_AMPS_FOC_MIN) { ui8_angle_correction--; }
+      // first, verify if motor current is positive or negative (motor or regen mode), if regen mode, we need to invert the logic for angle correction
+      // second, adjust ui8_angle_correction so the ui8_adc_id_current is zero (FOC principle)
+      if (ui8_adc_motor_current > ui8_adc_motor_current_offset)
+      {
+	if (ui8_adc_id_current > ADC_PHASE_B_CURRENT_ZERO_AMPS_FOC_MAX) { ui8_angle_correction++; }
+	else if (ui8_adc_id_current < ADC_PHASE_B_CURRENT_ZERO_AMPS_FOC_MIN) { ui8_angle_correction--; }
+      }
+      else if (ui8_adc_motor_current < ui8_adc_motor_current_offset)
+      {
+	if (ui8_adc_id_current > ADC_PHASE_B_CURRENT_ZERO_AMPS_FOC_MAX) { ui8_angle_correction--; }
+	else if (ui8_adc_id_current < ADC_PHASE_B_CURRENT_ZERO_AMPS_FOC_MIN) { ui8_angle_correction++; }
+      }
     }
   }
   /****************************************************************************/
@@ -1006,5 +1021,3 @@ void EXTI_PORTD_IRQHandler(void) __interrupt(EXTI_PORTD_IRQHANDLER)
   motor_disable_PWM ();
   ebike_app_set_error (EBIKE_APP_ERROR_06_SHORT_CIRCUIT);
 }
-
-
