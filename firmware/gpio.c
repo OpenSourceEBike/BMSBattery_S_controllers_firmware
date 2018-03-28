@@ -12,7 +12,7 @@
 
 void gpio_init (void)
 {
-  ;
+
 }
 
 void debug_pin_init (void)

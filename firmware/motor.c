@@ -290,7 +290,7 @@ uint16_t ui16_PWM_cycles_counter = 1;
 uint16_t ui16_PWM_cycles_counter_6 = 1;
 uint16_t ui16_PWM_cycles_counter_total = 0xffff;
 
-uint16_t ui16_motor_speed_erps = 0;
+volatile uint16_t ui16_motor_speed_erps = 0;
 uint8_t ui8_sinewave_table_index = 0;
 uint8_t ui8_motor_rotor_absolute_angle;
 uint8_t ui8_motor_rotor_angle;
@@ -306,7 +306,7 @@ uint8_t ui8_hall_sensors_last = 0;
 
 uint8_t ui8_adc_id_current = 0;
 
-uint8_t ui8_adc_target_motor_current_max;
+volatile uint8_t ui8_adc_target_motor_current_max;
 volatile uint8_t ui8_adc_target_motor_regen_current_max;
 
 volatile uint8_t ui8_adc_motor_current;
@@ -582,8 +582,8 @@ void TIM1_CAP_COM_IRQHandler(void) __interrupt(TIM1_CAP_COM_IRQHANDLER)
   // - limit motor max ERPS
   // - ramp up/down PWM duty_cycle value
 
-  if ((UI8_ADC_BATTERY_CURRENT > ui8_adc_target_battery_current_max) || // battery max current, reduce duty_cycle
-      (ui8_adc_motor_current > ui8_adc_target_motor_current_max) || // motor max current, reduce duty_cycle
+  if ((UI8_ADC_BATTERY_CURRENT > (ui8_adc_target_battery_current_max+10)) || // battery max current, reduce duty_cycle
+      (ui8_adc_motor_current > (ui8_adc_target_motor_current_max+10)) || // motor max current, reduce duty_cycle
       (ui16_motor_speed_erps > MOTOR_OVER_SPEED_ERPS) || // motor speed over max ERPS, reduce duty_cycle
       (UI8_ADC_BATTERY_VOLTAGE < ((uint8_t) ADC_BATTERY_VOLTAGE_MIN))) // battery voltage under min voltage, reduce duty_cycle
   {

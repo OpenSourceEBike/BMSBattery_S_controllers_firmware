@@ -37,6 +37,7 @@ extern uint8_t ui8_pwm_duty_cycle_duty_cycle_controller;
 extern uint8_t ui8_pas_state;
 extern volatile uint8_t ui8_torque_sensor_throttle_processed_value;
 extern volatile uint8_t ui8_adc_target_motor_regen_current_max;
+extern volatile uint8_t ui8_adc_target_motor_current_max;
 
 /***************************************************************************************/
 // Motor interface

@@ -55,6 +55,9 @@ extern int16_t i16_battery_current_filtered;
 extern volatile uint8_t ui8_adc_target_battery_current_max;
 extern volatile uint8_t ui8_adc_target_battery_regen_current_max;
 
+extern volatile uint8_t ui8_log_pi_battery_current_value;
+extern volatile uint8_t ui8_log_pi_battery_target_current_value;
+
 void ebike_app_init (void);
 void ebike_app_controller (void);
 void ebike_app_cruise_control_stop (void);

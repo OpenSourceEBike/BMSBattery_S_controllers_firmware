@@ -94,17 +94,20 @@ int main (void)
 
   while (1)
   {
-#ifdef DEBUG_UART
-//    printf ("%d,%d,%d\n", ui8_duty_cycle, ui8_adc_motor_current, ui8_adc_target_motor_regen_current_max);
-#endif
-
     // because of continue; at the end of each if code block that will stop the while (1) loop there,
     // the first if block code will have the higher priority over any others
+
     ui16_TIM2_counter = TIM2_GetCounter ();
-    if ((ui16_TIM2_counter - ui16_ebike_app_controller_counter) > 781) // every 100ms
+    if ((ui16_TIM2_counter - ui16_ebike_app_controller_counter) > 25) // every 25ms
     {
       ui16_ebike_app_controller_counter = ui16_TIM2_counter;
+      // ebike_app_controller() takes about 13ms (measured at 2018.03)
       ebike_app_controller ();
+
+#ifdef DEBUG_UART
+      // sugestion: no more than 6 variables printed (takes about 3ms to printf 6 variables)
+      printf ("%d,%d,%d,%d,%d,%d,%d,%d\n", brake_is_set(), ui16_motor_get_motor_speed_erps(), ui8_duty_cycle_target, ui8_duty_cycle, ui8_adc_target_battery_current_max, UI8_ADC_BATTERY_CURRENT, ui8_log_pi_battery_target_current_value, ui8_log_pi_battery_current_value);
+#endif
       continue;
     }
   }

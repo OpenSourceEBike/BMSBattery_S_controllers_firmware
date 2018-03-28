@@ -87,6 +87,9 @@ int16_t i16_battery_current_filtered = 0;
 uint8_t ui8_adc_battery_current_offset;
 uint16_t ui16_adc_battery_current_offset_10b;
 
+volatile uint8_t ui8_log_pi_battery_current_value;
+volatile uint8_t ui8_log_pi_battery_target_current_value;
+
 volatile uint8_t ui8_adc_target_battery_current_max;
 volatile uint8_t ui8_adc_target_battery_regen_current_max;
 
@@ -98,7 +101,8 @@ void set_motor_controller_max_current (uint8_t ui8_controller_max_current);
 void calc_wheel_speed (void);
 void ebike_throttle_type_throttle_pas (void);
 void ebike_throttle_type_torque_sensor (void);
-void read_throttle (void);
+void throttle_read (void);
+void throttle_reset_filter (void);
 void read_torque_sensor_throttle (void);
 void read_pas_cadence_and_direction (void);
 uint8_t pas_is_set (void);
@@ -151,7 +155,7 @@ void ebike_app_controller (void)
 #if (EBIKE_THROTTLE_TYPE == EBIKE_THROTTLE_TYPE_THROTTLE_PAS)
   // map throttle value from 0 up to 255 to global variable: ui8_throttle_value
   // setup ui8_is_throttle_released flag
-  read_throttle ();
+  throttle_read ();
 #elif (EBIKE_THROTTLE_TYPE == EBIKE_THROTTLE_TYPE_TORQUE_SENSOR)
   read_torque_sensor_throttle ();
 #else
@@ -323,6 +327,7 @@ uint8_t throttle_is_set (void)
 
 void communications_controller (void)
 {
+#ifndef DEBUG_UART
   uint8_t ui8_moving_indication = 0;
   int16_t i16_motor_current_filtered_10b = 0;
 
@@ -412,9 +417,7 @@ void communications_controller (void)
   // send the package over UART
   for (ui8_i = 0; ui8_i <= 11; ui8_i++)
   {
-#ifndef DEBUG_UART
     putchar (ui8_tx_buffer [ui8_i]);
-#endif
   }
 
   /********************************************************************************************/
@@ -454,6 +457,7 @@ void communications_controller (void)
 
     UART2->CR2 |= (1 << 5); // enable UART2 receive interrupt as we are now ready to receive a new package
   }
+#endif
 
   // do here some tasks that must be done even if we don't receive a package from the LCD
   set_motor_controller_max_current (lcd_configuration_variables.ui8_controller_max_current);
@@ -850,6 +854,8 @@ void ebike_throttle_type_torque_sensor (void)
   if (i16_battery_current_filtered < 0){ battery_current_pi_controller_state.ui8_current_value = 0; }
   else { battery_current_pi_controller_state.ui8_current_value = (uint8_t) i16_battery_current_filtered; }
   battery_current_pi_controller_state.ui8_target_value = ui8_target_current;
+//ui8_log_pi_battery_current_value = battery_current_pi_controller_state.ui8_current_value;
+//ui8_log_pi_battery_target_current_value = battery_current_pi_controller_state.ui8_target_value;
   pi_controller (&battery_current_pi_controller_state);
 
   // LCD P3 = 1, control / limit speed to max value
@@ -887,10 +893,12 @@ void ebike_throttle_type_torque_sensor (void)
     // keep reseting PI controllers so the I term will not increase while we are braking!
     pi_controller_reset (&battery_current_pi_controller_state);
     pi_controller_reset (&wheel_speed_pi_controller_state);
+    // reset throttle filter to get a fast response when we realease brakes
+    throttle_reset_filter();
   }
 }
 
-void read_throttle (void)
+void throttle_read (void)
 {
   // read torque sensor signal
   ui8_adc_throttle_value = ui8_adc_read_throttle ();
@@ -912,11 +920,16 @@ void read_throttle (void)
   ui8_is_throttle_released = ((ui8_throttle_value > ((uint8_t) ADC_THROTTLE_MIN_VALUE)) ? 0 : 1);
 }
 
+void throttle_reset_filter (void)
+{
+  ui16_throttle_value_accumulated = 0;
+}
+
 void read_torque_sensor_throttle (void)
 {
   static uint8_t ui8_startup_phase;
 
-  read_throttle (); // so we get regular processing of throttle signal
+  throttle_read (); // so we get regular processing of throttle signal
 
   // calc startup phase
   switch (ui8_rtst_state_machine)
