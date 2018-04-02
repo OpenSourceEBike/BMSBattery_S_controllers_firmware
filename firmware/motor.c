@@ -554,22 +554,18 @@ void TIM1_CAP_COM_IRQHandler(void) __interrupt(TIM1_CAP_COM_IRQHANDLER)
     {
       // read here the phase B current: FOC Id current
       ui8_adc_id_current = UI8_ADC_MOTOR_PHASE_B_CURRENT;
-
       if (ui8_adc_id_current > ADC_PHASE_B_CURRENT_ZERO_AMPS_FOC_MAX)
       {
-	if ((ui8_angle_correction+1) < 143)
-	{
-	  ui8_angle_correction++;
-	}
+	// limit max ui8_angle_correction value (127 + 15)
+	if ((ui8_angle_correction+1) < 143) { ui8_angle_correction++; }
       }
       else if (ui8_adc_id_current < ADC_PHASE_B_CURRENT_ZERO_AMPS_FOC_MIN)
       {
+	// limit min ui8_angle_correction value (127 - 15)
 	if ((ui8_angle_correction-1) > 112)
 	{
-	  if (UI8_ADC_BATTERY_CURRENT > (ui8_adc_battery_current_offset+2))
-	  {
-	    ui8_angle_correction--;
-	  }
+	  // decrease only when not regen!! other way ui8_angle_correction will always decrease... CAN WE IMPROVE THIS??
+	  if (UI8_ADC_BATTERY_CURRENT > (ui8_adc_battery_current_offset+2)) { ui8_angle_correction--; }
 	}
       }
     }
