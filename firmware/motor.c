@@ -555,17 +555,22 @@ void TIM1_CAP_COM_IRQHandler(void) __interrupt(TIM1_CAP_COM_IRQHANDLER)
       // read here the phase B current: FOC Id current
       ui8_adc_id_current = UI8_ADC_MOTOR_PHASE_B_CURRENT;
 
-      // first, verify if motor current is positive or negative (motor or regen mode), if regen mode, we need to invert the logic for angle correction
-      // second, adjust ui8_angle_correction so the ui8_adc_id_current is zero (FOC principle)
-      if (ui8_adc_motor_current > ui8_adc_motor_current_offset)
+      if (ui8_adc_id_current > ADC_PHASE_B_CURRENT_ZERO_AMPS_FOC_MAX)
       {
-	if (ui8_adc_id_current > ADC_PHASE_B_CURRENT_ZERO_AMPS_FOC_MAX) { ui8_angle_correction++; }
-	else if (ui8_adc_id_current < ADC_PHASE_B_CURRENT_ZERO_AMPS_FOC_MIN) { ui8_angle_correction--; }
+	if ((ui8_angle_correction+1) < 143)
+	{
+	  ui8_angle_correction++;
+	}
       }
-      else if (ui8_adc_motor_current < ui8_adc_motor_current_offset)
+      else if (ui8_adc_id_current < ADC_PHASE_B_CURRENT_ZERO_AMPS_FOC_MIN)
       {
-	if (ui8_adc_id_current > ADC_PHASE_B_CURRENT_ZERO_AMPS_FOC_MAX) { ui8_angle_correction--; }
-	else if (ui8_adc_id_current < ADC_PHASE_B_CURRENT_ZERO_AMPS_FOC_MIN) { ui8_angle_correction++; }
+	if ((ui8_angle_correction-1) > 112)
+	{
+	  if (UI8_ADC_BATTERY_CURRENT > (ui8_adc_battery_current_offset+2))
+	  {
+	    ui8_angle_correction--;
+	  }
+	}
       }
     }
   }
@@ -582,8 +587,8 @@ void TIM1_CAP_COM_IRQHandler(void) __interrupt(TIM1_CAP_COM_IRQHANDLER)
   // - limit motor max ERPS
   // - ramp up/down PWM duty_cycle value
 
-  if ((UI8_ADC_BATTERY_CURRENT > (ui8_adc_target_battery_current_max+10)) || // battery max current, reduce duty_cycle
-      (ui8_adc_motor_current > (ui8_adc_target_motor_current_max+10)) || // motor max current, reduce duty_cycle
+  if ((UI8_ADC_BATTERY_CURRENT > ui8_adc_target_battery_current_max) || // battery max current, reduce duty_cycle
+      (ui8_adc_motor_current > ui8_adc_target_motor_current_max) || // motor max current, reduce duty_cycle
       (ui16_motor_speed_erps > MOTOR_OVER_SPEED_ERPS) || // motor speed over max ERPS, reduce duty_cycle
       (UI8_ADC_BATTERY_VOLTAGE < ((uint8_t) ADC_BATTERY_VOLTAGE_MIN))) // battery voltage under min voltage, reduce duty_cycle
   {
@@ -777,7 +782,7 @@ void TIM1_CAP_COM_IRQHandler(void) __interrupt(TIM1_CAP_COM_IRQHANDLER)
     if (PAS1__PORT->IDR & PAS1__PIN)
     {
       ui8_pas2_counter++;
-      if (ui8_pas2_counter > 1)
+      if (ui8_pas2_counter > 3)
       {
 	ui8_pas2_counter = 1;
 	ui8_pas2_direction = 1;

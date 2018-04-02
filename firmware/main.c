@@ -30,6 +30,7 @@
 
 uint16_t ui16_TIM2_counter = 0;
 uint16_t ui16_ebike_app_controller_counter = 0;
+uint16_t ui16_debug_uart_counter = 0;
 
 /////////////////////////////////////////////////////////////////////////////////////////////
 //// Functions prototypes
@@ -98,18 +99,33 @@ int main (void)
     // the first if block code will have the higher priority over any others
 
     ui16_TIM2_counter = TIM2_GetCounter ();
-    if ((ui16_TIM2_counter - ui16_ebike_app_controller_counter) > 25) // every 25ms
+    if ((ui16_TIM2_counter - ui16_ebike_app_controller_counter) > 100) // every 100ms
     {
       ui16_ebike_app_controller_counter = ui16_TIM2_counter;
       // ebike_app_controller() takes about 13ms (measured at 2018.03)
       ebike_app_controller ();
-
-#ifdef DEBUG_UART
-      // sugestion: no more than 6 variables printed (takes about 3ms to printf 6 variables)
-      printf ("%d,%d,%d,%d,%d,%d,%d,%d\n", brake_is_set(), ui16_motor_get_motor_speed_erps(), ui8_duty_cycle_target, ui8_duty_cycle, ui8_adc_target_battery_current_max, UI8_ADC_BATTERY_CURRENT, ui8_log_pi_battery_target_current_value, ui8_log_pi_battery_current_value);
-#endif
       continue;
     }
+
+#ifdef DEBUG_UART
+    ui16_TIM2_counter = TIM2_GetCounter ();
+    if ((ui16_TIM2_counter - ui16_debug_uart_counter) > 20) // every 20ms
+    {
+      ui16_debug_uart_counter = ui16_TIM2_counter;
+
+      // sugestion: no more than 6 variables printed (takes about 3ms to printf 6 variables)
+      printf ("%d,%d,%d,%d,%d,%d,%d,%d\n",
+	      brake_is_set(),
+	      ui16_motor_get_motor_speed_erps(),
+	      ui8_duty_cycle_target,
+	      ui8_duty_cycle,
+	      ui8_adc_target_battery_current_max,
+	      UI8_ADC_BATTERY_CURRENT,
+	      (ui16_motor_get_motor_speed_erps() > MOTOR_ROTOR_ERPS_START_INTERPOLATION_60_DEGREES),
+	      ui8_angle_correction);
+      continue;
+    }
+#endif
   }
 
   return 0;

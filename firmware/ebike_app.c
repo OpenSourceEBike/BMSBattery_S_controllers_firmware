@@ -65,7 +65,6 @@ uint8_t ui8_battery_controller_max_current;
 
 uint8_t ui8_wheel_speed_max = 0;
 
-struct_pi_controller_state battery_current_pi_controller_state;
 struct_pi_controller_state wheel_speed_pi_controller_state;
 
 uint16_t ui16_adc_battery_voltage_accumulated = (uint16_t) ADC_BATTERY_VOLTAGE_MED;
@@ -81,10 +80,7 @@ uint8_t ui8_motor_cool_counter = 0;
 uint8_t ui8_rtst_state_machine = 0;
 uint8_t ui8_rtst_counter = 0;
 
-uint16_t ui16_adc_battery_current_accumulated;
-uint16_t ui16_adc_battery_current_filtered;
-int16_t i16_battery_current_filtered = 0;
-uint8_t ui8_adc_battery_current_offset;
+volatile uint8_t ui8_adc_battery_current_offset;
 uint16_t ui16_adc_battery_current_offset_10b;
 
 volatile uint8_t ui8_log_pi_battery_current_value;
@@ -112,22 +108,11 @@ float f_get_assist_level ();
 void ebike_app_battery_set_current_max (uint8_t ui8_value);
 void ebike_app_battery_set_regen_current_max (uint8_t ui8_value);
 uint8_t ebike_app_get_ADC_battery_voltage_filtered (void);
-void calc_battery_current_filtered (void);
 
 void ebike_app_init (void)
 {
   ebike_app_battery_set_current_max (ADC_BATTERY_CURRENT_MAX);
   ebike_app_battery_set_regen_current_max (0);
-
-  // initialize at the zero value
-  ui16_adc_battery_current_accumulated = (uint16_t) ui8_adc_battery_current_offset;
-
-  // init variables for motor current controller
-  battery_current_pi_controller_state.ui8_kp_dividend = MOTOR_CURRENT_PI_CONTROLLER_KP_DIVIDEND;
-  battery_current_pi_controller_state.ui8_kp_divisor = MOTOR_CURRENT_PI_CONTROLLER_KP_DIVISOR;
-  battery_current_pi_controller_state.ui8_ki_dividend = MOTOR_CURRENT_PI_CONTROLLER_KI_DIVIDEND;
-  battery_current_pi_controller_state.ui8_ki_divisor = MOTOR_CURRENT_PI_CONTROLLER_KI_DIVISOR;
-  battery_current_pi_controller_state.i16_i_term = 0;
 
   // init variables for wheel speed controller
   wheel_speed_pi_controller_state.ui8_kp_dividend = WHEEL_SPEED_PI_CONTROLLER_KP_DIVIDEND;
@@ -141,9 +126,6 @@ void ebike_app_controller (void)
 {
   // reads battery voltage and also protects for undervoltage
   read_battery_voltage ();
-
-  // calc battery current filtered and save the value on global variable i16_battery_current_filtered
-  calc_battery_current_filtered ();
 
   // calc wheel speed and save the value on global variable ui8_wheel_speed
   calc_wheel_speed ();
@@ -240,8 +222,7 @@ void ebike_app_state_machine (void)
 	ui8_duty_cycle = 0;
 	ui8_duty_cycle_target = 0;
 
-	// reseting PI controllers so the I term is zero otherwise the motor will start after releasing throttle
-	pi_controller_reset (&battery_current_pi_controller_state);
+	// reseting PI controller so the I term is zero otherwise the motor will start after releasing throttle
 	pi_controller_reset (&wheel_speed_pi_controller_state);
 
 	motor_controller_reset_state (MOTOR_CONTROLLER_STATE_MOTOR_BLOCKED);
@@ -748,6 +729,7 @@ void ebike_throttle_type_throttle_pas (void)
   uint8_t ui8_temp;
   float f_temp;
   uint8_t ui8_target_current;
+  uint8_t ui8_target_duty_cycle;
 
   // map ui8_pas1_cadence_rpm to 0 - 255
   ui8_temp = (uint8_t) (map ((uint32_t) ui8_pas1_cadence_rpm,
@@ -773,19 +755,14 @@ void ebike_throttle_type_throttle_pas (void)
 			   (uint32_t) 255, // max input value
 			   (uint32_t) 0, // min output battery current value
 			   (uint32_t) ui8_battery_controller_max_current));  // max output battery current value
-
-  // PI controller for battery current
-  // no negative values, because we are not here to control regen current
-  if (i16_battery_current_filtered < 0){ battery_current_pi_controller_state.ui8_current_value = 0; }
-  else { battery_current_pi_controller_state.ui8_current_value = (uint8_t) i16_battery_current_filtered; }
-  battery_current_pi_controller_state.ui8_target_value = ui8_target_current;
-  pi_controller (&battery_current_pi_controller_state);
+  ebike_app_battery_set_current_max (ui8_target_current);
 
   // LCD P3 = 1, control / limit speed to max value
   if (lcd_configuration_variables.ui8_power_assist_control_mode)
   {
-    // do not comtrol the speed here, so put output value = 255
-    wheel_speed_pi_controller_state.ui8_controller_output_value = 255;
+    // do not control the speed here, so put output value = 255
+    ui8_target_duty_cycle = 255;
+    if (ui8_temp == 0) { ui8_target_duty_cycle = 0; }
   }
   else // LCD P3 = 0, control also the speed depending on ui8_throttle_pas_target_value
   {
@@ -800,21 +777,20 @@ void ebike_throttle_type_throttle_pas (void)
     wheel_speed_pi_controller_state.ui8_current_value = ui8_ebike_app_get_wheel_speed ();
     wheel_speed_pi_controller_state.ui8_target_value = ui8_temp;
     pi_controller (&wheel_speed_pi_controller_state);
+    ui8_target_duty_cycle = wheel_speed_pi_controller_state.ui8_controller_output_value;
   }
 
   // set PWM duty_cycle target value only if we are not braking
   if (!motor_controller_state_is_set (MOTOR_CONTROLLER_STATE_BRAKE))
   {
-    // now use the lowest value from the PI controllers outputs
-    motor_set_pwm_duty_cycle_target (ui8_min (
-      battery_current_pi_controller_state.ui8_controller_output_value,
-      wheel_speed_pi_controller_state.ui8_controller_output_value));
+    motor_set_pwm_duty_cycle_target (ui8_target_duty_cycle);
   }
   else
   {
-    // keep reseting PI controllers so the I term will not increase while we are braking!
-    pi_controller_reset (&battery_current_pi_controller_state);
+    // keep reseting PI controller so the I term will not increase while we are braking!
     pi_controller_reset (&wheel_speed_pi_controller_state);
+    // reset throttle filter to get a fast response when we realease brakes
+    throttle_reset_filter();
   }
 #endif
 }
@@ -824,6 +800,7 @@ void ebike_throttle_type_torque_sensor (void)
   uint8_t ui8_temp;
   float f_temp;
   uint8_t ui8_target_current;
+  uint8_t ui8_target_duty_cycle;
 
   // divide the torque sensor throttle value by 4 as it is very sensitive and multiply by assist level
   f_temp = (float) ((ui8_throttle_value_filtered >> 2) * lcd_configuration_variables.ui8_assist_level);
@@ -848,21 +825,14 @@ void ebike_throttle_type_torque_sensor (void)
 			   (uint32_t) 255, // max input value
 			   (uint32_t) 0, // min output battery current value
 			   (uint32_t) ui8_battery_controller_max_current));  // max output battery current value
-
-  // PI controller for battery current
-  // no negative values, because we are not here to control regen current
-  if (i16_battery_current_filtered < 0){ battery_current_pi_controller_state.ui8_current_value = 0; }
-  else { battery_current_pi_controller_state.ui8_current_value = (uint8_t) i16_battery_current_filtered; }
-  battery_current_pi_controller_state.ui8_target_value = ui8_target_current;
-//ui8_log_pi_battery_current_value = battery_current_pi_controller_state.ui8_current_value;
-//ui8_log_pi_battery_target_current_value = battery_current_pi_controller_state.ui8_target_value;
-  pi_controller (&battery_current_pi_controller_state);
+  ebike_app_battery_set_current_max (ui8_target_current);
 
   // LCD P3 = 1, control / limit speed to max value
   if (lcd_configuration_variables.ui8_power_assist_control_mode)
   {
-    // do not comtrol the speed here, so put output value = 255
-    wheel_speed_pi_controller_state.ui8_controller_output_value = 255;
+    // do not control the speed here, so put output value = 255
+    ui8_target_duty_cycle = 255;
+    if (ui8_temp == 0) { ui8_target_duty_cycle = 0; }
   }
   else // LCD P3 = 0, control also the speed depending on ui8_throttle_pas_target_value
   {
@@ -877,21 +847,18 @@ void ebike_throttle_type_torque_sensor (void)
     wheel_speed_pi_controller_state.ui8_current_value = ui8_ebike_app_get_wheel_speed ();
     wheel_speed_pi_controller_state.ui8_target_value = ui8_temp;
     pi_controller (&wheel_speed_pi_controller_state);
+    ui8_target_duty_cycle = wheel_speed_pi_controller_state.ui8_controller_output_value;
   }
 
   // set PWM duty_cycle target value only if we are not braking
   if ((!motor_controller_state_is_set (MOTOR_CONTROLLER_STATE_BRAKE)) &&
       (!motor_controller_state_is_set (MOTOR_CONTROLLER_STATE_BRAKE_LIKE_COAST_BRAKES)))
   {
-    // now use the lowest value from the PI controllers outputs
-    motor_set_pwm_duty_cycle_target (ui8_min (
-      battery_current_pi_controller_state.ui8_controller_output_value,
-      wheel_speed_pi_controller_state.ui8_controller_output_value));
+    motor_set_pwm_duty_cycle_target (ui8_target_duty_cycle);
   }
   else
   {
-    // keep reseting PI controllers so the I term will not increase while we are braking!
-    pi_controller_reset (&battery_current_pi_controller_state);
+    // keep reseting PI controller so the I term will not increase while we are braking!
     pi_controller_reset (&wheel_speed_pi_controller_state);
     // reset throttle filter to get a fast response when we realease brakes
     throttle_reset_filter();
@@ -917,7 +884,7 @@ void throttle_read (void)
   ui8_throttle_value_filtered = ui16_throttle_value_accumulated >> 2;
 
   // setup ui8_is_throttle_released flag
-  ui8_is_throttle_released = ((ui8_throttle_value > ((uint8_t) ADC_THROTTLE_MIN_VALUE)) ? 0 : 1);
+  ui8_is_throttle_released = ((ui8_throttle_value > ((uint8_t) THROTTLE_MIN_VALUE)) ? 0 : 1);
 }
 
 void throttle_reset_filter (void)
@@ -974,25 +941,25 @@ void read_torque_sensor_throttle (void)
     break;
   }
 
-  // if user doesn't pedal, disable throttle signal
-  if ((ui8_startup_phase == 0) && (ui8_pas1_cadence_rpm == 0))
-  {
-    ui8_throttle_value_filtered = 0;
-  }
-  // use ui8_throttle if cadence is lower than 15 RPM, otherwise, use the processed torque sensor value
-  else if (ui8_pas1_cadence_rpm <= 15)
-  {
-    ui8_throttle_value_filtered = ui8_throttle_value;
-  }
-  else
-  {
-    ui8_throttle_value_filtered = (uint8_t) (map (
-	  ui8_torque_sensor_throttle_processed_value,
-	  (uint8_t) ADC_THROTTLE_MIN_VALUE,
-	  (uint8_t) ADC_THROTTLE_MAX_VALUE,
-	  (uint8_t) THROTTLE_MIN_VALUE,
-	  (uint8_t) THROTTLE_MAX_VALUE));
-  }
+//  // if user doesn't pedal, disable throttle signal
+//  if ((ui8_startup_phase == 0) && (ui8_pas1_cadence_rpm == 0))
+//  {
+//    ui8_throttle_value_filtered = 0;
+//  }
+//  // use ui8_throttle if cadence is lower than 15 RPM, otherwise, use the processed torque sensor value
+//  else if (ui8_pas1_cadence_rpm <= 15)
+//  {
+//    ui8_throttle_value_filtered = ui8_throttle_value;
+//  }
+//  else
+//  {
+//    ui8_throttle_value_filtered = (uint8_t) (map (
+//	  ui8_torque_sensor_throttle_processed_value,
+//	  (uint8_t) ADC_THROTTLE_MIN_VALUE,
+//	  (uint8_t) ADC_THROTTLE_MAX_VALUE,
+//	  (uint8_t) THROTTLE_MIN_VALUE,
+//	  (uint8_t) THROTTLE_MAX_VALUE));
+//  }
 }
 
 void read_battery_voltage (void)
@@ -1075,17 +1042,6 @@ void ebike_app_battery_set_current_max (uint8_t ui8_value)
 void ebike_app_battery_set_regen_current_max (uint8_t ui8_value)
 {
   ui8_adc_target_battery_regen_current_max = ui8_adc_battery_current_offset - ui8_value;
-}
-
-void calc_battery_current_filtered (void)
-{
-  // low pass filter the current readed value, to avoid possible fast spikes/noise
-  ui16_adc_battery_current_accumulated -= ui16_adc_battery_current_accumulated >> 3;
-  ui16_adc_battery_current_accumulated += UI8_ADC_BATTERY_CURRENT;
-  ui16_adc_battery_current_filtered = ui16_adc_battery_current_accumulated >> 3;
-
-  // i16_battery_current_filtered has sign, negative value will be regen current
-  i16_battery_current_filtered = ui16_adc_battery_current_filtered - ui8_adc_battery_current_offset;
 }
 
 void battery_protect_over_voltage (void)
