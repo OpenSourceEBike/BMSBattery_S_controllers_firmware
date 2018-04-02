@@ -120,8 +120,8 @@ int main (void)
 	      ui8_duty_cycle_target,
 	      ui8_duty_cycle,
 	      ui8_adc_target_battery_current_max,
+	      ui8_adc_target_battery_regen_current_max,
 	      UI8_ADC_BATTERY_CURRENT,
-	      (ui16_motor_get_motor_speed_erps() > MOTOR_ROTOR_ERPS_START_INTERPOLATION_60_DEGREES),
 	      ui8_angle_correction);
       continue;
     }

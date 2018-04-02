@@ -692,6 +692,7 @@ void TIM1_CAP_COM_IRQHandler(void) __interrupt(TIM1_CAP_COM_IRQHANDLER)
   /****************************************************************************/
   // calc PAS1 timming between each positive pulses, in PWM cycles ticks
   // calc PAS1 on and off timming of each pulse, in PWM cycles ticks
+  // filter torque sensor throttle signal
   ui16_pas1_counter++;
 
   // detect PAS signal changes
@@ -732,6 +733,7 @@ void TIM1_CAP_COM_IRQHandler(void) __interrupt(TIM1_CAP_COM_IRQHANDLER)
       ui16_pas1_on_time_counter = 0;
     }
 
+#if (EBIKE_THROTTLE_TYPE == EBIKE_THROTTLE_TYPE_TORQUE_SENSOR)
     // filter the torque signal, by saving the max value of each one pedal rotation
     ui8_torque_sensor_throttle_value = UI8_ADC_THROTTLE;
     ui8_torque_sensor_pas_signal_change_counter++;
@@ -750,6 +752,7 @@ void TIM1_CAP_COM_IRQHandler(void) __interrupt(TIM1_CAP_COM_IRQHANDLER)
       }
     }
   }
+#endif
 
   // limit min PAS cadence
   if (ui16_pas1_counter > ((uint16_t) PAS_ABSOLUTE_MIN_CADENCE_PWM_CYCLE_TICKS))
@@ -759,7 +762,9 @@ void TIM1_CAP_COM_IRQHandler(void) __interrupt(TIM1_CAP_COM_IRQHANDLER)
     ui16_pas1_on_time_counter = 0;
     ui16_pas1_off_time_counter = 0;
     ui8_pas1_direction = 1;
+#if (EBIKE_THROTTLE_TYPE == EBIKE_THROTTLE_TYPE_TORQUE_SENSOR)
     ui8_torque_sensor_throttle_processed_value = 0;
+#endif
   }
   /****************************************************************************/
 

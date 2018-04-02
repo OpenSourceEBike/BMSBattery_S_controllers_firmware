@@ -77,7 +77,7 @@ uint8_t ui8_ebike_app_error = EBIKE_APP_ERROR_EMPTY;
 uint8_t ui8_motor_startup_counter = 0;
 uint8_t ui8_motor_cool_counter = 0;
 
-uint8_t ui8_rtst_state_machine = 0;
+uint8_t ui8_tstr_state_machine = 0;
 uint8_t ui8_rtst_counter = 0;
 
 volatile uint8_t ui8_adc_battery_current_offset;
@@ -99,7 +99,7 @@ void ebike_throttle_type_throttle_pas (void);
 void ebike_throttle_type_torque_sensor (void);
 void throttle_read (void);
 void throttle_reset_filter (void);
-void read_torque_sensor_throttle (void);
+void torque_sensor_throttle_read (void);
 void read_pas_cadence_and_direction (void);
 uint8_t pas_is_set (void);
 void read_battery_voltage (void);
@@ -139,7 +139,7 @@ void ebike_app_controller (void)
   // setup ui8_is_throttle_released flag
   throttle_read ();
 #elif (EBIKE_THROTTLE_TYPE == EBIKE_THROTTLE_TYPE_TORQUE_SENSOR)
-  read_torque_sensor_throttle ();
+  torque_sensor_throttle_read ();
 #else
 #error
 #endif
@@ -878,10 +878,12 @@ void throttle_read (void)
 		  (uint8_t) THROTTLE_MIN_VALUE,
 		  (uint8_t) THROTTLE_MAX_VALUE));
 
-  // low pass filter the torque sensor to smooth the signal
-  ui16_throttle_value_accumulated -= ui16_throttle_value_accumulated >> 2;
-  ui16_throttle_value_accumulated += ((uint16_t) ui8_throttle_value);
-  ui8_throttle_value_filtered = ui16_throttle_value_accumulated >> 2;
+//  // low pass filter the torque sensor to smooth the signal
+//  ui16_throttle_value_accumulated -= ui16_throttle_value_accumulated >> 2;
+//  ui16_throttle_value_accumulated += ((uint16_t) ui8_throttle_value);
+//  ui8_throttle_value_filtered = ui16_throttle_value_accumulated >> 2;
+
+ui8_throttle_value_filtered = ui8_throttle_value;
 
   // setup ui8_is_throttle_released flag
   ui8_is_throttle_released = ((ui8_throttle_value > ((uint8_t) THROTTLE_MIN_VALUE)) ? 0 : 1);
@@ -892,48 +894,46 @@ void throttle_reset_filter (void)
   ui16_throttle_value_accumulated = 0;
 }
 
-void read_torque_sensor_throttle (void)
+void torque_sensor_throttle_read (void)
 {
-  static uint8_t ui8_startup_phase;
+#define STATE_NO_PEDALLING 		0
+#define STATE_STARTUP_PEDALLING 	1
+#define STATE_PEDALLING 		2
 
   throttle_read (); // so we get regular processing of throttle signal
 
-  // calc startup phase
-  switch (ui8_rtst_state_machine)
+  switch (ui8_tstr_state_machine)
   {
     // ebike is stopped, wait for throttle signal
-    case 0:
-    ui8_startup_phase = 1;
-
+    case STATE_NO_PEDALLING:
     if ((!ebike_app_is_throttle_released ()) &&
 	(!brake_is_set()))
     {
-      ui8_rtst_state_machine = 1;
+      ui8_tstr_state_machine = STATE_STARTUP_PEDALLING;
     }
     break;
 
     // now count 5 seconds
-    case 1:
+    case STATE_STARTUP_PEDALLING:
     if (ui8_rtst_counter++ > 50) // 5 seconds
     {
       ui8_rtst_counter = 0;
-      ui8_startup_phase = 0;
-      ui8_rtst_state_machine = 2;
+      ui8_tstr_state_machine = STATE_PEDALLING;
     }
 
     // ebike is not moving, let's return to begin
     if (ui8_wheel_speed == 0)
     {
       ui8_rtst_counter = 0;
-      ui8_rtst_state_machine = 0;
+      ui8_tstr_state_machine = 0;
     }
     break;
 
-    // wait on this state and reset to start when ebike stops
-    case 2:
+    // wait on this state and reset when ebike stops
+    case STATE_PEDALLING:
     if (ui8_wheel_speed == 0)
     {
-      ui8_rtst_state_machine = 0;
+      ui8_tstr_state_machine = STATE_NO_PEDALLING;
     }
     break;
 
@@ -941,25 +941,26 @@ void read_torque_sensor_throttle (void)
     break;
   }
 
-//  // if user doesn't pedal, disable throttle signal
-//  if ((ui8_startup_phase == 0) && (ui8_pas1_cadence_rpm == 0))
-//  {
-//    ui8_throttle_value_filtered = 0;
-//  }
-//  // use ui8_throttle if cadence is lower than 15 RPM, otherwise, use the processed torque sensor value
-//  else if (ui8_pas1_cadence_rpm <= 15)
-//  {
-//    ui8_throttle_value_filtered = ui8_throttle_value;
-//  }
-//  else
-//  {
-//    ui8_throttle_value_filtered = (uint8_t) (map (
-//	  ui8_torque_sensor_throttle_processed_value,
-//	  (uint8_t) ADC_THROTTLE_MIN_VALUE,
-//	  (uint8_t) ADC_THROTTLE_MAX_VALUE,
-//	  (uint8_t) THROTTLE_MIN_VALUE,
-//	  (uint8_t) THROTTLE_MAX_VALUE));
-//  }
+  // bike is moving but user doesn't pedal, disable throttle signal
+  if ((ui8_tstr_state_machine == STATE_PEDALLING) && (ui8_pas1_cadence_rpm == 0))
+  {
+    ui8_throttle_value_filtered = 0;
+  }
+  // use ui8_throttle if cadence is lower than 15 RPM, otherwise, use the processed torque sensor value
+  else if ((ui8_pas1_cadence_rpm <= 15) ||
+      (ui8_torque_sensor_throttle_processed_value == 0)) // use ui8_throttle_value value while ui8_torque_sensor_throttle_processed_value is 0
+  {
+    ui8_throttle_value_filtered = ui8_throttle_value;
+  }
+  else
+  {
+    ui8_throttle_value_filtered = (uint8_t) (map (
+	  ui8_torque_sensor_throttle_processed_value,
+	  (uint8_t) ADC_THROTTLE_MIN_VALUE,
+	  (uint8_t) ADC_THROTTLE_MAX_VALUE,
+	  (uint8_t) THROTTLE_MIN_VALUE,
+	  (uint8_t) THROTTLE_MAX_VALUE));
+  }
 }
 
 void read_battery_voltage (void)
