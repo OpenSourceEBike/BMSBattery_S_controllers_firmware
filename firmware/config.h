@@ -21,7 +21,7 @@
 #define ASSIST_LEVEL_3 0.6
 #define ASSIST_LEVEL_4 0.8
 #define ASSIST_LEVEL_5 1.0
-#define BATTERY_LI_ION_CELLS_NUMBER 13
+#define BATTERY_LI_ION_CELLS_NUMBER 7
 #define ADC_BATTERY_CURRENT_MAX 35
 #define ADC_BATTERY_REGEN_CURRENT_MAX 35
 #define MOTOR_ROTOR_OFFSET_ANGLE 210 // 210 adjusted as a good value for Q11 direct drive motor

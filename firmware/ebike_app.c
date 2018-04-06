@@ -67,7 +67,7 @@ uint8_t ui8_wheel_speed_max = 0;
 
 struct_pi_controller_state wheel_speed_pi_controller_state;
 
-uint16_t ui16_adc_battery_voltage_accumulated = (uint16_t) ADC_BATTERY_VOLTAGE_MED;
+uint16_t ui16_adc_battery_voltage_accumulated = ADC_BATTERY_VOLTAGE_MED;
 uint8_t ui8_adc_battery_voltage_filtered;
 
 volatile uint8_t ui8_ebike_app_state = EBIKE_APP_STATE_MOTOR_STOP;
@@ -326,7 +326,8 @@ void communications_controller (void)
   else if (ui16_battery_volts > ((uint16_t) BATTERY_PACK_VOLTS_60)) { ui8_battery_soc = 12; } // 3 bars
   else if (ui16_battery_volts > ((uint16_t) BATTERY_PACK_VOLTS_40)) { ui8_battery_soc = 8; } // 2 bars
   else if (ui16_battery_volts > ((uint16_t) BATTERY_PACK_VOLTS_20)) { ui8_battery_soc = 4; } // 1 bar
-  else { ui8_battery_soc = 3; } // empty
+  else if (ui16_battery_volts > ((uint16_t) BATTERY_PACK_VOLTS_10)) { ui8_battery_soc = 3; } // empty
+  else { ui8_battery_soc = 1; } // flashing
 
   // prepare error
   ui16_error = ebike_app_get_error (); // get the error value

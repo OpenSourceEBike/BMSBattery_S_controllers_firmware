@@ -30,8 +30,8 @@
 
 // Choose your controller type
 //
-//#define CONTROLLER_TYPE CONTROLLER_TYPE_S06S
-#define CONTROLLER_TYPE CONTROLLER_TYPE_S12S
+#define CONTROLLER_TYPE CONTROLLER_TYPE_S06S
+//#define CONTROLLER_TYPE CONTROLLER_TYPE_S12S
 
 // *************************************************************************** //
 // Throotle and PAS
@@ -57,8 +57,6 @@
 //#define ADC_PHASE_B_CURRENT_ZERO_AMPS_FOC_MAX 102 // for phase B current sensor that outputs 2.0V at zero amps (ACS712)
 //#define ADC_PHASE_B_CURRENT_ZERO_AMPS_FOC_MIN 100 // for phase B current sensor that outputs 2.0V at zero amps (ACS712)
 
-#define ADC_PHASE_B_CURRENT_FACTOR 333 // 0.1 / 0.030A * 0.707 = 3.3
-
 #if defined (DO_SINEWAVE_INTERPOLATION_360_DEGREES)
 // This value is ERPS speed after which a transition happens from sinewave 60 degrees to have
 // interpolation 360 degrees and must be found experimentally but a value of 100 may be good
@@ -72,8 +70,6 @@
 #endif
 
 #define PWM_CYCLES_SECOND 15625L // 1 / 64us(PWM period)
-
-#define SPEED_INVERSE_INTERPOLATION 625 // experimental value; min speed aftwer which interpolation starts
 
 #define PWM_DUTY_CYCLE_MAX 254
 #define PWM_DUTY_CYCLE_MIN 20
@@ -93,21 +89,11 @@
 #define MOTOR_OVER_SPEED_ERPS 520 // motor max speed, protection max value | 30 points for the sinewave at max speed
 
 #if CONTROLLER_TYPE == CONTROLLER_TYPE_S06S
-#define MOTOR_CURRENT_PI_CONTROLLER_KP_DIVIDEND	3
-#define MOTOR_CURRENT_PI_CONTROLLER_KP_DIVISOR	1
-#define MOTOR_CURRENT_PI_CONTROLLER_KI_DIVIDEND	2
-#define MOTOR_CURRENT_PI_CONTROLLER_KI_DIVISOR	1
-
-#define WHEEL_SPEED_PI_CONTROLLER_KP_DIVIDEND	8
-#define WHEEL_SPEED_PI_CONTROLLER_KP_DIVISOR	3
-#define WHEEL_SPEED_PI_CONTROLLER_KI_DIVIDEND	6
-#define WHEEL_SPEED_PI_CONTROLLER_KI_DIVISOR	5
+#define WHEEL_SPEED_PI_CONTROLLER_KP_DIVIDEND	16
+#define WHEEL_SPEED_PI_CONTROLLER_KP_DIVISOR	2
+#define WHEEL_SPEED_PI_CONTROLLER_KI_DIVIDEND	10
+#define WHEEL_SPEED_PI_CONTROLLER_KI_DIVISOR	4
 #elif CONTROLLER_TYPE == CONTROLLER_TYPE_S12S
-#define MOTOR_CURRENT_PI_CONTROLLER_KP_DIVIDEND 12
-#define MOTOR_CURRENT_PI_CONTROLLER_KP_DIVISOR	4
-#define MOTOR_CURRENT_PI_CONTROLLER_KI_DIVIDEND	4
-#define MOTOR_CURRENT_PI_CONTROLLER_KI_DIVISOR	4
-
 #define WHEEL_SPEED_PI_CONTROLLER_KP_DIVIDEND	8
 #define WHEEL_SPEED_PI_CONTROLLER_KP_DIVISOR	5
 #define WHEEL_SPEED_PI_CONTROLLER_KI_DIVIDEND	6
@@ -163,33 +149,38 @@
 // 29.8V --> 110 (8bits ADC)
 // 22.1V --> 81 (8bits ADC)
 // 1 ADC step 8 bits --> 0.287 volts
-//#define ADC_BATTERY_VOLTAGE_PER_ADC_STEP 0.272 // S06S controller | this value was found experimentaly, to beter represent the real value
-#define ADC_BATTERY_VOLTAGE_PER_ADC_STEP 0.262 // S12S controller | this value was found experimentaly, to beter represent the real value
-//#define ADC_BATTERY_VOLTAGE_K 73 // S06S | 0.272 << 8
-#define ADC_BATTERY_VOLTAGE_K 67 // S12S | 0.262 << 8
+#if CONTROLLER_TYPE == CONTROLLER_TYPE_S06S
+#define ADC_BATTERY_VOLTAGE_PER_ADC_STEP 0.2652 // S06S controller | this value was found experimentaly, to beter represent the real value
+#define ADC_BATTERY_VOLTAGE_K 68 // S06S | 0.26252 << 8
+#elif CONTROLLER_TYPE == CONTROLLER_TYPE_S12S
+#define ADC_BATTERY_VOLTAGE_PER_ADC_STEP 0.2652 // S12S controller | this value was found experimentaly, to beter represent the real value
+#define ADC_BATTERY_VOLTAGE_K 68 // S12S | 0.26252 << 8
+#endif
 
 #define COMMUNICATIONS_BATTERY_VOLTAGE	(uint8_t) (((float) BATTERY_LI_ION_CELLS_NUMBER) * 3.45) // example: 7S battery, should be = 24
-#define ADC_BATTERY_VOLTAGE_MAX 	(uint8_t) ((((float) BATTERY_LI_ION_CELLS_NUMBER) * LI_ION_CELL_VOLTS_MAX) / ADC_BATTERY_VOLTAGE_PER_ADC_STEP)
-#define ADC_BATTERY_VOLTAGE_MED 	((COMMUNICATIONS_BATTERY_VOLTAGE / ADC_BATTERY_VOLTAGE_PER_ADC_STEP)) << 6
-#define ADC_BATTERY_VOLTAGE_MIN 	(uint8_t) ((((float) BATTERY_LI_ION_CELLS_NUMBER) * LI_ION_CELL_VOLTS_MIN) / ADC_BATTERY_VOLTAGE_PER_ADC_STEP)
+#define ADC_BATTERY_VOLTAGE_MAX 	(uint8_t) ((float) (BATTERY_LI_ION_CELLS_NUMBER * LI_ION_CELL_VOLTS_MAX) / ADC_BATTERY_VOLTAGE_PER_ADC_STEP)
+#define ADC_BATTERY_VOLTAGE_MED 	((uint16_t) (((uint16_t) (((float) LI_ION_CELL_VOLTS_60  * BATTERY_LI_ION_CELLS_NUMBER) / ADC_BATTERY_VOLTAGE_PER_ADC_STEP)) << 6))
+#define ADC_BATTERY_VOLTAGE_MIN 	(uint8_t) ((float) (BATTERY_LI_ION_CELLS_NUMBER * LI_ION_CELL_VOLTS_MIN) / ADC_BATTERY_VOLTAGE_PER_ADC_STEP)
 
 // Considering the follow voltage values for each li-ion battery cell
 // State of charge 		| voltage
-#define LI_ION_CELL_VOLTS_MAX 	((float) 4.25)
-#define LI_ION_CELL_VOLTS_100 	((float) 4.20)
-#define LI_ION_CELL_VOLTS_80 	((float) 4.02)
-#define LI_ION_CELL_VOLTS_60 	((float) 3.87)
-#define LI_ION_CELL_VOLTS_40 	((float) 3.80)
-#define LI_ION_CELL_VOLTS_20 	((float) 3.73)
-#define LI_ION_CELL_VOLTS_0 	((float) 3.27)
-#define LI_ION_CELL_VOLTS_MIN 	((float) 3.10)
+#define LI_ION_CELL_VOLTS_MAX 	4.25
+#define LI_ION_CELL_VOLTS_100 	4.20
+#define LI_ION_CELL_VOLTS_80 	4.02
+#define LI_ION_CELL_VOLTS_60 	3.87
+#define LI_ION_CELL_VOLTS_40 	3.80
+#define LI_ION_CELL_VOLTS_20 	3.73
+#define LI_ION_CELL_VOLTS_10 	3.69
+#define LI_ION_CELL_VOLTS_0 	3.27
+#define LI_ION_CELL_VOLTS_MIN 	3.10
 
-#define BATTERY_PACK_VOLTS_100	(uint16_t) (LI_ION_CELL_VOLTS_100 * ((float) BATTERY_LI_ION_CELLS_NUMBER)) * ((float) 256)
-#define BATTERY_PACK_VOLTS_80 	(uint16_t) (LI_ION_CELL_VOLTS_80  * ((float) BATTERY_LI_ION_CELLS_NUMBER)) * ((float) 256)
-#define BATTERY_PACK_VOLTS_60	(uint16_t) (LI_ION_CELL_VOLTS_60  * ((float) BATTERY_LI_ION_CELLS_NUMBER)) * ((float) 256)
-#define BATTERY_PACK_VOLTS_40	(uint16_t) (LI_ION_CELL_VOLTS_40  * ((float) BATTERY_LI_ION_CELLS_NUMBER)) * ((float) 256)
-#define BATTERY_PACK_VOLTS_20	(uint16_t) (LI_ION_CELL_VOLTS_20  * ((float) BATTERY_LI_ION_CELLS_NUMBER)) * ((float) 256)
-#define BATTERY_PACK_VOLTS_0	(uint16_t) (LI_ION_CELL_VOLTS_0   * ((float) BATTERY_LI_ION_CELLS_NUMBER)) * ((float) 2569
+#define BATTERY_PACK_VOLTS_100	((float) LI_ION_CELL_VOLTS_100 * (BATTERY_LI_ION_CELLS_NUMBER << 8))
+#define BATTERY_PACK_VOLTS_80	((float) LI_ION_CELL_VOLTS_80  * (BATTERY_LI_ION_CELLS_NUMBER << 8))
+#define BATTERY_PACK_VOLTS_60	((float) LI_ION_CELL_VOLTS_60  * (BATTERY_LI_ION_CELLS_NUMBER << 8))
+#define BATTERY_PACK_VOLTS_40	((float) LI_ION_CELL_VOLTS_40  * (BATTERY_LI_ION_CELLS_NUMBER << 8))
+#define BATTERY_PACK_VOLTS_20	((float) LI_ION_CELL_VOLTS_20  * (BATTERY_LI_ION_CELLS_NUMBER << 8))
+#define BATTERY_PACK_VOLTS_10	((float) LI_ION_CELL_VOLTS_10  * (BATTERY_LI_ION_CELLS_NUMBER << 8))
+#define BATTERY_PACK_VOLTS_0	((float) LI_ION_CELL_VOLTS_0   * (BATTERY_LI_ION_CELLS_NUMBER << 8))
 // *************************************************************************** //
 
 #endif // _MAIN_H_
