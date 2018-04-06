@@ -100,9 +100,9 @@ void kingmeter_update(void)
 
     KM.Tx.Error = KM_ERROR_NONE;
 
-    if (((current_cal_a*ui16_BatteryCurrent)/10 + current_cal_b) != 0x99)
+    if (((current_cal_a*ui16_BatteryCurrent)/10 -ui16_current_cal_b) != 0x99)
     {
-    KM.Tx.Current_x10= (current_cal_a*ui16_BatteryCurrent)/10 + current_cal_b; //calculate Amps out of 10bit ADC value
+    KM.Tx.Current_x10= (current_cal_a*ui16_BatteryCurrent)/10 -ui16_current_cal_b; //calculate Amps out of 10bit ADC value
     }
 
     /* Receive Rx parameters/settings and send Tx parameters */
@@ -225,7 +225,7 @@ ui8_tx_buffer [0] = 65;
   // each unit of B8 = 0.25A
 
 
-  ui8_tx_buffer [8] =  (uint8_t)(((ui16_BatteryCurrent+current_cal_b+1)<<2)/current_cal_a);
+  ui8_tx_buffer [8] =  (uint8_t)(((ui16_BatteryCurrent-ui16_current_cal_b+1)<<2)/current_cal_a);
   // B9: motor temperature
   ui8_tx_buffer [9] = 0;
   // B10 and B11: 0

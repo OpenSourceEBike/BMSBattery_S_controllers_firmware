@@ -17,6 +17,7 @@
 #include "config.h"
 #include "display_kingmeter.h"
 #include "adc.h"
+#include "update_setpoint.h"
 
 
 uint8_t ui8_counter = 0;
@@ -142,7 +143,7 @@ debug_pin_set ();
 
       case 1: //rotor position 240 degree, do FOC control
 
-	if (ui16_motor_speed_erps > 10 && ui16_BatteryCurrent>-1*current_cal_b)
+	if (ui16_motor_speed_erps > 10 && ui16_BatteryCurrent>ui16_current_cal_b)
 	      {
 		if (ui16_ADC_iq_current>>2 > 127)// hier prüfen, ob Wandlung von 10 auf 8 bit geht....
 		{

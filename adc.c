@@ -12,6 +12,7 @@
 #include "gpio.h"
 #include "stm8s_adc1.h"
 #include "adc.h"
+#include "update_setpoint.h"
 
 
 
@@ -58,17 +59,18 @@ void adc_init (void)
     printf("ACD init");
   }
 
- /* // read and average a few values of ADC
-  ui16_motor_total_current_offset_10b = 0;
+  // read and average a few values of ADC
+  ui16_current_cal_b = 0;
   for (ui8_i = 0; ui8_i < 16; ui8_i++)
   {
-    ui16_counter = TIM2_GetCounter () + 10;
-    while (TIM2_GetCounter () < ui16_counter) ;
+
     adc_trigger ();
-    ui16_motor_total_current_offset_10b += ui16_adc_read_motor_total_current ();
+    ui16_current_cal_b += ui16_adc_read_motor_total_current ();
+    printf("ACD init");
   }
-  ui16_motor_total_current_offset_10b >>= 4;
-  ui8_motor_total_current_offset = ui16_motor_total_current_offset_10b >> 2;*/
+  ui16_current_cal_b >>= 4;
+  ui16_current_cal_b -= 1;
+  //ui8_motor_total_current_offset = ui16_motor_total_current_offset_10b >> 2;
 }
 
   inline void adc_trigger (void) //inline ?!
