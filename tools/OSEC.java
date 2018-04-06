@@ -51,7 +51,6 @@ public class OSEC extends JFrame {
 	private final ButtonGroup Ridingmode = new ButtonGroup();
 	private JTextField txtMotor_specific_angle;
 	private JTextField txtBatteryCurcala;
-	private JTextField txtBatteryCurcalb;
 	private JLabel lblDiplayType;
 	private final ButtonGroup buttonGroup = new ButtonGroup();
 	private final ButtonGroup MotorSpeed = new ButtonGroup();
@@ -205,16 +204,6 @@ public class OSEC extends JFrame {
 		JLabel lblBatteryCurrentCal = new JLabel("Battery Current cal a");
 		lblBatteryCurrentCal.setBounds(5, 384, 121, 14);
 		contentPane.add(lblBatteryCurrentCal);
-		
-		txtBatteryCurcalb = new JTextField();
-		txtBatteryCurcalb.setText("-312");
-		txtBatteryCurcalb.setBounds(150, 412, 86, 20);
-		contentPane.add(txtBatteryCurcalb);
-		txtBatteryCurcalb.setColumns(10);
-		
-		JLabel lblBatteryCurrentCal_1 = new JLabel("Battery Current cal b");
-		lblBatteryCurrentCal_1.setBounds(5, 415, 131, 14);
-		contentPane.add(lblBatteryCurrentCal_1);
 		
 		JLabel lblAssistLevel = new JLabel("Assist Level 1");
 		lblAssistLevel.setBounds(383, 92, 88, 14);
@@ -388,13 +377,13 @@ public class OSEC extends JFrame {
 		contentPane.add(i_factor);
 		
 		JLabel lblGearRatio = new JLabel("Gear Ratio");
-		lblGearRatio.setBounds(5, 446, 131, 14);
+		lblGearRatio.setBounds(5, 415, 131, 14);
 		contentPane.add(lblGearRatio);
 		
 		GearRatio = new JTextField();
 		GearRatio.setText("64");
 		GearRatio.setColumns(10);
-		GearRatio.setBounds(150, 443, 86, 20);
+		GearRatio.setBounds(150, 412, 86, 20);
 		contentPane.add(GearRatio);
 		
 		JLabel lblNumberSerialCells = new JLabel("Serial cells");
@@ -514,8 +503,12 @@ public class OSEC extends JFrame {
 		contentPane.add(rdbtnLeft);
 		
 		JRadioButton rdbtnDiganostics = new JRadioButton("Diganostics");
-		rdbtnDiganostics.setBounds(5, 630, 97, 23);
+		rdbtnDiganostics.setBounds(104, 445, 97, 23);
 		contentPane.add(rdbtnDiganostics);
+		
+		JRadioButton rdbtnRegen = new JRadioButton("Regen");
+		rdbtnRegen.setBounds(5, 445, 97, 23);
+		contentPane.add(rdbtnRegen);
 		
 		
 		
@@ -594,8 +587,6 @@ public class OSEC extends JFrame {
 		            text_to_save = "#define MOTOR_ROTOR_DELTA_PHASE_ANGLE_RIGHT " + txtMotor_specific_angle.getText();
 		            pWriter.println(text_to_save); 
 		            text_to_save = "#define current_cal_a " + txtBatteryCurcala.getText();
-		            pWriter.println(text_to_save); 
-		            text_to_save = "#define current_cal_b " + txtBatteryCurcalb.getText()+"L";
 		            pWriter.println(text_to_save); 
 		            text_to_save = "#define LEVEL_1 " + Assist_Level_1.getText();
 		            pWriter.println(text_to_save); 
@@ -682,6 +673,11 @@ public class OSEC extends JFrame {
 			            pWriter.println(text_to_save); 		                
 		    		}
 		    		
+		    		if (rdbtnRegen.isSelected()){ 
+			            text_to_save = "#define REGEN";
+			            pWriter.println(text_to_save); 		                
+		    		}
+		    		
 		    		if (rdbtnLeft.isSelected()){ 
 			            text_to_save = "#define PAS_DIRECTION 0";
 			            pWriter.println(text_to_save); 		                
@@ -714,6 +710,8 @@ public class OSEC extends JFrame {
 		btnWriteConfiguration.setForeground(Color.BLUE);
 		btnWriteConfiguration.setBounds(382, 495, 167, 58);
 		contentPane.add(btnWriteConfiguration);
+		
+
 		
 	
 

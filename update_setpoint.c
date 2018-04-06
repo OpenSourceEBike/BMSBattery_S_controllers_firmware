@@ -66,7 +66,7 @@ uint16_t update_setpoint (uint16_t speed, uint16_t PAS, uint16_t sumtorque, uint
   if(ui16_SPEED_Counter>40000){ui32_SPEED_km_h=0;}     //if wheel isn't turning, reset speed
 
 
-
+#ifdef REGEN
   //check if regen is wanted
   if(ui8_regen_throttle>10){
   float_temp=(float)ui8_regen_throttle*(float)(REGEN_CURRENT_MAX_VALUE-ui16_current_cal_b)/255.0+(float)ui16_current_cal_b;
@@ -76,8 +76,13 @@ uint16_t update_setpoint (uint16_t speed, uint16_t PAS, uint16_t sumtorque, uint
   //printf("R, %lu, %d, %d, %d\r\n", ui32_setpoint, ui8_regen_throttle, ui16_BatteryCurrent, (uint16_t) float_temp);
   }
   //check for undervoltage
-  else if(ui8_BatteryVoltage<BATTERY_VOLTAGE_MIN_VALUE){
 
+  else if(ui8_BatteryVoltage<BATTERY_VOLTAGE_MIN_VALUE){
+#endif
+
+#ifndef REGEN
+      if(ui8_BatteryVoltage<BATTERY_VOLTAGE_MIN_VALUE){
+#endif
       TIM1_CtrlPWMOutputs(DISABLE);
       uint_PWM_Enable=0; // highest priority: Stop motor for undervoltage protection
       ui32_setpoint=0;
