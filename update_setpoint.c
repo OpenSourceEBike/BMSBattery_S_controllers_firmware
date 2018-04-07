@@ -42,6 +42,7 @@ uint8_t ui8_regen_throttle; //regen throttle read from ADC
 static uint16_t ui16_PAS_accumulated = 64000L; // for filtering of PAS value
 static uint32_t ui32_erps_accumulated; //for filtering of erps
 uint32_t ui32_erps_filtered; //filtered value of erps
+uint32_t ui32_temp;
 //uint16_t ui16_erps_limit_lower=((limit)*(GEAR_RATIO/wheel_circumference));
 //uint16_t ui16_erps_limit_higher=((limit+2)*(GEAR_RATIO/wheel_circumference));
 uint16_t ui16_erps_limit_lower=(uint16_t)((float)GEAR_RATIO*(float)limit*10000.0/((float)wheel_circumference*36.0));
@@ -63,6 +64,7 @@ uint16_t update_setpoint (uint16_t speed, uint16_t PAS, uint16_t sumtorque, uint
   ui8_regen_throttle = map (ui8_adc_read_regen_throttle () , ADC_THROTTLE_MIN_VALUE, ADC_THROTTLE_MAX_VALUE, 0, SETPOINT_MAX_VALUE); //map throttle to limits
 
   ui32_SPEED_km_h=(wheel_circumference*PWM_CYCLES_SECOND*36L)/(10L*(uint32_t)speed);			//calculate speed in m/h conversion fr	om sec to hour --> *3600, conversion from mm to km --> /1000000, tic frequency 15625 Hz
+  //printf("speed km/h %lu\r\n",ui32_SPEED_km_h);
   if(ui16_SPEED_Counter>40000){ui32_SPEED_km_h=0;}     //if wheel isn't turning, reset speed
 
 
@@ -159,7 +161,7 @@ uint16_t update_setpoint (uint16_t speed, uint16_t PAS, uint16_t sumtorque, uint
   if (ui32_setpoint<10)ui32_setpoint=0;
   if (ui32_setpoint>255)ui32_setpoint=255;
 
-  printf("%d, %d, %d, %d\r\n", (uint16_t) ui32_SPEED_km_h/1000, speed, ui16_BatteryCurrent, (uint16_t) uint32_current_target);
+  //printf("%d, %d, %d, %d\r\n", (uint16_t) ui32_SPEED_km_h/1000, speed, ui16_BatteryCurrent, (uint16_t) uint32_current_target);
   //printf("setpoint %lu, Voltage %d, a %d, b %d, DCmax %d, erps %d\n", ui32_setpoint, ui8_BatteryVoltage, ui16_a, ui16_b, ui16_dutycycle_max, ui16_motor_speed_erps);
 #endif
 
@@ -247,17 +249,23 @@ uint32_t CheckSpeed (uint16_t current_target, uint16_t erps)
 #ifdef SPEEDSENSOR_EXTERNAL
 uint32_t CheckSpeed (uint16_t current_target, uint16_t speed)
 {
-  //printf("Speed %d, %d\r\n", erps, ui16_erps_limit_lower);
+
   //ramp down motor power if you are riding too fast and speed liming is active
   if (speed>limit*1000 && ui8_cheat_state!=4){
-
+      //printf("Vor %d, %d\r\n", current_target-ui16_current_cal_b, speed);
 	if (speed>(limit+2)*1000){ //if you are riding much too fast, stop motor immediately
 	    current_target=ui16_current_cal_b;
-	   // printf("Speed much too high! %d, %d\r\n", erps,((limit+2)*GEAR_RATIO));
+	   //printf("Speed much too high! %d, %d\r\n", current_target, speed);
 	}
 	else {
-	    current_target=(uint16_t)(((uint32_t)current_target-ui16_current_cal_b)*((limit+2)*1000)-speed)/2000+ui16_current_cal_b; 	//ramp down the motor power within 2 km/h, if you are riding too fast
+
+	    ui32_temp=((current_target-ui16_current_cal_b));
+	    //printf("Substraktion %d, %lu\r\n", current_target, ui32_temp) ;
+	    ui32_temp *=((limit+2)*1000-speed);
+	    //printf("Mal %d, %lu\r\n", current_target, ui32_temp) ;
+	    current_target=(uint16_t)(ui32_temp/2000+ui16_current_cal_b); 	//ramp down the motor power within 2 km/h, if you are riding too fast
 	    //printf("Speed too high!\r\n");
+	    //printf("Nach %d, %lu\r\n", current_target, ui32_temp) ;
 	}
   }
     return ((uint32_t)current_target);
