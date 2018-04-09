@@ -19,6 +19,10 @@ void putchar(char c);
 int putchar(int c);
 #endif
 
+#if __SDCC_REVISION < 9989
 char getchar(void);
+#else
+int getchar(void);
+#endif
 
 #endif /* _UART_H */
