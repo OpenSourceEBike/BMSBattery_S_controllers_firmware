@@ -26,3 +26,4 @@ int getchar(void);
 #endif
 
 #endif /* _UART_H */
+
