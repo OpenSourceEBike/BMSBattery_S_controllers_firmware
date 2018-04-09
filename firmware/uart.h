@@ -12,7 +12,7 @@
 #include "main.h"
 
 void uart_init (void);
-
+/*
 #if __SDCC_REVISION < 9624
 void putchar(char c);
 #else
@@ -20,5 +20,6 @@ int putchar(int c);
 #endif
 
 char getchar(void);
+*/
 
 #endif /* _UART_H */
