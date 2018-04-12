@@ -58,9 +58,6 @@ public class OSEC extends JFrame {
 	private JLabel lblAssistLevel_3;
 	private JLabel lblAssistLevel_4;
 	private JTextField Assist_Level_5;
-	private JTextField Cheat_Time_1;
-	private JTextField Cheat_Time_2;
-	private JTextField Cheat_Time_3;
 	private JTextField ramp_upwards;
 	private JTextField ramp_downwards;
 	private JTextField txtMaxregencurrent;
@@ -72,6 +69,9 @@ public class OSEC extends JFrame {
 	private JRadioButton rdbtn6Fet;
 	private JRadioButton rdbtn12Fet;
 	private JTextField textInterpolationstart;
+	private JTextField AdjInv;
+	private JTextField RegenMotorMax;
+	private JTextField MotorMax;
 	
 	
 
@@ -132,7 +132,7 @@ public class OSEC extends JFrame {
 		txtNumberOfPas.setToolTipText("This is the number of magnets in your PAS disk.");
 		
 		lblAssistLevel_5 = new JLabel("Assist Level 5");
-		lblAssistLevel_5.setBounds(295, 230, 88, 14);
+		lblAssistLevel_5.setBounds(281, 230, 119, 14);
 		contentPane.add(lblAssistLevel_5);
 		
 		Assist_Level_6 = new JTextField();
@@ -144,16 +144,16 @@ public class OSEC extends JFrame {
 		
 		txtMotor_specific_angle = new JTextField();
 		txtMotor_specific_angle.setText("137");
-		txtMotor_specific_angle.setBounds(150, 291, 86, 20);
+		txtMotor_specific_angle.setBounds(382, 255, 86, 20);
 		contentPane.add(txtMotor_specific_angle);
 		txtMotor_specific_angle.setColumns(10);
 		
 		JLabel lblAngleadjust = new JLabel("Angle adjust");
-		lblAngleadjust.setBounds(5, 294, 121, 14);
+		lblAngleadjust.setBounds(281, 261, 119, 14);
 		contentPane.add(lblAngleadjust);
 		
 		JLabel lblAssistLevel0 = new JLabel("Assist Level 0");
-		lblAssistLevel0.setBounds(295, 95, 114, 14);
+		lblAssistLevel0.setBounds(281, 95, 119, 14);
 		contentPane.add(lblAssistLevel0);
 		
 		Assist_Level_1 = new JTextField();
@@ -164,7 +164,7 @@ public class OSEC extends JFrame {
 		Assist_Level_1.setToolTipText("This is the percentage of the defined maximum current in Level 1.");
 		
 		JLabel lblAssistLevel_1 = new JLabel("Assist Level 1");
-		lblAssistLevel_1.setBounds(295, 122, 114, 14);
+		lblAssistLevel_1.setBounds(281, 122, 119, 14);
 		contentPane.add(lblAssistLevel_1);
 		
 		Assist_Level_2 = new JTextField();
@@ -174,7 +174,7 @@ public class OSEC extends JFrame {
 		contentPane.add(Assist_Level_2);
 		
 		JLabel lblAssistLevel_2 = new JLabel("Assist Level 2");
-		lblAssistLevel_2.setBounds(295, 149, 114, 14);
+		lblAssistLevel_2.setBounds(281, 149, 119, 14);
 		contentPane.add(lblAssistLevel_2);
 		
 		Assist_Level_3 = new JTextField();
@@ -190,11 +190,11 @@ public class OSEC extends JFrame {
 		contentPane.add(Assist_Level_4);
 		
 		lblAssistLevel_3 = new JLabel("Assist Level 3");
-		lblAssistLevel_3.setBounds(295, 176, 114, 14);
+		lblAssistLevel_3.setBounds(281, 176, 119, 14);
 		contentPane.add(lblAssistLevel_3);
 		
 		lblAssistLevel_4 = new JLabel("Assist Level 4");
-		lblAssistLevel_4.setBounds(295, 204, 79, 14);
+		lblAssistLevel_4.setBounds(281, 204, 119, 14);
 		contentPane.add(lblAssistLevel_4);
 		
 		Assist_Level_5 = new JTextField();
@@ -206,36 +206,6 @@ public class OSEC extends JFrame {
 		JList list = new JList();
 		list.setBounds(441, 177, 1, 1);
 		contentPane.add(list);
-		
-		JLabel lblCheattime = new JLabel("Cheat-time 1");
-		lblCheattime.setBounds(295, 257, 114, 14);
-		contentPane.add(lblCheattime);
-		
-		Cheat_Time_1 = new JTextField();
-		Cheat_Time_1.setText("50");
-		Cheat_Time_1.setColumns(10);
-		Cheat_Time_1.setBounds(382, 254, 86, 20);
-		contentPane.add(Cheat_Time_1);
-		
-		JLabel lblCheattime_1 = new JLabel("Cheat-time 2");
-		lblCheattime_1.setBounds(295, 291, 114, 14);
-		contentPane.add(lblCheattime_1);
-		
-		Cheat_Time_2 = new JTextField();
-		Cheat_Time_2.setText("50");
-		Cheat_Time_2.setColumns(10);
-		Cheat_Time_2.setBounds(382, 288, 86, 20);
-		contentPane.add(Cheat_Time_2);
-		
-		JLabel lblCheattime_2 = new JLabel("Cheat-time 3");
-		lblCheattime_2.setBounds(295, 322, 114, 14);
-		contentPane.add(lblCheattime_2);
-		
-		Cheat_Time_3 = new JTextField();
-		Cheat_Time_3.setText("50");
-		Cheat_Time_3.setColumns(10);
-		Cheat_Time_3.setBounds(382, 319, 86, 20);
-		contentPane.add(Cheat_Time_3);
 		
 		lblHttpsopensourceebikefirmwarebitbucketio = new JButton("https://opensourceebikefirmware.bitbucket.io/");
 		lblHttpsopensourceebikefirmwarebitbucketio.addActionListener(new ActionListener() {
@@ -290,7 +260,7 @@ public class OSEC extends JFrame {
 		contentPane.add(txtOffsetangle);
 		txtOffsetangle.setColumns(10);
 		
-		JLabel lblRampupwards = new JLabel("Ramp upwards");
+		JLabel lblRampupwards = new JLabel("Delay upwards");
 		lblRampupwards.setBounds(5, 146, 86, 14);
 		contentPane.add(lblRampupwards);
 		
@@ -304,7 +274,7 @@ public class OSEC extends JFrame {
 		lblOffsetangle.setBounds(5, 260, 121, 14);
 		contentPane.add(lblOffsetangle);
 		
-		JLabel lblRampdownwards = new JLabel("Ramp downwards");
+		JLabel lblRampdownwards = new JLabel("Delay downwards");
 		lblRampdownwards.setBounds(5, 176, 109, 14);
 		contentPane.add(lblRampdownwards);
 		
@@ -317,12 +287,12 @@ public class OSEC extends JFrame {
 		JRadioButton rdbtnThrottle_PAS = new JRadioButton("Throttle / PAS");
 		rdbtnThrottle_PAS.setSelected(true);
 		Ridingmode.add(rdbtnThrottle_PAS);
-		rdbtnThrottle_PAS.setBounds(150, 506, 109, 23);
+		rdbtnThrottle_PAS.setBounds(150, 476, 109, 23);
 		contentPane.add(rdbtnThrottle_PAS);
 		
 		JRadioButton rdbtnTorquesensor = new JRadioButton("Torquesensor");
 		Ridingmode.add(rdbtnTorquesensor);
-		rdbtnTorquesensor.setBounds(150, 530, 131, 23);
+		rdbtnTorquesensor.setBounds(150, 500, 131, 23);
 		contentPane.add(rdbtnTorquesensor);
 		
 		JRadioButton rdbtnPWMdirectly = new JRadioButton("PWM directly");
@@ -338,7 +308,7 @@ public class OSEC extends JFrame {
 		
 		JLabel lblRideMode = new JLabel("Input Type");
 		lblRideMode.setFont(new Font("Tahoma", Font.BOLD, 12));
-		lblRideMode.setBounds(150, 487, 86, 14);
+		lblRideMode.setBounds(150, 457, 86, 14);
 		contentPane.add(lblRideMode);
 		
 		lblDiplayType = new JLabel("Torquesensor mode");
@@ -416,13 +386,13 @@ public class OSEC extends JFrame {
 		contentPane.add(rdbtn12Fet);
 		
 		JLabel lblInterpolationstart60 = new JLabel("60\u00B0 Interpolation Start");
-		lblInterpolationstart60.setBounds(5, 325, 141, 14);
+		lblInterpolationstart60.setBounds(5, 291, 141, 14);
 		contentPane.add(lblInterpolationstart60);
 		
 		textInterpolationstart = new JTextField();
 		textInterpolationstart.setText("15");
 		textInterpolationstart.setColumns(10);
-		textInterpolationstart.setBounds(150, 322, 86, 20);
+		textInterpolationstart.setBounds(150, 288, 86, 20);
 		contentPane.add(textInterpolationstart);
 		
 		JLabel lblInterpolation360 = new JLabel("360\u00B0 Interpolation");
@@ -441,6 +411,48 @@ public class OSEC extends JFrame {
 		rdbtnNo.setSelected(true);
 		rdbtnNo.setBounds(300, 427, 86, 23);
 		contentPane.add(rdbtnNo);
+		
+		JRadioButton rdbtnThrottleNotLimited = new JRadioButton("Throttle not limited");
+		rdbtnThrottleNotLimited.setBounds(150, 526, 131, 23);
+		contentPane.add(rdbtnThrottleNotLimited);
+		
+		JLabel lblAngleAdjustInv = new JLabel("Angle adjust inv.");
+		lblAngleAdjustInv.setBounds(281, 286, 127, 14);
+		contentPane.add(lblAngleAdjustInv);
+		
+		AdjInv = new JTextField();
+		AdjInv.setText("242");
+		AdjInv.setColumns(10);
+		AdjInv.setBounds(382, 283, 86, 20);
+		contentPane.add(AdjInv);
+		
+		JLabel lblRegenMotorMax = new JLabel("Regen Motor max");
+		lblRegenMotorMax.setBounds(5, 319, 131, 14);
+		contentPane.add(lblRegenMotorMax);
+		
+		RegenMotorMax = new JTextField();
+		RegenMotorMax.setText("66");
+		RegenMotorMax.setColumns(10);
+		RegenMotorMax.setBounds(150, 316, 86, 20);
+		contentPane.add(RegenMotorMax);
+		
+		JLabel lblMotorMax = new JLabel("Motor max");
+		lblMotorMax.setBounds(5, 347, 131, 14);
+		contentPane.add(lblMotorMax);
+		
+		MotorMax = new JTextField();
+		MotorMax.setText("120");
+		MotorMax.setColumns(10);
+		MotorMax.setBounds(150, 344, 86, 20);
+		contentPane.add(MotorMax);
+		
+		JRadioButton rdbtnUseRegen = new JRadioButton("Use Regen");
+		rdbtnUseRegen.setBounds(277, 315, 131, 23);
+		contentPane.add(rdbtnUseRegen);
+		
+		JRadioButton rdbtnLinux = new JRadioButton("Linux");
+		rdbtnLinux.setBounds(277, 343, 131, 23);
+		contentPane.add(rdbtnLinux);
 		
 		
 		
@@ -505,11 +517,17 @@ public class OSEC extends JFrame {
 
 		            text_to_save = "#define MOTOR_ROTOR_OFFSET_ANGLE " + txtOffsetangle.getText();
 		            pWriter.println(text_to_save); 
-		            text_to_save = "#define ADC_MOTOR_CURRENT_MAX " + txtMaxbatterycurrent.getText();
+		            text_to_save = "#define ADC_BATTERY_CURRENT_MAX " + txtMaxbatterycurrent.getText();
 		            pWriter.println(text_to_save); 
-		            text_to_save = "#define ADC_MOTOR_REGEN_CURRENT_MAX " + txtMaxregencurrent.getText();
+		            text_to_save = "#define ADC_BATTERY_REGEN_CURRENT_MAX " + txtMaxregencurrent.getText();
+		            pWriter.println(text_to_save); 
+		            text_to_save = "#define ADC_MOTOR_CURRENT_MAX " + MotorMax.getText();
+		            pWriter.println(text_to_save); 
+		            text_to_save = "#define ADC_MOTOR_REGEN_CURRENT_MAX " + RegenMotorMax.getText();
 		            pWriter.println(text_to_save); 
 		            text_to_save = "#define FOC_READ_ID_CURRENT_ANGLE_ADJUST " + txtMotor_specific_angle.getText();
+		            pWriter.println(text_to_save); 
+		            text_to_save = "#define FOC_READ_ID_CURRENT_ANGLE_ADJUST_INVERT" + AdjInv.getText();
 		            pWriter.println(text_to_save); 
 
 		            text_to_save = "#define ASSIST_LEVEL_0  " + Assist_Level_1.getText();
@@ -524,12 +542,6 @@ public class OSEC extends JFrame {
 		            pWriter.println(text_to_save);
 		            text_to_save = "#define ASSIST_LEVEL_5 " + Assist_Level_6.getText();
 		            pWriter.println(text_to_save); 
-		            text_to_save = "#define CHEAT_TIME_1 " + Cheat_Time_1.getText();
-		            pWriter.println(text_to_save);
-		            text_to_save = "#define CHEAT_TIME_2 " + Cheat_Time_2.getText();
-		            pWriter.println(text_to_save);
-		            text_to_save = "#define CHEAT_TIME_3 " + Cheat_Time_3.getText();
-		            pWriter.println(text_to_save);
 		            text_to_save = "#define PWM_DUTY_CYCLE_RAMP_UP_INVERSE_STEP " + ramp_upwards.getText();
 		            pWriter.println(text_to_save);
 		            text_to_save = "#define PWM_DUTY_CYCLE_RAMP_DOWN_INVERSE_STEP " + ramp_downwards.getText();
@@ -591,6 +603,21 @@ public class OSEC extends JFrame {
 			            text_to_save = "#define DO_SINEWAVE_INTERPOLATION_360_DEGREES";
 			            pWriter.println(text_to_save); 
 		    		}
+		    		
+		    		if (rdbtnThrottleNotLimited.isSelected()){ 
+			            text_to_save = "#define EBIKE_THROTTLE_TYPE_THROTTLE_PAS_ASSIST_LEVEL_PAS_ONLY";
+			            pWriter.println(text_to_save); 
+		    		}
+		    		
+		    		if (rdbtnUseRegen.isSelected()){ 
+			            text_to_save = "#define EBIKE_REGEN_EBRAKE_LIKE_COAST_BRAKES";
+			            pWriter.println(text_to_save); 
+		    		}
+		    		
+		    		if (rdbtnLinux.isSelected()){ 
+			            text_to_save = "#define LINUX";
+			            pWriter.println(text_to_save); 
+		    		}
 
 		            pWriter.println("\r\n#endif /* CONFIG_H_ */"); 
 		            
@@ -617,6 +644,8 @@ public class OSEC extends JFrame {
 		btnWriteConfiguration.setForeground(Color.BLUE);
 		btnWriteConfiguration.setBounds(295, 471, 167, 58);
 		contentPane.add(btnWriteConfiguration);
+		
+
 		
 
 		
