@@ -310,7 +310,8 @@ void communications_controller (void)
 {
 #ifndef DEBUG_UART
   uint8_t ui8_moving_indication = 0;
-  int16_t i16_motor_current_filtered_10b = 0;
+  int16_t i16_motor_current_filtered_10b;
+  uint8_t ui8_motor_current_filtered;
 
   /********************************************************************************************/
   // Prepare and send packate to LCD
@@ -381,7 +382,9 @@ void communications_controller (void)
   i16_motor_current_filtered_10b = ui8_adc_read_battery_current () - ui8_adc_battery_current_offset;
   i16_motor_current_filtered_10b -= 1; // try to avoid LCD display about 25W when motor is not running
   if (i16_motor_current_filtered_10b < 0) { i16_motor_current_filtered_10b = 0; } // limit to be only positive value, LCD don't accept regen current value
-  ui8_tx_buffer [8] = ((uint8_t) (i16_motor_current_filtered_10b) << 1);
+  ui8_motor_current_filtered = (float) i16_motor_current_filtered_10b;
+  // verified experimental that on S0S, display LCD3 needs: adc_read_battery_current * 1.5
+  ui8_tx_buffer [8] = ui8_motor_current_filtered + (ui8_motor_current_filtered >> 1);
   // B9: motor temperature
   ui8_tx_buffer [9] = 0;
   // B10 and B11: 0
@@ -442,6 +445,7 @@ void communications_controller (void)
 #endif
 
   // do here some tasks that must be done even if we don't receive a package from the LCD
+// NOTE: we are now setup controller max current on another place
   set_motor_controller_max_current (lcd_configuration_variables.ui8_controller_max_current);
   ui8_wheel_speed_max = lcd_configuration_variables.ui8_max_speed;
 }
@@ -801,6 +805,7 @@ void ebike_throttle_type_torque_sensor (void)
   uint8_t ui8_temp;
   float f_temp;
   uint8_t ui8_target_current;
+  uint8_t ui8_target_wheel_speed;
   uint8_t ui8_target_duty_cycle;
 
   // divide the torque sensor throttle value by 4 as it is very sensitive and multiply by assist level
@@ -821,34 +826,42 @@ void ebike_throttle_type_torque_sensor (void)
   }
 #endif
 
-  ui8_target_current = (uint16_t) (map ((uint32_t) ui8_temp,
-			   (uint32_t) 0, // min input value
-			   (uint32_t) 255, // max input value
-			   (uint32_t) 0, // min output battery current value
-			   (uint32_t) ui8_battery_controller_max_current));  // max output battery current value
-  ebike_app_battery_set_current_max (ui8_target_current);
+  // we do not control duty_cycle here, keep it at max value
+  ui8_target_duty_cycle = 255;
+  if (ui8_temp == 0) { ui8_target_duty_cycle = 0; }
 
-  // LCD P3 = 1, control / limit speed to max value
+  // LCD P3 = 1, control only current
   if (lcd_configuration_variables.ui8_power_assist_control_mode)
   {
-    // do not control the speed here, so put output value = 255
-    ui8_target_duty_cycle = 255;
-    if (ui8_temp == 0) { ui8_target_duty_cycle = 0; }
+    // current controller
+    ui8_target_current = (uint8_t) (map ((uint32_t) ui8_temp,
+			 (uint32_t) 0, // min input value
+			 (uint32_t) 255, // max input value
+			 (uint32_t) 0, // min output battery current value
+			 (uint32_t) ui8_battery_controller_max_current));  // max output battery current value
+    ebike_app_battery_set_current_max (ui8_target_current);
   }
-  else // LCD P3 = 0, control also the speed depending on ui8_throttle_pas_target_value
+  else // LCD P3 = 0, control current and also the speed
   {
+    // speed controller
     // map to wheel speed
-    ui8_temp = (uint8_t) (map ((uint32_t) ui8_temp,
+    ui8_target_wheel_speed = (uint8_t) (map ((uint32_t) ui8_temp,
   		   (uint32_t) 0,
   		   (uint32_t) 255,
   		   (uint32_t) 0,
   		   (uint32_t) ui8_wheel_speed_max));
-
     // PI controller for wheel speed
     wheel_speed_pi_controller_state.ui8_current_value = ui8_ebike_app_get_wheel_speed ();
-    wheel_speed_pi_controller_state.ui8_target_value = ui8_temp;
+    wheel_speed_pi_controller_state.ui8_target_value = ui8_target_wheel_speed;
     pi_controller (&wheel_speed_pi_controller_state);
-    ui8_target_duty_cycle = wheel_speed_pi_controller_state.ui8_controller_output_value;
+
+    // limit PI controller output to max current
+    ui8_target_current = (uint8_t) (map ((uint32_t) wheel_speed_pi_controller_state.ui8_controller_output_value,
+		     (uint32_t) 0, // min input value
+		     (uint32_t) 255, // max input value
+		     (uint32_t) 0, // min output battery current value
+		     (uint32_t) ui8_battery_controller_max_current));  // max output battery current value
+    ebike_app_battery_set_current_max (ui8_target_current);
   }
 
   // set PWM duty_cycle target value only if we are not braking
@@ -962,6 +975,8 @@ void torque_sensor_throttle_read (void)
 	  (uint8_t) THROTTLE_MIN_VALUE,
 	  (uint8_t) THROTTLE_MAX_VALUE));
   }
+
+//ui8_throttle_value_filtered = ui8_throttle_value;
 }
 
 void read_battery_voltage (void)
