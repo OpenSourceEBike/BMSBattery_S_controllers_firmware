@@ -112,9 +112,10 @@ int main (void)
     if ((ui16_TIM2_counter - ui16_debug_uart_counter) > 20) // every 20ms
     {
       ui16_debug_uart_counter = ui16_TIM2_counter;
+      //printf("debugging mode\r\n");
 
       // sugestion: no more than 6 variables printed (takes about 3ms to printf 6 variables)
-      printf ("%d,%d,%d,%d,%d,%d,%d,%d\n",
+   /*   printf ("%d,%d,%d,%d,%d,%d,%d,%d\n",
 	      brake_is_set(),
 	      ui16_motor_get_motor_speed_erps(),
 	      ui8_duty_cycle_target,
@@ -124,6 +125,7 @@ int main (void)
 	      UI8_ADC_BATTERY_CURRENT,
 	      ui8_angle_correction);
       continue;
+      */
     }
 #endif
   }

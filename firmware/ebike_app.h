@@ -38,7 +38,9 @@ typedef struct _lcd_configuration_variables
 } struct_lcd_configuration_variables;
 
 extern volatile uint16_t ui16_pas1_pwm_cycles_ticks;
+extern volatile uint16_t ui16_pas1_pwm_cycles_on_ticks;
 extern volatile uint8_t ui8_pas1_direction;
+extern uint8_t ui8_pas_flag;
 
 extern volatile uint8_t ui8_ebike_app_state;
 

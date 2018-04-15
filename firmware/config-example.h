@@ -21,7 +21,7 @@
 
 
 // *************************************************************************** //
-// THROOTLE
+// THROTTLE
 //
 // choose between throttle and/or pas or torque sensor
 #define EBIKE_THROTTLE_TYPE	EBIKE_THROTTLE_TYPE_THROTTLE_PAS
