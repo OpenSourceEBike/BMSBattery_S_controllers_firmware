@@ -312,8 +312,6 @@ void communications_controller (void)
   uint8_t ui8_moving_indication = 0;
   int16_t i16_battery_current;
   uint8_t ui8_battery_current;
-  static uint16_t ui16_battery_current_accumulated;
-  uint8_t ui8_battery_current_filtered;
 
   /********************************************************************************************/
   // Prepare and send packate to LCD
@@ -387,13 +385,8 @@ void communications_controller (void)
   if (i16_battery_current < 4) { i16_battery_current = 0; }
   ui8_battery_current = (uint8_t) i16_battery_current;
 
-  // low pass filter the ui8_battery_current to smooth the fast variations of power, when showing to user on LCD
-  ui16_battery_current_accumulated -= ui16_battery_current_accumulated >> 2;
-  ui16_battery_current_accumulated += ((uint16_t) ui8_battery_current);
-  ui8_battery_current_filtered = (uint8_t) ui16_battery_current_accumulated >> 2;
-
   // verified experimental that on S0S, display LCD3 needs: battery_current * 1.5 (because each unit of battery current is equal to 0.35A)
-  ui8_tx_buffer [8] = ui8_battery_current_filtered + (ui8_battery_current_filtered >> 1);
+  ui8_tx_buffer [8] = ui8_battery_current + (ui8_battery_current >> 1);
   // B9: motor temperature
   ui8_tx_buffer [9] = 0;
   // B10 and B11: 0
