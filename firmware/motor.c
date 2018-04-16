@@ -842,6 +842,7 @@ void TIM1_CAP_COM_IRQHandler(void) __interrupt(TIM1_CAP_COM_IRQHANDLER)
         ui16_pas1_on_time_counter = 0;
         ui16_pas1_off_time_counter = 0;
         ui8_pas1_direction = 1;
+        PAS_act=3;
     #if (EBIKE_THROTTLE_TYPE == EBIKE_THROTTLE_TYPE_TORQUE_SENSOR)
         ui8_torque_sensor_throttle_processed_value = 0;
     #endif
