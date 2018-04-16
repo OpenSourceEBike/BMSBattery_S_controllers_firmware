@@ -59,7 +59,7 @@ volatile uint16_t ui16_pas1_pwm_cycles_ticks = (uint16_t) PAS_ABSOLUTE_MIN_CADEN
 volatile uint16_t ui16_pas1_pwm_cycles_on_ticks=0;
 volatile uint8_t ui8_pas1_direction = 0;
 uint8_t ui8_pas_flag=0;
-uint8_t PAS_act;
+uint8_t PAS_act=3;
 uint8_t ui8_pas1_cadence_rpm = 0;
 
 
@@ -710,7 +710,7 @@ void read_pas_cadence_and_direction (void)
 
      	  if (PAS_act>0) {PAS_act--;}
            }
-           printf("%d,\r\n",PAS_act);
+          // printf("%d,\r\n",PAS_act);
      #endif
 
      #if (PAS_DIRECTION == PAS_DIRECTION_LEFT)
@@ -724,7 +724,7 @@ void read_pas_cadence_and_direction (void)
      #endif
 
            if (PAS_act>4){ui8_pas1_direction=0;} //set direction only if enough pulses in the right direction are detected.
-           else if (PAS_act<3) {ui8_pas1_direction=1;} // pedaling reverse
+           else if (PAS_act<1) {ui8_pas1_direction=1;} // pedaling reverse
            //printf("%d\r\n", PAS_act);
     ui8_pas_flag=0;
   }
