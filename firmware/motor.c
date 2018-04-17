@@ -416,7 +416,7 @@ void TIM1_CAP_COM_IRQHandler(void) __interrupt(TIM1_CAP_COM_IRQHANDLER)
 	else { ui16_motor_speed_erps = ((uint16_t) PWM_CYCLES_SECOND); }
       }
       // update motor commutation state based on motor speed
-#ifdef DO_SVM_INTERPOLATION_60_DEGREES
+#ifdef DO_SVM_INTERPOLATION_360_DEGREES
       if (ui16_motor_speed_erps > MOTOR_ROTOR_ERPS_START_INTERPOLATION_360_DEGREES)
       {
 	if (ui8_motor_commutation_type == SVM_INTERPOLATION_60_DEGREES)
@@ -530,19 +530,22 @@ void TIM1_CAP_COM_IRQHandler(void) __interrupt(TIM1_CAP_COM_IRQHANDLER)
     ui8_interpolation_angle = (ui16_PWM_cycles_counter_6 << 8) / ui16_PWM_cycles_counter_total; // this operations take 4.4us
     ui8_motor_rotor_angle = ui8_motor_rotor_absolute_angle + ui8_interpolation_angle;
   }
+#ifdef DO_SVM_INTERPOLATION_360_DEGREES
   else if (ui8_motor_commutation_type == SVM_INTERPOLATION_60_DEGREES)
   {
     ui8_interpolation_angle = (ui16_PWM_cycles_counter << 8) / ui16_PWM_cycles_counter_total;
     ui8_motor_rotor_angle = ui8_motor_rotor_absolute_angle + ui8_interpolation_angle;
   }
+#endif
   else
 #endif
   {
     ui8_motor_rotor_angle = ui8_motor_rotor_absolute_angle;
   }
-  
-  // now we shift 90 degrees because we want to put current at 90 degrees of rotor position, to get the most torque per amp
-  // when motor speed is zero or near zero
+
+  // when motor speed is zero or near zero (at startup) (or with very low phase current), phase current should be almost in phase with phase voltage
+  // now we shift 90 degrees because we want to put phase current at 90 degrees of rotor position, to get the most torque per amp
+  // as speed and current increases, ui8_foc_angle_correction value will displace the phase voltage phase as needed so the phase current stays at 90 degrees of rotor position
   ui8_phase_voltage_svm_table_index = ui8_motor_rotor_angle + ANGLE_90 + ui8_foc_angle_correction;
 
   ui8_motor_rotor_angle += ((uint8_t) FOC_READ_ID_CURRENT_OFFSET);
