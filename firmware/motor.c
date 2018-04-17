@@ -26,7 +26,7 @@
 
 #define PHASE_VOLTAGE_SVM_TABLE_LEN 256
 
-uint8_t ui8_phase_voltage_svm_table [SVM_TABLE_LEN_SVM_TABLE_LEN] =
+uint8_t ui8_phase_voltage_svm_table [PHASE_VOLTAGE_SVM_TABLE_LEN] =
 {
     127	,
     133	,
@@ -294,8 +294,9 @@ volatile uint16_t ui16_motor_speed_erps = 0;
 uint8_t ui8_phase_voltage_svm_table_index = 0;
 uint8_t ui8_motor_rotor_absolute_angle;
 uint8_t ui8_motor_rotor_angle;
-uint8_t ui8_motor_rotor_angle = 0;
-volatile uint8_t ui8_foc_angle_correction = 127;
+uint8_t ui8_flag_foc_read_id_current = 0;
+#define FOC_ANGLE_CORRECTION_RESET_VALUE 127
+volatile uint8_t ui8_foc_angle_correction = FOC_ANGLE_CORRECTION_RESET_VALUE;
 uint8_t ui8_interpolation_angle = 0;
 
 uint8_t ui8_motor_commutation_type = BLOCK_COMMUTATION;
@@ -397,9 +398,9 @@ void TIM1_CAP_COM_IRQHandler(void) __interrupt(TIM1_CAP_COM_IRQHANDLER)
     switch (ui8_hall_sensors_state)
     {
       case 3:
-      if (ui8_motor_commutation_type != SVM_INTERPOLATION_60_DEGREES)
+      if (ui8_motor_commutation_type != SVM_INTERPOLATION_360_DEGREES)
       {
-	ui8_motor_rotor_absolute_angle = (uint8_t) MOTOR_ROTOR_ANGLE_210;
+	ui8_motor_rotor_absolute_angle = (uint8_t) MOTOR_ROTOR_ANGLE_270;
       }
       break;
 
@@ -417,7 +418,7 @@ void TIM1_CAP_COM_IRQHandler(void) __interrupt(TIM1_CAP_COM_IRQHANDLER)
       }
       // update motor commutation state based on motor speed
 #ifdef DO_SVM_INTERPOLATION_360_DEGREES
-      if (ui16_motor_speed_erps > MOTOR_ROTOR_ERPS_START_INTERPOLATION_360_DEGREES)
+      if (ui16_motor_speed_erps > MOTOR_ROTOR_ERPS_START_SVM_INTERPOLATION_360_DEGREES)
       {
 	if (ui8_motor_commutation_type == SVM_INTERPOLATION_60_DEGREES)
 	{
@@ -432,7 +433,7 @@ void TIM1_CAP_COM_IRQHandler(void) __interrupt(TIM1_CAP_COM_IRQHANDLER)
 	}
       }
 #endif
-      if (ui16_motor_speed_erps > MOTOR_ROTOR_ERPS_START_INTERPOLATION_60_DEGREES)
+      if (ui16_motor_speed_erps > MOTOR_ROTOR_ERPS_START_SVM_INTERPOLATION_60_DEGREES)
       {
 	if (ui8_motor_commutation_type == BLOCK_COMMUTATION)
 	{
@@ -445,44 +446,46 @@ void TIM1_CAP_COM_IRQHandler(void) __interrupt(TIM1_CAP_COM_IRQHANDLER)
 	if (ui8_motor_commutation_type == SVM_INTERPOLATION_60_DEGREES)
 	{
 	  ui8_motor_commutation_type = BLOCK_COMMUTATION;
-	  ui8_foc_angle_correction = 127;
+	  ui8_foc_angle_correction = FOC_ANGLE_CORRECTION_RESET_VALUE;
 	}
       }
 
-      if (ui8_motor_commutation_type != SVM_INTERPOLATION_60_DEGREES)
-      {
-	ui8_motor_rotor_absolute_angle = (uint8_t) MOTOR_ROTOR_ANGLE_270;
-      }
+//      if (ui8_motor_commutation_type != SVM_INTERPOLATION_360_DEGREES)
+//      {
+	ui8_motor_rotor_absolute_angle = (uint8_t) MOTOR_ROTOR_ANGLE_330;
+//      }
       break;
 
       case 5:
-      if (ui8_motor_commutation_type != SVM_INTERPOLATION_60_DEGREES)
-      {
-	ui8_motor_rotor_absolute_angle = (uint8_t) MOTOR_ROTOR_ANGLE_330;
-      }
-      break;
-
-      case 4:
-      if (ui8_motor_commutation_type != SVM_INTERPOLATION_60_DEGREES)
+      if (ui8_motor_commutation_type != SVM_INTERPOLATION_360_DEGREES)
       {
 	ui8_motor_rotor_absolute_angle = (uint8_t) MOTOR_ROTOR_ANGLE_30;
       }
       break;
 
-      case 6:
-      ui8_half_erps_flag = 1;
-      ui8_motor_rotor_angle = 1;
+      // we consider that motor rotor position is at 90 degrees here
+      case 4:
+      ui8_flag_foc_read_id_current = 1;
 
-      if (ui8_motor_commutation_type != SVM_INTERPOLATION_60_DEGREES)
+      if (ui8_motor_commutation_type != SVM_INTERPOLATION_360_DEGREES)
       {
 	ui8_motor_rotor_absolute_angle = (uint8_t) MOTOR_ROTOR_ANGLE_90;
       }
       break;
 
-      case 2:
-      if (ui8_motor_commutation_type != SVM_INTERPOLATION_60_DEGREES)
+      case 6:
+      ui8_half_erps_flag = 1;
+
+      if (ui8_motor_commutation_type != SVM_INTERPOLATION_360_DEGREES)
       {
 	ui8_motor_rotor_absolute_angle = (uint8_t) MOTOR_ROTOR_ANGLE_150;
+      }
+      break;
+
+      case 2:
+      if (ui8_motor_commutation_type != SVM_INTERPOLATION_360_DEGREES)
+      {
+	ui8_motor_rotor_absolute_angle = (uint8_t) MOTOR_ROTOR_ANGLE_210;
       }
       break;
 
@@ -509,7 +512,7 @@ void TIM1_CAP_COM_IRQHandler(void) __interrupt(TIM1_CAP_COM_IRQHANDLER)
     ui8_half_erps_flag = 0;
     ui16_motor_speed_erps = 0;
     ui16_PWM_cycles_counter_total = 0xffff;
-    ui8_foc_angle_correction = 127;
+    ui8_foc_angle_correction = FOC_ANGLE_CORRECTION_RESET_VALUE;
     ui8_motor_commutation_type = BLOCK_COMMUTATION;
     ui8_hall_sensors_last_state = 0; // this way we force execution of hall sensors code next time
     ebike_app_cruise_control_stop ();
@@ -546,28 +549,33 @@ void TIM1_CAP_COM_IRQHandler(void) __interrupt(TIM1_CAP_COM_IRQHANDLER)
   // when motor speed is zero or near zero (at startup) (or with very low phase current), phase current should be almost in phase with phase voltage
   // now we shift 90 degrees because we want to put phase current at 90 degrees of rotor position, to get the most torque per amp
   // as speed and current increases, ui8_foc_angle_correction value will displace the phase voltage phase as needed so the phase current stays at 90 degrees of rotor position
-  ui8_phase_voltage_svm_table_index = ui8_motor_rotor_angle + ANGLE_90 + ui8_foc_angle_correction;
+  // FOC_ANGLE_CORRECTION_RESET_VALUE offset must be removed from the equation
 
-  ui8_motor_rotor_angle += ((uint8_t) FOC_READ_ID_CURRENT_OFFSET);
+//  ui8_phase_voltage_svm_table_index = ui8_motor_rotor_angle + ANGLE_90 + ui8_foc_angle_correction - FOC_ANGLE_CORRECTION_RESET_VALUE;
+//  ui8_phase_voltage_svm_table_index = ui8_motor_rotor_angle + 180 + ui8_foc_angle_correction - FOC_ANGLE_CORRECTION_RESET_VALUE;
+//  ui8_phase_voltage_svm_table_index = ui8_motor_rotor_angle - ANGLE_90 + 180 + ui8_foc_angle_correction - FOC_ANGLE_CORRECTION_RESET_VALUE;
+  ui8_phase_voltage_svm_table_index = ui8_motor_rotor_angle + ANGLE_90 - 18 + 127;
+
   // make sure we just execute one time per ERPS, so use the flag ui8_motor_rotor_angle
-  if ((ui8_motor_rotor_angle >= ((uint8_t) 90)) && (ui8_motor_rotor_angle))
+//  if ((ui8_motor_rotor_angle >= MOTOR_ROTOR_ANGLE_90) && (ui8_flag_foc_read_id_current))
+if ((ui8_motor_rotor_angle >= 180) && (ui8_flag_foc_read_id_current))
   {
-    ui8_motor_rotor_angle = 0;
+    ui8_flag_foc_read_id_current = 0;
 
     // minimum speed to do FOC
-    if (ui16_motor_speed_erps > MOTOR_ROTOR_ERPS_START_INTERPOLATION_60_DEGREES)
+    if (ui16_motor_speed_erps > MOTOR_ROTOR_ERPS_START_SVM_INTERPOLATION_60_DEGREES)
     {
       // read here the phase B current: FOC Id current
       ui8_adc_id_current = UI8_ADC_MOTOR_PHASE_B_CURRENT;
       if (ui8_adc_id_current > ADC_PHASE_B_CURRENT_ZERO_AMPS_FOC_MAX)
       {
-	// limit max ui8_angle_correction value (127 + 15)
-	if ((ui8_foc_angle_correction+1) < 143) { ui8_foc_angle_correction++; }
+	// limit max ui8_angle_correction value (FOC_ANGLE_CORRECTION_RESET_VALUE + 15)
+	if ((ui8_foc_angle_correction + 1) < 143) { ui8_foc_angle_correction++; }
       }
       else if (ui8_adc_id_current < ADC_PHASE_B_CURRENT_ZERO_AMPS_FOC_MIN)
       {
-	// limit min ui8_angle_correction value (127 - 15)
-	if ((ui8_foc_angle_correction-1) > 112)
+	// limit min ui8_angle_correction value (FOC_ANGLE_CORRECTION_RESET_VALUE - 15)
+	if ((ui8_foc_angle_correction - 1) > 112)
 	{
 	  // decrease only when not regen!! other way ui8_angle_correction will always decrease... CAN WE IMPROVE THIS??
 	  if (UI8_ADC_BATTERY_CURRENT > (ui8_adc_battery_current_offset+2)) { ui8_foc_angle_correction--; }
@@ -632,7 +640,7 @@ void TIM1_CAP_COM_IRQHandler(void) __interrupt(TIM1_CAP_COM_IRQHANDLER)
   // calc final PWM duty_cycle values to be applied to TIMER1
 
   // scale and apply _duty_cycle
-  ui8_temp = ui8_svm_table [ui8_phase_voltage_svm_table_index];
+  ui8_temp = ui8_phase_voltage_svm_table [ui8_phase_voltage_svm_table_index];
   if (ui8_temp > MIDDLE_PWM_DUTY_CYCLE_MAX)
   {
     ui16_value = ((uint16_t) (ui8_temp - MIDDLE_PWM_DUTY_CYCLE_MAX)) * ui8_duty_cycle;
@@ -647,7 +655,7 @@ void TIM1_CAP_COM_IRQHandler(void) __interrupt(TIM1_CAP_COM_IRQHANDLER)
   }
 
   // add 120 degrees and limit
-  ui8_temp = ui8_svm_table [(uint8_t) (ui8_phase_voltage_svm_table_index + 85 /* 120º */)];
+  ui8_temp = ui8_phase_voltage_svm_table [(uint8_t) (ui8_phase_voltage_svm_table_index + 85 /* 120º */)];
   if (ui8_temp > MIDDLE_PWM_DUTY_CYCLE_MAX)
   {
     ui16_value = ((uint16_t) (ui8_temp - MIDDLE_PWM_DUTY_CYCLE_MAX)) * ui8_duty_cycle;
@@ -662,7 +670,7 @@ void TIM1_CAP_COM_IRQHandler(void) __interrupt(TIM1_CAP_COM_IRQHANDLER)
   }
 
   // subtract 120 degrees and limit
-  ui8_temp = ui8_svm_table [(uint8_t) (ui8_phase_voltage_svm_table_index + 171 /* 240º */)];
+  ui8_temp = ui8_phase_voltage_svm_table [(uint8_t) (ui8_phase_voltage_svm_table_index + 171 /* 240º */)];
   if (ui8_temp > MIDDLE_PWM_DUTY_CYCLE_MAX)
   {
     ui16_value = ((uint16_t) (ui8_temp - MIDDLE_PWM_DUTY_CYCLE_MAX)) * ui8_duty_cycle;
@@ -677,15 +685,25 @@ void TIM1_CAP_COM_IRQHandler(void) __interrupt(TIM1_CAP_COM_IRQHANDLER)
   }
 
   // set final duty_cycle value
+//  // phase A
+//  TIM1->CCR1H = (uint8_t) (ui8_value_a >> 7);
+//  TIM1->CCR1L = (uint8_t) (ui8_value_a << 1);
+//  // phase B
+//  TIM1->CCR2H = (uint8_t) (ui8_value_c >> 7);
+//  TIM1->CCR2L = (uint8_t) (ui8_value_c << 1);
+//  // phase C
+//  TIM1->CCR3H = (uint8_t) (ui8_value_b >> 7);
+//  TIM1->CCR3L = (uint8_t) (ui8_value_b << 1);
+
   // phase A
-  TIM1->CCR1H = (uint8_t) (ui8_value_a >> 7);
-  TIM1->CCR1L = (uint8_t) (ui8_value_a << 1);
+  TIM1->CCR1H = (uint8_t) (ui8_value_b >> 7);
+  TIM1->CCR1L = (uint8_t) (ui8_value_b << 1);
   // phase B
-  TIM1->CCR2H = (uint8_t) (ui8_value_c >> 7);
-  TIM1->CCR2L = (uint8_t) (ui8_value_c << 1);
+  TIM1->CCR2H = (uint8_t) (ui8_value_a >> 7);
+  TIM1->CCR2L = (uint8_t) (ui8_value_a << 1);
   // phase C
-  TIM1->CCR3H = (uint8_t) (ui8_value_b >> 7);
-  TIM1->CCR3L = (uint8_t) (ui8_value_b << 1);
+  TIM1->CCR3H = (uint8_t) (ui8_value_c >> 7);
+  TIM1->CCR3L = (uint8_t) (ui8_value_c << 1);
 
   // enable PWM signals only when MOTOR_CONTROLLER_STATE_OK
   if (ui8_motor_controller_state == MOTOR_CONTROLLER_STATE_OK)

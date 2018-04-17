@@ -60,7 +60,7 @@
 #if defined (DO_SVM_INTERPOLATION_360_DEGREES)
 // This value is ERPS speed after which a transition happens from sinewave 60 degrees to have
 // interpolation 360 degrees and must be found experimentally but a value of 100 may be good
-#define MOTOR_ROTOR_ERPS_START_INTERPOLATION_360_DEGREES 100
+#define MOTOR_ROTOR_ERPS_START_SVM_INTERPOLATION_360_DEGREES 100
 #endif
 
 #if MOTOR_TYPE == MOTOR_TYPE_Q85
@@ -83,9 +83,6 @@
 #define MOTOR_ROTOR_ANGLE_330 	(234  + MOTOR_ROTOR_OFFSET_ANGLE)
 
 #define ANGLE_90 	63
-
-// angle offset to make the FOC read Id current to be 127 at reset, just to be easier for the user when customizing and limit his value
-#define FOC_READ_ID_CURRENT_OFFSET (127 - ((uint8_t) MOTOR_ROTOR_ANGLE_270))
 
 #define MOTOR_OVER_SPEED_ERPS 520 // motor max speed, protection max value | 30 points for the sinewave at max speed
 
