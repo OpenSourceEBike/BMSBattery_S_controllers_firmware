@@ -239,6 +239,7 @@ int main (void)
       else{
 	  if (PAS_act>0) {PAS_act--;}
       }
+
 #endif
 
 #if (!PAS_DIRECTION)
@@ -271,7 +272,7 @@ int main (void)
 
       ui8_torque_index++;
       if (ui8_torque_index>NUMBER_OF_PAS_MAGS-1){ui8_torque_index=0;} //reset index counter
-      printf("%d,%d,%d,%d,%d\r\n",ui8_temp, ui16_sum_torque, ui16_PAS, ui16_PAS_High, PAS_act);
+      //printf("%d,%d,%d,%d,%d\r\n",ui8_temp, ui16_sum_torque, ui16_PAS, ui16_PAS_High, PAS_act);
     }
 
 
@@ -382,7 +383,7 @@ if(ui8_cheat_state==3) //second step, make sure the brake is hold according to d
 
 	  /****************************************************************************/
 //very slow loop for communication
-      if (ui8_veryslowloop_counter > 5){
+      if (ui8_veryslowloop_counter > 50){
 	  ui8_veryslowloop_counter=0;
       //getchar1 ();
 
@@ -392,10 +393,13 @@ if(ui8_cheat_state==3) //second step, make sure the brake is hold according to d
 	  //printf("erps %d, motorstate %d, cyclecountertotal %d\r\n", ui16_motor_speed_erps, ui8_motor_state, ui16_PWM_cycles_counter_total);
 
       //printf("cheatstate, %d, km/h %lu, Voltage, %d, setpoint %d, erps %d, current %d, correction_value, %d\n", ui8_cheat_state, ui32_SPEED_km_h, ui8_BatteryVoltage, ui16_setpoint, ui16_motor_speed_erps, ui16_BatteryCurrent, ui8_position_correction_value);
-      //printf("%d, %d, %d, %d, %d, %d\n", int8_t_hall_case[0], int8_t_hall_case[1], int8_t_hall_case[2], int8_t_hall_case[3], int8_t_hall_case[4], int8_t_hall_case[5]);
+      //printf("%d, %d, %d, %d, %d, %d\r\n", int8_t_hall_case[0], int8_t_hall_case[1], int8_t_hall_case[2], int8_t_hall_case[3], int8_t_hall_case[4], int8_t_hall_case[5]);
 	//printf("kv %d, erps %d, R %d\n", (uint16_t)(float_kv*10.0) , ui16_motor_speed_erps, (uint16_t)(float_R*1000.0));
-
-
+	 /* for(a = 0; a < 6; a++) {			// sum up array content
+	  	   putchar(int8_t_hall_case[a]);
+	  	   }
+	  putchar(255);*/
+	 // printf("%d, %d\r\n", ui8_position_correction_value, ui16_ADC_iq_current);
       //printf("correction angle %d, Current %d, Voltage %d, sumtorque %d, setpoint %d, km/h %lu\n",ui8_position_correction_value, i16_deziAmps, ui8_BatteryVoltage, ui16_sum_torque, ui16_setpoint, ui32_SPEED_km_h);
       }//end of very slow loop
 

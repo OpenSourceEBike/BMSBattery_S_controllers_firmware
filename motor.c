@@ -90,14 +90,15 @@ void hall_sensors_read_and_action (void)
     {
       case 3://rotor position 180 degree
       // full electric revolution recognized, reset counters read here the phase B current for FOC,
-
+	//int8_t_hall_case[3]=ui8_adc_read_phase_B_current();
       if (ui8_adc_read_throttle_busy == 0)
       {
-debug_pin_set ();
+	debug_pin_set ();
+	if (ui16_BatteryCurrent > ui16_current_cal_b){
 	ui16_ADC_iq_current_accumulated-=ui16_ADC_iq_current_accumulated>>3;
 	ui16_ADC_iq_current_accumulated+= ui16_adc_read_phase_B_current ();
 	ui16_ADC_iq_current = ui16_ADC_iq_current_accumulated>>3; // this value is regualted to be zero by FOC in this case without averaging
-
+	}
       }
       if(ui8_half_rotation_flag){
 	  ui8_half_rotation_flag=0;
@@ -142,18 +143,30 @@ debug_pin_set ();
       break;
 
       case 1: //rotor position 240 degree, do FOC control
+	//int8_t_hall_case[4]=ui8_adc_read_phase_B_current ();
 
-	if (ui16_motor_speed_erps > 10 && ui16_BatteryCurrent>ui16_current_cal_b)
+	if (ui16_motor_speed_erps > 10 ) //normal riding, current positve && ui16_BatteryCurrent > ui16_current_cal_b
 	      {
-		if (ui16_ADC_iq_current>>2 > 127)// hier prüfen, ob Wandlung von 10 auf 8 bit geht....
+		if (ui16_ADC_iq_current>>2 > 127 && ui8_position_correction_value < 154)
 		{
 		  ui8_position_correction_value++;
 		}
-		else if (ui16_ADC_iq_current>>2 < 125)
+		else if (ui16_ADC_iq_current>>2 < 125 && ui8_position_correction_value > 100)
 		{
 		  ui8_position_correction_value--;
 		}
 	      }
+	/*if (ui16_motor_speed_erps > 10 && ui16_BatteryCurrent < ui16_current_cal_b) //regen, current negative
+		      {
+			if (ui16_ADC_iq_current>>2 > 127 && ui8_position_correction_value > 100)
+			{
+			  ui8_position_correction_value=127;
+			}
+			else if (ui16_ADC_iq_current>>2 < 125 && ui8_position_correction_value<154)
+			{
+			  ui8_position_correction_value=127;
+			}
+		      }*/
       if (ui8_motor_state != MOTOR_STATE_RUNNING_INTERPOLATION_360_DEGREES)
       {
 	ui8_motor_rotor_absolute_position = ANGLE_240 + MOTOR_ROTOR_DELTA_PHASE_ANGLE_RIGHT;
@@ -161,6 +174,7 @@ debug_pin_set ();
       break;
 
       case 5: //rotor position 300 degree
+	//int8_t_hall_case[5]=ui8_adc_read_phase_B_current ();
 
       if (ui8_motor_state != MOTOR_STATE_RUNNING_INTERPOLATION_360_DEGREES)
       {
@@ -170,6 +184,7 @@ debug_pin_set ();
 
       case 4: //rotor position 0 degree
 	ui8_half_rotation_flag=1;
+	//int8_t_hall_case[0]=ui8_adc_read_phase_B_current ();
 	debug_pin_reset ();
       if (ui8_motor_state != MOTOR_STATE_RUNNING_INTERPOLATION_360_DEGREES)
       {
@@ -178,6 +193,13 @@ debug_pin_set ();
       break;
 
       case 6://rotor position 60 degree
+	//int8_t_hall_case[1]=ui8_adc_read_phase_B_current ();
+
+	if (ui16_BatteryCurrent < ui16_current_cal_b){
+	ui16_ADC_iq_current_accumulated-=ui16_ADC_iq_current_accumulated>>3;
+	ui16_ADC_iq_current_accumulated+= ui16_adc_read_phase_B_current ();
+	ui16_ADC_iq_current = ui16_ADC_iq_current_accumulated>>3; // this value is regualted to be zero by FOC in this case without averaging
+	}
 
       if (ui8_motor_state != MOTOR_STATE_RUNNING_INTERPOLATION_360_DEGREES)
       {
@@ -186,6 +208,8 @@ debug_pin_set ();
       break;
 
       case 2://rotor position 120 degree
+
+	//int8_t_hall_case[2]=ui8_adc_read_phase_B_current ();
 
       if (ui8_motor_state != MOTOR_STATE_RUNNING_INTERPOLATION_360_DEGREES)
       {
