@@ -57,7 +57,7 @@
 //#define ADC_PHASE_B_CURRENT_ZERO_AMPS_FOC_MAX 102 // for phase B current sensor that outputs 2.0V at zero amps (ACS712)
 //#define ADC_PHASE_B_CURRENT_ZERO_AMPS_FOC_MIN 100 // for phase B current sensor that outputs 2.0V at zero amps (ACS712)
 
-#if defined (DO_SINEWAVE_INTERPOLATION_360_DEGREES)
+#if defined (DO_SVM_INTERPOLATION_360_DEGREES)
 // This value is ERPS speed after which a transition happens from sinewave 60 degrees to have
 // interpolation 360 degrees and must be found experimentally but a value of 100 may be good
 #define MOTOR_ROTOR_ERPS_START_INTERPOLATION_360_DEGREES 100
@@ -75,13 +75,12 @@
 #define PWM_DUTY_CYCLE_MIN 20
 #define MIDDLE_PWM_DUTY_CYCLE_MAX (PWM_DUTY_CYCLE_MAX/2)
 
+#define ANGLE_360 	(255 + MOTOR_ROTOR_OFFSET_ANGLE)
 #define ANGLE_1 	(0   + MOTOR_ROTOR_OFFSET_ANGLE)
 #define ANGLE_60 	(42  + MOTOR_ROTOR_OFFSET_ANGLE)
-#define ANGLE_120 	(85  + MOTOR_ROTOR_OFFSET_ANGLE)
-#define ANGLE_180 	(127 + MOTOR_ROTOR_OFFSET_ANGLE)
-#define ANGLE_240 	(170 + MOTOR_ROTOR_OFFSET_ANGLE)
-#define ANGLE_300 	(212 + MOTOR_ROTOR_OFFSET_ANGLE)
-#define ANGLE_360 	(255 + MOTOR_ROTOR_OFFSET_ANGLE)
+#define ANGLE_180 	(85  + MOTOR_ROTOR_OFFSET_ANGLE)
+#define ANGLE_240 	(127 + MOTOR_ROTOR_OFFSET_ANGLE)
+#define ANGLE_300 	(170 + MOTOR_ROTOR_OFFSET_ANGLE)
 
 // angle offset to make the FOC read Id current at 127 as default, just to be easier for the user when customizing
 #define FOC_READ_ID_CURRENT_OFFSET (127 - ((uint8_t) ANGLE_180))

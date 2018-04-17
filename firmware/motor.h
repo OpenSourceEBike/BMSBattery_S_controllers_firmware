@@ -12,9 +12,9 @@
 #include <stdint.h>
 
 // motor states
-#define BLOCK_COMMUTATION 			1
-#define SINEWAVE_INTERPOLATION_60_DEGREES 	2
-#define SINEWAVE_INTERPOLATION_360_DEGREES 	3
+#define BLOCK_COMMUTATION 		1
+#define SVM_INTERPOLATION_60_DEGREES 	2
+#define SVM_INTERPOLATION_360_DEGREES 	3
 
 #define MOTOR_CONTROLLER_STATE_OK			1
 #define MOTOR_CONTROLLER_STATE_BRAKE			2
@@ -26,7 +26,7 @@
 #define MOTOR_CONTROLLER_STATE_MOTOR_BLOCKED		128
 
 extern uint8_t ui8_motor_commutation_type;
-extern volatile uint8_t ui8_angle_correction;
+extern volatile uint8_t ui8_phase_voltage_svm_angle_correction;
 extern volatile uint8_t ui8_adc_motor_current;
 extern uint8_t ui8_adc_motor_current_offset;
 extern volatile uint8_t ui8_duty_cycle;

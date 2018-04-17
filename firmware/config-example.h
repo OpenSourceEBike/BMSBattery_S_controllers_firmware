@@ -115,10 +115,10 @@
 
 // This value is ERPS speed after which a transition happens from sinewave no interpolation to have
 // interpolation 60 degrees and must be found experimentally but a value of 40 may be good
-#define MOTOR_ROTOR_ERPS_START_INTERPOLATION_60_DEGREES 15
+#define MOTOR_ROTOR_ERPS_START_SVM_INTERPOLATION_60_DEGREES 15
 
 // For some motors with not very well placed mosfets at 120 degrees between each of them. May be easier to keep this option disabled
-//#define DO_SINEWAVE_INTERPOLATION_360_DEGREES
+//#define DO_SVM_INTERPOLATION_360_DEGREES
 // *************************************************************************** //
 
 #endif /* CONFIG_H_ */
