@@ -75,15 +75,15 @@
 #define PWM_DUTY_CYCLE_MIN 20
 #define MIDDLE_PWM_DUTY_CYCLE_MAX (PWM_DUTY_CYCLE_MAX/2)
 
-#define ANGLE_360 	(255 + MOTOR_ROTOR_OFFSET_ANGLE)
-#define ANGLE_1 	(0   + MOTOR_ROTOR_OFFSET_ANGLE)
-#define ANGLE_60 	(42  + MOTOR_ROTOR_OFFSET_ANGLE)
-#define ANGLE_180 	(85  + MOTOR_ROTOR_OFFSET_ANGLE)
-#define ANGLE_240 	(127 + MOTOR_ROTOR_OFFSET_ANGLE)
-#define ANGLE_300 	(170 + MOTOR_ROTOR_OFFSET_ANGLE)
+#define ANGLE_30 	(20 + MOTOR_ROTOR_OFFSET_ANGLE)
+#define ANGLE_90 	(63   + MOTOR_ROTOR_OFFSET_ANGLE)
+#define ANGLE_150 	(106  + MOTOR_ROTOR_OFFSET_ANGLE)
+#define ANGLE_210 	(148  + MOTOR_ROTOR_OFFSET_ANGLE)
+#define ANGLE_270 	(191 + MOTOR_ROTOR_OFFSET_ANGLE)
+#define ANGLE_330 	(234 + MOTOR_ROTOR_OFFSET_ANGLE)
 
-// angle offset to make the FOC read Id current at 127 as default, just to be easier for the user when customizing
-#define FOC_READ_ID_CURRENT_OFFSET (127 - ((uint8_t) ANGLE_180))
+// angle offset to make the FOC read Id current to be 127 at reset, just to be easier for the user when customizing and limit his value
+#define FOC_READ_ID_CURRENT_OFFSET (127 - ((uint8_t) ANGLE_270))
 
 #define MOTOR_OVER_SPEED_ERPS 520 // motor max speed, protection max value | 30 points for the sinewave at max speed
 
