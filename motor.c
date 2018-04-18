@@ -145,9 +145,9 @@ void hall_sensors_read_and_action (void)
       case 1: //rotor position 240 degree, do FOC control
 	//int8_t_hall_case[4]=ui8_adc_read_phase_B_current ();
 
-	if (ui16_motor_speed_erps > 10 ) //normal riding, current positve && ui16_BatteryCurrent > ui16_current_cal_b
+	if (ui16_motor_speed_erps > 10 && ui16_BatteryCurrent > ui16_current_cal_b) //normal riding,
 	      {
-		if (ui16_ADC_iq_current>>2 > 127 && ui8_position_correction_value < 154)
+		if (ui16_ADC_iq_current>>2 > 127 && ui8_position_correction_value < 135)
 		{
 		  ui8_position_correction_value++;
 		}
@@ -156,15 +156,16 @@ void hall_sensors_read_and_action (void)
 		  ui8_position_correction_value--;
 		}
 	      }
+
 	/*if (ui16_motor_speed_erps > 10 && ui16_BatteryCurrent < ui16_current_cal_b) //regen, current negative
 		      {
 			if (ui16_ADC_iq_current>>2 > 127 && ui8_position_correction_value > 100)
 			{
-			  ui8_position_correction_value=127;
+			  ui8_position_correction_value--;
 			}
-			else if (ui16_ADC_iq_current>>2 < 125 && ui8_position_correction_value<154)
+			else if (ui16_ADC_iq_current>>2 < 125 && ui8_position_correction_value<135)
 			{
-			  ui8_position_correction_value=127;
+			  ui8_position_correction_value++;
 			}
 		      }*/
       if (ui8_motor_state != MOTOR_STATE_RUNNING_INTERPOLATION_360_DEGREES)
@@ -194,12 +195,6 @@ void hall_sensors_read_and_action (void)
 
       case 6://rotor position 60 degree
 	//int8_t_hall_case[1]=ui8_adc_read_phase_B_current ();
-
-	if (ui16_BatteryCurrent < ui16_current_cal_b){
-	ui16_ADC_iq_current_accumulated-=ui16_ADC_iq_current_accumulated>>3;
-	ui16_ADC_iq_current_accumulated+= ui16_adc_read_phase_B_current ();
-	ui16_ADC_iq_current = ui16_ADC_iq_current_accumulated>>3; // this value is regualted to be zero by FOC in this case without averaging
-	}
 
       if (ui8_motor_state != MOTOR_STATE_RUNNING_INTERPOLATION_360_DEGREES)
       {

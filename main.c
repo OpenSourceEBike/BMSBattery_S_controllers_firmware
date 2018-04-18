@@ -399,7 +399,7 @@ if(ui8_cheat_state==3) //second step, make sure the brake is hold according to d
 	  	   putchar(int8_t_hall_case[a]);
 	  	   }
 	  putchar(255);*/
-	 // printf("%d, %d\r\n", ui8_position_correction_value, ui16_ADC_iq_current);
+	 // printf("%d, %d, %d\r\n", ui8_position_correction_value, ui16_BatteryCurrent, ui16_setpoint);
       //printf("correction angle %d, Current %d, Voltage %d, sumtorque %d, setpoint %d, km/h %lu\n",ui8_position_correction_value, i16_deziAmps, ui8_BatteryVoltage, ui16_sum_torque, ui16_setpoint, ui32_SPEED_km_h);
       }//end of very slow loop
 
