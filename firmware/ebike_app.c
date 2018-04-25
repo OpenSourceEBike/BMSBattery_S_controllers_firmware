@@ -67,8 +67,11 @@ uint8_t ui8_wheel_speed_max = 0;
 
 struct_pi_controller_state wheel_speed_pi_controller_state;
 
-uint16_t ui16_adc_battery_voltage_accumulated = ADC_BATTERY_VOLTAGE_MED;
+uint16_t ui16_adc_battery_voltage_accumulated = ((uint16_t) ADC_BATTERY_VOLTAGE_MIN) << READ_BATTERY_VOLTAGE_FILTER_COEFFICIENT;
 uint8_t ui8_adc_battery_voltage_filtered;
+
+uint16_t ui16_adc_battery_current_accumulated = 0;
+uint8_t ui8_adc_battery_current_filtered;
 
 volatile uint8_t ui8_ebike_app_state = EBIKE_APP_STATE_MOTOR_STOP;
 
@@ -103,11 +106,13 @@ void torque_sensor_throttle_read (void);
 void read_pas_cadence_and_direction (void);
 uint8_t pas_is_set (void);
 void read_battery_voltage (void);
+void read_battery_current (void);
 void ebike_app_state_machine (void);
 float f_get_assist_level ();
 void ebike_app_battery_set_current_max (uint8_t ui8_value);
 void ebike_app_battery_set_regen_current_max (uint8_t ui8_value);
 uint8_t ebike_app_get_ADC_battery_voltage_filtered (void);
+uint8_t ebike_app_get_ADC_battery_current_filtered (void);
 
 void ebike_app_init (void)
 {
@@ -124,8 +129,9 @@ void ebike_app_init (void)
 
 void ebike_app_controller (void)
 {
-  // reads battery voltage and also protects for undervoltage
+  // reads battery voltage and current
   read_battery_voltage ();
+  read_battery_current ();
 
   // calc wheel speed and save the value on global variable ui8_wheel_speed
   calc_wheel_speed ();
@@ -309,8 +315,7 @@ uint8_t throttle_is_set (void)
 void communications_controller (void)
 {
 #ifndef DEBUG_UART
-  uint8_t ui8_moving_indication = 0;
-  int16_t i16_battery_current;
+  uint8_t ui8_moving_indication;
   uint8_t ui8_battery_current;
 
   /********************************************************************************************/
@@ -379,13 +384,8 @@ void communications_controller (void)
   // - B8 = 250, LCD shows 1875 watts
   // - B8 = 100, LCD shows 750 watts
   // each unit of B8 = 0.25A
-  i16_battery_current = ui8_adc_read_battery_current () - ui8_adc_battery_current_offset;
-  // limit to be only positive value, LCD don't accept regen current value
-  // also just show power to user when current is higher than 1 amp, so avoid showing the drift values of ui8_adc_battery_current_offset
-  if (i16_battery_current < 4) { i16_battery_current = 0; }
-  ui8_battery_current = (uint8_t) i16_battery_current;
-
   // verified experimental that on S0S, display LCD3 needs: battery_current * 1.5 (because each unit of battery current is equal to 0.35A)
+  ui8_battery_current = ebike_app_get_ADC_battery_current_filtered ();
   ui8_tx_buffer [8] = ui8_battery_current + (ui8_battery_current >> 1);
   // B9: motor temperature
   ui8_tx_buffer [9] = 0;
@@ -984,14 +984,34 @@ void torque_sensor_throttle_read (void)
 void read_battery_voltage (void)
 {
   // low pass filter the voltage readed value, to avoid possible fast spikes/noise
-  ui16_adc_battery_voltage_accumulated -= ui16_adc_battery_voltage_accumulated >> 6;
+  ui16_adc_battery_voltage_accumulated -= ui16_adc_battery_voltage_accumulated >> READ_BATTERY_VOLTAGE_FILTER_COEFFICIENT;
   ui16_adc_battery_voltage_accumulated += ((uint16_t) ui8_adc_read_battery_voltage ());
-  ui8_adc_battery_voltage_filtered = ui16_adc_battery_voltage_accumulated >> 6;
+  ui8_adc_battery_voltage_filtered = ui16_adc_battery_voltage_accumulated >> READ_BATTERY_VOLTAGE_FILTER_COEFFICIENT;
+}
+
+void read_battery_current (void)
+{
+  int16_t i16_battery_current;
+
+  // low pass filter the positive battery readed value (no regen current), to avoid possible fast spikes/noise
+  ui16_adc_battery_current_accumulated -= ui16_adc_battery_current_accumulated >> READ_BATTERY_CURRENT_FILTER_COEFFICIENT;
+  ui16_adc_battery_current_accumulated += (uint16_t) UI8_ADC_BATTERY_CURRENT;
+
+  i16_battery_current = ((uint8_t) (ui16_adc_battery_current_accumulated >> READ_BATTERY_CURRENT_FILTER_COEFFICIENT)) - ui8_adc_battery_current_offset;
+  // limit to be only positive value, LCD doesn't accept regen current value
+  // avoid little values that happens over time with drifting from the hardware
+  if (i16_battery_current < 4) { i16_battery_current = 0; }
+  ui8_adc_battery_current_filtered = (uint8_t) i16_battery_current;
 }
 
 uint8_t ebike_app_get_ADC_battery_voltage_filtered (void)
 {
   return ui8_adc_battery_voltage_filtered;
+}
+
+uint8_t ebike_app_get_ADC_battery_current_filtered (void)
+{
+  return ui8_adc_battery_current_filtered;
 }
 
 float f_get_assist_level ()
