@@ -315,11 +315,6 @@ void ebike_app_cruise_control_stop (void)
   ui8_cruise_state = 0;
 }
 
-uint8_t throttle_is_set (void)
-{
-  return (ui8_throttle_value > ADC_THROTTLE_MIN_VALUE) ? 1: 0;
-}
-
 void communications_controller (void)
 {
 #ifndef DEBUG_UART
@@ -357,7 +352,7 @@ void communications_controller (void)
   if (motor_controller_state_is_set (MOTOR_CONTROLLER_STATE_BRAKE) ||
       motor_controller_state_is_set (MOTOR_CONTROLLER_STATE_BRAKE_LIKE_COAST_BRAKES)) { ui8_moving_indication = (1 << 5); }
   if (ebike_app_cruise_control_is_set ()) { ui8_moving_indication |= (1 << 3); }
-  if (throttle_is_set ()) { ui8_moving_indication |= (1 << 1); }
+  if (ebike_app_throttle_is_released ()) { ui8_moving_indication |= (1 << 1); }
   if (pas_is_set ()) { ui8_moving_indication |= (1 << 4); }
 
   // if battery over voltage, signal instead on LCD with battery symbol flashing and brake signal
@@ -662,7 +657,7 @@ uint8_t ebike_app_get_adc_throttle_value_cruise_control (void)
   return ui8_adc_throttle_value_cruise_control;
 }
 
-uint8_t ebike_app_is_throttle_released (void)
+uint8_t ebike_app_throttle_is_released (void)
 {
   return ui8_is_throttle_released;
 }
@@ -945,7 +940,7 @@ void throttle_read (void)
   ui8_throttle_value_filtered = ui16_throttle_value_accumulated >> THROTTLE_FILTER_COEFFICIENT;
 
   // setup ui8_is_throttle_released flag
-  ui8_is_throttle_released = ((ui8_throttle_value > ((uint8_t) THROTTLE_MIN_VALUE)) ? 0 : 1);
+  ui8_is_throttle_released = ((ui8_throttle_value > 0) ? 1 : 0);
 }
 
 void throttle_reset_filter (void)
@@ -965,7 +960,7 @@ void torque_sensor_throttle_read (void)
   {
     // ebike is stopped, wait for throttle signal
     case STATE_NO_PEDALLING:
-    if ((!ebike_app_is_throttle_released ()) &&
+    if ((!ebike_app_throttle_is_released ()) &&
 	(!brake_is_set()))
     {
       ui8_tstr_state_machine = STATE_STARTUP_PEDALLING;

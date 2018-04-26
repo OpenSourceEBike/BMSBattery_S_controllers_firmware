@@ -100,18 +100,6 @@
 #define WHEEL_SPEED_PI_CONTROLLER_KI_DIVISOR	6
 #endif
 
-// TORQUE SENSOR
-#if (EBIKE_THROTTLE_TYPE == EBIKE_THROTTLE_TYPE_THROTTLE_PAS)
-#define ADC_THROTTLE_MIN_VALUE 45
-#define ADC_THROTTLE_MAX_VALUE 229
-#elif (EBIKE_THROTTLE_TYPE == EBIKE_THROTTLE_TYPE_TORQUE_SENSOR)
-#define ADC_THROTTLE_MIN_VALUE 51
-#define ADC_THROTTLE_MAX_VALUE 183
-#endif
-
-#define THROTTLE_MIN_VALUE 0
-#define THROTTLE_MAX_VALUE 255
-
 // Possible values: 0, 1, 2, 3, 4, 5, 6
 // 0 equal to no filtering and no delay, higher values will increase filtering but will also add bigger delay
 #define THROTTLE_FILTER_COEFFICIENT 3
