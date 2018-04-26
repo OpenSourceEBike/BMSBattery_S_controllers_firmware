@@ -71,7 +71,7 @@
 
 #define PWM_CYCLES_SECOND 15625L // 1 / 64us(PWM period)
 
-#define PWM_DUTY_CYCLE_MAX 254
+#define PWM_DUTY_CYCLE_MAX 250
 #define PWM_DUTY_CYCLE_MIN 20
 #define MIDDLE_PWM_DUTY_CYCLE_MAX (PWM_DUTY_CYCLE_MAX/2)
 
@@ -111,6 +111,11 @@
 
 #define THROTTLE_MIN_VALUE 0
 #define THROTTLE_MAX_VALUE 255
+
+// Possible values: 0, 1, 2, 3, 4, 5, 6
+// 0 equal to no filtering and no delay, higher values will increase filtering but will also add bigger delay
+#define THROTTLE_FILTER_COEFFICIENT 3
+#define ADC_THROTTLE_THRESHOLD 		4
 
 #define CRUISE_CONTROL_MIN 20
 
@@ -182,7 +187,7 @@
 #define BATTERY_PACK_VOLTS_0	((float) LI_ION_CELL_VOLTS_0   * (BATTERY_LI_ION_CELLS_NUMBER << 8))
 
 // Possible values: 0, 1, 2, 3, 4, 5, 6
-// 0 equal to no filtering and no delay, hihher values will increase filtering but will also add bigger delay
+// 0 equal to no filtering and no delay, higher values will increase filtering but will also add bigger delay
 #define READ_BATTERY_CURRENT_FILTER_COEFFICIENT 3
 #define READ_BATTERY_VOLTAGE_FILTER_COEFFICIENT 6
 // *************************************************************************** //

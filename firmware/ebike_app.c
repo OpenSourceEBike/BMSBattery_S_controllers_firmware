@@ -47,7 +47,6 @@ uint8_t ui8_rx_counter = 0;
 uint8_t ui8_byte_received;
 uint8_t ui8_state_machine = 0;
 
-uint8_t ui8_adc_throttle_value;
 uint8_t ui8_adc_throttle_value_cruise_control;
 uint8_t ui8_throttle_value;
 volatile uint16_t ui16_throttle_value_accumulated = 0;
@@ -92,6 +91,9 @@ volatile uint8_t ui8_log_pi_battery_target_current_value;
 volatile uint8_t ui8_adc_target_battery_current_max;
 volatile uint8_t ui8_adc_target_battery_regen_current_max;
 
+uint8_t ui8_adc_throttle_offset;
+uint16_t ui16_adc_throttle_offset;
+
 // function prototypes
 void communications_controller (void);
 uint8_t ebike_app_cruise_control (uint8_t ui8_value);
@@ -101,6 +103,7 @@ void calc_wheel_speed (void);
 void ebike_throttle_type_throttle_pas (void);
 void ebike_throttle_type_torque_sensor (void);
 void throttle_read (void);
+void throttle_value_remove_offset (uint8_t *ui8_throttle_value);
 void throttle_reset_filter (void);
 void torque_sensor_throttle_read (void);
 void read_pas_cadence_and_direction (void);
@@ -309,7 +312,7 @@ void ebike_app_cruise_control_stop (void)
 
 uint8_t throttle_is_set (void)
 {
-  return (ui8_adc_throttle_value > ADC_THROTTLE_MIN_VALUE) ? 1: 0;
+  return (ui8_throttle_value > ADC_THROTTLE_MIN_VALUE) ? 1: 0;
 }
 
 void communications_controller (void)
@@ -810,12 +813,12 @@ void ebike_throttle_type_torque_sensor (void)
   uint8_t ui8_target_wheel_speed;
   uint8_t ui8_target_duty_cycle;
 
-  // divide the torque sensor throttle value by 4 as it is very sensitive and multiply by assist level
-  f_temp = (float) ((ui8_throttle_value_filtered >> 2) * lcd_configuration_variables.ui8_assist_level);
+  f_temp = ((float) ui8_throttle_value_filtered) * f_get_assist_level ();
+  if (f_temp > 255) { f_temp = 255; }
 
 #if defined (EBIKE_THROTTLE_TYPE_TORQUE_SENSOR_HUMAN_POWER)
   // calc humam power on the crank using as input the pedal torque sensor value and pedal cadence
-  ui16_temp = (uint16_t) (f_temp * ((float) ((float) ui8_pas1_cadence_rpm / ((float) PAS_MAX_CADENCE_RPM))));
+  ui8_temp = (uint8_t) (f_temp * ((float) ((float) ui8_pas1_cadence_rpm / ((float) PAS_MAX_CADENCE_RPM))));
 #else
   ui8_temp = (uint8_t) f_temp;
 #endif
@@ -881,25 +884,33 @@ void ebike_throttle_type_torque_sensor (void)
   }
 }
 
+void throttle_value_remove_offset (uint8_t *ui8_throttle_value)
+{
+  uint8_t ui8_temp;
+
+  // remove throttle signal offset and consider active after a safe threshold
+  ui8_temp = ui8_adc_throttle_offset + ADC_THROTTLE_THRESHOLD;
+  if (*ui8_throttle_value > ui8_temp)
+  {
+    *ui8_throttle_value -= ui8_temp;
+  }
+  else
+  {
+    *ui8_throttle_value = 0;
+  }
+}
+
 void throttle_read (void)
 {
   // read torque sensor signal
-  ui8_adc_throttle_value = ui8_adc_read_throttle ();
+  ui8_throttle_value = UI8_ADC_THROTTLE;
 
-  // map throttle value from 0 up to 255
-  ui8_throttle_value = (uint8_t) (map (
-		  ui8_adc_throttle_value,
-		  (uint8_t) ADC_THROTTLE_MIN_VALUE,
-		  (uint8_t) ADC_THROTTLE_MAX_VALUE,
-		  (uint8_t) THROTTLE_MIN_VALUE,
-		  (uint8_t) THROTTLE_MAX_VALUE));
+  throttle_value_remove_offset (&ui8_throttle_value);
 
-//  // low pass filter the torque sensor to smooth the signal
-//  ui16_throttle_value_accumulated -= ui16_throttle_value_accumulated >> 2;
-//  ui16_throttle_value_accumulated += ((uint16_t) ui8_throttle_value);
-//  ui8_throttle_value_filtered = ui16_throttle_value_accumulated >> 2;
-
-ui8_throttle_value_filtered = ui8_throttle_value;
+  // low pass filter the torque sensor to smooth the signal
+  ui16_throttle_value_accumulated -= ui16_throttle_value_accumulated >> THROTTLE_FILTER_COEFFICIENT;
+  ui16_throttle_value_accumulated += ((uint16_t) ui8_throttle_value);
+  ui8_throttle_value_filtered = ui16_throttle_value_accumulated >> THROTTLE_FILTER_COEFFICIENT;
 
   // setup ui8_is_throttle_released flag
   ui8_is_throttle_released = ((ui8_throttle_value > ((uint8_t) THROTTLE_MIN_VALUE)) ? 0 : 1);
@@ -966,19 +977,13 @@ void torque_sensor_throttle_read (void)
   else if ((ui8_pas1_cadence_rpm <= 15) ||
       (ui8_torque_sensor_throttle_processed_value == 0)) // use ui8_throttle_value value while ui8_torque_sensor_throttle_processed_value is 0
   {
-    ui8_throttle_value_filtered = ui8_throttle_value;
+    ui8_throttle_value_filtered = ui8_throttle_value; // use the fast, unfiltered throttle signal value
   }
   else
   {
-    ui8_throttle_value_filtered = (uint8_t) (map (
-	  ui8_torque_sensor_throttle_processed_value,
-	  (uint8_t) ADC_THROTTLE_MIN_VALUE,
-	  (uint8_t) ADC_THROTTLE_MAX_VALUE,
-	  (uint8_t) THROTTLE_MIN_VALUE,
-	  (uint8_t) THROTTLE_MAX_VALUE));
+    ui8_throttle_value_filtered = ui8_torque_sensor_throttle_processed_value;
+    throttle_value_remove_offset (&ui8_throttle_value_filtered);
   }
-
-//ui8_throttle_value_filtered = ui8_throttle_value;
 }
 
 void read_battery_voltage (void)

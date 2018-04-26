@@ -57,6 +57,9 @@ extern volatile uint8_t ui8_log_pi_battery_current_value;
 extern volatile uint8_t ui8_log_pi_battery_target_current_value;
 extern volatile uint8_t ui8_adc_battery_current_offset;
 
+extern uint8_t ui8_adc_throttle_offset;
+extern uint16_t ui16_adc_throttle_offset;
+
 void ebike_app_init (void);
 void ebike_app_controller (void);
 void ebike_app_cruise_control_stop (void);
