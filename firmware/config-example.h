@@ -21,7 +21,7 @@
 
 
 // *************************************************************************** //
-// THROOTLE
+// THROTTLE
 //
 // choose between throttle and/or pas or torque sensor
 #define EBIKE_THROTTLE_TYPE	EBIKE_THROTTLE_TYPE_THROTTLE_PAS
@@ -42,6 +42,8 @@
 //
 #define PAS_NUMBER_MAGNETS	8
 #define PAS_MAX_CADENCE_RPM 	90
+
+#define PAS_THRESHOLD 1.7
 
 // if your motor accelerates while rotating backwards the pedals instead of rotating forward, select the other option
 #define PAS_DIRECTION PAS_DIRECTION_LEFT

@@ -717,10 +717,15 @@ void TIM1_CAP_COM_IRQHandler(void) __interrupt(TIM1_CAP_COM_IRQHANDLER)
       if (ui16_pas1_counter < ((uint16_t) PAS_ABSOLUTE_MAX_CADENCE_PWM_CYCLE_TICKS)) { ui16_pas1_counter = PAS_ABSOLUTE_MAX_CADENCE_PWM_CYCLE_TICKS; }
 
       ui16_pas1_pwm_cycles_ticks = ui16_pas1_counter;
-      ui16_pas1_counter = 0;
+      ui16_pas1_pwm_cycles_on_ticks = ui16_pas1_on_time_counter;
+      ui16_pas1_counter = 1;
+      ui16_pas1_off_time_counter = 1;
+      ui16_pas1_on_time_counter = 1;
+      ui8_pas_flag = 1;
     }
-    else
-    {
+    /*
+     else
+     {
 #if (PAS_DIRECTION == PAS_DIRECTION_RIGHT)
       if (ui16_pas1_on_time_counter > ui16_pas1_off_time_counter)
 #else
@@ -729,9 +734,9 @@ void TIM1_CAP_COM_IRQHandler(void) __interrupt(TIM1_CAP_COM_IRQHANDLER)
       { ui8_pas1_direction = 1; }
       else { ui8_pas1_direction = 0; }
 
-      ui16_pas1_off_time_counter = 0;
-      ui16_pas1_on_time_counter = 0;
+
     }
+    */
 
 #if (EBIKE_THROTTLE_TYPE == EBIKE_THROTTLE_TYPE_TORQUE_SENSOR)
     // filter the torque signal, by saving the max value of each one pedal rotation
@@ -752,21 +757,6 @@ void TIM1_CAP_COM_IRQHandler(void) __interrupt(TIM1_CAP_COM_IRQHANDLER)
       }
     }
 #endif
-  }
-
-
-  // limit min PAS cadence
-  if (ui16_pas1_counter > ((uint16_t) PAS_ABSOLUTE_MIN_CADENCE_PWM_CYCLE_TICKS))
-  {
-    ui16_pas1_pwm_cycles_ticks = (uint16_t) PAS_ABSOLUTE_MIN_CADENCE_PWM_CYCLE_TICKS;
-    ui16_pas1_counter = 0;
-    ui16_pas1_on_time_counter = 0;
-    ui16_pas1_off_time_counter = 0;
-    ui8_pas1_direction = 1;
-#if (EBIKE_THROTTLE_TYPE == EBIKE_THROTTLE_TYPE_TORQUE_SENSOR)
-    ui8_torque_sensor_throttle_processed_value = 0;
-#endif
-  }
   /****************************************************************************/
 
 #if defined(EBIKE_REGEN_EBRAKE_LIKE_COAST_BRAKES)
@@ -774,6 +764,7 @@ void TIM1_CAP_COM_IRQHandler(void) __interrupt(TIM1_CAP_COM_IRQHANDLER)
   // detect pedal rotating backwards and configure regen current
 
   // detect PAS2 signal changes
+  /*
   if (!(PAS2__PORT->IDR & PAS2__PIN)) { ui8_pas2_state = 0; }
   else { ui8_pas2_state = 1; }
 
@@ -794,9 +785,9 @@ void TIM1_CAP_COM_IRQHandler(void) __interrupt(TIM1_CAP_COM_IRQHANDLER)
     { // we are rotating pedals forward
       ui8_pas2_counter = 0;
       ui8_pas2_direction = 0;
-    }
+    }*/
 
-    if (ui8_pas2_direction) // rotating backwards
+    if (ui8_pas1_direction) // rotating backwards
     {
       if (ui8_pas2_regen_count < 5)
       {
@@ -835,9 +826,24 @@ void TIM1_CAP_COM_IRQHandler(void) __interrupt(TIM1_CAP_COM_IRQHANDLER)
 	ui8_adc_target_battery_regen_current_max = ui8_adc_battery_current_offset; // disable ebrake/regen
       }
     }
+
+    // limit min PAS cadence
+    if (ui16_pas1_counter > ((uint16_t) PAS_ABSOLUTE_MIN_CADENCE_PWM_CYCLE_TICKS))
+    {
+      ui16_pas1_pwm_cycles_ticks = (uint16_t) PAS_ABSOLUTE_MIN_CADENCE_PWM_CYCLE_TICKS;
+      ui16_pas1_counter = 0;
+      ui16_pas1_on_time_counter = 0;
+      ui16_pas1_off_time_counter = 0;
+      ui8_pas1_direction = 1;
+      PAS_act=3;
+#if (EBIKE_THROTTLE_TYPE == EBIKE_THROTTLE_TYPE_TORQUE_SENSOR)
+      ui8_torque_sensor_throttle_processed_value = 0;
+#endif
   }
+
   /****************************************************************************/
 #endif
+  }
 
   /****************************************************************************/
   // calc wheel speed sensor timming between each positive pulses, in PWM cycles ticks

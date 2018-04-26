@@ -21,6 +21,7 @@
 #include "uart.h"
 #include "brake.h"
 #include "eeprom.h"
+#include "config.h"
 
 // cruise control variables
 uint8_t ui8_cruise_state = 0;
@@ -54,8 +55,12 @@ uint8_t ui8_throttle_value_filtered;
 uint8_t ui8_is_throttle_released;
 
 volatile uint16_t ui16_pas1_pwm_cycles_ticks = (uint16_t) PAS_ABSOLUTE_MIN_CADENCE_PWM_CYCLE_TICKS;
+volatile uint16_t ui16_pas1_pwm_cycles_on_ticks=0;
 volatile uint8_t ui8_pas1_direction = 0;
+uint8_t ui8_pas_flag=0;
+uint8_t PAS_act=3;
 uint8_t ui8_pas1_cadence_rpm = 0;
+
 
 volatile uint16_t ui16_wheel_speed_sensor_pwm_cycles_ticks = (uint16_t) WHEEL_SPEED_SENSOR_MAX_PWM_CYCLE_TICKS;
 volatile uint8_t ui8_wheel_speed_sensor_is_disconnected = 1; // must start with this value to have correct value at start up
@@ -697,6 +702,33 @@ void calc_wheel_speed (void)
 void read_pas_cadence_and_direction (void)
 {
   float f_temp;
+
+  if (ui8_pas_flag)
+  {
+#if (PAS_DIRECTION == PAS_DIRECTION_RIGHT)
+    if (((float) ui16_pas1_pwm_cycles_ticks /(float) ui16_pas1_pwm_cycles_on_ticks) > PAS_THRESHOLD)
+    {
+      if (PAS_act < 7) { PAS_act++; }
+    }
+    else
+    {
+      if (PAS_act > 0) { PAS_act--; }
+    }
+#elif (PAS_DIRECTION == PAS_DIRECTION_LEFT)
+    if (((float) ui16_pas1_pwm_cycles_ticks /(float) ui16_pas1_pwm_cycles_on_ticks) < PAS_THRESHOLD)
+    {
+      if (PAS_act < 7) { PAS_act++; }
+    }
+    else
+    {
+      if (PAS_act > 0) { PAS_act--; }
+    }
+#endif
+
+    if (PAS_act > 4) { ui8_pas1_direction = 0; } // set direction only if enough pulses in the right direction are detected.
+    else if (PAS_act <1 ) { ui8_pas1_direction = 1; } // pedaling reverse
+    ui8_pas_flag = 0;
+  }
 
   // cadence in RPM =  60 / (ui16_pas_timer2_ticks * PAS_NUMBER_MAGNETS * 0.000064)
   if (ui16_pas1_pwm_cycles_ticks >= ((uint16_t) PAS_ABSOLUTE_MIN_CADENCE_PWM_CYCLE_TICKS)) { ui8_pas1_cadence_rpm = 0; }
