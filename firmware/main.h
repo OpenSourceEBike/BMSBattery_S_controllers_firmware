@@ -164,6 +164,7 @@
 
 #define COMMUNICATIONS_BATTERY_VOLTAGE	(uint8_t) (((float) BATTERY_LI_ION_CELLS_NUMBER) * 3.45) // example: 7S battery, should be = 24
 #define ADC_BATTERY_VOLTAGE_MAX 	(uint8_t) ((float) (BATTERY_LI_ION_CELLS_NUMBER * LI_ION_CELL_VOLTS_MAX) / ADC_BATTERY_VOLTAGE_PER_ADC_STEP)
+#define ADC_BATTERY_VOLTAGE_10	 	(uint8_t) ((float) (BATTERY_LI_ION_CELLS_NUMBER * LI_ION_CELL_VOLTS_10)  / ADC_BATTERY_VOLTAGE_PER_ADC_STEP)
 #define ADC_BATTERY_VOLTAGE_MIN 	(uint8_t) ((float) (BATTERY_LI_ION_CELLS_NUMBER * LI_ION_CELL_VOLTS_MIN) / ADC_BATTERY_VOLTAGE_PER_ADC_STEP)
 
 // Considering the follow voltage values for each li-ion battery cell
@@ -189,7 +190,7 @@
 // Possible values: 0, 1, 2, 3, 4, 5, 6
 // 0 equal to no filtering and no delay, higher values will increase filtering but will also add bigger delay
 #define READ_BATTERY_CURRENT_FILTER_COEFFICIENT 3
-#define READ_BATTERY_VOLTAGE_FILTER_COEFFICIENT 6
+#define READ_BATTERY_VOLTAGE_FILTER_COEFFICIENT 5
 // *************************************************************************** //
 
 #endif // _MAIN_H_

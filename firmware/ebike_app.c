@@ -71,7 +71,7 @@ uint8_t ui8_wheel_speed_max = 0;
 
 struct_pi_controller_state wheel_speed_pi_controller_state;
 
-uint16_t ui16_adc_battery_voltage_accumulated = ((uint16_t) ADC_BATTERY_VOLTAGE_MIN) << READ_BATTERY_VOLTAGE_FILTER_COEFFICIENT;
+uint16_t ui16_adc_battery_voltage_accumulated = ((uint16_t) ADC_BATTERY_VOLTAGE_10) << READ_BATTERY_VOLTAGE_FILTER_COEFFICIENT;
 uint8_t ui8_adc_battery_voltage_filtered;
 
 uint16_t ui16_adc_battery_current_accumulated = 0;
@@ -120,7 +120,7 @@ float f_get_assist_level ();
 void ebike_app_battery_set_current_max (uint8_t ui8_value);
 void ebike_app_battery_set_regen_current_max (uint8_t ui8_value);
 uint8_t ebike_app_get_ADC_battery_voltage_filtered (void);
-uint8_t ebike_app_get_ADC_battery_current_filtered (void);
+uint8_t ebike_app_get_battery_current_filtered (void);
 
 void ebike_app_init (void)
 {
@@ -393,7 +393,7 @@ void communications_controller (void)
   // - B8 = 100, LCD shows 750 watts
   // each unit of B8 = 0.25A
   // verified experimental that on S0S, display LCD3 needs: battery_current * 1.5 (because each unit of battery current is equal to 0.35A)
-  ui8_battery_current = ebike_app_get_ADC_battery_current_filtered ();
+  ui8_battery_current = ebike_app_get_battery_current_filtered ();
   ui8_tx_buffer [8] = ui8_battery_current + (ui8_battery_current >> 1);
   // B9: motor temperature
   ui8_tx_buffer [9] = 0;
@@ -1022,7 +1022,7 @@ void read_battery_voltage (void)
 {
   // low pass filter the voltage readed value, to avoid possible fast spikes/noise
   ui16_adc_battery_voltage_accumulated -= ui16_adc_battery_voltage_accumulated >> READ_BATTERY_VOLTAGE_FILTER_COEFFICIENT;
-  ui16_adc_battery_voltage_accumulated += ((uint16_t) ui8_adc_read_battery_voltage ());
+  ui16_adc_battery_voltage_accumulated += ((uint16_t) UI8_ADC_BATTERY_VOLTAGE);
   ui8_adc_battery_voltage_filtered = ui16_adc_battery_voltage_accumulated >> READ_BATTERY_VOLTAGE_FILTER_COEFFICIENT;
 }
 
@@ -1046,7 +1046,7 @@ uint8_t ebike_app_get_ADC_battery_voltage_filtered (void)
   return ui8_adc_battery_voltage_filtered;
 }
 
-uint8_t ebike_app_get_ADC_battery_current_filtered (void)
+uint8_t ebike_app_get_battery_current_filtered (void)
 {
   return ui8_adc_battery_current_filtered;
 }
