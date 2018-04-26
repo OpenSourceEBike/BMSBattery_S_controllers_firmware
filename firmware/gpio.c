@@ -12,6 +12,9 @@
 
 void gpio_init (void)
 {
+  GPIO_Init(GPIOD,
+	    GPIO_PIN_3,
+	    GPIO_MODE_OUT_OD_HIZ_FAST);
 
 }
 

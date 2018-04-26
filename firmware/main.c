@@ -72,40 +72,75 @@ void UART2_IRQHandler(void) __interrupt(UART2_IRQHANDLER);
 
 int main (void)
 {
-  //set clock at the max 16MHz
+  float f_1 = 1.1;
+  float f_2 = 1.1;
+  float f_3 = 1.1;
+  float f_4 = 1.1;
+  float f_5 = 1.1;
+  float f_6 = 1.1;
+  float f_7 = 1.1;
+  float f_8 = 1.1;
+
+  int32_t i32_1;
+  int32_t i32_2;
+  int32_t i32_3;
+
+  //set clock at the max 8MHz
   CLK_HSIPrescalerConfig (CLK_PRESCALER_HSIDIV1);
 
   gpio_init ();
-  brake_init ();
-  while (brake_is_set()) ; // hold here while brake is pressed -- this is a protection for development
+//  brake_init ();
+//  while (brake_is_set()) ; // hold here while brake is pressed -- this is a protection for development
   debug_pin_init ();
   timer2_init ();
   uart_init ();
-  pwm_init_bipolar_4q ();
-  hall_sensor_init ();
-  adc_init ();
-  battery_protect_over_voltage (); // will stop the motor if battery over voltage
-  eeprom_init ();
-  motor_init ();
-  pas1_init ();
-  pas2_init ();
-  wheel_speed_sensor_init ();
-  ebike_app_init ();
-  enableInterrupts ();
+//  pwm_init_bipolar_4q ();
+//  hall_sensor_init ();
+//  adc_init ();
+//  battery_protect_over_voltage (); // will stop the motor if battery over voltage
+//  eeprom_init ();
+//  motor_init ();
+//  pas1_init ();
+//  pas2_init ();
+//  wheel_speed_sensor_init ();
+//  ebike_app_init ();
+//  enableInterrupts ();
 
   while (1)
   {
-    // because of continue; at the end of each if code block that will stop the while (1) loop there,
-    // the first if block code will have the higher priority over any others
 
-    ui16_TIM2_counter = TIM2_GetCounter ();
-    if ((ui16_TIM2_counter - ui16_ebike_app_controller_counter) > 100) // every 100ms
-    {
-      ui16_ebike_app_controller_counter = ui16_TIM2_counter;
-      // ebike_app_controller() takes about 13ms (measured at 2018.03)
-      ebike_app_controller ();
-      continue;
-    }
+
+
+
+
+      f_1 += 0.1;
+      f_2 += 0.2;
+      f_3 += 0.3;
+      f_4 += 0.4;
+      f_5 += 0.5;
+      f_6 += 0.6;
+      f_7 += 0.7;
+
+
+      debug_pin_set ();
+      f_8 = (f_1 * f_2 * f_3 * f_4 * f_5) / (f_6 * f_7);
+      f_8 = f_1 * f_8;
+      debug_pin_reset ();
+
+      printf ("%d\n", f_8*100);
+
+
+//    // because of continue; at the end of each if code block that will stop the while (1) loop there,
+//    // the first if block code will have the higher priority over any others
+//
+//    ui16_TIM2_counter = TIM2_GetCounter ();
+//    if ((ui16_TIM2_counter - ui16_ebike_app_controller_counter) > 100) // every 100ms
+//    {
+//      ui16_ebike_app_controller_counter = ui16_TIM2_counter;
+//      // ebike_app_controller() takes about 13ms (measured at 2018.03)
+//      ebike_app_controller ();
+//      continue;
+//    }
 
 #ifdef DEBUG_UART
     ui16_TIM2_counter = TIM2_GetCounter ();

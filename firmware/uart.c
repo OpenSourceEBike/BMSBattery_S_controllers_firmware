@@ -28,7 +28,7 @@ void uart_init (void)
 	     UART2_SYNCMODE_CLOCK_DISABLE,
 	     UART2_MODE_TXRX_ENABLE);
 
-  UART2_ITConfig(UART2_IT_RXNE_OR, ENABLE);
+//  UART2_ITConfig(UART2_IT_RXNE_OR, ENABLE);
 }
 
 #if __SDCC_REVISION < 9624
@@ -38,7 +38,7 @@ void putchar(char c)
   UART2_SendData8(c);
 
   //Loop until the end of transmission
-  while (UART2_GetFlagStatus(UART2_FLAG_TXE) == RESET);
+//  while (UART2_GetFlagStatus(UART2_FLAG_TXE) == RESET);
 }
 #else
 int putchar(int c)
@@ -47,7 +47,7 @@ int putchar(int c)
   UART2_SendData8(c);
 
   //Loop until the end of transmission
-  while (UART2_GetFlagStatus(UART2_FLAG_TXE) == RESET);
+//  while (UART2_GetFlagStatus(UART2_FLAG_TXE) == RESET);
 
   return((unsigned char)c);
 }
