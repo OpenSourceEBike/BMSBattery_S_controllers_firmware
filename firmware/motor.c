@@ -547,7 +547,7 @@ void TIM1_CAP_COM_IRQHandler(void) __interrupt(TIM1_CAP_COM_IRQHANDLER)
   }
 
   // make sure we just execute one time per ERPS, so use the flag ui8_flag_foc_read_id_current
-  if ((ui8_motor_rotor_angle >= (ANGLE_180) && (ui8_flag_foc_read_id_current))
+  if ((ui8_motor_rotor_angle >= ANGLE_180) && (ui8_flag_foc_read_id_current))
   {
     ui8_flag_foc_read_id_current = 0;
 
@@ -675,14 +675,14 @@ void TIM1_CAP_COM_IRQHandler(void) __interrupt(TIM1_CAP_COM_IRQHANDLER)
 
   // set final duty_cycle value
   // phase A
-  TIM1->CCR1H = (uint8_t) (ui8_phase_b_voltage >> 7);
-  TIM1->CCR1L = (uint8_t) (ui8_phase_b_voltage << 1);
+  TIM1->CCR1H = (uint8_t) (ui8_phase_c_voltage >> 7);
+  TIM1->CCR1L = (uint8_t) (ui8_phase_c_voltage << 1);
   // phase B
-  TIM1->CCR2H = (uint8_t) (ui8_phase_a_voltage >> 7);
-  TIM1->CCR2L = (uint8_t) (ui8_phase_a_voltage << 1);
+  TIM1->CCR2H = (uint8_t) (ui8_phase_b_voltage >> 7);
+  TIM1->CCR2L = (uint8_t) (ui8_phase_b_voltage << 1);
   // phase C
-  TIM1->CCR3H = (uint8_t) (ui8_phase_c_voltage >> 7);
-  TIM1->CCR3L = (uint8_t) (ui8_phase_c_voltage << 1);
+  TIM1->CCR3H = (uint8_t) (ui8_phase_a_voltage >> 7);
+  TIM1->CCR3L = (uint8_t) (ui8_phase_a_voltage << 1);
 
   // enable PWM signals only when MOTOR_CONTROLLER_STATE_OK
   if (ui8_motor_controller_state == MOTOR_CONTROLLER_STATE_OK)
