@@ -301,8 +301,8 @@ uint8_t ui8_interpolation_angle = 0;
 uint8_t ui8_motor_commutation_type = BLOCK_COMMUTATION;
 volatile uint8_t ui8_motor_controller_state = MOTOR_CONTROLLER_STATE_OK;
 
-uint8_t ui8_hall_sensors = 0;
-uint8_t ui8_hall_sensors_last = 0;
+uint8_t ui8_hall_sensors_state = 0;
+uint8_t ui8_hall_sensors_state_last = 0;
 
 uint8_t ui8_adc_id_current = 0;
 
@@ -388,18 +388,19 @@ void TIM1_CAP_COM_IRQHandler(void) __interrupt(TIM1_CAP_COM_IRQHANDLER)
   // - calc motor speed in erps (ui16_motor_speed_erps)
 
   // read hall sensors signal pins and mask other pins
-  ui8_hall_sensors = ((uint8_t) HALL_SENSORS__PORT->IDR) & (HALL_SENSORS_MASK);
+  // hall sensors sequence: 3, 1, 5, 4, 6, 2
+  ui8_hall_sensors_state = ((uint8_t) HALL_SENSORS__PORT->IDR) & (HALL_SENSORS_MASK);
   // make sure we run next code only when there is a change on the hall sensors signal
-  if (ui8_hall_sensors != ui8_hall_sensors_last)
+  if (ui8_hall_sensors_state != ui8_hall_sensors_state_last)
   {
-    ui8_hall_sensors_last = ui8_hall_sensors;
+    ui8_hall_sensors_state_last = ui8_hall_sensors_state;
 
-    switch (ui8_hall_sensors)
+    switch (ui8_hall_sensors_state)
     {
       case 3:
       if (ui8_motor_commutation_type != SINEWAVE_INTERPOLATION_360_DEGREES)
       {
-	ui8_motor_rotor_absolute_angle = (uint8_t) ANGLE_180;
+	ui8_motor_rotor_absolute_angle = (uint8_t) ANGLE_150;
       }
       break;
 
@@ -449,23 +450,20 @@ void TIM1_CAP_COM_IRQHandler(void) __interrupt(TIM1_CAP_COM_IRQHANDLER)
 	}
       }
 
-      if (ui8_motor_commutation_type != SINEWAVE_INTERPOLATION_360_DEGREES)
-      {
-	ui8_motor_rotor_absolute_angle = (uint8_t) ANGLE_240;
-      }
+      ui8_motor_rotor_absolute_angle = (uint8_t) ANGLE_210;
       break;
 
       case 5:
       if (ui8_motor_commutation_type != SINEWAVE_INTERPOLATION_360_DEGREES)
       {
-	ui8_motor_rotor_absolute_angle = (uint8_t) ANGLE_300;
+	ui8_motor_rotor_absolute_angle = (uint8_t) ANGLE_270;
       }
       break;
 
       case 4:
       if (ui8_motor_commutation_type != SINEWAVE_INTERPOLATION_360_DEGREES)
       {
-	ui8_motor_rotor_absolute_angle = (uint8_t) ANGLE_1;
+	ui8_motor_rotor_absolute_angle = (uint8_t) ANGLE_330;
       }
       break;
 
@@ -475,14 +473,16 @@ void TIM1_CAP_COM_IRQHandler(void) __interrupt(TIM1_CAP_COM_IRQHANDLER)
 
       if (ui8_motor_commutation_type != SINEWAVE_INTERPOLATION_360_DEGREES)
       {
-	ui8_motor_rotor_absolute_angle = (uint8_t) ANGLE_60;
+	ui8_motor_rotor_absolute_angle = (uint8_t) ANGLE_30;
       }
       break;
 
+      // BEMF is always 90 degrees advanced over motor rotor position degree zero
+      // here, phase B BEMF is at max value (measured on osciloscope by rotating the motor), meaning we should put max of sinewave phase current aligned here also
       case 2:
       if (ui8_motor_commutation_type != SINEWAVE_INTERPOLATION_360_DEGREES)
       {
-	ui8_motor_rotor_absolute_angle = (uint8_t) ANGLE_120;
+	ui8_motor_rotor_absolute_angle = (uint8_t) ANGLE_90;
       }
       break;
 
@@ -511,7 +511,7 @@ void TIM1_CAP_COM_IRQHandler(void) __interrupt(TIM1_CAP_COM_IRQHANDLER)
     ui16_PWM_cycles_counter_total = 0xffff;
     ui8_angle_correction = 127;
     ui8_motor_commutation_type = BLOCK_COMMUTATION;
-    ui8_hall_sensors_last = 0; // this way we force execution of hall sensors code next time
+    ui8_hall_sensors_state_last = 0; // this way we force execution of hall sensors code next time
     ebike_app_cruise_control_stop ();
     if (ui8_ebike_app_state == EBIKE_APP_STATE_MOTOR_RUNNING) { ui8_ebike_app_state = EBIKE_APP_STATE_MOTOR_STOP; }
   }
