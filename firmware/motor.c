@@ -826,6 +826,9 @@ void TIM1_CAP_COM_IRQHandler(void) __interrupt(TIM1_CAP_COM_IRQHANDLER)
 	ui8_adc_target_battery_regen_current_max = ui8_adc_battery_current_offset; // disable ebrake/regen
       }
     }
+	  
+  #endif
+  }
 
     // limit min PAS cadence
     if (ui16_pas1_counter > ((uint16_t) PAS_ABSOLUTE_MIN_CADENCE_PWM_CYCLE_TICKS))
@@ -842,8 +845,7 @@ void TIM1_CAP_COM_IRQHandler(void) __interrupt(TIM1_CAP_COM_IRQHANDLER)
   }
 
   /****************************************************************************/
-#endif
-  }
+
 
   /****************************************************************************/
   // calc wheel speed sensor timming between each positive pulses, in PWM cycles ticks
