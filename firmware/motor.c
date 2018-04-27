@@ -559,16 +559,16 @@ void TIM1_CAP_COM_IRQHandler(void) __interrupt(TIM1_CAP_COM_IRQHANDLER)
       if (ui8_adc_id_current > ADC_PHASE_B_CURRENT_ZERO_AMPS_FOC_MAX)
       {
 	// limit min ui8_angle_correction value (127 - 15)
-	if ((ui8_angle_correction-1) > 112)
+	if ((ui8_angle_correction - 1) > 112)
 	{
 	  // decrease only when not regen!! other way ui8_angle_correction will always decrease... CAN WE IMPROVE THIS??
-	  if (UI8_ADC_BATTERY_CURRENT > (ui8_adc_battery_current_offset+2)) { ui8_angle_correction--; }
+	  if (UI8_ADC_BATTERY_CURRENT > (ui8_adc_battery_current_offset + 2)) { ui8_angle_correction--; }
 	}
       }
       else if (ui8_adc_id_current < ADC_PHASE_B_CURRENT_ZERO_AMPS_FOC_MIN)
       {
 	// limit max ui8_angle_correction value (127 + 15)
-	if ((ui8_angle_correction+1) < 143) { ui8_angle_correction++; }
+	if ((ui8_angle_correction + 1) < 143) { ui8_angle_correction++; }
       }
     }
   }
