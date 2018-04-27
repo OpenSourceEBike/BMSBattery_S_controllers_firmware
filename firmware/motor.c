@@ -398,15 +398,13 @@ void TIM1_CAP_COM_IRQHandler(void) __interrupt(TIM1_CAP_COM_IRQHANDLER)
     switch (ui8_hall_sensors_state)
     {
       case 3:
-debug_pin_set ();
       if (ui8_motor_commutation_type != SINEWAVE_INTERPOLATION_360_DEGREES)
       {
-	ui8_motor_rotor_absolute_angle = (uint8_t) ANGLE_330;
+	ui8_motor_rotor_absolute_angle = (uint8_t) ANGLE_210;
       }
       break;
 
       case 1:
-debug_pin_reset ();
       if (ui8_half_erps_flag == 1)
       {
 	ui8_half_erps_flag = 0;
@@ -453,14 +451,30 @@ debug_pin_reset ();
 	}
       }
 
-      ui8_motor_rotor_absolute_angle = (uint8_t) ANGLE_30;
+      ui8_motor_rotor_absolute_angle = (uint8_t) ANGLE_270;
+      break;
+
+      case 5:
+      ui8_flag_foc_read_id_current = 1;
+
+      if (ui8_motor_commutation_type != SINEWAVE_INTERPOLATION_360_DEGREES)
+      {
+	ui8_motor_rotor_absolute_angle = (uint8_t) ANGLE_330;
+      }
+      break;
+
+      case 4:
+      if (ui8_motor_commutation_type != SINEWAVE_INTERPOLATION_360_DEGREES)
+      {
+	ui8_motor_rotor_absolute_angle = (uint8_t) ANGLE_30;
+      }
       break;
 
       // BEMF is always 90 degrees advanced over motor rotor position degree zero
       // and here (hall sensor C blue wire, signal transition to positive),
       // phase B BEMF is at max value (measured on osciloscope by rotating the motor)
-      case 5:
-      ui8_flag_foc_read_id_current = 1;
+      case 6:
+      ui8_half_erps_flag = 1;
 
       if (ui8_motor_commutation_type != SINEWAVE_INTERPOLATION_360_DEGREES)
       {
@@ -468,26 +482,10 @@ debug_pin_reset ();
       }
       break;
 
-      case 4:
-      if (ui8_motor_commutation_type != SINEWAVE_INTERPOLATION_360_DEGREES)
-      {
-	ui8_motor_rotor_absolute_angle = (uint8_t) ANGLE_150;
-      }
-      break;
-
-      case 6:
-      ui8_half_erps_flag = 1;
-
-      if (ui8_motor_commutation_type != SINEWAVE_INTERPOLATION_360_DEGREES)
-      {
-	ui8_motor_rotor_absolute_angle = (uint8_t) ANGLE_210;
-      }
-      break;
-
       case 2:
       if (ui8_motor_commutation_type != SINEWAVE_INTERPOLATION_360_DEGREES)
       {
-	ui8_motor_rotor_absolute_angle = (uint8_t) ANGLE_270;
+	ui8_motor_rotor_absolute_angle = (uint8_t) ANGLE_150;
       }
       break;
 
