@@ -325,9 +325,9 @@ uint16_t ui16_duty_cycle_ramp_up_inverse_step;
 uint16_t ui16_duty_cycle_ramp_down_inverse_step;
 uint16_t ui16_counter_duty_cycle_ramp_up = 0;
 uint16_t ui16_counter_duty_cycle_ramp_down = 0;
-uint8_t ui8_value_a;
-uint8_t ui8_value_b;
-uint8_t ui8_value_c;
+uint8_t ui8_phase_a_voltage;
+uint8_t ui8_phase_b_voltage;
+uint8_t ui8_phase_c_voltage;
 uint16_t ui16_value;
 
 uint8_t ui8_first_time_run_flag = 1;
@@ -634,13 +634,13 @@ void TIM1_CAP_COM_IRQHandler(void) __interrupt(TIM1_CAP_COM_IRQHANDLER)
   {
     ui16_value = ((uint16_t) (ui8_temp - MIDDLE_PWM_DUTY_CYCLE_MAX)) * ui8_duty_cycle;
     ui8_temp = (uint8_t) (ui16_value >> 8);
-    ui8_value_a = MIDDLE_PWM_DUTY_CYCLE_MAX + ui8_temp;
+    ui8_phase_a_voltage = MIDDLE_PWM_DUTY_CYCLE_MAX + ui8_temp;
   }
   else
   {
     ui16_value = ((uint16_t) (MIDDLE_PWM_DUTY_CYCLE_MAX - ui8_temp)) * ui8_duty_cycle;
     ui8_temp = (uint8_t) (ui16_value >> 8);
-    ui8_value_a = MIDDLE_PWM_DUTY_CYCLE_MAX - ui8_temp;
+    ui8_phase_a_voltage = MIDDLE_PWM_DUTY_CYCLE_MAX - ui8_temp;
   }
 
   // add 120 degrees and limit
@@ -649,13 +649,13 @@ void TIM1_CAP_COM_IRQHandler(void) __interrupt(TIM1_CAP_COM_IRQHANDLER)
   {
     ui16_value = ((uint16_t) (ui8_temp - MIDDLE_PWM_DUTY_CYCLE_MAX)) * ui8_duty_cycle;
     ui8_temp = (uint8_t) (ui16_value >> 8);
-    ui8_value_b = MIDDLE_PWM_DUTY_CYCLE_MAX + ui8_temp;
+    ui8_phase_b_voltage = MIDDLE_PWM_DUTY_CYCLE_MAX + ui8_temp;
   }
   else
   {
     ui16_value = ((uint16_t) (MIDDLE_PWM_DUTY_CYCLE_MAX - ui8_temp)) * ui8_duty_cycle;
     ui8_temp = (uint8_t) (ui16_value >> 8);
-    ui8_value_b = MIDDLE_PWM_DUTY_CYCLE_MAX - ui8_temp;
+    ui8_phase_b_voltage = MIDDLE_PWM_DUTY_CYCLE_MAX - ui8_temp;
   }
 
   // subtract 120 degrees and limit
@@ -664,25 +664,25 @@ void TIM1_CAP_COM_IRQHandler(void) __interrupt(TIM1_CAP_COM_IRQHANDLER)
   {
     ui16_value = ((uint16_t) (ui8_temp - MIDDLE_PWM_DUTY_CYCLE_MAX)) * ui8_duty_cycle;
     ui8_temp = (uint8_t) (ui16_value >> 8);
-    ui8_value_c = MIDDLE_PWM_DUTY_CYCLE_MAX + ui8_temp;
+    ui8_phase_c_voltage = MIDDLE_PWM_DUTY_CYCLE_MAX + ui8_temp;
   }
   else
   {
     ui16_value = ((uint16_t) (MIDDLE_PWM_DUTY_CYCLE_MAX - ui8_temp)) * ui8_duty_cycle;
     ui8_temp = (uint8_t) (ui16_value >> 8);
-    ui8_value_c = MIDDLE_PWM_DUTY_CYCLE_MAX - ui8_temp;
+    ui8_phase_c_voltage = MIDDLE_PWM_DUTY_CYCLE_MAX - ui8_temp;
   }
 
   // set final duty_cycle value
   // phase A
-  TIM1->CCR1H = (uint8_t) (ui8_value_a >> 7);
-  TIM1->CCR1L = (uint8_t) (ui8_value_a << 1);
+  TIM1->CCR1H = (uint8_t) (ui8_phase_b_voltage >> 7);
+  TIM1->CCR1L = (uint8_t) (ui8_phase_b_voltage << 1);
   // phase B
-  TIM1->CCR2H = (uint8_t) (ui8_value_c >> 7);
-  TIM1->CCR2L = (uint8_t) (ui8_value_c << 1);
+  TIM1->CCR2H = (uint8_t) (ui8_phase_a_voltage >> 7);
+  TIM1->CCR2L = (uint8_t) (ui8_phase_a_voltage << 1);
   // phase C
-  TIM1->CCR3H = (uint8_t) (ui8_value_b >> 7);
-  TIM1->CCR3L = (uint8_t) (ui8_value_b << 1);
+  TIM1->CCR3H = (uint8_t) (ui8_phase_c_voltage >> 7);
+  TIM1->CCR3L = (uint8_t) (ui8_phase_c_voltage << 1);
 
   // enable PWM signals only when MOTOR_CONTROLLER_STATE_OK
   if (ui8_motor_controller_state == MOTOR_CONTROLLER_STATE_OK)
