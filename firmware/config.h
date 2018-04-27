@@ -6,8 +6,8 @@
  *  Author: casainho
  */
 
-#ifndef CONFIG_H_
-#define CONFIG_H_
+#ifndef _CONFIG_H_
+#define _CONFIG_H_
 
 #define EBIKE_THROTTLE_TYPE EBIKE_THROTTLE_TYPE_TORQUE_SENSOR
 #define EBIKE_THROTTLE_TYPE_THROTTLE_PAS_CURRENT_SPEED
@@ -35,4 +35,4 @@
 
 #define EBIKE_REGEN_EBRAKE_LIKE_COAST_BRAKES
 
-#endif /* CONFIG_H_ */
+#endif /* _CONFIG_H_ */

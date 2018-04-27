@@ -104,7 +104,7 @@
 // a value to much higher or lower will make the motor not having torque while the motor starting up.
 // This value can be tested with motor blocked, at startup, to found a value where is does have the best torque at startup
 // A value of MOTOR_ROTOR_OFFSET_ANGLE = 202 was found to be a good one for BMSBattery Q85 motor with S06S controller
-#define MOTOR_ROTOR_OFFSET_ANGLE 202
+#define MOTOR_ROTOR_OFFSET_ANGLE 0
 
 // This value at 127 is the default but a value a bit higher or lower my improve the controller efficiency
 // This value can be tested with motor running at medium speed, where it is already running with sinewave interpolation (not at startup)
