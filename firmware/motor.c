@@ -388,7 +388,7 @@ void TIM1_CAP_COM_IRQHandler(void) __interrupt(TIM1_CAP_COM_IRQHANDLER)
   // - calc motor speed in erps (ui16_motor_speed_erps)
 
   // read hall sensors signal pins and mask other pins
-  // hall sensors sequence: 3, 1, 5, 4, 6, 2
+  // hall sensors sequence with motor forward rotation: 4, 6, 2, 3, 1, 5
   ui8_hall_sensors_state = ((uint8_t) HALL_SENSORS__PORT->IDR) & (HALL_SENSORS_MASK);
   // make sure we run next code only when there is a change on the hall sensors signal
   if (ui8_hall_sensors_state != ui8_hall_sensors_state_last)
@@ -398,13 +398,15 @@ void TIM1_CAP_COM_IRQHandler(void) __interrupt(TIM1_CAP_COM_IRQHANDLER)
     switch (ui8_hall_sensors_state)
     {
       case 3:
+debug_pin_set ();
       if (ui8_motor_commutation_type != SINEWAVE_INTERPOLATION_360_DEGREES)
       {
-	ui8_motor_rotor_absolute_angle = (uint8_t) ANGLE_150;
+	ui8_motor_rotor_absolute_angle = (uint8_t) ANGLE_330;
       }
       break;
 
       case 1:
+debug_pin_reset ();
       if (ui8_half_erps_flag == 1)
       {
 	ui8_half_erps_flag = 0;
@@ -417,7 +419,7 @@ void TIM1_CAP_COM_IRQHandler(void) __interrupt(TIM1_CAP_COM_IRQHANDLER)
 	else { ui16_motor_speed_erps = ((uint16_t) PWM_CYCLES_SECOND); }
 
 	// update motor commutation state based on motor speed
-  #ifdef DO_SINEWAVE_INTERPOLATION_360_DEGREES
+#ifdef DO_SINEWAVE_INTERPOLATION_360_DEGREES
 	if (ui16_motor_speed_erps > MOTOR_ROTOR_ERPS_START_INTERPOLATION_360_DEGREES)
 	{
 	  if (ui8_motor_commutation_type == SINEWAVE_INTERPOLATION_60_DEGREES)
@@ -432,7 +434,7 @@ void TIM1_CAP_COM_IRQHandler(void) __interrupt(TIM1_CAP_COM_IRQHANDLER)
 	    ui8_motor_commutation_type = SINEWAVE_INTERPOLATION_60_DEGREES;
 	  }
 	}
-  #endif
+#endif
 	if (ui16_motor_speed_erps > MOTOR_ROTOR_ERPS_START_INTERPOLATION_60_DEGREES)
 	{
 	  if (ui8_motor_commutation_type == BLOCK_COMMUTATION)
@@ -451,20 +453,25 @@ void TIM1_CAP_COM_IRQHandler(void) __interrupt(TIM1_CAP_COM_IRQHANDLER)
 	}
       }
 
-      ui8_motor_rotor_absolute_angle = (uint8_t) ANGLE_210;
+      ui8_motor_rotor_absolute_angle = (uint8_t) ANGLE_30;
       break;
 
+      // BEMF is always 90 degrees advanced over motor rotor position degree zero
+      // and here (hall sensor C blue wire, signal transition to positive),
+      // phase B BEMF is at max value (measured on osciloscope by rotating the motor)
       case 5:
+      ui8_flag_foc_read_id_current = 1;
+
       if (ui8_motor_commutation_type != SINEWAVE_INTERPOLATION_360_DEGREES)
       {
-	ui8_motor_rotor_absolute_angle = (uint8_t) ANGLE_270;
+	ui8_motor_rotor_absolute_angle = (uint8_t) ANGLE_90;
       }
       break;
 
       case 4:
       if (ui8_motor_commutation_type != SINEWAVE_INTERPOLATION_360_DEGREES)
       {
-	ui8_motor_rotor_absolute_angle = (uint8_t) ANGLE_330;
+	ui8_motor_rotor_absolute_angle = (uint8_t) ANGLE_150;
       }
       break;
 
@@ -473,19 +480,14 @@ void TIM1_CAP_COM_IRQHandler(void) __interrupt(TIM1_CAP_COM_IRQHANDLER)
 
       if (ui8_motor_commutation_type != SINEWAVE_INTERPOLATION_360_DEGREES)
       {
-	ui8_motor_rotor_absolute_angle = (uint8_t) ANGLE_30;
+	ui8_motor_rotor_absolute_angle = (uint8_t) ANGLE_210;
       }
       break;
 
-      // BEMF is always 90 degrees advanced over motor rotor position degree zero
-      // and here (hall sensor C blue wire, signal transition to negative),
-      // phase B BEMF is at max value (measured on osciloscope by rotating the motor)
       case 2:
-      ui8_flag_foc_read_id_current = 1;
-
       if (ui8_motor_commutation_type != SINEWAVE_INTERPOLATION_360_DEGREES)
       {
-	ui8_motor_rotor_absolute_angle = (uint8_t) ANGLE_90;
+	ui8_motor_rotor_absolute_angle = (uint8_t) ANGLE_270;
       }
       break;
 
@@ -547,7 +549,7 @@ void TIM1_CAP_COM_IRQHandler(void) __interrupt(TIM1_CAP_COM_IRQHANDLER)
   }
 
   // make sure we just execute one time per ERPS, so use the flag ui8_flag_foc_read_id_current
-  if ((ui8_motor_rotor_angle >= ANGLE_180) && (ui8_flag_foc_read_id_current))
+  if ((ui8_motor_rotor_angle >= 127) && (ui8_flag_foc_read_id_current))
   {
     ui8_flag_foc_read_id_current = 0;
 
@@ -558,17 +560,22 @@ void TIM1_CAP_COM_IRQHandler(void) __interrupt(TIM1_CAP_COM_IRQHANDLER)
       ui8_adc_id_current = UI8_ADC_MOTOR_PHASE_B_CURRENT;
       if (ui8_adc_id_current > ADC_PHASE_B_CURRENT_ZERO_AMPS_FOC_MAX)
       {
-	// limit min ui8_angle_correction value (127 - 15)
-	if ((ui8_angle_correction - 1) > 112)
+	// limit max ui8_angle_correction value (127 + 15)
+	if ((ui8_angle_correction + 1) < 143)
 	{
-	  // decrease only when not regen!! other way ui8_angle_correction will always decrease... CAN WE IMPROVE THIS??
-	  if (UI8_ADC_BATTERY_CURRENT > (ui8_adc_battery_current_offset + 2)) { ui8_angle_correction--; }
+//	  ui8_angle_correction++;
 	}
       }
       else if (ui8_adc_id_current < ADC_PHASE_B_CURRENT_ZERO_AMPS_FOC_MIN)
       {
-	// limit max ui8_angle_correction value (127 + 15)
-	if ((ui8_angle_correction + 1) < 143) { ui8_angle_correction++; }
+	// limit min ui8_angle_correction value (127 - 15)
+	if ((ui8_angle_correction - 1) > 112)
+	{
+//	  ui8_angle_correction--;
+
+//	  // decrease only when not regen!! other way ui8_angle_correction will always decrease... CAN WE IMPROVE THIS??
+//	  if (UI8_ADC_BATTERY_CURRENT > (ui8_adc_battery_current_offset + 2)) { ui8_angle_correction--; }
+	}
       }
     }
   }
@@ -675,14 +682,14 @@ void TIM1_CAP_COM_IRQHandler(void) __interrupt(TIM1_CAP_COM_IRQHANDLER)
 
   // set final duty_cycle value
   // phase A
-  TIM1->CCR1H = (uint8_t) (ui8_phase_c_voltage >> 7);
-  TIM1->CCR1L = (uint8_t) (ui8_phase_c_voltage << 1);
+  TIM1->CCR1H = (uint8_t) (ui8_phase_a_voltage >> 7);
+  TIM1->CCR1L = (uint8_t) (ui8_phase_a_voltage << 1);
   // phase B
   TIM1->CCR2H = (uint8_t) (ui8_phase_b_voltage >> 7);
   TIM1->CCR2L = (uint8_t) (ui8_phase_b_voltage << 1);
   // phase C
-  TIM1->CCR3H = (uint8_t) (ui8_phase_a_voltage >> 7);
-  TIM1->CCR3L = (uint8_t) (ui8_phase_a_voltage << 1);
+  TIM1->CCR3H = (uint8_t) (ui8_phase_c_voltage >> 7);
+  TIM1->CCR3L = (uint8_t) (ui8_phase_c_voltage << 1);
 
   // enable PWM signals only when MOTOR_CONTROLLER_STATE_OK
   if (ui8_motor_controller_state == MOTOR_CONTROLLER_STATE_OK)
