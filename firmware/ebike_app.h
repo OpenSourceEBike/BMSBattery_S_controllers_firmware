@@ -38,7 +38,10 @@ typedef struct _lcd_configuration_variables
 } struct_lcd_configuration_variables;
 
 extern volatile uint16_t ui16_pas1_pwm_cycles_ticks;
+extern volatile uint16_t ui16_pas1_pwm_cycles_on_ticks;
 extern volatile uint8_t ui8_pas1_direction;
+extern uint8_t ui8_pas_flag;
+extern uint8_t PAS_act;
 
 extern volatile uint8_t ui8_ebike_app_state;
 
@@ -57,12 +60,15 @@ extern volatile uint8_t ui8_log_pi_battery_current_value;
 extern volatile uint8_t ui8_log_pi_battery_target_current_value;
 extern volatile uint8_t ui8_adc_battery_current_offset;
 
+extern uint8_t ui8_adc_throttle_offset;
+extern uint16_t ui16_adc_throttle_offset;
+
 void ebike_app_init (void);
 void ebike_app_controller (void);
 void ebike_app_cruise_control_stop (void);
 uint8_t ebike_app_get_adc_throttle_value_cruise_control (void);
 struct_lcd_configuration_variables *ebike_app_get_lcd_configuration_variables (void);
-uint8_t ebike_app_is_throttle_released (void);
+uint8_t ebike_app_throttle_is_released (void);
 uint8_t ui8_ebike_app_get_wheel_speed (void);
 void ebike_app_set_state (uint8_t ui8_state);
 void ebike_app_set_error (uint8_t error);

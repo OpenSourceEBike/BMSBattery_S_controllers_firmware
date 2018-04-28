@@ -21,7 +21,7 @@
 
 
 // *************************************************************************** //
-// THROOTLE
+// THROTTLE
 //
 // choose between throttle and/or pas or torque sensor
 #define EBIKE_THROTTLE_TYPE	EBIKE_THROTTLE_TYPE_THROTTLE_PAS
@@ -43,6 +43,8 @@
 #define PAS_NUMBER_MAGNETS	8
 #define PAS_MAX_CADENCE_RPM 	90
 
+#define PAS_THRESHOLD 1.7
+
 // if your motor accelerates while rotating backwards the pedals instead of rotating forward, select the other option
 #define PAS_DIRECTION PAS_DIRECTION_LEFT
 //#define PAS_DIRECTION PAS_DIRECTION_RIGHT
@@ -57,13 +59,13 @@
 
 // the firmware supports automatically both LCD3 and LCD5
 
-// you can tune LCD assist level values but to be safe, keep the original values
+// you can tune LCD assist level
 #define ASSIST_LEVEL_0	0.0
-#define ASSIST_LEVEL_1 	0.2
-#define ASSIST_LEVEL_2 	0.4
-#define ASSIST_LEVEL_3 	0.6
-#define ASSIST_LEVEL_4 	0.8
-#define ASSIST_LEVEL_5 	1.0
+#define ASSIST_LEVEL_1 	0.25
+#define ASSIST_LEVEL_2 	0.5
+#define ASSIST_LEVEL_3 	0.1
+#define ASSIST_LEVEL_4 	2.0
+#define ASSIST_LEVEL_5 	4.0
 // *************************************************************************** //
 
 
@@ -71,6 +73,7 @@
 // BATTERY
 // Choose your battery pack voltage
 
+// the cells number can be a custom value that the controller supports, like 8 for 8S battery pack
 #define BATTERY_LI_ION_CELLS_NUMBER	 7 // 7S = 24V battery pack
 //#define BATTERY_LI_ION_CELLS_NUMBER	10 // 10S = 36V battery pack
 //#define BATTERY_LI_ION_CELLS_NUMBER	13 // 13S = 48V battery pack

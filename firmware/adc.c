@@ -69,7 +69,6 @@ void adc_init (void)
     ui16_adc_battery_current_offset_10b += ui16_adc_read_battery_current_10b ();
   }
   ui16_adc_battery_current_offset_10b >>= 4;
-  ui16_adc_battery_current_offset_10b -= 4;
   ui8_adc_battery_current_offset = ui16_adc_battery_current_offset_10b >> 2;
 
   // read and average a few values of ADC motor current
@@ -82,8 +81,19 @@ void adc_init (void)
     ui16_adc_motor_current_offset += ui8_adc_read_motor_current ();
   }
   ui16_adc_motor_current_offset >>= 4;
-  ui16_adc_motor_current_offset -= 4;
   ui8_adc_motor_current_offset = ui16_adc_motor_current_offset;
+
+  // read and average a few values of ADC throttle
+  ui16_adc_throttle_offset = 0;
+  for (ui8_i = 0; ui8_i < 16; ui8_i++)
+  {
+    ui16_counter = TIM2_GetCounter () + 10; // delay ~10ms
+    adc_trigger ();
+    while (!ADC1_GetFlagStatus (ADC1_FLAG_EOC)) ; // wait for end of conversion
+    ui16_adc_throttle_offset += UI8_ADC_THROTTLE;
+  }
+  ui16_adc_throttle_offset >>= 4;
+  ui8_adc_throttle_offset = ui16_adc_throttle_offset;
 }
 
 void adc_trigger (void)
