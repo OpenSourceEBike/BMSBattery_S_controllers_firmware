@@ -380,7 +380,7 @@ void TIM1_CAP_COM_IRQHandler(void) __interrupt(TIM1_CAP_COM_IRQHANDLER)
   ADC1->CSR = 0x09; // clear EOC flag first (selected also channel 9)
   ADC1->CR1 |= ADC1_CR1_ADON; // start ADC1 conversion
   /****************************************************************************/
-
+#define MOTOR_ROTOR_OFFSET_ANGLE 0
   /****************************************************************************/
   // read hall sensor signals and:
   // - find the motor rotor absolute angle
@@ -634,7 +634,7 @@ void TIM1_CAP_COM_IRQHandler(void) __interrupt(TIM1_CAP_COM_IRQHANDLER)
   // calc final PWM duty_cycle values to be applied to TIMER1
 
   // scale and apply _duty_cycle
-  ui8_temp = ui8_svm_table [(uint8_t) (ui8_sinewave_table_index + 85 /* 120º */)];
+  ui8_temp = ui8_svm_table [ui8_sinewave_table_index];
   if (ui8_temp > MIDDLE_PWM_DUTY_CYCLE_MAX)
   {
     ui16_value = ((uint16_t) (ui8_temp - MIDDLE_PWM_DUTY_CYCLE_MAX)) * ui8_duty_cycle;
@@ -649,7 +649,7 @@ void TIM1_CAP_COM_IRQHandler(void) __interrupt(TIM1_CAP_COM_IRQHANDLER)
   }
 
   // add 120 degrees and limit
-  ui8_temp = ui8_svm_table [ui8_sinewave_table_index];
+  ui8_temp = ui8_svm_table [(uint8_t) (ui8_sinewave_table_index + 85 /* 120º */)];
   if (ui8_temp > MIDDLE_PWM_DUTY_CYCLE_MAX)
   {
     ui16_value = ((uint16_t) (ui8_temp - MIDDLE_PWM_DUTY_CYCLE_MAX)) * ui8_duty_cycle;
@@ -680,14 +680,14 @@ void TIM1_CAP_COM_IRQHandler(void) __interrupt(TIM1_CAP_COM_IRQHANDLER)
 
   // set final duty_cycle value
   // phase A
-  TIM1->CCR1H = (uint8_t) (ui8_phase_a_voltage >> 7);
-  TIM1->CCR1L = (uint8_t) (ui8_phase_a_voltage << 1);
+  TIM1->CCR3H = (uint8_t) (ui8_phase_a_voltage >> 7);
+  TIM1->CCR3L = (uint8_t) (ui8_phase_a_voltage << 1);
   // phase B
   TIM1->CCR2H = (uint8_t) (ui8_phase_b_voltage >> 7);
   TIM1->CCR2L = (uint8_t) (ui8_phase_b_voltage << 1);
   // phase C
-  TIM1->CCR3H = (uint8_t) (ui8_phase_c_voltage >> 7);
-  TIM1->CCR3L = (uint8_t) (ui8_phase_c_voltage << 1);
+  TIM1->CCR1H = (uint8_t) (ui8_phase_c_voltage >> 7);
+  TIM1->CCR1L = (uint8_t) (ui8_phase_c_voltage << 1);
 
   // enable PWM signals only when MOTOR_CONTROLLER_STATE_OK
   if (ui8_motor_controller_state == MOTOR_CONTROLLER_STATE_OK)
