@@ -82,7 +82,6 @@
 #define MOTOR_ROTOR_ANGLE_210 	(148 + MOTOR_ROTOR_OFFSET_ANGLE)
 #define MOTOR_ROTOR_ANGLE_270 	(191 + MOTOR_ROTOR_OFFSET_ANGLE)
 #define MOTOR_ROTOR_ANGLE_330 	(234 + MOTOR_ROTOR_OFFSET_ANGLE)
-#define ANGLE_180 		127
 
 #define MOTOR_OVER_SPEED_ERPS 520 // motor max speed, protection max value | 30 points for the sinewave at max speed
 

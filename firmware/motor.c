@@ -295,7 +295,8 @@ uint8_t ui8_sinewave_table_index = 0;
 uint8_t ui8_motor_rotor_absolute_angle;
 uint8_t ui8_motor_rotor_angle;
 uint8_t ui8_flag_foc_read_id_current = 0;
-volatile uint8_t ui8_angle_correction = 127;
+#define START_ANGLE_CORRECTION 127
+volatile uint8_t ui8_angle_correction = START_ANGLE_CORRECTION;
 uint8_t ui8_interpolation_angle = 0;
 
 uint8_t ui8_motor_commutation_type = BLOCK_COMMUTATION;
@@ -446,7 +447,7 @@ void TIM1_CAP_COM_IRQHandler(void) __interrupt(TIM1_CAP_COM_IRQHANDLER)
 	  if (ui8_motor_commutation_type == SINEWAVE_INTERPOLATION_60_DEGREES)
 	  {
 	    ui8_motor_commutation_type = BLOCK_COMMUTATION;
-	    ui8_angle_correction = 127;
+	    ui8_angle_correction = START_ANGLE_CORRECTION;
 	  }
 	}
       }
