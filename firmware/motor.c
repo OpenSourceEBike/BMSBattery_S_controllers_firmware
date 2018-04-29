@@ -295,7 +295,23 @@ uint8_t ui8_sinewave_table_index = 0;
 uint8_t ui8_motor_rotor_absolute_angle;
 uint8_t ui8_motor_rotor_angle;
 uint8_t ui8_flag_foc_read_id_current = 0;
-#define START_ANGLE_CORRECTION 127
+//#define START_ANGLE_CORRECTION 0 // motor rotates backwards
+//#define START_ANGLE_CORRECTION 127 // no torque
+//#define START_ANGLE_CORRECTION 147 // ok!! 13.9km
+//#define START_ANGLE_CORRECTION 127 // sem força
+//#define START_ANGLE_CORRECTION 107 // consome  corrent mas não puxa
+//#define START_ANGLE_CORRECTION 152 // ok 17.3 km THE STRONG: 127 + 21 (30 degrees)
+//#define START_ANGLE_CORRECTION 157 // ok 19.5 km
+//#define START_ANGLE_CORRECTION 158 // ok 20.3
+//#define START_ANGLE_CORRECTION 160 // ok 20.7 but makes some noises with wheel blocked
+//#define START_ANGLE_CORRECTION 162 // ok 20.3
+//#define START_ANGLE_CORRECTION 167 // ok 19.3
+//#define START_ANGLE_CORRECTION 172 // ok 19.3
+//#define START_ANGLE_CORRECTION 177 // ok 17.7 less strong and makes some noises with wheel blocked
+//#define START_ANGLE_CORRECTION 160 // ok 20.7
+
+#define START_ANGLE_CORRECTION 0 // ok 20.7 STRONG
+
 volatile uint8_t ui8_angle_correction = START_ANGLE_CORRECTION;
 uint8_t ui8_interpolation_angle = 0;
 
@@ -513,7 +529,7 @@ void TIM1_CAP_COM_IRQHandler(void) __interrupt(TIM1_CAP_COM_IRQHANDLER)
     ui8_half_erps_flag = 0;
     ui16_motor_speed_erps = 0;
     ui16_PWM_cycles_counter_total = 0xffff;
-    ui8_angle_correction = 127;
+    ui8_angle_correction = START_ANGLE_CORRECTION;
     ui8_motor_commutation_type = BLOCK_COMMUTATION;
     ui8_hall_sensors_state_last = 0; // this way we force execution of hall sensors code next time
     ebike_app_cruise_control_stop ();
@@ -525,53 +541,53 @@ void TIM1_CAP_COM_IRQHandler(void) __interrupt(TIM1_CAP_COM_IRQHANDLER)
   // - calc interpolation angle and sinewave table index
   // - read FOC Id current and ajust ui8_angle_correction
 #define DO_INTERPOLATION 1 // may be usefull to disable interpolation when debugging
-#if DO_INTERPOLATION == 1
-  // calculate the interpolation angle (and it doesn't work when motor starts and at very low speeds)
-  if (ui8_motor_commutation_type == SINEWAVE_INTERPOLATION_60_DEGREES)
-  {
-    // division by 0: ui16_PWM_cycles_counter_total should never be 0
-    // TODO: verifiy if (ui16_PWM_cycles_counter_6 << 8) do not overflow
-    ui8_interpolation_angle = (ui16_PWM_cycles_counter_6 << 8) / ui16_PWM_cycles_counter_total; // this operations take 4.4us
-    ui8_motor_rotor_angle = ui8_motor_rotor_absolute_angle + ui8_interpolation_angle;
-    ui8_sinewave_table_index = ui8_motor_rotor_angle + ui8_angle_correction;
-  }
-  else if (ui8_motor_commutation_type == SINEWAVE_INTERPOLATION_360_DEGREES)
-  {
-    ui8_interpolation_angle = (ui16_PWM_cycles_counter << 8) / ui16_PWM_cycles_counter_total;
-    ui8_motor_rotor_angle = ui8_motor_rotor_absolute_angle + ui8_interpolation_angle;
-    ui8_sinewave_table_index = ui8_motor_rotor_angle + ui8_angle_correction;
-  }
-  else
-#endif
-  {
+//#if DO_INTERPOLATION == 1
+//  // calculate the interpolation angle (and it doesn't work when motor starts and at very low speeds)
+//  if (ui8_motor_commutation_type == SINEWAVE_INTERPOLATION_60_DEGREES)
+//  {
+//    // division by 0: ui16_PWM_cycles_counter_total should never be 0
+//    // TODO: verifiy if (ui16_PWM_cycles_counter_6 << 8) do not overflow
+//    ui8_interpolation_angle = (ui16_PWM_cycles_counter_6 << 8) / ui16_PWM_cycles_counter_total; // this operations take 4.4us
+//    ui8_motor_rotor_angle = ui8_motor_rotor_absolute_angle + ui8_interpolation_angle;
+//    ui8_sinewave_table_index = ui8_motor_rotor_angle + ui8_angle_correction;
+//  }
+//  else if (ui8_motor_commutation_type == SINEWAVE_INTERPOLATION_360_DEGREES)
+//  {
+//    ui8_interpolation_angle = (ui16_PWM_cycles_counter << 8) / ui16_PWM_cycles_counter_total;
+//    ui8_motor_rotor_angle = ui8_motor_rotor_absolute_angle + ui8_interpolation_angle;
+//    ui8_sinewave_table_index = ui8_motor_rotor_angle + ui8_angle_correction;
+//  }
+//  else
+//#endif
+//  {
     ui8_sinewave_table_index = ui8_motor_rotor_absolute_angle + ui8_angle_correction;
-  }
+//  }
 
   // make sure we just execute one time per ERPS, so use the flag ui8_flag_foc_read_id_current
-  if ((ui8_motor_rotor_angle >= ANGLE_180) && (ui8_flag_foc_read_id_current))
+  if ((ui8_motor_rotor_angle >= MOTOR_ROTOR_ANGLE_180) && (ui8_flag_foc_read_id_current))
   {
     ui8_flag_foc_read_id_current = 0;
 
-    // minimum speed to do FOC
-    if (ui16_motor_speed_erps > MOTOR_ROTOR_ERPS_START_INTERPOLATION_60_DEGREES)
-    {
-      // read here the phase B current: FOC Id current
-      ui8_adc_id_current = UI8_ADC_MOTOR_PHASE_B_CURRENT;
-      if (ui8_adc_id_current > ADC_PHASE_B_CURRENT_ZERO_AMPS_FOC_MAX)
-      {
-	// limit max ui8_angle_correction value (127 + 15)
-	if ((ui8_angle_correction + 1) < 143) { ui8_angle_correction--; }
-      }
-      else if (ui8_adc_id_current < ADC_PHASE_B_CURRENT_ZERO_AMPS_FOC_MIN)
-      {
-	// limit min ui8_angle_correction value (127 - 15)
-	if ((ui8_angle_correction - 1) > 112)
-	{
-	  // decrease only when not regen!! other way ui8_angle_correction will always decrease... CAN WE IMPROVE THIS??
-	  if (UI8_ADC_BATTERY_CURRENT > (ui8_adc_battery_current_offset + 2)) { ui8_angle_correction++; }
-	}
-      }
-    }
+//    // minimum speed to do FOC
+//    if (ui16_motor_speed_erps > MOTOR_ROTOR_ERPS_START_INTERPOLATION_60_DEGREES)
+//    {
+//      // read here the phase B current: FOC Id current
+//      ui8_adc_id_current = UI8_ADC_MOTOR_PHASE_B_CURRENT;
+//      if (ui8_adc_id_current > ADC_PHASE_B_CURRENT_ZERO_AMPS_FOC_MAX)
+//      {
+//	// limit max ui8_angle_correction value (127 + 15)
+//	if ((ui8_angle_correction + 1) < 143) { ui8_angle_correction--; }
+//      }
+//      else if (ui8_adc_id_current < ADC_PHASE_B_CURRENT_ZERO_AMPS_FOC_MIN)
+//      {
+//	// limit min ui8_angle_correction value (127 - 15)
+//	if ((ui8_angle_correction - 1) > 112)
+//	{
+//	  // decrease only when not regen!! other way ui8_angle_correction will always decrease... CAN WE IMPROVE THIS??
+//	  if (UI8_ADC_BATTERY_CURRENT > (ui8_adc_battery_current_offset + 2)) { ui8_angle_correction++; }
+//	}
+//      }
+//    }
   }
   /****************************************************************************/
 
