@@ -779,13 +779,17 @@ void ebike_throttle_type_throttle_pas (void)
   ui8_temp = ui8_max (ui8_throttle_value_filtered, ui8_temp); // use the max value from throttle or pas cadence
 #endif
 
-  f_temp = (float) (((float) ui8_temp) * f_get_assist_level ());
+  f_temp = ((float) ui8_temp) * f_get_assist_level ();
+  if (f_temp > 255) { f_temp = 255; }
 
 #if !defined(EBIKE_THROTTLE_TYPE_THROTTLE_PAS_ASSIST_LEVEL_PAS_ONLY)
-  ui8_throttle_pas_target_value = (uint8_t) f_temp;
+  ui8_temp = (uint8_t) f_temp;
 #else
   ui8_temp = ui8_max (ui8_throttle_value_filtered, (uint8_t) f_temp); // use the max value from throttle or (pas cadence * assist level)
 #endif
+
+  // if assist level is 0, keep at zero the final value
+  if (f_get_assist_level () < 0.01) { ui8_temp = 0; }
 
   ui8_target_current = (uint16_t) (map ((uint32_t) ui8_temp,
 			   (uint32_t) 0, // min input value
@@ -849,6 +853,9 @@ void ebike_throttle_type_torque_sensor (void)
 #else
   ui8_temp = (uint8_t) f_temp;
 #endif
+
+  // if assist level is 0, keep at zero the final value
+  if (f_get_assist_level () < 0.01) { ui8_temp = 0; }
 
 #if defined (EBIKE_REGEN_EBRAKE_LIKE_COAST_BRAKES)
   // if user is applying torque on torque sensor, means he doesn't want to brake anymore
