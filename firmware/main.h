@@ -60,7 +60,7 @@
 #if defined (DO_SINEWAVE_INTERPOLATION_360_DEGREES)
 // This value is ERPS speed after which a transition happens from sinewave 60 degrees to have
 // interpolation 360 degrees and must be found experimentally but a value of 100 may be good
-#define MOTOR_ROTOR_ERPS_START_INTERPOLATION_360_DEGREES 100
+#define MOTOR_ROTOR_ERPS_START_INTERPOLATION_360_DEGREES 150
 #endif
 
 #if MOTOR_TYPE == MOTOR_TYPE_Q85
@@ -75,16 +75,13 @@
 #define PWM_DUTY_CYCLE_MIN 20
 #define MIDDLE_PWM_DUTY_CYCLE_MAX (PWM_DUTY_CYCLE_MAX/2)
 
-#define ANGLE_1 	(0   + MOTOR_ROTOR_OFFSET_ANGLE)
-#define ANGLE_60 	(42  + MOTOR_ROTOR_OFFSET_ANGLE)
-#define ANGLE_120 	(85  + MOTOR_ROTOR_OFFSET_ANGLE)
-#define ANGLE_180 	(127 + MOTOR_ROTOR_OFFSET_ANGLE)
-#define ANGLE_240 	(170 + MOTOR_ROTOR_OFFSET_ANGLE)
-#define ANGLE_300 	(212 + MOTOR_ROTOR_OFFSET_ANGLE)
-#define ANGLE_360 	(255 + MOTOR_ROTOR_OFFSET_ANGLE)
-
-// angle offset to make the FOC read Id current at 127 as default, just to be easier for the user when customizing
-#define FOC_READ_ID_CURRENT_OFFSET (127 - ((uint8_t) ANGLE_180))
+#define MOTOR_ROTOR_ANGLE_30 	(20  + MOTOR_ROTOR_OFFSET_ANGLE)
+#define MOTOR_ROTOR_ANGLE_90 	(63  + MOTOR_ROTOR_OFFSET_ANGLE)
+#define MOTOR_ROTOR_ANGLE_150 	(106 + MOTOR_ROTOR_OFFSET_ANGLE)
+#define MOTOR_ROTOR_ANGLE_180 	(127 + MOTOR_ROTOR_OFFSET_ANGLE)
+#define MOTOR_ROTOR_ANGLE_210 	(148 + MOTOR_ROTOR_OFFSET_ANGLE)
+#define MOTOR_ROTOR_ANGLE_270 	(191 + MOTOR_ROTOR_OFFSET_ANGLE)
+#define MOTOR_ROTOR_ANGLE_330 	(234 + MOTOR_ROTOR_OFFSET_ANGLE)
 
 #define MOTOR_OVER_SPEED_ERPS 520 // motor max speed, protection max value | 30 points for the sinewave at max speed
 

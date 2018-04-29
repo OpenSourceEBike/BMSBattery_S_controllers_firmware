@@ -106,8 +106,8 @@
 #define WHEEL_SPEED_SENSOR__PIN   GPIO_PIN_5
 #define WHEEL_SPEED_SENSOR__PORT  GPIOC
 
-#define DEBUG__PIN                GPIO_PIN_2
-#define DEBUG__PORT               GPIOD
+#define DEBUG__PIN                GPIO_PIN_7
+#define DEBUG__PORT               GPIOC
 
 
 void gpio_init (void);

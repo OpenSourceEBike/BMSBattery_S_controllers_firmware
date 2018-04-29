@@ -49,7 +49,7 @@
 #define PAS_DIRECTION PAS_DIRECTION_LEFT
 //#define PAS_DIRECTION PAS_DIRECTION_RIGHT
 
-// this is an advsanced feature, please read bout it here:
+// this is an advanced feature, please read bout it here:
 // https://opensourceebikefirmware.bitbucket.io/development/Various--2017.12.01_-_Regen_ebrake_like_coast_brakes.html
 //#define EBIKE_REGEN_EBRAKE_LIKE_COAST_BRAKES
 // *************************************************************************** //
@@ -103,22 +103,13 @@
 
 // Choose some parameters for your motor (if you don't know, just keep the following original values because they should work ok)
 //
-// This value must be found experimenting. Motor should rotate forward and have a good torque,
-// a value to much higher or lower will make the motor not having torque while the motor starting up.
-// This value can be tested with motor blocked, at startup, to found a value where is does have the best torque at startup
-// A value of MOTOR_ROTOR_OFFSET_ANGLE = 202 was found to be a good one for BMSBattery Q85 motor with S06S controller
-#define MOTOR_ROTOR_OFFSET_ANGLE 202
-
-// This value at 127 is the default but a value a bit higher or lower my improve the controller efficiency
-// This value can be tested with motor running at medium speed, where it is already running with sinewave interpolation (not at startup)
-// A way to test: put the motor with the same mechanical load (like on a bike training roller) and with a constant speed
-// changing this value will make the motor to need more or less current to mantain the same speed -- adjust to use the least current possible
-// A value of FOC_READ_ID_CURRENT_ANGLE_ADJUST = 137 was found to be a good one for BMSBattery Q85 motor with S06S controller
-#define FOC_READ_ID_CURRENT_ANGLE_ADJUST 137
+// This value should be near 0. When measured with an oscilloscope, for a Q85 motor, the offset is -5 which probably will
+// not make  any big difference im terms of efficiency
+#define MOTOR_ROTOR_OFFSET_ANGLE 0
 
 // This value is ERPS speed after which a transition happens from sinewave no interpolation to have
-// interpolation 60 degrees and must be found experimentally but a value of 40 may be good
-#define MOTOR_ROTOR_ERPS_START_INTERPOLATION_60_DEGREES 15
+// interpolation 60 degrees and must be found experimentally but a value of 30 may be good
+#define MOTOR_ROTOR_ERPS_START_INTERPOLATION_60_DEGREES 30
 
 // For some motors with not very well placed mosfets at 120 degrees between each of them. May be easier to keep this option disabled
 //#define DO_SINEWAVE_INTERPOLATION_360_DEGREES
