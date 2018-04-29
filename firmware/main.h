@@ -60,7 +60,7 @@
 #if defined (DO_SINEWAVE_INTERPOLATION_360_DEGREES)
 // This value is ERPS speed after which a transition happens from sinewave 60 degrees to have
 // interpolation 360 degrees and must be found experimentally but a value of 100 may be good
-#define MOTOR_ROTOR_ERPS_START_INTERPOLATION_360_DEGREES 100
+#define MOTOR_ROTOR_ERPS_START_INTERPOLATION_360_DEGREES 150
 #endif
 
 #if MOTOR_TYPE == MOTOR_TYPE_Q85
