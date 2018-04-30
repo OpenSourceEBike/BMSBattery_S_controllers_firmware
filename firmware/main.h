@@ -54,8 +54,6 @@
 // RMS value --> max value * 0.707
 #define ADC_PHASE_B_CURRENT_ZERO_AMPS_FOC_MAX 127 // for phase B current sensor that outputs 2.5V at zero amps (ACS711)
 #define ADC_PHASE_B_CURRENT_ZERO_AMPS_FOC_MIN 125 // for phase B current sensor that outputs 2.5V at zero amps (ACS711)
-//#define ADC_PHASE_B_CURRENT_ZERO_AMPS_FOC_MAX 102 // for phase B current sensor that outputs 2.0V at zero amps (ACS712)
-//#define ADC_PHASE_B_CURRENT_ZERO_AMPS_FOC_MIN 100 // for phase B current sensor that outputs 2.0V at zero amps (ACS712)
 
 #if defined (DO_SINEWAVE_INTERPOLATION_360_DEGREES)
 // This value is ERPS speed after which a transition happens from sinewave 60 degrees to have
@@ -101,10 +99,18 @@
 
 // Possible values: 0, 1, 2, 3, 4, 5, 6
 // 0 equal to no filtering and no delay, higher values will increase filtering but will also add bigger delay
-#define THROTTLE_FILTER_COEFFICIENT 3
-#define ADC_THROTTLE_THRESHOLD 		4
+#define THROTTLE_FILTER_COEFFICIENT 		1
+#define ADC_THROTTLE_THRESHOLD 			4 // value in ADC 8 bits step
 
-#define CRUISE_CONTROL_MIN 20
+#define CRUISE_CONTROL_MIN 			20
+
+// Max voltage value for throttle and torque sensor signals, in ADC 8 bits step
+// each ADC 8 bits step = (5V / 256) = 0.0195
+#if (EBIKE_THROTTLE_TYPE == EBIKE_THROTTLE_TYPE_THROTTLE_PAS)
+#define ADC_THROTTLE_MAX_VALUE 229
+#elif (EBIKE_THROTTLE_TYPE == EBIKE_THROTTLE_TYPE_TORQUE_SENSOR)
+#define ADC_THROTTLE_MAX_VALUE 183
+#endif
 
 // *************************************************************************** //
 // PAS

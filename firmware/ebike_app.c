@@ -941,6 +941,14 @@ void throttle_read (void)
 
   throttle_value_remove_offset (&ui8_throttle_value);
 
+  // map throttle value from 0 up to 255
+  ui8_throttle_value = (uint8_t) (map (
+      ui8_throttle_value,
+      (uint8_t) 0,
+      (uint8_t) ADC_THROTTLE_MAX_VALUE,
+      (uint8_t) 0,
+      (uint8_t) 255));
+
   // low pass filter the torque sensor to smooth the signal
   ui16_throttle_value_accumulated -= ui16_throttle_value_accumulated >> THROTTLE_FILTER_COEFFICIENT;
   ui16_throttle_value_accumulated += ((uint16_t) ui8_throttle_value);
