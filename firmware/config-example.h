@@ -78,8 +78,19 @@
 //#define BATTERY_LI_ION_CELLS_NUMBER	10 // 10S = 36V battery pack
 //#define BATTERY_LI_ION_CELLS_NUMBER	13 // 13S = 48V battery pack
 
-#define ADC_BATTERY_CURRENT_MAX		10 // each unit = 0.35A
+#define ADC_BATTERY_CURRENT_MAX		42 // each unit = 0.35A | in this example, 42 * 0.35 ~= 15 amps
 #define ADC_BATTERY_REGEN_CURRENT_MAX	5 // CAN'T be more than 66 units!! each unit = 0.35A
+
+// Considering the follow voltage values for each li-ion battery cell
+// State of charge 		| voltage
+#define LI_ION_CELL_VOLTS_MAX 		4.25 // this value is used to protect battery from overcharge on regeneration mode, mainly for direct drive motors
+#define LI_ION_CELL_VOLTS_100 		4.06 // this value is used to help finding the battery SOC
+#define LI_ION_CELL_VOLTS_80 		3.93 // this value is used to help finding the battery SOC
+#define LI_ION_CELL_VOLTS_60 		3.78 // this value is used to help finding the battery SOC
+#define LI_ION_CELL_VOLTS_40 		3.60 // this value is used to help finding the battery SOC
+#define LI_ION_CELL_VOLTS_20 		3.38 // this value is used to help finding the battery SOC
+#define LI_ION_CELL_VOLTS_10 		3.25 // this value is used to help finding the battery SOC
+#define LI_ION_CELL_VOLTS_0 		3.00 // this value is used to help finding the battery SOC and is the minimum value after which the firmware don't ask more current to battery, to run the motor
 // *************************************************************************** //
 
 // *************************************************************************** //
