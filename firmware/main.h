@@ -73,7 +73,7 @@
 #define PWM_DUTY_CYCLE_MIN 20
 #define MIDDLE_PWM_DUTY_CYCLE_MAX (PWM_DUTY_CYCLE_MAX/2)
 
-#define MOTOR_ROTOR_ANGLE_30 	(20  + MOTOR_ROTOR_OFFSET_ANGLE)
+#define MOTOR_ROTOR_ANGLE_30 	(21  + MOTOR_ROTOR_OFFSET_ANGLE)
 #define MOTOR_ROTOR_ANGLE_90 	(63  + MOTOR_ROTOR_OFFSET_ANGLE)
 #define MOTOR_ROTOR_ANGLE_150 	(106 + MOTOR_ROTOR_OFFSET_ANGLE)
 #define MOTOR_ROTOR_ANGLE_180 	(127 + MOTOR_ROTOR_OFFSET_ANGLE)
@@ -81,7 +81,7 @@
 #define MOTOR_ROTOR_ANGLE_270 	(191 + MOTOR_ROTOR_OFFSET_ANGLE)
 #define MOTOR_ROTOR_ANGLE_330 	(234 + MOTOR_ROTOR_OFFSET_ANGLE)
 
-#define STARTUP_ADVANCE_ANGLE 21 // 21 --> 30 degrees is neededso the motor has best torque at startup
+#define STARTUP_ADVANCE_ANGLE 0 //20 // 63 --> 90 degrees is needed so the motor has best torque at startup!!
 
 #define MOTOR_OVER_SPEED_ERPS 520 // motor max speed, protection max value | 30 points for the sinewave at max speed
 

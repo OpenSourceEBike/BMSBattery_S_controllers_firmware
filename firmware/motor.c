@@ -358,6 +358,11 @@ uint16_t ui16_wheel_speed_sensor_counter = 0;
 
 uint8_t ui8_pwm_duty_cycle_duty_cycle_controller;
 
+// Measures did with a 24V Q85 328 RPM motor, rotating motor backwards by hand:
+// Hall sensor A positivie to negative transition | BEMF phase B at max value / top of sinewave
+// Hall sensor B positivie to negative transition | BEMF phase A at max value / top of sinewave
+// Hall sensor C positive to negative transition | BEMF phase C at max value / top of sinewave
+
 // runs every 64us (PWM frequency)
 void TIM1_CAP_COM_IRQHandler(void) __interrupt(TIM1_CAP_COM_IRQHANDLER)
 {
@@ -398,10 +403,13 @@ void TIM1_CAP_COM_IRQHandler(void) __interrupt(TIM1_CAP_COM_IRQHANDLER)
 
     switch (ui8_hall_sensors_state)
     {
+      // BEMF is always 90 degrees advanced over motor rotor position degree zero
+      // and here (hall sensor C blue wire, signal transition to negative),
+      // phase B BEMF is at max value (measured on osciloscope by rotating the motor)
       case 3:
       if (ui8_motor_commutation_type != SINEWAVE_INTERPOLATION_360_DEGREES)
       {
-	ui8_motor_rotor_absolute_angle = (uint8_t) MOTOR_ROTOR_ANGLE_150;
+	ui8_motor_rotor_absolute_angle = (uint8_t) MOTOR_ROTOR_ANGLE_90;
       }
       break;
 
@@ -452,40 +460,38 @@ void TIM1_CAP_COM_IRQHandler(void) __interrupt(TIM1_CAP_COM_IRQHANDLER)
 	}
       }
 
-      ui8_motor_rotor_absolute_angle = (uint8_t) MOTOR_ROTOR_ANGLE_210;
+      ui8_motor_rotor_absolute_angle = (uint8_t) MOTOR_ROTOR_ANGLE_150;
       break;
 
       case 5:
       if (ui8_motor_commutation_type != SINEWAVE_INTERPOLATION_360_DEGREES)
       {
-	ui8_motor_rotor_absolute_angle = (uint8_t) MOTOR_ROTOR_ANGLE_270;
+	ui8_motor_rotor_absolute_angle = (uint8_t) MOTOR_ROTOR_ANGLE_210;
       }
       break;
 
       case 4:
       if (ui8_motor_commutation_type != SINEWAVE_INTERPOLATION_360_DEGREES)
       {
-	ui8_motor_rotor_absolute_angle = (uint8_t) MOTOR_ROTOR_ANGLE_330;
+	ui8_motor_rotor_absolute_angle = (uint8_t) MOTOR_ROTOR_ANGLE_270;
       }
       break;
 
       case 6:
       ui8_half_erps_flag = 1;
+
+      if (ui8_motor_commutation_type != SINEWAVE_INTERPOLATION_360_DEGREES)
+      {
+	ui8_motor_rotor_absolute_angle = (uint8_t) MOTOR_ROTOR_ANGLE_330;
+      }
+      break;
+
+      case 2:
       ui8_flag_foc_read_id_current = 1;
 
       if (ui8_motor_commutation_type != SINEWAVE_INTERPOLATION_360_DEGREES)
       {
 	ui8_motor_rotor_absolute_angle = (uint8_t) MOTOR_ROTOR_ANGLE_30;
-      }
-      break;
-
-      // BEMF is always 90 degrees advanced over motor rotor position degree zero
-      // and here (hall sensor C blue wire, signal transition to positive),
-      // phase B BEMF is at max value (measured on osciloscope by rotating the motor)
-      case 2:
-      if (ui8_motor_commutation_type != SINEWAVE_INTERPOLATION_360_DEGREES)
-      {
-	ui8_motor_rotor_absolute_angle = (uint8_t) MOTOR_ROTOR_ANGLE_90;
       }
       break;
 
@@ -549,8 +555,9 @@ void TIM1_CAP_COM_IRQHandler(void) __interrupt(TIM1_CAP_COM_IRQHANDLER)
   if (ui8_motor_commutation_type != BLOCK_COMMUTATION)
   {
     // make sure we just execute one time per ERPS, so use the flag ui8_flag_foc_read_id_current
-    if ((ui8_motor_rotor_angle >= MOTOR_ROTOR_ANGLE_30) && (ui8_flag_foc_read_id_current))
+    if ((ui8_motor_rotor_angle >= MOTOR_ROTOR_ANGLE_180) && (ui8_flag_foc_read_id_current))
     {
+debug_pin_set ();
       ui8_flag_foc_read_id_current = 0;
 
       // minimum speed to do FOC
@@ -562,7 +569,7 @@ void TIM1_CAP_COM_IRQHandler(void) __interrupt(TIM1_CAP_COM_IRQHANDLER)
         if (ui8_adc_id_current > ADC_PHASE_B_CURRENT_ZERO_AMPS_FOC_MAX)
         {
 	  // limit max ui8_angle_correction value (127 + 31) // +90 degrees
-	  if ((ui8_temp + 1) < 158) { ui8_angle_correction--; } { ui8_angle_correction--; }
+	  if ((ui8_temp + 1) < 158) { ui8_angle_correction--; } { ui8_angle_correction++; }
         }
         else if (ui8_adc_id_current < ADC_PHASE_B_CURRENT_ZERO_AMPS_FOC_MIN)
         {
@@ -570,10 +577,11 @@ void TIM1_CAP_COM_IRQHandler(void) __interrupt(TIM1_CAP_COM_IRQHANDLER)
 	  if ((ui8_temp - 1) > 96)
 	  {
 	    // decrease only when not regen!! other way ui8_angle_correction will always decrease... CAN WE IMPROVE THIS??
-	    if (UI8_ADC_BATTERY_CURRENT > (ui8_adc_battery_current_offset + 2)) { ui8_angle_correction++; }
+	    if (UI8_ADC_BATTERY_CURRENT > (ui8_adc_battery_current_offset + 2)) { ui8_angle_correction--; }
 	  }
         }
       }
+debug_pin_reset ();
     }
   }
   /****************************************************************************/
