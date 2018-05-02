@@ -557,7 +557,7 @@ void TIM1_CAP_COM_IRQHandler(void) __interrupt(TIM1_CAP_COM_IRQHANDLER)
     // make sure we just execute one time per ERPS, so use the flag ui8_flag_foc_read_id_current
     if ((ui8_motor_rotor_angle >= MOTOR_ROTOR_ANGLE_180) && (ui8_flag_foc_read_id_current))
     {
-debug_pin_set ();
+//debug_pin_set ();
       ui8_flag_foc_read_id_current = 0;
 
       // minimum speed to do FOC
@@ -569,19 +569,20 @@ debug_pin_set ();
         if (ui8_adc_id_current > ADC_PHASE_B_CURRENT_ZERO_AMPS_FOC_MAX)
         {
 	  // limit max ui8_angle_correction value (127 + 31) // +90 degrees
-	  if ((ui8_temp + 1) < 158) { ui8_angle_correction--; } { ui8_angle_correction++; }
+//	  if ((ui8_temp + 1) < 158) { ui8_angle_correction--; } { ui8_angle_correction++; }
+	  ui8_angle_correction++;
         }
         else if (ui8_adc_id_current < ADC_PHASE_B_CURRENT_ZERO_AMPS_FOC_MIN)
         {
 	  // limit min ui8_angle_correction value (127 - 31) // -90 degrees
-	  if ((ui8_temp - 1) > 96)
+//	  if ((ui8_temp - 1) > 96)
 	  {
 	    // decrease only when not regen!! other way ui8_angle_correction will always decrease... CAN WE IMPROVE THIS??
 	    if (UI8_ADC_BATTERY_CURRENT > (ui8_adc_battery_current_offset + 2)) { ui8_angle_correction--; }
 	  }
         }
       }
-debug_pin_reset ();
+//debug_pin_reset ();
     }
   }
   /****************************************************************************/

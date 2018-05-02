@@ -81,7 +81,7 @@
 #define MOTOR_ROTOR_ANGLE_270 	(191 + MOTOR_ROTOR_OFFSET_ANGLE)
 #define MOTOR_ROTOR_ANGLE_330 	(234 + MOTOR_ROTOR_OFFSET_ANGLE)
 
-#define STARTUP_ADVANCE_ANGLE 0 //20 // 63 --> 90 degrees is needed so the motor has best torque at startup!!
+#define STARTUP_ADVANCE_ANGLE 63 // 63 --> 90 degrees is needed so the motor has best torque at startup!!
 
 #define MOTOR_OVER_SPEED_ERPS 520 // motor max speed, protection max value | 30 points for the sinewave at max speed
 
