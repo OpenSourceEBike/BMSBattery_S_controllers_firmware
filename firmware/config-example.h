@@ -114,13 +114,13 @@
 
 // Choose some parameters for your motor (if you don't know, just keep the following original values because they should work ok)
 //
-// This value should be near 0. When measured with an oscilloscope, for a Q85 motor, the offset is -5 which probably will
-// not make  any big difference im terms of efficiency
+// This value should be near 0. When measured with an oscilloscope, for a Q85 motor, the offset is 5
+// You can try to tune with the whell on the air, full throttle and look at batttery current: adjust for lower battery current
 #define MOTOR_ROTOR_OFFSET_ANGLE 0
 
 // This value is ERPS speed after which a transition happens from sinewave no interpolation to have
-// interpolation 60 degrees and must be found experimentally but a value of 30 may be good
-#define MOTOR_ROTOR_ERPS_START_INTERPOLATION_60_DEGREES 30
+// interpolation 60 degrees and must be found experimentally but a value of 25 may be good
+#define MOTOR_ROTOR_ERPS_START_INTERPOLATION_60_DEGREES 25
 
 // For some motors with not very well placed mosfets at 120 degrees between each of them. May be easier to keep this option disabled
 //#define DO_SINEWAVE_INTERPOLATION_360_DEGREES
