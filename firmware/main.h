@@ -11,7 +11,7 @@
 
 #include "config.h"
 
-#define DEBUG_UART
+//#define DEBUG_UART
 
 #define MOTOR_TYPE_Q85 1
 #define MOTOR_TYPE_Q100 2
@@ -52,8 +52,8 @@
 // 512 --> 15.5 amps
 // 1 ADC increment --> 0.030A
 // RMS value --> max value * 0.707
-#define ADC_PHASE_B_CURRENT_ZERO_AMPS_FOC_MAX 127 // for phase B current sensor that outputs 2.5V at zero amps (ACS711)
-#define ADC_PHASE_B_CURRENT_ZERO_AMPS_FOC_MIN 125 // for phase B current sensor that outputs 2.5V at zero amps (ACS711)
+#define ADC_PHASE_B_CURRENT_ZERO_AMPS_FOC_MAX 125 // for phase B current sensor that outputs 2.5V at zero amps (ACS711)
+#define ADC_PHASE_B_CURRENT_ZERO_AMPS_FOC_MIN 123 // for phase B current sensor that outputs 2.5V at zero amps (ACS711)
 
 #if defined (DO_SINEWAVE_INTERPOLATION_360_DEGREES)
 // This value is ERPS speed after which a transition happens from sinewave 60 degrees to have
@@ -73,15 +73,16 @@
 #define PWM_DUTY_CYCLE_MIN 20
 #define MIDDLE_PWM_DUTY_CYCLE_MAX (PWM_DUTY_CYCLE_MAX/2)
 
-#define MOTOR_ROTOR_ANGLE_0 		(0   + MOTOR_ROTOR_OFFSET_ANGLE)
-#define MOTOR_ROTOR_ANGLE_60 		(42  + MOTOR_ROTOR_OFFSET_ANGLE)
-#define MOTOR_ROTOR_ANGLE_120 		(84  + MOTOR_ROTOR_OFFSET_ANGLE)
-#define MOTOR_ROTOR_ANGLE_180 		(127 + MOTOR_ROTOR_OFFSET_ANGLE)
-#define MOTOR_ROTOR_ANGLE_240 		(170 + MOTOR_ROTOR_OFFSET_ANGLE)
-#define MOTOR_ROTOR_ANGLE_300 		(212 + MOTOR_ROTOR_OFFSET_ANGLE)
-#define MOTOR_ROTOR_ANGLE_FOC 		(107  + MOTOR_ROTOR_OFFSET_ANGLE)
+#define MOTOR_ROTOR_ANGLE_90 	(63  + MOTOR_ROTOR_OFFSET_ANGLE)
+#define MOTOR_ROTOR_ANGLE_150 	(106 + MOTOR_ROTOR_OFFSET_ANGLE)
+#define MOTOR_ROTOR_ANGLE_210 	(148 + MOTOR_ROTOR_OFFSET_ANGLE)
+#define MOTOR_ROTOR_ANGLE_270 	(191 + MOTOR_ROTOR_OFFSET_ANGLE)
+#define MOTOR_ROTOR_ANGLE_330 	(233 + MOTOR_ROTOR_OFFSET_ANGLE)
+#define MOTOR_ROTOR_ANGLE_30 	(20  + MOTOR_ROTOR_OFFSET_ANGLE)
 
-#define STARTUP_ADVANCE_ANGLE 20 // 20 --> 30 degrees is needed so the motor has best torque at startup!!
+// this value of 174 (244 degrees; 170 would be 239 degrees) was found experimentaly
+// seems to be about 180 + 60 degrees; were I expected to be 180 degrees
+#define MOTOR_ROTOR_ANGLE_FOC 	(174 + MOTOR_ROTOR_OFFSET_ANGLE)
 
 #define MOTOR_OVER_SPEED_ERPS 520 // motor max speed, protection max value | 30 points for the sinewave at max speed
 

@@ -296,7 +296,7 @@ uint8_t ui8_motor_rotor_absolute_angle;
 uint8_t ui8_motor_rotor_angle;
 uint8_t ui8_flag_foc_read_id_current = 0;
 
-volatile uint8_t ui8_angle_correction = STARTUP_ADVANCE_ANGLE;
+volatile uint8_t ui8_angle_correction = 0;
 uint8_t ui8_interpolation_angle = 0;
 
 uint8_t ui8_motor_commutation_type = BLOCK_COMMUTATION;
@@ -408,7 +408,7 @@ void TIM1_CAP_COM_IRQHandler(void) __interrupt(TIM1_CAP_COM_IRQHANDLER)
 
       if (ui8_motor_commutation_type != SINEWAVE_INTERPOLATION_360_DEGREES)
       {
-	ui8_motor_rotor_absolute_angle = (uint8_t) MOTOR_ROTOR_ANGLE_60;
+	ui8_motor_rotor_absolute_angle = (uint8_t) MOTOR_ROTOR_ANGLE_150;
       }
       break;
 
@@ -454,26 +454,26 @@ void TIM1_CAP_COM_IRQHandler(void) __interrupt(TIM1_CAP_COM_IRQHANDLER)
 	  if (ui8_motor_commutation_type == SINEWAVE_INTERPOLATION_60_DEGREES)
 	  {
 	    ui8_motor_commutation_type = BLOCK_COMMUTATION;
-	    ui8_angle_correction = STARTUP_ADVANCE_ANGLE;
+	    ui8_angle_correction = 0;
 	  }
 	}
       }
 
-      ui8_motor_rotor_absolute_angle = (uint8_t) MOTOR_ROTOR_ANGLE_120;
+      ui8_motor_rotor_absolute_angle = (uint8_t) MOTOR_ROTOR_ANGLE_210;
       break;
 
       case 5:
 
       if (ui8_motor_commutation_type != SINEWAVE_INTERPOLATION_360_DEGREES)
       {
-	ui8_motor_rotor_absolute_angle = (uint8_t) MOTOR_ROTOR_ANGLE_180;
+	ui8_motor_rotor_absolute_angle = (uint8_t) MOTOR_ROTOR_ANGLE_270;
       }
       break;
 
       case 4:
       if (ui8_motor_commutation_type != SINEWAVE_INTERPOLATION_360_DEGREES)
       {
-	ui8_motor_rotor_absolute_angle = (uint8_t) MOTOR_ROTOR_ANGLE_240;
+	ui8_motor_rotor_absolute_angle = (uint8_t) MOTOR_ROTOR_ANGLE_330;
       }
       break;
 
@@ -482,19 +482,17 @@ void TIM1_CAP_COM_IRQHandler(void) __interrupt(TIM1_CAP_COM_IRQHANDLER)
 
       if (ui8_motor_commutation_type != SINEWAVE_INTERPOLATION_360_DEGREES)
       {
-	ui8_motor_rotor_absolute_angle = (uint8_t) MOTOR_ROTOR_ANGLE_300;
+	ui8_motor_rotor_absolute_angle = (uint8_t) MOTOR_ROTOR_ANGLE_30;
       }
       break;
 
-      // hall sensor C, high to low
-      //
       // BEMF is always 90 degrees advanced over motor rotor position degree zero
-      // and here (hall sensor C blue wire, signal transition to negative),
+      // and here (hall sensor C blue wire, signal transition from positive to negative),
       // phase B BEMF is at max value (measured on osciloscope by rotating the motor)
       case 2:
       if (ui8_motor_commutation_type != SINEWAVE_INTERPOLATION_360_DEGREES)
       {
-	ui8_motor_rotor_absolute_angle = (uint8_t) MOTOR_ROTOR_ANGLE_0;
+	ui8_motor_rotor_absolute_angle = (uint8_t) MOTOR_ROTOR_ANGLE_90;
       }
       break;
 
@@ -521,7 +519,7 @@ void TIM1_CAP_COM_IRQHandler(void) __interrupt(TIM1_CAP_COM_IRQHANDLER)
     ui8_half_erps_flag = 0;
     ui16_motor_speed_erps = 0;
     ui16_PWM_cycles_counter_total = 0xffff;
-    ui8_angle_correction = STARTUP_ADVANCE_ANGLE;
+    ui8_angle_correction = 0;
     ui8_motor_commutation_type = BLOCK_COMMUTATION;
     ui8_hall_sensors_state_last = 0; // this way we force execution of hall sensors code next time
     ebike_app_cruise_control_stop ();
@@ -555,12 +553,14 @@ void TIM1_CAP_COM_IRQHandler(void) __interrupt(TIM1_CAP_COM_IRQHANDLER)
     ui8_sinewave_table_index = ui8_motor_rotor_absolute_angle + ui8_angle_correction;
   }
 
+  // we need to put phase voltage 90 degrees ahead of rotor position, to get current 90 degrees ahead and have max torque per amp
+  ui8_sinewave_table_index -= 63;
+
   if (ui8_motor_commutation_type != BLOCK_COMMUTATION)
   {
     // make sure we just execute one time per ERPS, so use the flag ui8_flag_foc_read_id_current
     if ((ui8_motor_rotor_angle >= MOTOR_ROTOR_ANGLE_FOC) && (ui8_flag_foc_read_id_current))
     {
-debug_pin_set ();
       ui8_flag_foc_read_id_current = 0;
 
       // minimum speed to do FOC
@@ -575,7 +575,6 @@ debug_pin_set ();
 	  if (UI8_ADC_BATTERY_CURRENT > (ui8_adc_battery_current_offset + 2)) { ui8_angle_correction--; }
         }
       }
-debug_pin_reset ();
     }
   }
   /****************************************************************************/
