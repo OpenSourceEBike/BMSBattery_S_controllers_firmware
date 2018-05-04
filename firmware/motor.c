@@ -403,10 +403,9 @@ void TIM1_CAP_COM_IRQHandler(void) __interrupt(TIM1_CAP_COM_IRQHANDLER)
 
     switch (ui8_hall_sensors_state)
     {
-      // BEMF is always 90 degrees advanced over motor rotor position degree zero
-      // and here (hall sensor C blue wire, signal transition to negative),
-      // phase B BEMF is at max value (measured on osciloscope by rotating the motor)
       case 3:
+      ui8_flag_foc_read_id_current = 1;
+
       if (ui8_motor_commutation_type != SINEWAVE_INTERPOLATION_360_DEGREES)
       {
 	ui8_motor_rotor_absolute_angle = (uint8_t) MOTOR_ROTOR_ANGLE_60;
@@ -488,9 +487,11 @@ void TIM1_CAP_COM_IRQHandler(void) __interrupt(TIM1_CAP_COM_IRQHANDLER)
       break;
 
       // hall sensor C, high to low
+      //
+      // BEMF is always 90 degrees advanced over motor rotor position degree zero
+      // and here (hall sensor C blue wire, signal transition to negative),
+      // phase B BEMF is at max value (measured on osciloscope by rotating the motor)
       case 2:
-      ui8_flag_foc_read_id_current = 1;
-
       if (ui8_motor_commutation_type != SINEWAVE_INTERPOLATION_360_DEGREES)
       {
 	ui8_motor_rotor_absolute_angle = (uint8_t) MOTOR_ROTOR_ANGLE_0;
@@ -566,23 +567,12 @@ debug_pin_set ();
       if (ui16_motor_speed_erps > MOTOR_ROTOR_ERPS_START_INTERPOLATION_60_DEGREES)
       {
         // read here the phase B current: FOC Id current
-	ui8_temp = ui8_angle_correction + 127; // to have ui8_angle_correction value in a positive range, for comparing
         ui8_adc_id_current = UI8_ADC_MOTOR_PHASE_B_CURRENT;
-        if (ui8_adc_id_current > ADC_PHASE_B_CURRENT_ZERO_AMPS_FOC_MAX)
-        {
-	  // limit max ui8_angle_correction value (127 + 31) // +90 degrees
-//	  if ((ui8_temp + 1) < 158) { ui8_angle_correction--; } { ui8_angle_correction++; }
-	  ui8_angle_correction++;
-        }
+        if (ui8_adc_id_current > ADC_PHASE_B_CURRENT_ZERO_AMPS_FOC_MAX) { ui8_angle_correction++; }
         else if (ui8_adc_id_current < ADC_PHASE_B_CURRENT_ZERO_AMPS_FOC_MIN)
         {
-	  // limit min ui8_angle_correction value (127 - 31) // -90 degrees
-//	  if ((ui8_temp - 1) > 96)
-	  {
-	    // decrease only when not regen!! other way ui8_angle_correction will always decrease... CAN WE IMPROVE THIS??
-//	    if (UI8_ADC_BATTERY_CURRENT > (ui8_adc_battery_current_offset + 2)) { ui8_angle_correction--; }
-	    ui8_angle_correction--;
-	  }
+	  // decrease only when not regen!! other way ui8_angle_correction will always decrease... CAN WE IMPROVE THIS??
+	  if (UI8_ADC_BATTERY_CURRENT > (ui8_adc_battery_current_offset + 2)) { ui8_angle_correction--; }
         }
       }
 debug_pin_reset ();
