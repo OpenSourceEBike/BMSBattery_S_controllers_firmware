@@ -409,7 +409,7 @@ void TIM1_CAP_COM_IRQHandler(void) __interrupt(TIM1_CAP_COM_IRQHANDLER)
       case 3:
       if (ui8_motor_commutation_type != SINEWAVE_INTERPOLATION_360_DEGREES)
       {
-	ui8_motor_rotor_absolute_angle = (uint8_t) MOTOR_ROTOR_ANGLE_90;
+	ui8_motor_rotor_absolute_angle = (uint8_t) MOTOR_ROTOR_ANGLE_60;
       }
       break;
 
@@ -460,20 +460,21 @@ void TIM1_CAP_COM_IRQHandler(void) __interrupt(TIM1_CAP_COM_IRQHANDLER)
 	}
       }
 
-      ui8_motor_rotor_absolute_angle = (uint8_t) MOTOR_ROTOR_ANGLE_150;
+      ui8_motor_rotor_absolute_angle = (uint8_t) MOTOR_ROTOR_ANGLE_120;
       break;
 
       case 5:
+debug_pin_set ();
       if (ui8_motor_commutation_type != SINEWAVE_INTERPOLATION_360_DEGREES)
       {
-	ui8_motor_rotor_absolute_angle = (uint8_t) MOTOR_ROTOR_ANGLE_210;
+	ui8_motor_rotor_absolute_angle = (uint8_t) MOTOR_ROTOR_ANGLE_180;
       }
       break;
 
       case 4:
       if (ui8_motor_commutation_type != SINEWAVE_INTERPOLATION_360_DEGREES)
       {
-	ui8_motor_rotor_absolute_angle = (uint8_t) MOTOR_ROTOR_ANGLE_270;
+	ui8_motor_rotor_absolute_angle = (uint8_t) MOTOR_ROTOR_ANGLE_240;
       }
       break;
 
@@ -482,16 +483,18 @@ void TIM1_CAP_COM_IRQHandler(void) __interrupt(TIM1_CAP_COM_IRQHANDLER)
 
       if (ui8_motor_commutation_type != SINEWAVE_INTERPOLATION_360_DEGREES)
       {
-	ui8_motor_rotor_absolute_angle = (uint8_t) MOTOR_ROTOR_ANGLE_330;
+	ui8_motor_rotor_absolute_angle = (uint8_t) MOTOR_ROTOR_ANGLE_300;
       }
       break;
 
+      // hall sensor C, high to low
       case 2:
+debug_pin_reset ();
       ui8_flag_foc_read_id_current = 1;
 
       if (ui8_motor_commutation_type != SINEWAVE_INTERPOLATION_360_DEGREES)
       {
-	ui8_motor_rotor_absolute_angle = (uint8_t) MOTOR_ROTOR_ANGLE_30;
+	ui8_motor_rotor_absolute_angle = (uint8_t) MOTOR_ROTOR_ANGLE_0;
       }
       break;
 
@@ -555,7 +558,7 @@ void TIM1_CAP_COM_IRQHandler(void) __interrupt(TIM1_CAP_COM_IRQHANDLER)
   if (ui8_motor_commutation_type != BLOCK_COMMUTATION)
   {
     // make sure we just execute one time per ERPS, so use the flag ui8_flag_foc_read_id_current
-    if ((ui8_motor_rotor_angle >= MOTOR_ROTOR_ANGLE_180) && (ui8_flag_foc_read_id_current))
+    if ((ui8_motor_rotor_angle >= MOTOR_ROTOR_ANGLE_FOC) && (ui8_flag_foc_read_id_current))
     {
 //debug_pin_set ();
       ui8_flag_foc_read_id_current = 0;
