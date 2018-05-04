@@ -28,71 +28,6 @@
 
 uint8_t ui8_svm_table [SVM_TABLE_LEN] =
 {
-    127	,
-    133	,
-    138	,
-    144	,
-    149	,
-    154	,
-    160	,
-    165	,
-    170	,
-    176	,
-    181	,
-    186	,
-    191	,
-    197	,
-    202	,
-    207	,
-    212	,
-    217	,
-    222	,
-    227	,
-    231	,
-    236	,
-    239	,
-    240	,
-    242	,
-    243	,
-    244	,
-    245	,
-    247	,
-    248	,
-    249	,
-    250	,
-    250	,
-    251	,
-    252	,
-    253	,
-    253	,
-    254	,
-    254	,
-    254	,
-    255	,
-    255	,
-    255	,
-    255	,
-    255	,
-    255	,
-    254	,
-    254	,
-    254	,
-    253	,
-    253	,
-    252	,
-    251	,
-    251	,
-    250	,
-    249	,
-    248	,
-    247	,
-    246	,
-    245	,
-    243	,
-    242	,
-    241	,
-    239	,
-    238	,
     239	,
     241	,
     242	,
@@ -283,7 +218,72 @@ uint8_t ui8_svm_table [SVM_TABLE_LEN] =
     106	,
     111	,
     116	,
-    122
+    122 ,
+    127	,
+    133	,
+    138	,
+    144	,
+    149	,
+    154	,
+    160	,
+    165	,
+    170	,
+    176	,
+    181	,
+    186	,
+    191	,
+    197	,
+    202	,
+    207	,
+    212	,
+    217	,
+    222	,
+    227	,
+    231	,
+    236	,
+    239	,
+    240	,
+    242	,
+    243	,
+    244	,
+    245	,
+    247	,
+    248	,
+    249	,
+    250	,
+    250	,
+    251	,
+    252	,
+    253	,
+    253	,
+    254	,
+    254	,
+    254	,
+    255	,
+    255	,
+    255	,
+    255	,
+    255	,
+    255	,
+    254	,
+    254	,
+    254	,
+    253	,
+    253	,
+    252	,
+    251	,
+    251	,
+    250	,
+    249	,
+    248	,
+    247	,
+    246	,
+    245	,
+    243	,
+    242	,
+    241	,
+    239	,
+    238	,
 };
 
 uint16_t ui16_PWM_cycles_counter = 1;
@@ -464,7 +464,7 @@ void TIM1_CAP_COM_IRQHandler(void) __interrupt(TIM1_CAP_COM_IRQHANDLER)
       break;
 
       case 5:
-debug_pin_set ();
+
       if (ui8_motor_commutation_type != SINEWAVE_INTERPOLATION_360_DEGREES)
       {
 	ui8_motor_rotor_absolute_angle = (uint8_t) MOTOR_ROTOR_ANGLE_180;
@@ -489,7 +489,6 @@ debug_pin_set ();
 
       // hall sensor C, high to low
       case 2:
-debug_pin_reset ();
       ui8_flag_foc_read_id_current = 1;
 
       if (ui8_motor_commutation_type != SINEWAVE_INTERPOLATION_360_DEGREES)
@@ -560,7 +559,7 @@ debug_pin_reset ();
     // make sure we just execute one time per ERPS, so use the flag ui8_flag_foc_read_id_current
     if ((ui8_motor_rotor_angle >= MOTOR_ROTOR_ANGLE_FOC) && (ui8_flag_foc_read_id_current))
     {
-//debug_pin_set ();
+debug_pin_set ();
       ui8_flag_foc_read_id_current = 0;
 
       // minimum speed to do FOC
@@ -581,11 +580,12 @@ debug_pin_reset ();
 //	  if ((ui8_temp - 1) > 96)
 	  {
 	    // decrease only when not regen!! other way ui8_angle_correction will always decrease... CAN WE IMPROVE THIS??
-	    if (UI8_ADC_BATTERY_CURRENT > (ui8_adc_battery_current_offset + 2)) { ui8_angle_correction--; }
+//	    if (UI8_ADC_BATTERY_CURRENT > (ui8_adc_battery_current_offset + 2)) { ui8_angle_correction--; }
+	    ui8_angle_correction--;
 	  }
         }
       }
-//debug_pin_reset ();
+debug_pin_reset ();
     }
   }
   /****************************************************************************/
