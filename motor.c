@@ -82,23 +82,26 @@ void hall_sensors_read_and_action (void)
     hall_sensors_last = hall_sensors;
 
     if (ui8_motor_state == MOTOR_STATE_COAST) { ui8_motor_state = MOTOR_STATE_RUNNING_NO_INTERPOLATION_60_DEGREES; }
-    /*int8_t_hall_case[int8_t_hall_counter]=hall_sensors;
-    int8_t_hall_counter++;
-    if(int8_t_hall_counter>5)int8_t_hall_counter=0;*/
+
 
     switch (hall_sensors)
     {
       case 3://rotor position 180 degree
       // full electric revolution recognized, reset counters read here the phase B current for FOC,
-	//int8_t_hall_case[3]=ui8_adc_read_phase_B_current();
+
+#ifdef LOGPHASECURRENT
+	int8_t_hall_case[3]=ui8_adc_read_phase_B_current();
+#endif
       if (ui8_adc_read_throttle_busy == 0)
       {
 	debug_pin_set ();
-	if (ui16_BatteryCurrent > ui16_current_cal_b){
+	if ( ui8_duty_cycle_target > 5){
 	ui16_ADC_iq_current_accumulated-=ui16_ADC_iq_current_accumulated>>3;
 	ui16_ADC_iq_current_accumulated+= ui16_adc_read_phase_B_current ();
 	ui16_ADC_iq_current = ui16_ADC_iq_current_accumulated>>3; // this value is regualted to be zero by FOC in this case without averaging
+
 	}
+
       }
       if(ui8_half_rotation_flag){
 	  ui8_half_rotation_flag=0;
@@ -120,7 +123,7 @@ void hall_sensors_read_and_action (void)
       {
 	ui8_motor_state = MOTOR_STATE_RUNNING_INTERPOLATION_360_DEGREES;
       }
-      else if (ui16_motor_speed_erps > 10)
+      else if (ui16_motor_speed_erps > 5)
       {
 	ui8_motor_state = MOTOR_STATE_RUNNING_INTERPOLATION_60_DEGREES;
       }
@@ -139,19 +142,23 @@ void hall_sensors_read_and_action (void)
       }
 #endif
 
+      /*if(ui8_regen_flag)ui8_motor_rotor_absolute_position = ANGLE_240 + MOTOR_ROTOR_DELTA_PHASE_ANGLE_RIGHT;
+      else */
       ui8_motor_rotor_absolute_position = ANGLE_180 + MOTOR_ROTOR_DELTA_PHASE_ANGLE_RIGHT;
       break;
 
       case 1: //rotor position 240 degree, do FOC control
-	//int8_t_hall_case[4]=ui8_adc_read_phase_B_current ();
+#ifdef LOGPHASECURRENT
+	int8_t_hall_case[4]=ui8_adc_read_phase_B_current ();
+#endif
 
-	if (ui16_motor_speed_erps > 10 && ui16_BatteryCurrent > ui16_current_cal_b) //normal riding,
+	if (ui16_motor_speed_erps > 10 ) //normal riding,
 	      {
 		if (ui16_ADC_iq_current>>2 > 127 && ui8_position_correction_value < 135)
 		{
 		  ui8_position_correction_value++;
 		}
-		else if (ui16_ADC_iq_current>>2 < 125 && ui8_position_correction_value > 100)
+		else if (ui16_ADC_iq_current>>2 < 125 && ui8_position_correction_value >90)
 		{
 		  ui8_position_correction_value--;
 		}
@@ -170,45 +177,63 @@ void hall_sensors_read_and_action (void)
 		      }*/
       if (ui8_motor_state != MOTOR_STATE_RUNNING_INTERPOLATION_360_DEGREES)
       {
-	ui8_motor_rotor_absolute_position = ANGLE_240 + MOTOR_ROTOR_DELTA_PHASE_ANGLE_RIGHT;
+	  /*if(ui8_regen_flag)ui8_motor_rotor_absolute_position = ANGLE_300 + MOTOR_ROTOR_DELTA_PHASE_ANGLE_RIGHT;
+	  else*/
+	  ui8_motor_rotor_absolute_position = ANGLE_240 + MOTOR_ROTOR_DELTA_PHASE_ANGLE_RIGHT;
       }
       break;
 
       case 5: //rotor position 300 degree
-	//int8_t_hall_case[5]=ui8_adc_read_phase_B_current ();
+#ifdef LOGPHASECURRENT
+	int8_t_hall_case[5]=ui8_adc_read_phase_B_current ();
+#endif
 
       if (ui8_motor_state != MOTOR_STATE_RUNNING_INTERPOLATION_360_DEGREES)
       {
-	ui8_motor_rotor_absolute_position = ANGLE_300 + MOTOR_ROTOR_DELTA_PHASE_ANGLE_RIGHT;
+
+	  /*if(ui8_regen_flag)ui8_motor_rotor_absolute_position = ANGLE_1 + MOTOR_ROTOR_DELTA_PHASE_ANGLE_RIGHT;
+	  else*/
+	  ui8_motor_rotor_absolute_position = ANGLE_300 + MOTOR_ROTOR_DELTA_PHASE_ANGLE_RIGHT;
       }
       break;
 
       case 4: //rotor position 0 degree
 	ui8_half_rotation_flag=1;
-	//int8_t_hall_case[0]=ui8_adc_read_phase_B_current ();
+#ifdef LOGPHASECURRENT
+	int8_t_hall_case[0]=ui8_adc_read_phase_B_current ();
+#endif
 	debug_pin_reset ();
       if (ui8_motor_state != MOTOR_STATE_RUNNING_INTERPOLATION_360_DEGREES)
       {
-	ui8_motor_rotor_absolute_position = ANGLE_1 + MOTOR_ROTOR_DELTA_PHASE_ANGLE_RIGHT;
+	  /*if(ui8_regen_flag)ui8_motor_rotor_absolute_position = ANGLE_60 + MOTOR_ROTOR_DELTA_PHASE_ANGLE_RIGHT;
+	  else */
+	  ui8_motor_rotor_absolute_position = ANGLE_1 + MOTOR_ROTOR_DELTA_PHASE_ANGLE_RIGHT;
       }
       break;
 
       case 6://rotor position 60 degree
-	//int8_t_hall_case[1]=ui8_adc_read_phase_B_current ();
+#ifdef LOGPHASECURRENT
+	int8_t_hall_case[1]=ui8_adc_read_phase_B_current ();
+#endif
 
       if (ui8_motor_state != MOTOR_STATE_RUNNING_INTERPOLATION_360_DEGREES)
       {
-	ui8_motor_rotor_absolute_position = ANGLE_60 + MOTOR_ROTOR_DELTA_PHASE_ANGLE_RIGHT;
+	  /*if(ui8_regen_flag)ui8_motor_rotor_absolute_position = ANGLE_120 + MOTOR_ROTOR_DELTA_PHASE_ANGLE_RIGHT;
+	  else */
+	  ui8_motor_rotor_absolute_position = ANGLE_60 + MOTOR_ROTOR_DELTA_PHASE_ANGLE_RIGHT;
       }
       break;
 
       case 2://rotor position 120 degree
-
-	//int8_t_hall_case[2]=ui8_adc_read_phase_B_current ();
+#ifdef LOGPHASECURRENT
+	int8_t_hall_case[2]=ui8_adc_read_phase_B_current ();
+#endif
 
       if (ui8_motor_state != MOTOR_STATE_RUNNING_INTERPOLATION_360_DEGREES)
       {
-	ui8_motor_rotor_absolute_position = ANGLE_120 + MOTOR_ROTOR_DELTA_PHASE_ANGLE_RIGHT;
+	 /* if(ui8_regen_flag)ui8_motor_rotor_absolute_position = ANGLE_180 + MOTOR_ROTOR_DELTA_PHASE_ANGLE_RIGHT;
+	  else */
+	  ui8_motor_rotor_absolute_position = ANGLE_120 + MOTOR_ROTOR_DELTA_PHASE_ANGLE_RIGHT;
       }
       break;
 

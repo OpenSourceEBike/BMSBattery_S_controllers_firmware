@@ -39,6 +39,7 @@ uint16_t ui16_BatteryCurrent; //Battery Current read from ADC8
 uint16_t ui16_current_cal_b;
 uint8_t ui8_BatteryVoltage; //Battery Voltage read from ADC
 uint8_t ui8_regen_throttle; //regen throttle read from ADC
+uint8_t ui8_regen_flag=0; //regen flag for shifting from +90° to -90°
 static uint16_t ui16_PAS_accumulated = 64000L; // for filtering of PAS value
 static uint32_t ui32_erps_accumulated; //for filtering of erps
 uint32_t ui32_erps_filtered; //filtered value of erps
@@ -62,7 +63,7 @@ uint16_t update_setpoint (uint16_t speed, uint16_t PAS, uint16_t sumtorque, uint
   ui32_erps_filtered=ui32_erps_accumulated>>3;
 
   ui8_regen_throttle = map (ui8_adc_read_regen_throttle () , ADC_THROTTLE_MIN_VALUE, ADC_THROTTLE_MAX_VALUE, 0, SETPOINT_MAX_VALUE); //map throttle to limits
-
+  //ui8_position_correction_value=127+sumtorque;
   ui32_SPEED_km_h=(wheel_circumference*PWM_CYCLES_SECOND*36L)/(10L*(uint32_t)speed);			//calculate speed in m/h conversion fr	om sec to hour --> *3600, conversion from mm to km --> /1000000, tic frequency 15625 Hz
   //printf("speed km/h %lu\r\n",ui32_SPEED_km_h);
   if(ui16_SPEED_Counter>40000){ui32_SPEED_km_h=0;}     //if wheel isn't turning, reset speed
@@ -70,18 +71,53 @@ uint16_t update_setpoint (uint16_t speed, uint16_t PAS, uint16_t sumtorque, uint
 
 #ifdef REGEN
   //check if regen is wanted
-  if(ui8_regen_throttle>10){
-  float_temp=(float)ui8_regen_throttle*(float)(REGEN_CURRENT_MAX_VALUE-ui16_current_cal_b)/255.0+(float)ui16_current_cal_b;
-  ui32_setpoint= PI_control(ui16_BatteryCurrent, (uint16_t) float_temp);
-  if (ui32_setpoint<3)ui32_setpoint=0;
-  if (ui32_setpoint>255)ui32_setpoint=255;
-  //printf("R, %lu, %d, %d, %d\r\n", ui32_setpoint, ui8_regen_throttle, ui16_BatteryCurrent, (uint16_t) float_temp);
-  }
-  //check for undervoltage
+  if(ui8_regen_throttle>2){
 
+    if (ui16_motor_speed_erps*5>3){
+
+
+	 float_temp=(float)ui8_regen_throttle*(float)(REGEN_CURRENT_MAX_VALUE-ui16_current_cal_b)/255.0+(float)ui16_current_cal_b;
+
+	 ui32_setpoint= PI_control(ui16_BatteryCurrent, (uint16_t) float_temp);
+
+	 if (ui32_setpoint<(ui16_motor_speed_erps*5-3)/2)ui32_setpoint=(ui16_motor_speed_erps*5-3)/2;
+  }
+    else ui32_setpoint= PI_control(ui16_BatteryCurrent, ui16_current_cal_b); //if erps are too low, control current to zero
+    if (ui32_setpoint<5)ui32_setpoint=0;
+    if (ui32_setpoint>255)ui32_setpoint=255;
+  }
+
+/*
+  if (!ui8_regen_flag && setpoint_old > 0){ui32_setpoint= PI_control(setpoint_old, 0);} //Ramp down duty cycle before switching from +90° to -90°
+
+  else if (!ui8_regen_flag) // switch commutation from +90°, working as motor to -90°, working as generator
+    {ui8_position_correction_value=127;
+    ui8_regen_flag=1;
+    //printf("1.elseif\r\n");
+    }
+
+  else if (ui8_regen_flag){ ui32_setpoint= PI_control(setpoint_old,  0);} //control current to desired value, workaround to let the control loop run into the right direction
+
+  //printf("R, %lu, %d, %d, %d\r\n", ui32_setpoint, ui8_regen_throttle, ui16_BatteryCurrent, (uint16_t) float_temp);
+  ui8_position_correction_value= 127;
+  ui32_setpoint=ui8_regen_throttle;
+	if (ui32_setpoint<5)ui32_setpoint=0;
+        if (ui32_setpoint>255)ui32_setpoint=255;
+        //printf("2.elseif\r\n");
+  }
+
+  else if (ui8_regen_flag){ // switch commutation back to motor mode
+    if (setpoint_old > 0){ui32_setpoint= PI_control(setpoint_old, 0);} //ramp down duty cycle
+
+    else
+    {
+	ui8_position_correction_value =127;
+	ui8_regen_flag=0;
+    }
+  }*/
   else if(ui8_BatteryVoltage<BATTERY_VOLTAGE_MIN_VALUE){
 #endif
-
+      //check for undervoltage
 #ifndef REGEN
       if(ui8_BatteryVoltage<BATTERY_VOLTAGE_MIN_VALUE){
 #endif
@@ -94,7 +130,7 @@ uint16_t update_setpoint (uint16_t speed, uint16_t PAS, uint16_t sumtorque, uint
   //check if rider is braking
   else if (brake_is_set()){
             ui32_setpoint= PI_control(ui16_BatteryCurrent, ui16_current_cal_b);//Curret target = 0 A, this is to keep the integral part of the PI-control up to date
-                  if (ui32_setpoint<30){ui32_setpoint=0;}
+                  if (ui32_setpoint<5){ui32_setpoint=0;}
                   if (ui32_setpoint>255){ui32_setpoint=255;}
       printf("you are braking!\r\n");
   }
@@ -102,7 +138,7 @@ uint16_t update_setpoint (uint16_t speed, uint16_t PAS, uint16_t sumtorque, uint
   //limit max erps
   else if (ui32_erps_filtered>ui16_erps_max){
               ui32_setpoint= PI_control(ui32_erps_filtered, ui16_erps_max);//limit the erps to maximum value to have minimum 30 points of sine table for proper commutation
-                    if (ui32_setpoint<30){ui32_setpoint=0;}
+                    if (ui32_setpoint<5){ui32_setpoint=0;}
                     if (ui32_setpoint>255){ui32_setpoint=255;}
         printf("erps too high!\r\n");
     }
@@ -111,7 +147,7 @@ uint16_t update_setpoint (uint16_t speed, uint16_t PAS, uint16_t sumtorque, uint
 #ifndef THROTTLE
   else if (ui16_PAS_Counter>timeout || !PAS_dir){
             ui32_setpoint= PI_control(ui16_BatteryCurrent, ui16_current_cal_b);//Curret target = 0 A, this is to keep the integral part of the PI-control up to date
-                  if (ui32_setpoint<30){ui32_setpoint=0;}
+                  if (ui32_setpoint<5){ui32_setpoint=0;}
                   if (ui32_setpoint>255){ui32_setpoint=255;}
      //printf("P, %lu, %d, %d, %d\r\n", ui32_setpoint, sumtorque, ui16_BatteryCurrent, (uint16_t) ui16_current_cal_b);
      // printf("you are not pedaling!\r\n");
@@ -139,7 +175,7 @@ uint16_t update_setpoint (uint16_t speed, uint16_t PAS, uint16_t sumtorque, uint
   uint32_current_target = CheckSpeed ((uint16_t)uint32_current_target, (uint16_t) ui32_SPEED_km_h); //limit speed
 #endif
       ui32_setpoint= PI_control(ui16_BatteryCurrent, (uint16_t)uint32_current_target);
-      if (ui32_setpoint<30)ui32_setpoint=0;
+      if (ui32_setpoint<5)ui32_setpoint=0;
       if (ui32_setpoint>255)ui32_setpoint=255;
       //printf("T, %lu, %d, %d, %d\r\n", ui32_setpoint, sumtorque, ui16_BatteryCurrent, (uint16_t) uint32_current_target);
       //printf("%lu, %d, %d, %d\r\n", ui32_setpoint, PAS>>3, ui16_BatteryCurrent, (uint16_t) uint32_current_target);
@@ -158,7 +194,7 @@ uint16_t update_setpoint (uint16_t speed, uint16_t PAS, uint16_t sumtorque, uint
 #endif
 
   ui32_setpoint= PI_control(ui16_BatteryCurrent, (uint16_t) uint32_current_target);
-  if (ui32_setpoint<10)ui32_setpoint=0;
+  if (ui32_setpoint<5)ui32_setpoint=0;
   if (ui32_setpoint>255)ui32_setpoint=255;
 
   //printf("%d, %d, %d, %d\r\n", (uint16_t) ui32_SPEED_km_h/1000, speed, ui16_BatteryCurrent, (uint16_t) uint32_current_target);
@@ -192,7 +228,7 @@ uint16_t update_setpoint (uint16_t speed, uint16_t PAS, uint16_t sumtorque, uint
 #endif
 
   ui32_setpoint= PI_control(ui16_BatteryCurrent, uint32_current_target);
-    if (ui32_setpoint<30)ui32_setpoint=0;
+    if (ui32_setpoint<5)ui32_setpoint=0;
     if (ui32_setpoint>255)ui32_setpoint=255;
 
    //printf("%lu, %d, %d, %d\r\n", ui32_setpoint, ui8_position_correction_value, ui16_BatteryCurrent, (uint16_t) uint32_current_target);

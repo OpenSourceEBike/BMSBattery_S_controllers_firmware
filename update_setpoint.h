@@ -21,6 +21,8 @@ uint32_t CheckSpeed (uint16_t current_target, uint16_t speed);
 extern uint32_t ui32_SPEED_km_h;
 extern uint32_t ui32_erps_filtered;
 extern uint16_t ui16_current_cal_b;
+extern uint8_t ui8_regen_throttle;
+extern uint8_t ui8_regen_flag;
 
 
 #endif /* _SPEED_H */
