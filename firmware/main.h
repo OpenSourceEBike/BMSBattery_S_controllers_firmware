@@ -80,9 +80,8 @@
 #define MOTOR_ROTOR_ANGLE_330 	(233 + MOTOR_ROTOR_OFFSET_ANGLE)
 #define MOTOR_ROTOR_ANGLE_30 	(20  + MOTOR_ROTOR_OFFSET_ANGLE)
 
-// this value of 174 (244 degrees; 170 would be 239 degrees) was found experimentaly
-// seems to be about 180 + 60 degrees; were I expected to be 180 degrees
-#define MOTOR_ROTOR_ANGLE_FOC 	(174 + MOTOR_ROTOR_OFFSET_ANGLE)
+// this value of 127 is equal to 180 degrees
+#define MOTOR_ROTOR_ANGLE_FOC 	(127 + MOTOR_ROTOR_OFFSET_ANGLE)
 
 #define MOTOR_OVER_SPEED_ERPS 520 // motor max speed, protection max value | 30 points for the sinewave at max speed
 

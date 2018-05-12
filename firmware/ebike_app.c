@@ -382,14 +382,9 @@ void communications_controller (void)
   // throttle: 2
   ui8_tx_buffer [7] = ui8_moving_indication;
   // B8: 4x controller current
-  // Vbat = 30V:
-  // - B8 = 255, LCD shows 1912 watts
-  // - B8 = 250, LCD shows 1875 watts
-  // - B8 = 100, LCD shows 750 watts
-  // each unit of B8 = 0.25A
-  // verified experimental that on S0S, display LCD3 needs: battery_current * 1.5 (because each unit of battery current is equal to 0.35A)
+  // each unit of B8 = 0.5A
   ui8_battery_current = ebike_app_get_battery_current_filtered ();
-  ui8_tx_buffer [8] = ui8_battery_current + (ui8_battery_current >> 1);
+  ui8_tx_buffer [8] = (uint8_t) ((float) ui8_battery_current * (float) LCD_BATTERY_CURRENT_FACTOR);
   // B9: motor temperature
   ui8_tx_buffer [9] = 0;
   // B10 and B11: 0

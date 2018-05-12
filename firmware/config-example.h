@@ -60,12 +60,16 @@
 // the firmware supports automatically both LCD3 and LCD5
 
 // you can tune LCD assist level
-#define ASSIST_LEVEL_0	0.0
-#define ASSIST_LEVEL_1 	0.25
-#define ASSIST_LEVEL_2 	0.5
-#define ASSIST_LEVEL_3 	0.1
-#define ASSIST_LEVEL_4 	2.0
-#define ASSIST_LEVEL_5 	4.0
+#define ASSIST_LEVEL_0			0.00
+#define ASSIST_LEVEL_1 			0.44
+#define ASSIST_LEVEL_2 			0.66
+#define ASSIST_LEVEL_3 			1.00
+#define ASSIST_LEVEL_4 			1.5
+#define ASSIST_LEVEL_5 			2.25
+
+// S06S motor controller: 1.50
+// KT36/48SVPR: ??
+#define LCD_BATTERY_CURRENT_FACTOR	1.50 // each unit = 0.35A | in this example, 42 * 0.35 ~= 15 amps
 // *************************************************************************** //
 
 
@@ -99,8 +103,8 @@
 // Choose your controller max current and max regen current
 //
 // S06S controller holds 15 amps as max current
-#define ADC_MOTOR_CURRENT_MAX		60 // each unit = 0.25A; 60 = 15A | measured (on S06S) that ADC_MOTOR_CURRENT_MAX = 60 is almost equal to peak 15 amps of phase B current
-#define ADC_MOTOR_REGEN_CURRENT_MAX	30 // CAN'T be more than 66 units!! each unit = 0.25A; 30 = 7.5A but the brake/regen must be only for a few seconds!!
+#define ADC_MOTOR_CURRENT_MAX		43 // each unit = 0.35A; 43 = 15A (tested on S06S motor controller)
+#define ADC_MOTOR_REGEN_CURRENT_MAX	28 // CAN'T be more than 66 units!! each unit = 0.35A; 20 = 10A but the brake/regen must be only for a few seconds!!
 
 // Choose PWM ramp up/down step (higher value will make the motor acceleration slower)
 //
