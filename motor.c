@@ -123,7 +123,8 @@ void hall_sensors_read_and_action (void)
       {
 	ui8_motor_state = MOTOR_STATE_RUNNING_INTERPOLATION_360_DEGREES;
       }
-      else if (ui16_motor_speed_erps > 5)
+      else if (ui16_motor_speed_erps > 3
+	  )
       {
 	ui8_motor_state = MOTOR_STATE_RUNNING_INTERPOLATION_60_DEGREES;
       }
@@ -152,7 +153,19 @@ void hall_sensors_read_and_action (void)
 	int8_t_hall_case[4]=ui8_adc_read_phase_B_current ();
 #endif
 
-	if (ui16_motor_speed_erps > 10 ) //normal riding,
+	if (ui16_motor_speed_erps > 3 ) //normal riding,
+	      {
+		if (ui16_ADC_iq_current>>2 > 127 && ui8_position_correction_value < 135)
+		{
+		  ui8_position_correction_value++;
+		}
+		else if (ui16_ADC_iq_current>>2 < 125 && ui8_position_correction_value >90)
+		{
+		  ui8_position_correction_value--;
+		}
+	      }
+	/*if(ui16_motor_speed_erps > 3){
+	if (ui16_BatteryCurrent > ui16_current_cal_b)
 	      {
 		if (ui16_ADC_iq_current>>2 > 127 && ui8_position_correction_value < 135)
 		{
@@ -164,17 +177,20 @@ void hall_sensors_read_and_action (void)
 		}
 	      }
 
-	/*if (ui16_motor_speed_erps > 10 && ui16_BatteryCurrent < ui16_current_cal_b) //regen, current negative
+	if (ui16_BatteryCurrent < ui16_current_cal_b) //regen, current negative
 		      {
-			if (ui16_ADC_iq_current>>2 > 127 && ui8_position_correction_value > 100)
+			if (ui16_ADC_iq_current>>2 > 127 && ui8_position_correction_value > 90)
 			{
 			  ui8_position_correction_value--;
 			}
-			else if (ui16_ADC_iq_current>>2 < 125 && ui8_position_correction_value<135)
+			else if (ui16_ADC_iq_current>>2 < 125 && ui8_position_correction_value < 135)
 			{
 			  ui8_position_correction_value++;
 			}
-		      }*/
+		      }
+	}*/
+	else ui8_position_correction_value=127; //reset advance angle at very low speed)
+
       if (ui8_motor_state != MOTOR_STATE_RUNNING_INTERPOLATION_360_DEGREES)
       {
 	  /*if(ui8_regen_flag)ui8_motor_rotor_absolute_position = ANGLE_300 + MOTOR_ROTOR_DELTA_PHASE_ANGLE_RIGHT;

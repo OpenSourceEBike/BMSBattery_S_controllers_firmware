@@ -252,7 +252,8 @@ int main (void)
       }
 #endif
 
-      if (PAS_act>3){PAS_dir=1;} //set direction only if enough pulses in the right direction are detected.
+      //if (PAS_act>3){PAS_dir=1;} //set direction only if enough pulses in the right direction are detected.
+      if (ui16_PAS<timeout){PAS_dir=1;} //only PAS timeout for Torquesensor Mode.
       else{PAS_dir=0;}
 
       ui16_PAS_Counter=1;

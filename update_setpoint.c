@@ -73,14 +73,14 @@ uint16_t update_setpoint (uint16_t speed, uint16_t PAS, uint16_t sumtorque, uint
   //check if regen is wanted
   if(ui8_regen_throttle>2){
 
-    if (ui16_motor_speed_erps*5>3){
+    if (ui16_motor_speed_erps*4>14){
 
 
 	 float_temp=(float)ui8_regen_throttle*(float)(REGEN_CURRENT_MAX_VALUE-ui16_current_cal_b)/255.0+(float)ui16_current_cal_b;
 
 	 ui32_setpoint= PI_control(ui16_BatteryCurrent, (uint16_t) float_temp);
 
-	 if (ui32_setpoint<(ui16_motor_speed_erps*5-3)/2)ui32_setpoint=(ui16_motor_speed_erps*5-3)/2;
+	 if (ui32_setpoint<(ui16_motor_speed_erps*4-14)/2)ui32_setpoint=(ui16_motor_speed_erps*4-14)/2;
   }
     else ui32_setpoint= PI_control(ui16_BatteryCurrent, ui16_current_cal_b); //if erps are too low, control current to zero
     if (ui32_setpoint<5)ui32_setpoint=0;
