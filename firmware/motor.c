@@ -567,7 +567,7 @@ void TIM1_CAP_COM_IRQHandler(void) __interrupt(TIM1_CAP_COM_IRQHANDLER)
         // read here the phase B current: FOC Id current
         ui8_adc_id_current = UI8_ADC_MOTOR_PHASE_B_CURRENT;
 
-        if (UI8_ADC_MOTOR_CURRENT > ui8_adc_motor_current_offset)
+        if (UI8_ADC_BATTERY_CURRENT > ui8_adc_battery_current_offset)
 	{
           // motor mode
 	  if (ui8_adc_id_current > ADC_PHASE_B_CURRENT_ZERO_AMPS_FOC_MAX) { ui8_angle_correction++; }
