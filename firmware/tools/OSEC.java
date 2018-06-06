@@ -45,10 +45,7 @@ public class OSEC extends JFrame {
 	private final ButtonGroup Controller_behaviour = new ButtonGroup();
 	private final ButtonGroup PAS_Direction = new ButtonGroup();
 	private final ButtonGroup Battery_setup = new ButtonGroup();
-	private final ButtonGroup Controller_type = new ButtonGroup();
-	private final ButtonGroup Motor_type = new ButtonGroup();
 	private final ButtonGroup Interpolation360 = new ButtonGroup();
-	private JTextField txtMotor_specific_angle;
 	private JLabel lblDiplayType;
 	private final ButtonGroup buttonGroup = new ButtonGroup();
 	private JTextField Assist_Level_1;
@@ -65,13 +62,19 @@ public class OSEC extends JFrame {
 	private JRadioButton rdbtn7s;
 	private JRadioButton rdbtn10s;
 	private JRadioButton rdbtn13s;
-	private JLabel lblControllerType;
-	private JRadioButton rdbtn6Fet;
-	private JRadioButton rdbtn12Fet;
 	private JTextField textInterpolationstart;
-	private JTextField AdjInv;
 	private JTextField RegenMotorMax;
 	private JTextField MotorMax;
+	private JTextField LI_ION_CELL_VOLTS_MAX;
+	private JTextField LI_ION_CELL_VOLTS_20;
+	private JTextField LI_ION_CELL_VOLTS_10;
+	private JTextField LI_ION_CELL_VOLTS_40;
+	private JTextField LI_ION_CELL_VOLTS_60;
+	private JTextField LI_ION_CELL_VOLTS_80;
+	private JTextField LI_ION_CELL_VOLTS_100;
+	private JTextField LI_ION_CELL_VOLTS_0;
+	private JTextField PAS_THRESHOLD;
+	private JTextField LCD_BATTERY_CURRENT_FACTOR;
 	
 	
 
@@ -96,7 +99,7 @@ public class OSEC extends JFrame {
 	 */
 	public OSEC() {
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		setBounds(100, 100, 500, 706);
+		setBounds(100, 100, 789, 706);
 		contentPane = new JPanel();
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
 		setContentPane(contentPane);
@@ -106,7 +109,7 @@ public class OSEC extends JFrame {
 		lblTollesProgramm.setHorizontalAlignment(SwingConstants.CENTER);
 		lblTollesProgramm.setForeground(Color.BLUE);
 		lblTollesProgramm.setFont(new Font("Tahoma", Font.PLAIN, 18));
-		lblTollesProgramm.setBounds(57, 11, 326, 34);
+		lblTollesProgramm.setBounds(219, 11, 326, 34);
 		contentPane.add(lblTollesProgramm);
 		
 		JLabel lblMaxCadence = new JLabel("Maximum cadence");
@@ -126,7 +129,7 @@ public class OSEC extends JFrame {
 		
 		txtNumberOfPas = new JTextField();
 		txtNumberOfPas.setText("8");
-		txtNumberOfPas.setBounds(150, 87, 86, 20);
+		txtNumberOfPas.setBounds(150, 86, 86, 20);
 		contentPane.add(txtNumberOfPas);
 		txtNumberOfPas.setColumns(10);
 		txtNumberOfPas.setToolTipText("This is the number of magnets in your PAS disk.");
@@ -142,18 +145,8 @@ public class OSEC extends JFrame {
 		Assist_Level_6.setColumns(10);
 		Assist_Level_6.setToolTipText("This is the percentage of the defined maximum current in Level 5.");
 		
-		txtMotor_specific_angle = new JTextField();
-		txtMotor_specific_angle.setText("137");
-		txtMotor_specific_angle.setBounds(382, 255, 86, 20);
-		contentPane.add(txtMotor_specific_angle);
-		txtMotor_specific_angle.setColumns(10);
-		
-		JLabel lblAngleadjust = new JLabel("Angle adjust");
-		lblAngleadjust.setBounds(281, 261, 119, 14);
-		contentPane.add(lblAngleadjust);
-		
 		JLabel lblAssistLevel0 = new JLabel("Assist Level 0");
-		lblAssistLevel0.setBounds(281, 95, 119, 14);
+		lblAssistLevel0.setBounds(281, 92, 119, 14);
 		contentPane.add(lblAssistLevel0);
 		
 		Assist_Level_1 = new JTextField();
@@ -203,6 +196,115 @@ public class OSEC extends JFrame {
 		Assist_Level_5.setBounds(382, 201, 86, 20);
 		contentPane.add(Assist_Level_5);
 		
+		JLabel lblCellVoltageMax = new JLabel("Cell Voltage Max");
+		lblCellVoltageMax.setBounds(534, 95, 119, 14);
+		contentPane.add(lblCellVoltageMax);
+		
+		LI_ION_CELL_VOLTS_MAX = new JTextField();
+		LI_ION_CELL_VOLTS_MAX.setToolTipText("This is the percentage of the defined maximum current in Level 1.");
+		LI_ION_CELL_VOLTS_MAX.setText("4.25");
+		LI_ION_CELL_VOLTS_MAX.setColumns(10);
+		LI_ION_CELL_VOLTS_MAX.setBounds(648, 92, 86, 20);
+		contentPane.add(LI_ION_CELL_VOLTS_MAX);
+		
+		LI_ION_CELL_VOLTS_20 = new JTextField();
+		LI_ION_CELL_VOLTS_20.setToolTipText("This is the percentage of the defined maximum current in Level 1.");
+		LI_ION_CELL_VOLTS_20.setText("3.38");
+		LI_ION_CELL_VOLTS_20.setColumns(10);
+		LI_ION_CELL_VOLTS_20.setBounds(648, 230, 86, 20);
+		contentPane.add(LI_ION_CELL_VOLTS_20);
+		
+		LI_ION_CELL_VOLTS_10 = new JTextField();
+		LI_ION_CELL_VOLTS_10.setToolTipText("This is the percentage of the defined maximum current in Level 1.");
+		LI_ION_CELL_VOLTS_10.setText("3.25");
+		LI_ION_CELL_VOLTS_10.setColumns(10);
+		LI_ION_CELL_VOLTS_10.setBounds(648, 261, 86, 20);
+		contentPane.add(LI_ION_CELL_VOLTS_10);
+		
+		LI_ION_CELL_VOLTS_40 = new JTextField();
+		LI_ION_CELL_VOLTS_40.setToolTipText("This is the percentage of the defined maximum current in Level 1.");
+		LI_ION_CELL_VOLTS_40.setText("3.6");
+		LI_ION_CELL_VOLTS_40.setColumns(10);
+		LI_ION_CELL_VOLTS_40.setBounds(648, 204, 86, 20);
+		contentPane.add(LI_ION_CELL_VOLTS_40);
+		
+		LI_ION_CELL_VOLTS_60 = new JTextField();
+		LI_ION_CELL_VOLTS_60.setToolTipText("This is the percentage of the defined maximum current in Level 1.");
+		LI_ION_CELL_VOLTS_60.setText("3.78");
+		LI_ION_CELL_VOLTS_60.setColumns(10);
+		LI_ION_CELL_VOLTS_60.setBounds(648, 173, 86, 20);
+		contentPane.add(LI_ION_CELL_VOLTS_60);
+		
+		LI_ION_CELL_VOLTS_80 = new JTextField();
+		LI_ION_CELL_VOLTS_80.setToolTipText("This is the percentage of the defined maximum current in Level 1.");
+		LI_ION_CELL_VOLTS_80.setText("3.93");
+		LI_ION_CELL_VOLTS_80.setColumns(10);
+		LI_ION_CELL_VOLTS_80.setBounds(648, 149, 86, 20);
+		contentPane.add(LI_ION_CELL_VOLTS_80);
+		
+		LI_ION_CELL_VOLTS_100 = new JTextField();
+		LI_ION_CELL_VOLTS_100.setToolTipText("This is the percentage of the defined maximum current in Level 1.");
+		LI_ION_CELL_VOLTS_100.setText("4.06");
+		LI_ION_CELL_VOLTS_100.setColumns(10);
+		LI_ION_CELL_VOLTS_100.setBounds(648, 120, 86, 20);
+		contentPane.add(LI_ION_CELL_VOLTS_100);
+		
+		LI_ION_CELL_VOLTS_0 = new JTextField();
+		LI_ION_CELL_VOLTS_0.setToolTipText("This is the percentage of the defined maximum current in Level 1.");
+		LI_ION_CELL_VOLTS_0.setText("3.00");
+		LI_ION_CELL_VOLTS_0.setColumns(10);
+		LI_ION_CELL_VOLTS_0.setBounds(648, 292, 86, 20);
+		contentPane.add(LI_ION_CELL_VOLTS_0);
+		
+		JLabel lblCellVoltage100 = new JLabel("Cell Voltage 100");
+		lblCellVoltage100.setBounds(534, 123, 119, 14);
+		contentPane.add(lblCellVoltage100);
+		
+		JLabel lblCellVoltage80 = new JLabel("Cell Voltage 80");
+		lblCellVoltage80.setBounds(534, 152, 119, 14);
+		contentPane.add(lblCellVoltage80);
+		
+		JLabel lblCellVoltage60 = new JLabel("Cell Voltage 60");
+		lblCellVoltage60.setBounds(534, 176, 119, 14);
+		contentPane.add(lblCellVoltage60);
+		
+		JLabel lblCellVoltage40 = new JLabel("Cell Voltage 40");
+		lblCellVoltage40.setBounds(534, 207, 119, 14);
+		contentPane.add(lblCellVoltage40);
+		
+		JLabel lblCellVoltage20 = new JLabel("Cell Voltage 20");
+		lblCellVoltage20.setBounds(534, 233, 119, 14);
+		contentPane.add(lblCellVoltage20);
+		
+		JLabel lblCellVoltage10 = new JLabel("Cell Voltage 10");
+		lblCellVoltage10.setBounds(534, 264, 119, 14);
+		contentPane.add(lblCellVoltage10);
+		
+		JLabel lblCellVoltage0 = new JLabel("Cell Voltage 0");
+		lblCellVoltage0.setBounds(534, 295, 119, 14);
+		contentPane.add(lblCellVoltage0);
+		
+		PAS_THRESHOLD = new JTextField();
+		PAS_THRESHOLD.setText("1.70");
+		PAS_THRESHOLD.setColumns(10);
+		PAS_THRESHOLD.setBounds(382, 252, 86, 20);
+		contentPane.add(PAS_THRESHOLD);
+		
+		JLabel lblPasThreshold = new JLabel("PAS threshold");
+		lblPasThreshold.setBounds(281, 255, 119, 14);
+		contentPane.add(lblPasThreshold);
+		
+		JLabel lblLcdbatterycurrentfactor = new JLabel("Current factor");
+		lblLcdbatterycurrentfactor.setBounds(281, 286, 119, 14);
+		contentPane.add(lblLcdbatterycurrentfactor);
+		
+		LCD_BATTERY_CURRENT_FACTOR = new JTextField();
+		LCD_BATTERY_CURRENT_FACTOR.setText("1.50");
+		LCD_BATTERY_CURRENT_FACTOR.setColumns(10);
+		LCD_BATTERY_CURRENT_FACTOR.setBounds(382, 283, 86, 20);
+		contentPane.add(LCD_BATTERY_CURRENT_FACTOR);
+		
+		
 		JList list = new JList();
 		list.setBounds(441, 177, 1, 1);
 		contentPane.add(list);
@@ -224,14 +326,14 @@ public class OSEC extends JFrame {
 			}
 		});
 		lblHttpsopensourceebikefirmwarebitbucketio.setForeground(Color.BLUE);
-		lblHttpsopensourceebikefirmwarebitbucketio.setBounds(68, 627, 309, 29);
+		lblHttpsopensourceebikefirmwarebitbucketio.setBounds(215, 633, 309, 29);
 		contentPane.add(lblHttpsopensourceebikefirmwarebitbucketio);
 		
 		lblOpenSourceFirmware = new JLabel("Open Source Firmware for E-Bike Controller");
 		lblOpenSourceFirmware.setHorizontalAlignment(SwingConstants.CENTER);
 		lblOpenSourceFirmware.setFont(new Font("Tahoma", Font.PLAIN, 11));
 		lblOpenSourceFirmware.setForeground(Color.BLUE);
-		lblOpenSourceFirmware.setBounds(97, 42, 255, 14);
+		lblOpenSourceFirmware.setBounds(259, 42, 255, 14);
 		contentPane.add(lblOpenSourceFirmware);
 		
 		txtMaxbatterycurrent = new JTextField();
@@ -255,7 +357,7 @@ public class OSEC extends JFrame {
 		contentPane.add(txtMaxregencurrent);
 		
 		txtOffsetangle = new JTextField();
-		txtOffsetangle.setText("202");
+		txtOffsetangle.setText("0");
 		txtOffsetangle.setBounds(150, 257, 86, 20);
 		contentPane.add(txtOffsetangle);
 		txtOffsetangle.setColumns(10);
@@ -369,22 +471,6 @@ public class OSEC extends JFrame {
 		rdbtn13s.setBounds(5, 457, 61, 23);
 		contentPane.add(rdbtn13s);
 		
-		lblControllerType = new JLabel("Controller Type");
-		lblControllerType.setFont(new Font("Tahoma", Font.BOLD, 12));
-		lblControllerType.setBounds(186, 384, 109, 14);
-		contentPane.add(lblControllerType);
-		
-		rdbtn6Fet = new JRadioButton("6 FET");
-		Controller_type.add(rdbtn6Fet);
-		rdbtn6Fet.setSelected(true);
-		rdbtn6Fet.setBounds(186, 403, 109, 23);
-		contentPane.add(rdbtn6Fet);
-		
-		rdbtn12Fet = new JRadioButton("12 FET");
-		Controller_type.add(rdbtn12Fet);
-		rdbtn12Fet.setBounds(186, 427, 86, 23);
-		contentPane.add(rdbtn12Fet);
-		
 		JLabel lblInterpolationstart60 = new JLabel("60\u00B0 Interpolation Start");
 		lblInterpolationstart60.setBounds(5, 291, 141, 14);
 		contentPane.add(lblInterpolationstart60);
@@ -416,16 +502,6 @@ public class OSEC extends JFrame {
 		rdbtnThrottleNotLimited.setBounds(150, 526, 131, 23);
 		contentPane.add(rdbtnThrottleNotLimited);
 		
-		JLabel lblAngleAdjustInv = new JLabel("Angle adjust inv.");
-		lblAngleAdjustInv.setBounds(281, 286, 127, 14);
-		contentPane.add(lblAngleAdjustInv);
-		
-		AdjInv = new JTextField();
-		AdjInv.setText("242");
-		AdjInv.setColumns(10);
-		AdjInv.setBounds(382, 283, 86, 20);
-		contentPane.add(AdjInv);
-		
 		JLabel lblRegenMotorMax = new JLabel("Regen Motor max");
 		lblRegenMotorMax.setBounds(5, 319, 131, 14);
 		contentPane.add(lblRegenMotorMax);
@@ -449,10 +525,6 @@ public class OSEC extends JFrame {
 		JRadioButton rdbtnUseRegen = new JRadioButton("Use Regen");
 		rdbtnUseRegen.setBounds(277, 315, 131, 23);
 		contentPane.add(rdbtnUseRegen);
-		
-		JRadioButton rdbtnLinux = new JRadioButton("Linux");
-		rdbtnLinux.setBounds(277, 343, 131, 23);
-		contentPane.add(rdbtnLinux);
 		
 		
 		
@@ -489,7 +561,7 @@ public class OSEC extends JFrame {
 				}
 			}
 		});
-		btnWriteoptionsbyte.setBounds(295, 541, 167, 51);
+		btnWriteoptionsbyte.setBounds(567, 546, 167, 51);
 		contentPane.add(btnWriteoptionsbyte);
 		
 		btnWriteConfiguration = new JButton("Write Configuration");
@@ -525,10 +597,7 @@ public class OSEC extends JFrame {
 		            pWriter.println(text_to_save); 
 		            text_to_save = "#define ADC_MOTOR_REGEN_CURRENT_MAX " + RegenMotorMax.getText();
 		            pWriter.println(text_to_save); 
-		            text_to_save = "#define FOC_READ_ID_CURRENT_ANGLE_ADJUST " + txtMotor_specific_angle.getText();
-		            pWriter.println(text_to_save); 
-		            text_to_save = "#define FOC_READ_ID_CURRENT_ANGLE_ADJUST_INVERT" + AdjInv.getText();
-		            pWriter.println(text_to_save); 
+
 
 		            text_to_save = "#define ASSIST_LEVEL_0  " + Assist_Level_1.getText();
 		            pWriter.println(text_to_save); 
@@ -548,6 +617,29 @@ public class OSEC extends JFrame {
 		            pWriter.println(text_to_save); 
 		            text_to_save = "#define MOTOR_ROTOR_ERPS_START_INTERPOLATION_60_DEGREES " + textInterpolationstart.getText();
 		            pWriter.println(text_to_save); 
+		            
+		            text_to_save = "#define LI_ION_CELL_VOLTS_MAX " + LI_ION_CELL_VOLTS_MAX.getText();
+		            pWriter.println(text_to_save); 
+		            text_to_save = "#define LI_ION_CELL_VOLTS_100 " + LI_ION_CELL_VOLTS_100.getText();
+		            pWriter.println(text_to_save);
+		            text_to_save = "#define LI_ION_CELL_VOLTS_80 " + LI_ION_CELL_VOLTS_80.getText();
+		            pWriter.println(text_to_save);
+		            text_to_save = "#define LI_ION_CELL_VOLTS_60 " + LI_ION_CELL_VOLTS_60.getText();
+		            pWriter.println(text_to_save);
+		            text_to_save = "#define LI_ION_CELL_VOLTS_40 " + LI_ION_CELL_VOLTS_40.getText();
+		            pWriter.println(text_to_save);
+		            text_to_save = "#define LI_ION_CELL_VOLTS_20 " + LI_ION_CELL_VOLTS_20.getText();
+		            pWriter.println(text_to_save);
+		            text_to_save = "#define LI_ION_CELL_VOLTS_10 " + LI_ION_CELL_VOLTS_10.getText();
+		            pWriter.println(text_to_save);
+		            text_to_save = "#define LI_ION_CELL_VOLTS_0 " + LI_ION_CELL_VOLTS_0.getText();
+		            pWriter.println(text_to_save);
+		            
+		            text_to_save = "#define PAS_THRESHOLD " + PAS_THRESHOLD.getText();
+		            pWriter.println(text_to_save);
+		            
+		            text_to_save = "#define LCD_BATTERY_CURRENT_FACTOR " + LCD_BATTERY_CURRENT_FACTOR.getText();
+		            pWriter.println(text_to_save);
 	            
 		            
 
@@ -591,14 +683,7 @@ public class OSEC extends JFrame {
 			            text_to_save = "#define BATTERY_LI_ION_CELLS_NUMBER	 13";
 			            pWriter.println(text_to_save); 
 		    		}
-		    		if (rdbtn6Fet.isSelected()){ 
-			            text_to_save = "#define CONTROLLER_TYPE CONTROLLER_TYPE_S06S";
-			            pWriter.println(text_to_save); 
-		    		}
-		    		if (rdbtn12Fet.isSelected()){ 
-			            text_to_save = "#define CONTROLLER_TYPE CONTROLLER_TYPE_S12S";
-			            pWriter.println(text_to_save); 
-		    		}
+
 		    		if (rdbtnYes.isSelected()){ 
 			            text_to_save = "#define DO_SINEWAVE_INTERPOLATION_360_DEGREES";
 			            pWriter.println(text_to_save); 
@@ -614,10 +699,7 @@ public class OSEC extends JFrame {
 			            pWriter.println(text_to_save); 
 		    		}
 		    		
-		    		if (rdbtnLinux.isSelected()){ 
-			            text_to_save = "#define LINUX";
-			            pWriter.println(text_to_save); 
-		    		}
+
 
 		            pWriter.println("\r\n#endif /* CONFIG_H_ */"); 
 		            
@@ -642,8 +724,13 @@ public class OSEC extends JFrame {
 		});
 		btnWriteConfiguration.setFont(new Font("Tahoma", Font.BOLD, 12));
 		btnWriteConfiguration.setForeground(Color.BLUE);
-		btnWriteConfiguration.setBounds(295, 471, 167, 58);
+		btnWriteConfiguration.setBounds(567, 476, 167, 58);
 		contentPane.add(btnWriteConfiguration);
+		
+
+		
+
+
 		
 
 		
