@@ -139,3 +139,14 @@ uint8_t ui8_adc_read_battery_voltage (void)
   // 0x53E0 + 2*9 = 0x53F2
   return *(uint8_t*)(0x53F2);
 }
+
+uint16_t ui16_adc_read_battery_voltage (void)
+{
+  uint16_t temph;
+  uint8_t templ;
+
+  templ = *(uint8_t*)(0x53F3);
+  temph = *(uint8_t*)(0x53F2);
+
+  return ((uint16_t) temph) << 2 | ((uint16_t) templ);
+}

@@ -45,7 +45,7 @@ uint8_t ui8_motor_state = MOTOR_STATE_COAST;
 
 int8_t hall_sensors;
 int8_t hall_sensors_last = 0;
-int8_t int8_t_hall_case[6];
+uint8_t uint8_t_hall_case[7];
 int8_t int8_t_hall_counter=0;
 
 uint16_t ui16_ADC_iq_current = 0;
@@ -90,7 +90,7 @@ void hall_sensors_read_and_action (void)
       // full electric revolution recognized, reset counters read here the phase B current for FOC,
 
 #ifdef LOGPHASECURRENT
-	int8_t_hall_case[3]=ui8_adc_read_phase_B_current();
+	uint8_t_hall_case[3]=ui8_adc_read_phase_B_current();
 #endif
       if (ui8_adc_read_throttle_busy == 0)
       {
@@ -143,17 +143,16 @@ void hall_sensors_read_and_action (void)
       }
 #endif
 
-      /*if(ui8_regen_flag)ui8_motor_rotor_absolute_position = ANGLE_240 + MOTOR_ROTOR_DELTA_PHASE_ANGLE_RIGHT;
-      else */
+
       ui8_motor_rotor_absolute_position = ANGLE_180 + MOTOR_ROTOR_DELTA_PHASE_ANGLE_RIGHT;
       break;
 
       case 1: //rotor position 240 degree, do FOC control
 #ifdef LOGPHASECURRENT
-	int8_t_hall_case[4]=ui8_adc_read_phase_B_current ();
+	uint8_t_hall_case[4]=ui8_adc_read_phase_B_current ();
 #endif
 
-	if (ui16_motor_speed_erps > 3 ) //normal riding,
+	if (ui16_motor_speed_erps > 3 && ui8_regen_throttle<=2) //normal riding,
 	      {
 		if (ui16_ADC_iq_current>>2 > 127 && ui8_position_correction_value < 135)
 		{
@@ -164,32 +163,14 @@ void hall_sensors_read_and_action (void)
 		  ui8_position_correction_value--;
 		}
 	      }
-	/*if(ui16_motor_speed_erps > 3){
-	if (ui16_BatteryCurrent > ui16_current_cal_b)
-	      {
-		if (ui16_ADC_iq_current>>2 > 127 && ui8_position_correction_value < 135)
-		{
-		  ui8_position_correction_value++;
-		}
-		else if (ui16_ADC_iq_current>>2 < 125 && ui8_position_correction_value >90)
-		{
-		  ui8_position_correction_value--;
-		}
-	      }
+	else if (ui16_motor_speed_erps > 3 && ui8_regen_throttle>2) //regen
+	{
 
-	if (ui16_BatteryCurrent < ui16_current_cal_b) //regen, current negative
-		      {
-			if (ui16_ADC_iq_current>>2 > 127 && ui8_position_correction_value > 90)
-			{
-			  ui8_position_correction_value--;
-			}
-			else if (ui16_ADC_iq_current>>2 < 125 && ui8_position_correction_value < 135)
-			{
-			  ui8_position_correction_value++;
-			}
-		      }
-	}*/
-	else ui8_position_correction_value=127; //reset advance angle at very low speed)
+	    ui8_position_correction_value=127; //set advance angle to neutral value
+	}
+
+
+	else if (ui16_motor_speed_erps < 3)ui8_position_correction_value=127; //reset advance angle at very low speed)
 
       if (ui8_motor_state != MOTOR_STATE_RUNNING_INTERPOLATION_360_DEGREES)
       {
@@ -201,7 +182,7 @@ void hall_sensors_read_and_action (void)
 
       case 5: //rotor position 300 degree
 #ifdef LOGPHASECURRENT
-	int8_t_hall_case[5]=ui8_adc_read_phase_B_current ();
+	uint8_t_hall_case[5]=ui8_adc_read_phase_B_current ();
 #endif
 
       if (ui8_motor_state != MOTOR_STATE_RUNNING_INTERPOLATION_360_DEGREES)
@@ -216,7 +197,7 @@ void hall_sensors_read_and_action (void)
       case 4: //rotor position 0 degree
 	ui8_half_rotation_flag=1;
 #ifdef LOGPHASECURRENT
-	int8_t_hall_case[0]=ui8_adc_read_phase_B_current ();
+	uint8_t_hall_case[0]=ui8_adc_read_phase_B_current ();
 #endif
 	debug_pin_reset ();
       if (ui8_motor_state != MOTOR_STATE_RUNNING_INTERPOLATION_360_DEGREES)
@@ -229,7 +210,7 @@ void hall_sensors_read_and_action (void)
 
       case 6://rotor position 60 degree
 #ifdef LOGPHASECURRENT
-	int8_t_hall_case[1]=ui8_adc_read_phase_B_current ();
+	uint8_t_hall_case[1]=ui8_adc_read_phase_B_current ();
 #endif
 
       if (ui8_motor_state != MOTOR_STATE_RUNNING_INTERPOLATION_360_DEGREES)
@@ -242,7 +223,7 @@ void hall_sensors_read_and_action (void)
 
       case 2://rotor position 120 degree
 #ifdef LOGPHASECURRENT
-	int8_t_hall_case[2]=ui8_adc_read_phase_B_current ();
+	uint8_t_hall_case[2]=ui8_adc_read_phase_B_current ();
 #endif
 
       if (ui8_motor_state != MOTOR_STATE_RUNNING_INTERPOLATION_360_DEGREES)
@@ -282,10 +263,10 @@ void motor_fast_loop (void)
   {
 
 
-    ui16_PWM_cycles_counter = 0;
-    ui16_PWM_cycles_counter_6 = 0;
+    //ui16_PWM_cycles_counter = 0;
+    //ui16_PWM_cycles_counter_6 = 0;
     ui16_PWM_cycles_counter_total = 0xffff; //(SVM_TABLE_LEN_x1024) / PWM_CYCLES_COUNTER_MAX;
-    ui8_position_correction_value = 127;
+    //ui8_position_correction_value = 127;
     hall_sensors_last = 0;
     ui16_motor_speed_erps = 0;
 

@@ -70,51 +70,15 @@ uint16_t update_setpoint (uint16_t speed, uint16_t PAS, uint16_t sumtorque, uint
 
 
 #ifdef REGEN
+
   //check if regen is wanted
-  if(ui8_regen_throttle>2){
-
-    if (ui16_motor_speed_erps*4>14){
-
-
-	 float_temp=(float)ui8_regen_throttle*(float)(REGEN_CURRENT_MAX_VALUE-ui16_current_cal_b)/255.0+(float)ui16_current_cal_b;
-
-	 ui32_setpoint= PI_control(ui16_BatteryCurrent, (uint16_t) float_temp);
-
-	 if (ui32_setpoint<(ui16_motor_speed_erps*4-14)/2)ui32_setpoint=(ui16_motor_speed_erps*4-14)/2;
-  }
-    else ui32_setpoint= PI_control(ui16_BatteryCurrent, ui16_current_cal_b); //if erps are too low, control current to zero
-    if (ui32_setpoint<5)ui32_setpoint=0;
+    if(ui8_regen_throttle>2){
+    float_temp=(float)ui8_regen_throttle*(float)(REGEN_CURRENT_MAX_VALUE-ui16_current_cal_b)/255.0+(float)ui16_current_cal_b;
+    ui32_setpoint= PI_control(ui16_BatteryCurrent, (uint16_t) float_temp);
+    if (ui32_setpoint<3)ui32_setpoint=0;
     if (ui32_setpoint>255)ui32_setpoint=255;
-  }
-
-/*
-  if (!ui8_regen_flag && setpoint_old > 0){ui32_setpoint= PI_control(setpoint_old, 0);} //Ramp down duty cycle before switching from +90° to -90°
-
-  else if (!ui8_regen_flag) // switch commutation from +90°, working as motor to -90°, working as generator
-    {ui8_position_correction_value=127;
-    ui8_regen_flag=1;
-    //printf("1.elseif\r\n");
+    //printf("R, %lu, %d, %d, %d\r\n", ui32_setpoint, ui8_regen_throttle, ui16_BatteryCurrent, (uint16_t) float_temp);
     }
-
-  else if (ui8_regen_flag){ ui32_setpoint= PI_control(setpoint_old,  0);} //control current to desired value, workaround to let the control loop run into the right direction
-
-  //printf("R, %lu, %d, %d, %d\r\n", ui32_setpoint, ui8_regen_throttle, ui16_BatteryCurrent, (uint16_t) float_temp);
-  ui8_position_correction_value= 127;
-  ui32_setpoint=ui8_regen_throttle;
-	if (ui32_setpoint<5)ui32_setpoint=0;
-        if (ui32_setpoint>255)ui32_setpoint=255;
-        //printf("2.elseif\r\n");
-  }
-
-  else if (ui8_regen_flag){ // switch commutation back to motor mode
-    if (setpoint_old > 0){ui32_setpoint= PI_control(setpoint_old, 0);} //ramp down duty cycle
-
-    else
-    {
-	ui8_position_correction_value =127;
-	ui8_regen_flag=0;
-    }
-  }*/
   else if(ui8_BatteryVoltage<BATTERY_VOLTAGE_MIN_VALUE){
 #endif
       //check for undervoltage
@@ -240,7 +204,7 @@ uint16_t update_setpoint (uint16_t speed, uint16_t PAS, uint16_t sumtorque, uint
         uint_PWM_Enable=1;
         //printf("PWM enabled!\n");
      }
-  } //end of else
+ } //end of else
 
   return ui32_setpoint;
 

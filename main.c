@@ -15,6 +15,7 @@
 #include "interrupts.h"
 #include "stm8s_tim2.h"
 #include "motor.h"
+#include "main.h"
 #include "uart.h"
 #include "adc.h"
 #include "brake.h"
@@ -68,6 +69,15 @@ uint8_t PAS_old=4;			//last PAS direction reading
 uint16_t ui16_PAS = 32000;		//cadence in timetics
 uint8_t ui8_PAS_Flag = 0; 		//flag for PAS interrupt
 uint8_t ui8_SPEED_Flag = 0; 		//flag for SPEED interrupt
+uint8_t uint8_t_rotorposition [7] = {
+    0 ,
+    42 ,
+    85 ,
+    127 ,
+    170 ,
+    212 ,
+    255
+  };
 
 
 uint8_t ui8_assistlevel_global = 3;// for debugging of display communication
@@ -280,6 +290,7 @@ int main (void)
 #endif
 
 
+
 // scheduled update of setpoint and duty cycle (slow loop, 50 Hz)
 
 	if (ui8_slowloop_flag)
@@ -382,6 +393,7 @@ if(ui8_cheat_state==3) //second step, make sure the brake is hold according to d
 
 
 
+
 	  /****************************************************************************/
 //very slow loop for communication
       if (ui8_veryslowloop_counter > 5){
@@ -394,13 +406,17 @@ if(ui8_cheat_state==3) //second step, make sure the brake is hold according to d
 	  //printf("erps %d, motorstate %d, cyclecountertotal %d\r\n", ui16_motor_speed_erps, ui8_motor_state, ui16_PWM_cycles_counter_total);
 
       //printf("cheatstate, %d, km/h %lu, Voltage, %d, setpoint %d, erps %d, current %d, correction_value, %d\n", ui8_cheat_state, ui32_SPEED_km_h, ui8_BatteryVoltage, ui16_setpoint, ui16_motor_speed_erps, ui16_BatteryCurrent, ui8_position_correction_value);
-     // printf("%d, %d, %d, %d, %d, %d\r\n", (uint16_t) int8_t_hall_case[0], (uint16_t)int8_t_hall_case[1],(uint16_t) int8_t_hall_case[2],(uint16_t) int8_t_hall_case[3], (uint16_t)int8_t_hall_case[4], (uint16_t)int8_t_hall_case[5]);
+
 	//printf("kv %d, erps %d, R %d\n", (uint16_t)(float_kv*10.0) , ui16_motor_speed_erps, (uint16_t)(float_R*1000.0));
 #ifdef LOGPHASECURRENT
-	  for(a = 0; a < 6; a++) {			// sum up array content
-	  	   putchar(int8_t_hall_case[a]);
+	  /*for(a = 0; a < 6; a++) {			// sum up array content
+	  	   putchar(uint8_t_hall_case[a]);
 	  	   }
-	  putchar(255);
+	  putchar(ui16_ADC_iq_current>>2);
+	  putchar(ui8_position_correction_value);
+	  putchar(255);*/
+	  // printf("%d, %d, %d, %d, %d, %d\r\n", (uint16_t) uint8_t_hall_case[0], (uint16_t)uint8_t_hall_case[1],(uint16_t) uint8_t_hall_case[2],(uint16_t) uint8_t_hall_case[3], (uint16_t)uint8_t_hall_case[4], (uint16_t)uint8_t_hall_case[5]);
+	  printf("%d, %d, %d, %d, %d, %d, %d,\r\n", ui8_position_correction_value, ui16_BatteryCurrent, ui16_setpoint, ui8_regen_throttle, ui16_motor_speed_erps, ui16_ADC_iq_current>>2,ui16_adc_read_battery_voltage());
 #endif
 
 #ifndef LOGPHASECURRENT
@@ -413,3 +429,5 @@ if(ui8_cheat_state==3) //second step, make sure the brake is hold according to d
     }// end of slow loop
   }// end of while(1) loop
 }
+
+
