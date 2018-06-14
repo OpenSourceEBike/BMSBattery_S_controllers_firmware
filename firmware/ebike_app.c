@@ -582,6 +582,7 @@ void set_speed_erps_max_to_motor_controller (struct_lcd_configuration_variables 
   // avoid 0 division
   if (f_temp != 0) { f_temp = ((float) ui32_temp) / f_temp; }
   else { f_temp = ((float) ui32_temp); }
+  if (ui8_cheat_state==4) f_temp=MOTOR_OVER_SPEED_ERPS-1; //set maximum speed if limit is disabled
   motor_controller_set_speed_erps_max ((uint16_t) f_temp);
 }
 
@@ -795,13 +796,13 @@ void ebike_throttle_type_throttle_pas (void)
   ebike_app_battery_set_current_max (ui8_target_current);
 
   // LCD P3 = 1, control / limit speed to max value
-  if (lcd_configuration_variables.ui8_power_assist_control_mode)
+  if (lcd_configuration_variables.ui8_power_assist_control_mode || ui8_cheat_state==4)
   {
     // do not control the speed here, so put output value = 255
     ui8_target_duty_cycle = 255;
     if (ui8_temp == 0) { ui8_target_duty_cycle = 0; }
   }
-  else if (ui8_cheat_state!=4 && !lcd_configuration_variables.ui8_power_assist_control_mode) // LCD P3 = 0, control also the speed depending on ui8_throttle_pas_target_value
+  else // LCD P3 = 0, control also the speed depending on ui8_throttle_pas_target_value
   {
     // map to wheel speed
     ui8_temp = (uint8_t) (map ((uint32_t) ui8_temp,
@@ -865,8 +866,8 @@ void ebike_throttle_type_torque_sensor (void)
   ui8_target_duty_cycle = 255;
   if (ui8_temp == 0) { ui8_target_duty_cycle = 0; }
 
-  // LCD P3 = 1, control only current
-  if (lcd_configuration_variables.ui8_power_assist_control_mode)
+  // LCD P3 = 1 or cheat is enabled, control only current
+  if (lcd_configuration_variables.ui8_power_assist_control_mode || ui8_cheat_state==4)
   {
     // current controller
     ui8_target_current = (uint8_t) (map ((uint32_t) ui8_temp,
@@ -876,7 +877,7 @@ void ebike_throttle_type_torque_sensor (void)
 			 (uint32_t) ui8_battery_controller_max_current));  // max output battery current value
     ebike_app_battery_set_current_max (ui8_target_current);
   }
-  else if (ui8_cheat_state!=4 && !lcd_configuration_variables.ui8_power_assist_control_mode) // LCD P3 = 0, control current and also the speed if cheat is not active
+  else // LCD P3 = 0, control current and also the speed
   {
     // speed controller
     // map to wheel speed
