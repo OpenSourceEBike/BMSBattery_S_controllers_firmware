@@ -180,9 +180,9 @@
 
 extern uint8_t ui8_cheat_state; //Status of speed limit disabling
 // definition duration cheat state steps
-#define CHEAT_TIME_1 50
-#define CHEAT_TIME_2 50
-#define CHEAT_TIME_3 50
+#define CHEAT_TIME_1 10
+#define CHEAT_TIME_2 10
+#define CHEAT_TIME_3 10
 
 
 // *************************************************************************** //
