@@ -133,6 +133,7 @@ void ebike_app_init (void)
   wheel_speed_pi_controller_state.ui8_ki_dividend = WHEEL_SPEED_PI_CONTROLLER_KI_DIVIDEND;
   wheel_speed_pi_controller_state.ui8_ki_divisor = WHEEL_SPEED_PI_CONTROLLER_KI_DIVISOR;
   wheel_speed_pi_controller_state.i16_i_term = 0;
+  lcd_configuration_variables.ui8_power_assist_control_mode=0; // enable speed control by default, even if no display is connected
 }
 
 void ebike_app_controller (void)
@@ -800,7 +801,7 @@ void ebike_throttle_type_throttle_pas (void)
     ui8_target_duty_cycle = 255;
     if (ui8_temp == 0) { ui8_target_duty_cycle = 0; }
   }
-  else // LCD P3 = 0, control also the speed depending on ui8_throttle_pas_target_value
+  else if (ui8_cheat_state!=4 && !lcd_configuration_variables.ui8_power_assist_control_mode) // LCD P3 = 0, control also the speed depending on ui8_throttle_pas_target_value
   {
     // map to wheel speed
     ui8_temp = (uint8_t) (map ((uint32_t) ui8_temp,
@@ -875,7 +876,7 @@ void ebike_throttle_type_torque_sensor (void)
 			 (uint32_t) ui8_battery_controller_max_current));  // max output battery current value
     ebike_app_battery_set_current_max (ui8_target_current);
   }
-  else // LCD P3 = 0, control current and also the speed
+  else if (ui8_cheat_state!=4 && !lcd_configuration_variables.ui8_power_assist_control_mode) // LCD P3 = 0, control current and also the speed if cheat is not active
   {
     // speed controller
     // map to wheel speed

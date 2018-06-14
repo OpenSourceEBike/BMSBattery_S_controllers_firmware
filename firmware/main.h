@@ -176,6 +176,15 @@
 // 0 equal to no filtering and no delay, higher values will increase filtering but will also add bigger delay
 #define READ_BATTERY_CURRENT_FILTER_COEFFICIENT 3
 #define READ_BATTERY_VOLTAGE_FILTER_COEFFICIENT 5
+
+
+extern uint8_t ui8_cheat_state; //Status of speed limit disabling
+// definition duration cheat state steps
+#define CHEAT_TIME_1 50
+#define CHEAT_TIME_2 50
+#define CHEAT_TIME_3 50
+
+
 // *************************************************************************** //
 
 #endif // _MAIN_H_
