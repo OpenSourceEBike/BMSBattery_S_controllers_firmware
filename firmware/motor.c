@@ -554,6 +554,30 @@ void TIM1_CAP_COM_IRQHandler(void) __interrupt(TIM1_CAP_COM_IRQHANDLER)
   // we need to put phase voltage 90 degrees ahead of rotor position, to get current 90 degrees ahead and have max torque per amp
   ui8_sinewave_table_index -= 63;
 
+//  if (ui8_motor_commutation_type != BLOCK_COMMUTATION)
+//  {
+//    // make sure we just execute one time per ERPS, so use the flag ui8_flag_foc_read_id_current
+//    if ((ui8_motor_rotor_angle >= MOTOR_ROTOR_ANGLE_FOC) && (ui8_flag_foc_read_id_current))
+//    {
+//      ui8_flag_foc_read_id_current = 0;
+//
+//      // minimum speed to do FOC
+//      if (ui16_motor_speed_erps > MOTOR_ROTOR_ERPS_START_INTERPOLATION_60_DEGREES)
+//      {
+//	// minimum current to do FOC (motor or regen modes)
+//        if ((UI8_ADC_BATTERY_CURRENT > (ui8_adc_battery_current_offset + 3)) || // at least 1 amp
+//            (UI8_ADC_BATTERY_CURRENT < (ui8_adc_battery_current_offset - 3))) // at least 1 amp
+//	{
+//	  // read here the phase B current: FOC Id current
+//	  ui8_adc_id_current = UI8_ADC_MOTOR_PHASE_B_CURRENT;
+//
+//	  if (ui8_adc_id_current > ADC_PHASE_B_CURRENT_ZERO_AMPS_FOC_MAX) { ui8_angle_correction++; }
+//	  else if (ui8_adc_id_current < ADC_PHASE_B_CURRENT_ZERO_AMPS_FOC_MIN) { ui8_angle_correction--; }
+//	}
+//      }
+//    }
+//  }
+
   if (ui8_motor_commutation_type != BLOCK_COMMUTATION)
   {
     // make sure we just execute one time per ERPS, so use the flag ui8_flag_foc_read_id_current
@@ -564,20 +588,18 @@ void TIM1_CAP_COM_IRQHandler(void) __interrupt(TIM1_CAP_COM_IRQHANDLER)
       // minimum speed to do FOC
       if (ui16_motor_speed_erps > MOTOR_ROTOR_ERPS_START_INTERPOLATION_60_DEGREES)
       {
-        // read here the phase B current: FOC Id current
-        ui8_adc_id_current = UI8_ADC_MOTOR_PHASE_B_CURRENT;
-
-        if (UI8_ADC_BATTERY_CURRENT > ui8_adc_battery_current_offset)
+	// minimum current to do FOC (motor or regen modes)
+        if (UI8_ADC_BATTERY_CURRENT > (ui8_adc_battery_current_offset + 3)) // at least 1 amp
 	{
-          // motor mode
+	  // read here the phase B current: FOC Id current
+	  ui8_adc_id_current = UI8_ADC_MOTOR_PHASE_B_CURRENT;
+
 	  if (ui8_adc_id_current > ADC_PHASE_B_CURRENT_ZERO_AMPS_FOC_MAX) { ui8_angle_correction++; }
 	  else if (ui8_adc_id_current < ADC_PHASE_B_CURRENT_ZERO_AMPS_FOC_MIN) { ui8_angle_correction--; }
 	}
-        else
+        else if (UI8_ADC_BATTERY_CURRENT < (ui8_adc_battery_current_offset - 3)) // at least 1 amp
 	{
-	  // regen mode
-  	  if (ui8_adc_id_current > ADC_PHASE_B_CURRENT_ZERO_AMPS_FOC_MAX) { ui8_angle_correction--; }
-  	  else if (ui8_adc_id_current < ADC_PHASE_B_CURRENT_ZERO_AMPS_FOC_MIN) { ui8_angle_correction++; }
+	  ui8_angle_correction = MOTOR_ROTOR_ANGLE_STARTUP;
 	}
       }
     }

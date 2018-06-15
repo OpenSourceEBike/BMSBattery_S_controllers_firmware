@@ -72,10 +72,10 @@ uint8_t ui8_wheel_speed_max = 0;
 struct_pi_controller_state wheel_speed_pi_controller_state;
 
 uint16_t ui16_adc_battery_voltage_accumulated = ((uint16_t) ADC_BATTERY_VOLTAGE_10) << READ_BATTERY_VOLTAGE_FILTER_COEFFICIENT;
-uint8_t ui8_adc_battery_voltage_filtered;
+uint8_t ui16_adc_battery_voltage_filtered;
 
 uint16_t ui16_adc_battery_current_accumulated = 0;
-uint8_t ui8_adc_battery_current_filtered;
+uint8_t ui16_adc_battery_current_filtered;
 
 volatile uint8_t ui8_ebike_app_state = EBIKE_APP_STATE_MOTOR_STOP;
 
@@ -1028,7 +1028,7 @@ void read_battery_voltage (void)
   // low pass filter the voltage readed value, to avoid possible fast spikes/noise
   ui16_adc_battery_voltage_accumulated -= ui16_adc_battery_voltage_accumulated >> READ_BATTERY_VOLTAGE_FILTER_COEFFICIENT;
   ui16_adc_battery_voltage_accumulated += ((uint16_t) UI8_ADC_BATTERY_VOLTAGE);
-  ui8_adc_battery_voltage_filtered = ui16_adc_battery_voltage_accumulated >> READ_BATTERY_VOLTAGE_FILTER_COEFFICIENT;
+  ui16_adc_battery_voltage_filtered = ui16_adc_battery_voltage_accumulated >> READ_BATTERY_VOLTAGE_FILTER_COEFFICIENT;
 }
 
 void read_battery_current (void)
@@ -1043,17 +1043,17 @@ void read_battery_current (void)
   // limit to be only positive value, LCD doesn't accept regen current value
   // avoid little values that happens over time with drifting from the hardware
   if (i16_battery_current < 4) { i16_battery_current = 0; }
-  ui8_adc_battery_current_filtered = (uint8_t) i16_battery_current;
+  ui16_adc_battery_current_filtered = (uint8_t) i16_battery_current;
 }
 
 uint8_t ebike_app_get_ADC_battery_voltage_filtered (void)
 {
-  return ui8_adc_battery_voltage_filtered;
+  return ui16_adc_battery_voltage_filtered;
 }
 
 uint8_t ebike_app_get_battery_current_filtered (void)
 {
-  return ui8_adc_battery_current_filtered;
+  return ui16_adc_battery_current_filtered;
 }
 
 float f_get_assist_level ()

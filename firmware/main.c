@@ -108,7 +108,7 @@ int main (void)
 
 #ifdef DEBUG_UART
     ui16_TIM2_counter = TIM2_GetCounter ();
-    if ((ui16_TIM2_counter - ui16_debug_uart_counter) > 20) // every 20ms
+    if ((ui16_TIM2_counter - ui16_debug_uart_counter) > 50) // every 20ms
     {
       ui16_debug_uart_counter = ui16_TIM2_counter;
 
