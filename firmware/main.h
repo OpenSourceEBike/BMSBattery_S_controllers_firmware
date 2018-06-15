@@ -178,7 +178,19 @@
 #define READ_BATTERY_VOLTAGE_FILTER_COEFFICIENT 5
 // *************************************************************************** //
 
-// Offroad mode definition duration state steps
+#if defined(OFFROAD_MODE)
+#define OFFROAD_STATE_INIT_VALUE OFFROAD_STATE_OFFROAD_MODE_ENABLE
+#else
+#define OFFROAD_STATE_INIT_VALUE OFFROAD_STATE_START
+#endif
+
+#define OFFROAD_ALWAYS_ENABLED		1
+#define OFFROAD_STATE_START 		0
+#define OFFROAD_STATE_HOLD_1		1
+#define OFFROAD_STATE_RELEASE		2
+#define OFFROAD_STATE_HOLD_2		3
+#define OFFROAD_STATE_OFFROAD_MODE_DISABLE 	4
+#define OFFROAD_STATE_OFFROAD_MODE_ENABLE 	5
 #define OFFROAD_TIME_1 10
 #define OFFROAD_TIME_2 10
 #define OFFROAD_TIME_3 10

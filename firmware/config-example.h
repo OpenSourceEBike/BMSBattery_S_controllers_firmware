@@ -55,6 +55,13 @@
 // *************************************************************************** //
 
 // *************************************************************************** //
+// OFFROAD mode
+//
+// uncoment next line so the ebike will not have imposed speed limit (speed limit value as defined on LCD)
+//#define OFFROAD_MODE OFFROAD_ALWAYS_ENABLED
+// *************************************************************************** //
+
+// *************************************************************************** //
 // LCD
 
 // the firmware supports automatically both LCD3 and LCD5

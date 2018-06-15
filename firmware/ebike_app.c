@@ -94,7 +94,7 @@ volatile uint8_t ui8_adc_target_battery_regen_current_max;
 uint8_t ui8_adc_throttle_offset;
 uint16_t ui16_adc_throttle_offset;
 
-static uint8_t ui8_offroad_state = 0;
+static uint8_t ui8_offroad_state = OFFROAD_STATE_INIT_VALUE;
 static uint8_t ui8_offroad_counter = 0;
 static uint8_t ui8_offroad_mode = 0;
 
@@ -180,106 +180,104 @@ void ebike_app_controller (void)
 
 void offroad_mode (void)
 {
-#define OFFROAD_STATE_END 4
-
-  // no point to execute all the following code if we reached the end
-  if (ui8_offroad_state != 3)
+  switch (ui8_offroad_state)
   {
-    switch (ui8_offroad_state)
-    {
-      // first step, hold brake for the defined time
-      case 0:
-	if (brake_is_set ())
+    // first step, hold brake for the defined time
+    case OFFROAD_STATE_START:
+      if (brake_is_set ())
+      {
+	ui8_offroad_state = OFFROAD_STATE_HOLD_1;
+      }
+      else
+      {
+	ui8_offroad_state = OFFROAD_STATE_OFFROAD_MODE_DISABLE;
+      }
+    break;
+
+    case OFFROAD_STATE_HOLD_1:
+      ui8_offroad_counter++;
+
+      // brake is hold to much time
+      if (ui8_offroad_counter > (OFFROAD_TIME_1 + 5))
+      {
+	ui8_offroad_state = OFFROAD_STATE_OFFROAD_MODE_DISABLE;
+      }
+
+      if (!brake_is_set ()) // brake is released...
+      {
+	if ((ui8_offroad_counter < OFFROAD_TIME_1) || // to early or...
+	    (ui8_offroad_counter > (OFFROAD_TIME_1 + 5))) // too late
 	{
-	  ui8_offroad_state = 1;
+	  ui8_offroad_state = OFFROAD_STATE_OFFROAD_MODE_DISABLE;
 	}
-	else
+	else // in time
 	{
-	  ui8_offroad_state = OFFROAD_STATE_END;
+	  ui8_offroad_counter = 0;
+	  ui8_offroad_state = OFFROAD_STATE_RELEASE;
 	}
-      break;
+      }
+    break;
 
-      case 1:
-	ui8_offroad_counter++;
+    // second step, make sure the brake is released according to defined time
+    case OFFROAD_STATE_RELEASE:
+      ui8_offroad_counter++;
 
-	// brake is hold to much time
-	if (ui8_offroad_counter > (OFFROAD_TIME_1 + 5))
+      // brake is released to much time
+      if (ui8_offroad_counter > (OFFROAD_TIME_2 + 5))
+      {
+	ui8_offroad_state = OFFROAD_STATE_OFFROAD_MODE_DISABLE;
+      }
+
+      if (brake_is_set ()) // brake is hold...
+      {
+	if ((ui8_offroad_counter < OFFROAD_TIME_2) || // to much time or...
+	    (ui8_offroad_counter > (OFFROAD_TIME_2 + 5))) // too less time
 	{
-	  ui8_offroad_state = OFFROAD_STATE_END;
+	  ui8_offroad_state = OFFROAD_STATE_OFFROAD_MODE_DISABLE;
 	}
-
-	if (!brake_is_set ()) // brake is released...
+	else // in time
 	{
-	  if ((ui8_offroad_counter < OFFROAD_TIME_1) || // to early or...
-	      (ui8_offroad_counter > (OFFROAD_TIME_1 + 5))) // too late
-	  {
-	    ui8_offroad_state = OFFROAD_STATE_END;
-	  }
-	  else // in time
-	  {
-	    ui8_offroad_counter = 0;
-	    ui8_offroad_state = 2;
-	  }
+	  ui8_offroad_counter = 0;
+	  ui8_offroad_state = OFFROAD_STATE_HOLD_2;
 	}
-      break;
+      }
+    break;
 
-      // second step, make sure the brake is released according to defined time
-      case 2:
-	ui8_offroad_counter++;
+    // third step, make sure the brake is hold according to defined time
+    case OFFROAD_STATE_HOLD_2:
+      ui8_offroad_counter++;
 
-	// brake is released to much time
-	if (ui8_offroad_counter > (OFFROAD_TIME_2 + 5))
+      // brake is hold to much time
+      if (ui8_offroad_counter > (OFFROAD_TIME_3 + 5))
+      {
+	ui8_offroad_state = OFFROAD_STATE_OFFROAD_MODE_DISABLE;
+      }
+
+      if (!brake_is_set ()) // brake is released...
+      {
+	if ((ui8_offroad_counter < OFFROAD_TIME_3) || // to early or...
+	    (ui8_offroad_counter > (OFFROAD_TIME_3 + 5))) // too late
 	{
-	  ui8_offroad_state = OFFROAD_STATE_END;
+	  ui8_offroad_state = OFFROAD_STATE_OFFROAD_MODE_DISABLE;
 	}
-
-	if (brake_is_set ()) // brake is hold...
+	else // in time
 	{
-	  if ((ui8_offroad_counter < OFFROAD_TIME_2) || // to much time or...
-	      (ui8_offroad_counter > (OFFROAD_TIME_2 + 5))) // too less time
-	  {
-	    ui8_offroad_state = OFFROAD_STATE_END;
-	  }
-	  else // in time
-	  {
-	    ui8_offroad_counter = 0;
-	    ui8_offroad_state = 3;
-	  }
+	  ui8_offroad_state = OFFROAD_STATE_OFFROAD_MODE_ENABLE;
 	}
-      break;
+      }
+    break;
 
-      // third step, make sure the brake is hold according to defined time
-      case 3:
-	ui8_offroad_counter++;
+    // do nothing, just keep on this state
+    case OFFROAD_STATE_OFFROAD_MODE_DISABLE:
+    break;
 
-	// brake is hold to much time
-	if (ui8_offroad_counter > (OFFROAD_TIME_3 + 5))
-	{
-	  ui8_offroad_state = OFFROAD_STATE_END;
-	}
+    // do nothing, just keep on this state
+    case OFFROAD_STATE_OFFROAD_MODE_ENABLE:
+      ui8_offroad_mode = 1;
+    break;
 
-	if (!brake_is_set ()) // brake is released...
-	{
-	  if ((ui8_offroad_counter < OFFROAD_TIME_3) || // to early or...
-	      (ui8_offroad_counter > (OFFROAD_TIME_3 + 5))) // too late
-	  {
-	    ui8_offroad_state = OFFROAD_STATE_END;
-	  }
-	  else // in time
-	  {
-	    ui8_offroad_mode = 1;
-	    ui8_offroad_state = OFFROAD_STATE_END;
-	  }
-	}
-      break;
-
-      // do nothing, just keep on this state
-      case 4:
-      break;
-
-      default:
-      break;
-    }
+    default:
+    break;
   }
 }
 
