@@ -6,10 +6,9 @@
  * Released under the GPL License, Version 3
  */
 
-#include "ebike_app.h"
-
 #include <stdint.h>
 #include <stdio.h>
+#include "ebike_app.h"
 #include "stm8s.h"
 #include "stm8s_gpio.h"
 #include "main.h"
@@ -55,12 +54,11 @@ uint8_t ui8_throttle_value_filtered;
 uint8_t ui8_is_throttle_released;
 
 volatile uint16_t ui16_pas1_pwm_cycles_ticks = (uint16_t) PAS_ABSOLUTE_MIN_CADENCE_PWM_CYCLE_TICKS;
-volatile uint16_t ui16_pas1_pwm_cycles_on_ticks=0;
+volatile uint16_t ui16_pas1_pwm_cycles_on_ticks = 0;
 volatile uint8_t ui8_pas1_direction = 0;
-uint8_t ui8_pas_flag=0;
-uint8_t PAS_act=3;
+uint8_t ui8_pas_flag = 0;
+uint8_t PAS_act = 3;
 uint8_t ui8_pas1_cadence_rpm = 0;
-
 
 volatile uint16_t ui16_wheel_speed_sensor_pwm_cycles_ticks = (uint16_t) WHEEL_SPEED_SENSOR_MAX_PWM_CYCLE_TICKS;
 volatile uint8_t ui8_wheel_speed_sensor_is_disconnected = 1; // must start with this value to have correct value at start up
@@ -90,14 +88,15 @@ uint8_t ui8_rtst_counter = 0;
 volatile uint8_t ui8_adc_battery_current_offset;
 uint16_t ui16_adc_battery_current_offset_10b;
 
-volatile uint8_t ui8_log_pi_battery_current_value;
-volatile uint8_t ui8_log_pi_battery_target_current_value;
-
 volatile uint8_t ui8_adc_target_battery_current_max;
 volatile uint8_t ui8_adc_target_battery_regen_current_max;
 
 uint8_t ui8_adc_throttle_offset;
 uint16_t ui16_adc_throttle_offset;
+
+static uint8_t ui8_offroad_state = 0;
+static uint8_t ui8_offroad_counter = 0;
+static uint8_t ui8_offroad_mode = 0;
 
 // function prototypes
 void communications_controller (void);
@@ -121,6 +120,7 @@ void ebike_app_battery_set_current_max (uint8_t ui8_value);
 void ebike_app_battery_set_regen_current_max (uint8_t ui8_value);
 uint8_t ebike_app_get_ADC_battery_voltage_filtered (void);
 uint8_t ebike_app_get_battery_current_filtered (void);
+void offroad_mode (void);
 
 void ebike_app_init (void)
 {
@@ -149,6 +149,9 @@ void ebike_app_controller (void)
   // read PAS cadence to global variable: ui8_pas_cadence_rps
   read_pas_cadence_and_direction ();
 
+  // see if offroad_mode should be enabled
+  offroad_mode ();
+
 #if (EBIKE_THROTTLE_TYPE == EBIKE_THROTTLE_TYPE_THROTTLE_PAS)
   // map throttle value from 0 up to 255 to global variable: ui8_throttle_value
   // setup ui8_is_throttle_released flag
@@ -173,6 +176,98 @@ void ebike_app_controller (void)
 
   // send and received information to/from the LCD as also setup the configuration variables
   communications_controller ();
+}
+
+void offroad_mode (void)
+{
+  // no point to execute all the following code if we reached the end
+  if (ui8_offroad_state == 3)
+  {
+    switch (ui8_offroad_state)
+    {
+      // first step, hold brake for the defined time
+      case 0:
+	ui8_offroad_counter++;
+
+	// brake is hold to much time
+	if (ui8_offroad_counter > (OFFROAD_TIME_1 + 25))
+	{
+	  ui8_offroad_state = 3;
+	}
+
+	if (!brake_is_set ()) // brake is released...
+	{
+	  if ((ui8_offroad_counter < OFFROAD_TIME_1) || // to early or...
+	      (ui8_offroad_counter > (OFFROAD_TIME_1 + 25))) // too late
+	  {
+	    ui8_offroad_state = 3;
+	  }
+	  else // in time
+	  {
+	    ui8_offroad_counter = 0;
+	    ui8_offroad_state = 1;
+	  }
+	}
+      break;
+
+      // second step, make sure the brake is released according to defined time
+      case 1:
+	ui8_offroad_counter++;
+
+	// brake is released to much time
+	if (ui8_offroad_counter > (OFFROAD_TIME_2 + 25))
+	{
+	  ui8_offroad_state = 3;
+	}
+
+	if (brake_is_set ()) // brake is hold...
+	{
+	  if ((ui8_offroad_counter < OFFROAD_TIME_2) || // to much time or...
+	      (ui8_offroad_counter > (OFFROAD_TIME_2 + 25))) // too less time
+	  {
+	    ui8_offroad_state = 3;
+	  }
+	  else // in time
+	  {
+	    ui8_offroad_counter = 0;
+	    ui8_offroad_state = 2;
+	  }
+	}
+      break;
+
+      // third step, make sure the brake is hold according to defined time
+      case 2:
+	ui8_offroad_counter++;
+
+	// brake is hold to much time
+	if (ui8_offroad_counter > (OFFROAD_TIME_3 + 25))
+	{
+	  ui8_offroad_state = 3;
+	}
+
+	if (!brake_is_set ()) // brake is released...
+	{
+	  if ((ui8_offroad_counter < OFFROAD_TIME_3) || // to early or...
+	      (ui8_offroad_counter > (OFFROAD_TIME_3 + 25))) // too late
+	  {
+	    ui8_offroad_state = 3;
+	  }
+	  else // in time
+	  {
+	    ui8_offroad_mode = 1;
+	    ui8_offroad_state = 3;
+	  }
+	}
+      break;
+
+      // do nothing, just keep on this state
+      case 3:
+      break;
+
+      default:
+      break;
+    }
+  }
 }
 
 void ebike_app_state_machine (void)
@@ -582,7 +677,7 @@ void set_speed_erps_max_to_motor_controller (struct_lcd_configuration_variables 
   // avoid 0 division
   if (f_temp != 0) { f_temp = ((float) ui32_temp) / f_temp; }
   else { f_temp = ((float) ui32_temp); }
-  if (ui8_cheat_state==4) f_temp=MOTOR_OVER_SPEED_ERPS-1; //set maximum speed if limit is disabled
+  if (ui8_offroad_mode) { f_temp = MOTOR_OVER_SPEED_ERPS - 1; } // set maximum speed if offroaad mode is enabled
   motor_controller_set_speed_erps_max ((uint16_t) f_temp);
 }
 
@@ -796,7 +891,8 @@ void ebike_throttle_type_throttle_pas (void)
   ebike_app_battery_set_current_max (ui8_target_current);
 
   // LCD P3 = 1, control / limit speed to max value
-  if (lcd_configuration_variables.ui8_power_assist_control_mode || ui8_cheat_state==4)
+  if (lcd_configuration_variables.ui8_power_assist_control_mode ||
+      ui8_offroad_mode)
   {
     // do not control the speed here, so put output value = 255
     ui8_target_duty_cycle = 255;
@@ -866,8 +962,9 @@ void ebike_throttle_type_torque_sensor (void)
   ui8_target_duty_cycle = 255;
   if (ui8_temp == 0) { ui8_target_duty_cycle = 0; }
 
-  // LCD P3 = 1 or cheat is enabled, control only current
-  if (lcd_configuration_variables.ui8_power_assist_control_mode || ui8_cheat_state==4)
+  // LCD P3 = 1 or offroad mode is enabled, control only current
+  if (lcd_configuration_variables.ui8_power_assist_control_mode ||
+      ui8_offroad_mode)
   {
     // current controller
     ui8_target_current = (uint8_t) (map ((uint32_t) ui8_temp,
