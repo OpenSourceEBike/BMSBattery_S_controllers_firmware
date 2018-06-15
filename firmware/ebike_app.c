@@ -51,7 +51,7 @@ uint8_t ui8_adc_throttle_value_cruise_control;
 uint8_t ui8_throttle_value;
 volatile uint16_t ui16_throttle_value_accumulated = 0;
 uint8_t ui8_throttle_value_filtered;
-uint8_t ui8_is_throttle_released;
+uint8_t ui8_is_throttle_active;
 
 volatile uint16_t ui16_pas1_pwm_cycles_ticks = (uint16_t) PAS_ABSOLUTE_MIN_CADENCE_PWM_CYCLE_TICKS;
 volatile uint16_t ui16_pas1_pwm_cycles_on_ticks = 0;
@@ -97,6 +97,7 @@ uint16_t ui16_adc_throttle_offset;
 static uint8_t ui8_offroad_state = OFFROAD_STATE_INIT_VALUE;
 static uint8_t ui8_offroad_counter = 0;
 static uint8_t ui8_offroad_mode = 0;
+static uint8_t ui8_offroad_mode_init = 0;
 
 // function prototypes
 void communications_controller (void);
@@ -180,6 +181,20 @@ void ebike_app_controller (void)
 
 void offroad_mode (void)
 {
+  // once throttle or PAS are active for the first time, don't check anymore for offroad mode
+  if ((ui8_is_throttle_active) ||
+      (ui8_pas1_cadence_rpm > 0))
+  {
+    ui8_offroad_mode_init = 1;
+  }
+
+  // restart the ui8_offroad_state while user don't active throttle for the first time
+  if ((ui8_offroad_mode_init == 0) &&
+      (ui8_offroad_state == OFFROAD_STATE_OFFROAD_MODE_DISABLE))
+  {
+    ui8_offroad_state = OFFROAD_STATE_START;
+  }
+
   switch (ui8_offroad_state)
   {
     // first step, hold brake for the defined time
@@ -459,7 +474,7 @@ void communications_controller (void)
   if (motor_controller_state_is_set (MOTOR_CONTROLLER_STATE_BRAKE) ||
       motor_controller_state_is_set (MOTOR_CONTROLLER_STATE_BRAKE_LIKE_COAST_BRAKES)) { ui8_moving_indication = (1 << 5); }
   if (ebike_app_cruise_control_is_set ()) { ui8_moving_indication |= (1 << 3); }
-  if (ebike_app_throttle_is_released ()) { ui8_moving_indication |= (1 << 1); }
+  if (ebike_app_throttle_is_active ()) { ui8_moving_indication |= (1 << 1); }
   if (pas_is_set ()) { ui8_moving_indication |= (1 << 4); }
 
   // if battery over voltage, signal instead on LCD with battery symbol flashing and brake signal
@@ -760,9 +775,9 @@ uint8_t ebike_app_get_adc_throttle_value_cruise_control (void)
   return ui8_adc_throttle_value_cruise_control;
 }
 
-uint8_t ebike_app_throttle_is_released (void)
+uint8_t ebike_app_throttle_is_active (void)
 {
-  return ui8_is_throttle_released;
+  return ui8_is_throttle_active;
 }
 
 uint8_t ui8_ebike_app_get_wheel_speed (void)
@@ -1059,8 +1074,8 @@ void throttle_read (void)
   ui16_throttle_value_accumulated += ((uint16_t) ui8_throttle_value);
   ui8_throttle_value_filtered = ui16_throttle_value_accumulated >> THROTTLE_FILTER_COEFFICIENT;
 
-  // setup ui8_is_throttle_released flag
-  ui8_is_throttle_released = ((ui8_throttle_value > 0) ? 1 : 0);
+  // setup ui8_is_throttle_active flag
+  ui8_is_throttle_active = ((ui8_throttle_value > 0) ? 1 : 0);
 }
 
 void throttle_reset_filter (void)
@@ -1080,7 +1095,7 @@ void torque_sensor_throttle_read (void)
   {
     // ebike is stopped, wait for throttle signal
     case STATE_NO_PEDALLING:
-    if ((!ebike_app_throttle_is_released ()) &&
+    if ((!ebike_app_throttle_is_active ()) &&
 	(!brake_is_set()))
     {
       ui8_tstr_state_machine = STATE_STARTUP_PEDALLING;
