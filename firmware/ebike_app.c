@@ -203,7 +203,7 @@ void offroad_mode (void)
 	ui8_offroad_counter++;
 
 	// brake is hold to much time
-	if (ui8_offroad_counter > (OFFROAD_TIME_1 + 25))
+	if (ui8_offroad_counter > (OFFROAD_TIME_1 + 5))
 	{
 	  ui8_offroad_state = OFFROAD_STATE_END;
 	}
@@ -211,7 +211,7 @@ void offroad_mode (void)
 	if (!brake_is_set ()) // brake is released...
 	{
 	  if ((ui8_offroad_counter < OFFROAD_TIME_1) || // to early or...
-	      (ui8_offroad_counter > (OFFROAD_TIME_1 + 25))) // too late
+	      (ui8_offroad_counter > (OFFROAD_TIME_1 + 5))) // too late
 	  {
 	    ui8_offroad_state = OFFROAD_STATE_END;
 	  }
@@ -228,7 +228,7 @@ void offroad_mode (void)
 	ui8_offroad_counter++;
 
 	// brake is released to much time
-	if (ui8_offroad_counter > (OFFROAD_TIME_2 + 25))
+	if (ui8_offroad_counter > (OFFROAD_TIME_2 + 5))
 	{
 	  ui8_offroad_state = OFFROAD_STATE_END;
 	}
@@ -236,7 +236,7 @@ void offroad_mode (void)
 	if (brake_is_set ()) // brake is hold...
 	{
 	  if ((ui8_offroad_counter < OFFROAD_TIME_2) || // to much time or...
-	      (ui8_offroad_counter > (OFFROAD_TIME_2 + 25))) // too less time
+	      (ui8_offroad_counter > (OFFROAD_TIME_2 + 5))) // too less time
 	  {
 	    ui8_offroad_state = OFFROAD_STATE_END;
 	  }
@@ -253,7 +253,7 @@ void offroad_mode (void)
 	ui8_offroad_counter++;
 
 	// brake is hold to much time
-	if (ui8_offroad_counter > (OFFROAD_TIME_3 + 25))
+	if (ui8_offroad_counter > (OFFROAD_TIME_3 + 5))
 	{
 	  ui8_offroad_state = OFFROAD_STATE_END;
 	}
@@ -261,7 +261,7 @@ void offroad_mode (void)
 	if (!brake_is_set ()) // brake is released...
 	{
 	  if ((ui8_offroad_counter < OFFROAD_TIME_3) || // to early or...
-	      (ui8_offroad_counter > (OFFROAD_TIME_3 + 25))) // too late
+	      (ui8_offroad_counter > (OFFROAD_TIME_3 + 5))) // too late
 	  {
 	    ui8_offroad_state = OFFROAD_STATE_END;
 	  }
