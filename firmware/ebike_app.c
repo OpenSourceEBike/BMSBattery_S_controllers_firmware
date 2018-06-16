@@ -182,18 +182,6 @@ void ebike_app_controller (void)
 void offroad_mode (void)
 {
   // once throttle or PAS are active for the first time, don't check anymore for offroad mode
-  if ((ui8_is_throttle_active) ||
-      (ui8_pas1_cadence_rpm > 0))
-  {
-    ui8_offroad_mode_init = 1;
-  }
-
-  // restart the ui8_offroad_state while user don't active throttle for the first time
-  if ((ui8_offroad_mode_init == 0) &&
-      (ui8_offroad_state == OFFROAD_STATE_OFFROAD_MODE_DISABLE))
-  {
-    ui8_offroad_state = OFFROAD_STATE_START;
-  }
 
   switch (ui8_offroad_state)
   {
@@ -203,52 +191,37 @@ void offroad_mode (void)
       {
 	ui8_offroad_state = OFFROAD_STATE_HOLD_1;
       }
-      else
-      {
-	ui8_offroad_state = OFFROAD_STATE_OFFROAD_MODE_DISABLE;
-      }
+
     break;
 
     case OFFROAD_STATE_HOLD_1:
       ui8_offroad_counter++;
 
-      // brake is hold to much time
-      if (ui8_offroad_counter > (OFFROAD_TIME_1 + 5))
-      {
-	ui8_offroad_state = OFFROAD_STATE_OFFROAD_MODE_DISABLE;
-      }
-
       if (!brake_is_set ()) // brake is released...
       {
 	if ((ui8_offroad_counter < OFFROAD_TIME_1) || // to early or...
-	    (ui8_offroad_counter > (OFFROAD_TIME_1 + 5))) // too late
+	    (ui8_offroad_counter > (OFFROAD_TIME_1 + MORSE_TOLERANCE))) // too late
 	{
-	  ui8_offroad_state = OFFROAD_STATE_OFFROAD_MODE_DISABLE;
+	  ui8_offroad_state = OFFROAD_STATE_START;
 	}
 	else // in time
 	{
 	  ui8_offroad_counter = 0;
-	  ui8_offroad_state = OFFROAD_STATE_RELEASE;
+	  ui8_offroad_state = OFFROAD_STATE_RELEASE_1;
 	}
       }
     break;
 
     // second step, make sure the brake is released according to defined time
-    case OFFROAD_STATE_RELEASE:
+    case OFFROAD_STATE_RELEASE_1:
       ui8_offroad_counter++;
-
-      // brake is released to much time
-      if (ui8_offroad_counter > (OFFROAD_TIME_2 + 5))
-      {
-	ui8_offroad_state = OFFROAD_STATE_OFFROAD_MODE_DISABLE;
-      }
 
       if (brake_is_set ()) // brake is hold...
       {
 	if ((ui8_offroad_counter < OFFROAD_TIME_2) || // to much time or...
-	    (ui8_offroad_counter > (OFFROAD_TIME_2 + 5))) // too less time
+	    (ui8_offroad_counter > (OFFROAD_TIME_2 + MORSE_TOLERANCE))) // too less time
 	{
-	  ui8_offroad_state = OFFROAD_STATE_OFFROAD_MODE_DISABLE;
+	  ui8_offroad_state = OFFROAD_STATE_START;
 	}
 	else // in time
 	{
@@ -262,29 +235,55 @@ void offroad_mode (void)
     case OFFROAD_STATE_HOLD_2:
       ui8_offroad_counter++;
 
-      // brake is hold to much time
-      if (ui8_offroad_counter > (OFFROAD_TIME_3 + 5))
-      {
-	ui8_offroad_state = OFFROAD_STATE_OFFROAD_MODE_DISABLE;
-      }
-
       if (!brake_is_set ()) // brake is released...
       {
 	if ((ui8_offroad_counter < OFFROAD_TIME_3) || // to early or...
-	    (ui8_offroad_counter > (OFFROAD_TIME_3 + 5))) // too late
+	    (ui8_offroad_counter > (OFFROAD_TIME_3 + MORSE_TOLERANCE))) // too late
 	{
-	  ui8_offroad_state = OFFROAD_STATE_OFFROAD_MODE_DISABLE;
+	  ui8_offroad_state = OFFROAD_STATE_START;
 	}
 	else // in time
 	{
-	  ui8_offroad_state = OFFROAD_STATE_OFFROAD_MODE_ENABLE;
+	  ui8_offroad_state = OFFROAD_STATE_RELEASE_2;
 	}
       }
     break;
 
-    // do nothing, just keep on this state
-    case OFFROAD_STATE_OFFROAD_MODE_DISABLE:
-    break;
+    case OFFROAD_STATE_RELEASE_2:
+          ui8_offroad_counter++;
+
+          if (brake_is_set ()) // brake is hold...
+          {
+    	if ((ui8_offroad_counter < OFFROAD_TIME_4) || // to much time or...
+    	    (ui8_offroad_counter > (OFFROAD_TIME_4 + MORSE_TOLERANCE))) // too less time
+    	{
+    	  ui8_offroad_state = OFFROAD_STATE_START;
+    	}
+    	else // in time
+    	{
+    	  ui8_offroad_counter = 0;
+    	  ui8_offroad_state = OFFROAD_STATE_HOLD_3;
+    	}
+          }
+        break;
+
+        // third step, make sure the brake is hold according to defined time
+        case OFFROAD_STATE_HOLD_3:
+          ui8_offroad_counter++;
+
+          if (!brake_is_set ()) // brake is released...
+          {
+    	if ((ui8_offroad_counter < OFFROAD_TIME_5) || // to early or...
+    	    (ui8_offroad_counter > (OFFROAD_TIME_5 + MORSE_TOLERANCE))) // too late
+    	{
+    	  ui8_offroad_state = OFFROAD_STATE_START;
+    	}
+    	else // in time
+    	{
+    	  ui8_offroad_state = OFFROAD_STATE_OFFROAD_MODE_ENABLE;
+    	}
+          }
+        break;
 
     // do nothing, just keep on this state
     case OFFROAD_STATE_OFFROAD_MODE_ENABLE:

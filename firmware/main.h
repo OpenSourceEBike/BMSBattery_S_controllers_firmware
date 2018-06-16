@@ -187,12 +187,19 @@
 #define OFFROAD_ALWAYS_ENABLED		1
 #define OFFROAD_STATE_START 		0
 #define OFFROAD_STATE_HOLD_1		1
-#define OFFROAD_STATE_RELEASE		2
+#define OFFROAD_STATE_RELEASE_1		2
 #define OFFROAD_STATE_HOLD_2		3
-#define OFFROAD_STATE_OFFROAD_MODE_DISABLE 	4
-#define OFFROAD_STATE_OFFROAD_MODE_ENABLE 	5
-#define OFFROAD_TIME_1 10
-#define OFFROAD_TIME_2 10
-#define OFFROAD_TIME_3 10
+#define OFFROAD_STATE_RELEASE_2		4
+#define OFFROAD_STATE_HOLD_3		5
+
+#define OFFROAD_STATE_OFFROAD_MODE_DISABLE 	6
+#define OFFROAD_STATE_OFFROAD_MODE_ENABLE 	7
+#define OFFROAD_TIME_1 10	//duration of first pull of break lever
+#define OFFROAD_TIME_2 10	//duration of first release
+#define OFFROAD_TIME_3 10	//duration of second pull
+#define OFFROAD_TIME_4 10	//duration of second release
+#define OFFROAD_TIME_5 10	//duration of third pull
+
+#define MORSE_TOLERANCE 8
 
 #endif // _MAIN_H_
