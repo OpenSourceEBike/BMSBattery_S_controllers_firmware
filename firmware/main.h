@@ -140,7 +140,7 @@
 #define DEFAULT_VALUE_MOTOR_CHARACTARISTIC 	202 // for Q85 motor (12.6 * 16)
 #define DEFAULT_VALUE_WHEEL_SIZE	 	20 // 26''
 #define DEFAULT_VALUE_MAX_SPEED	 		25
-#define DEFAULT_VALUE_POWER_ASSIST_CONTROL_MODE 1
+#define DEFAULT_VALUE_POWER_ASSIST_CONTROL_MODE 0
 #define DEFAULT_VALUE_CONTROLLER_MAX_CURRENT	10
 // *************************************************************************** //
 

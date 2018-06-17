@@ -98,6 +98,7 @@ static uint8_t ui8_offroad_state = OFFROAD_STATE_INIT_VALUE;
 static uint8_t ui8_offroad_counter = 0;
 static uint8_t ui8_offroad_mode = 0;
 static uint8_t ui8_offroad_mode_init = 0;
+uint8_t ui8_quit_counter =0;
 
 // function prototypes
 void communications_controller (void);
@@ -307,6 +308,8 @@ void offroad_mode (void)
     // do nothing, just keep on this state
     case OFFROAD_STATE_OFFROAD_MODE_ENABLE:
       ui8_offroad_mode = 1;
+      if(ui8_quit_counter<30)ui8_quit_counter++;
+
     break;
 
     default:
@@ -511,8 +514,16 @@ void communications_controller (void)
   // B2: 24V controller
   ui8_tx_buffer [2] = (uint8_t) COMMUNICATIONS_BATTERY_VOLTAGE;
   // B3: speed, wheel rotation period, ms; period(ms)=B3*256+B4;
+
+
   ui8_tx_buffer [3] = (ui16_wheel_period_ms >> 8) & 0xff;
   ui8_tx_buffer [4] = ui16_wheel_period_ms & 0xff;
+
+  if (ui8_offroad_mode && ui8_quit_counter < 29){ //quitting signal for offroad mode enabled. Shows about 80 km/h for three seconds
+
+	  ui8_tx_buffer [3] = (100 >> 8) & 0xff; //100ms are about 80 km/h @ 28" 2200mm wheel circumference
+	  ui8_tx_buffer [4] = 100 & 0xff;
+  }
   // B5: error info display
   ui8_tx_buffer [5] = ui16_error;
   // B6: CRC: xor B1,B2,B3,B4,B5,B7,B8,B9,B10,B11

@@ -41,6 +41,6 @@
 #define LI_ION_CELL_VOLTS_20 	3.38
 #define LI_ION_CELL_VOLTS_10 	3.25
 #define LI_ION_CELL_VOLTS_0 	3.00
-#define DEBUG_UART
+//#define DEBUG_UART
 
 #endif /* _CONFIG_H_ */
