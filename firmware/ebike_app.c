@@ -190,6 +190,7 @@ void offroad_mode (void)
       if (brake_is_set ())
       {
 	ui8_offroad_state = OFFROAD_STATE_HOLD_1;
+	printf ("OFFROAD_STATE_HOLD_1\r\n");
       }
 
     break;
@@ -203,11 +204,14 @@ void offroad_mode (void)
 	    (ui8_offroad_counter > (OFFROAD_TIME_1 + MORSE_TOLERANCE))) // too late
 	{
 	  ui8_offroad_state = OFFROAD_STATE_START;
+	  ui8_offroad_counter=0;
+	  printf ("failed!\r\n");
 	}
 	else // in time
 	{
 	  ui8_offroad_counter = 0;
 	  ui8_offroad_state = OFFROAD_STATE_RELEASE_1;
+	  printf ("OFFROAD_STATE_RELEASE_1\r\n");
 	}
       }
     break;
@@ -222,11 +226,14 @@ void offroad_mode (void)
 	    (ui8_offroad_counter > (OFFROAD_TIME_2 + MORSE_TOLERANCE))) // too less time
 	{
 	  ui8_offroad_state = OFFROAD_STATE_START;
+	  ui8_offroad_counter=0;
+	  printf ("failed!\r\n");
 	}
 	else // in time
 	{
 	  ui8_offroad_counter = 0;
 	  ui8_offroad_state = OFFROAD_STATE_HOLD_2;
+	  printf ("OFFROAD_STATE_HOLD_2\r\n");
 	}
       }
     break;
@@ -241,10 +248,15 @@ void offroad_mode (void)
 	    (ui8_offroad_counter > (OFFROAD_TIME_3 + MORSE_TOLERANCE))) // too late
 	{
 	  ui8_offroad_state = OFFROAD_STATE_START;
+	  ui8_offroad_counter=0;
+	  printf ("failed!\r\n");
 	}
 	else // in time
 	{
-	  ui8_offroad_state = OFFROAD_STATE_RELEASE_2;
+		ui8_offroad_counter = 0;
+		ui8_offroad_state = OFFROAD_STATE_RELEASE_2;
+	  printf ("OFFROAD_STATE_RELEASE_2\r\n");
+
 	}
       }
     break;
@@ -258,11 +270,14 @@ void offroad_mode (void)
     	    (ui8_offroad_counter > (OFFROAD_TIME_4 + MORSE_TOLERANCE))) // too less time
     	{
     	  ui8_offroad_state = OFFROAD_STATE_START;
+    	  ui8_offroad_counter=0;
+    	  printf ("failed!\r\n");
     	}
     	else // in time
     	{
     	  ui8_offroad_counter = 0;
     	  ui8_offroad_state = OFFROAD_STATE_HOLD_3;
+    	  printf ("OFFROAD_STATE_HOLD_3\r\n");
     	}
           }
         break;
@@ -277,10 +292,14 @@ void offroad_mode (void)
     	    (ui8_offroad_counter > (OFFROAD_TIME_5 + MORSE_TOLERANCE))) // too late
     	{
     	  ui8_offroad_state = OFFROAD_STATE_START;
+    	  ui8_offroad_counter=0;
+    	  printf ("failed!\r\n");
     	}
     	else // in time
     	{
+    	ui8_offroad_counter = 0;
     	  ui8_offroad_state = OFFROAD_STATE_OFFROAD_MODE_ENABLE;
+    	  printf ("OFFROAD_STATE_OFFROAD_MODE_ENABLE \r\n");
     	}
           }
         break;

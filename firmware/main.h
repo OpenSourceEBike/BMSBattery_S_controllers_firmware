@@ -200,6 +200,6 @@
 #define OFFROAD_TIME_4 10	//duration of second release
 #define OFFROAD_TIME_5 10	//duration of third pull
 
-#define MORSE_TOLERANCE 8
+#define MORSE_TOLERANCE 5
 
 #endif // _MAIN_H_
