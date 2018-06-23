@@ -152,7 +152,7 @@ void hall_sensors_read_and_action (void)
 	uint8_t_hall_case[4]=ui8_adc_read_phase_B_current ();
 #endif
 
-	if (ui16_motor_speed_erps > 3 && ui8_regen_throttle<=2) //normal riding,
+	if (ui16_motor_speed_erps > 3 && ui16_BatteryCurrent >ui16_current_cal_b+3) //normal riding,
 	      {
 		if (ui16_ADC_iq_current>>2 > 127 && ui8_position_correction_value < 135)
 		{
@@ -163,7 +163,7 @@ void hall_sensors_read_and_action (void)
 		  ui8_position_correction_value--;
 		}
 	      }
-	else if (ui16_motor_speed_erps > 3 && ui8_regen_throttle>2) //regen
+	else if (ui16_motor_speed_erps > 3 && ui16_BatteryCurrent < ui16_current_cal_b-3) //regen
 	{
 
 	    ui8_position_correction_value=127; //set advance angle to neutral value

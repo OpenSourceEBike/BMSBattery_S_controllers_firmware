@@ -20,7 +20,6 @@
 #define REGEN_CURRENT_MAX_VALUE 251L
 #define MOTOR_ROTOR_DELTA_PHASE_ANGLE_RIGHT 238//214 //
 #define current_cal_a 10
-//#define current_cal_b -311L
 #define LEVEL_1 20
 #define LEVEL_2 40
 #define LEVEL_3 60
@@ -35,12 +34,12 @@
 #define GEAR_RATIO 64L
 #define BATTERY_LI_ION_CELLS_NUMBER 10
 #define PAS_THRESHOLD 1.7
-#define THROTTLE
+#define TORQUESENSOR
 #define PWM_CYCLES_SECOND 15625L
 #define DISPLAY_TYPE_KT_LCD3
 #define SPEEDSENSOR_EXTERNAL
 #define PAS_DIRECTION 1
-#define REGEN
-#define LOGPHASECURRENT
+#define REGEN_DIGITAL
+#define DIAGNOSTICS
 
 #endif /* CONFIG_H_ */

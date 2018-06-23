@@ -93,10 +93,16 @@ uint16_t update_setpoint (uint16_t speed, uint16_t PAS, uint16_t sumtorque, uint
 
   //check if rider is braking
   else if (brake_is_set()){
+#ifdef REGEN_DIGITAL
+            ui32_setpoint= PI_control(ui16_BatteryCurrent, REGEN_CURRENT_MAX_VALUE);  //Curret target = max regen,
+
+#else if
             ui32_setpoint= PI_control(ui16_BatteryCurrent, ui16_current_cal_b);//Curret target = 0 A, this is to keep the integral part of the PI-control up to date
-                  if (ui32_setpoint<5){ui32_setpoint=0;}
-                  if (ui32_setpoint>255){ui32_setpoint=255;}
-      printf("you are braking!\r\n");
+#endif
+
+            if (ui32_setpoint<5){ui32_setpoint=0;}
+            if (ui32_setpoint>255){ui32_setpoint=255;}
+      //printf("you are braking!\r\n");REGEN_CURRENT_MAX_VALUE
   }
 
   //limit max erps
@@ -265,7 +271,7 @@ uint32_t CheckSpeed (uint16_t current_target, uint16_t speed)
 	    //printf("Mal %d, %lu\r\n", current_target, ui32_temp) ;
 	    current_target=(uint16_t)(ui32_temp/2000+ui16_current_cal_b); 	//ramp down the motor power within 2 km/h, if you are riding too fast
 	    //printf("Speed too high!\r\n");
-	    //printf("Nach %d, %lu\r\n", current_target, ui32_temp) ;
+	    //printf("Ramp down: %d, %d\r\n", current_target, speed) ;
 	}
   }
     return ((uint32_t)current_target);
