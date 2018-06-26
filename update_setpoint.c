@@ -38,6 +38,7 @@ uint16_t ui16_BatteryCurrent_accumulated = 2496L; //8x current offset, for filte
 uint16_t ui16_BatteryCurrent; //Battery Current read from ADC8
 uint16_t ui16_current_cal_b;
 uint8_t ui8_BatteryVoltage; //Battery Voltage read from ADC
+uint16_t ui16_BatteryVoltage_accumulated;
 uint8_t ui8_regen_throttle; //regen throttle read from ADC
 uint8_t ui8_regen_flag=0; //regen flag for shifting from +90° to -90°
 static uint16_t ui16_PAS_accumulated = 64000L; // for filtering of PAS value
@@ -56,7 +57,11 @@ uint16_t update_setpoint (uint16_t speed, uint16_t PAS, uint16_t sumtorque, uint
   ui16_BatteryCurrent_accumulated -= ui16_BatteryCurrent_accumulated>>3;
   ui16_BatteryCurrent_accumulated += ui16_adc_read_motor_total_current();
   ui16_BatteryCurrent = ui16_BatteryCurrent_accumulated>>3;
-  ui8_BatteryVoltage = ui8_adc_read_battery_voltage();
+
+  ui16_BatteryVoltage_accumulated -= ui16_BatteryVoltage_accumulated>>3;
+  ui16_BatteryVoltage_accumulated += ui8_adc_read_battery_voltage();
+  ui8_BatteryVoltage = ui16_BatteryVoltage_accumulated>>3;
+
 
   ui32_erps_accumulated-=ui32_erps_accumulated>>3;
   ui32_erps_accumulated+=ui16_motor_speed_erps;
@@ -95,7 +100,7 @@ uint16_t update_setpoint (uint16_t speed, uint16_t PAS, uint16_t sumtorque, uint
   else if (brake_is_set()){
 #ifdef REGEN_DIGITAL
             ui32_setpoint= PI_control(ui16_BatteryCurrent, REGEN_CURRENT_MAX_VALUE);  //Curret target = max regen,
-
+            if (ui32_setpoint==0){ui32_setpoint=ui16_motor_speed_erps*2;} //try to get best regen at Low Speeds for BionX IGH
 #else if
             ui32_setpoint= PI_control(ui16_BatteryCurrent, ui16_current_cal_b);//Curret target = 0 A, this is to keep the integral part of the PI-control up to date
 #endif
