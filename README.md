@@ -1,6 +1,8 @@
 THIS CODE IS NOT BEING DEVELOPED NOR MANTAINED ANYMORE.
 
-Please use instead the Stancecoke firmware: https://github.com/stancecoke/BMSBattery_S_controllers_firmware
+Please use instead the Stancecoke firmware:
+- https://opensourceebikefirmware.bitbucket.io/windows_instructions
+- https://github.com/stancecoke/BMSBattery_S_controllers_firmware
 
 Casainho was developing and mantaining this code up to June 2018 but stopped because he started using on his ebikes the alternative TSDZ2 mide drive motor that uses another motor controller. Not having the hardware, it would be impossible to keep developing and testing the firmware.
 
