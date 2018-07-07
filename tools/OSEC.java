@@ -56,6 +56,7 @@ public class OSEC extends JFrame {
 	private final ButtonGroup MotorSpeed = new ButtonGroup();
 	private final ButtonGroup Speedsensor = new ButtonGroup();
 	private final ButtonGroup PASdirection = new ButtonGroup();
+	private final ButtonGroup Regen = new ButtonGroup();
 	private JTextField Assist_Level_1;
 	private JTextField Assist_Level_2;
 	private JTextField Assist_Level_3;
@@ -85,6 +86,7 @@ public class OSEC extends JFrame {
 	 * Launch the application.
 	 */
 	public static void main(String[] args) {
+		
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
 				try {
@@ -99,8 +101,12 @@ public class OSEC extends JFrame {
 
 	/**
 	 * Create the frame.
+	 * @throws IOException 
 	 */
-	public OSEC() {
+	public OSEC() throws IOException {
+		
+
+
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setBounds(100, 100, 600, 706);
 		contentPane = new JPanel();
@@ -425,23 +431,23 @@ public class OSEC extends JFrame {
 		
 		lblDiplayType = new JLabel("Display Type");
 		lblDiplayType.setFont(new Font("Tahoma", Font.BOLD, 12));
-		lblDiplayType.setBounds(5, 487, 86, 14);
+		lblDiplayType.setBounds(5, 543, 86, 14);
 		contentPane.add(lblDiplayType);
 		
 		JRadioButton rdbtnNone = new JRadioButton("None");
 		rdbtnNone.setSelected(true);
 		buttonGroup.add(rdbtnNone);
-		rdbtnNone.setBounds(5, 508, 109, 23);
+		rdbtnNone.setBounds(5, 564, 109, 23);
 		contentPane.add(rdbtnNone);
 		
 		JRadioButton rdbtnKingmeterJlcd = new JRadioButton("Kingmeter J-LCD");
 		buttonGroup.add(rdbtnKingmeterJlcd);
-		rdbtnKingmeterJlcd.setBounds(5, 532, 131, 23);
+		rdbtnKingmeterJlcd.setBounds(5, 588, 131, 23);
 		contentPane.add(rdbtnKingmeterJlcd);
 		
 		JRadioButton rdbtnKtlcd = new JRadioButton("KT-LCD3");
 		buttonGroup.add(rdbtnKtlcd);
-		rdbtnKtlcd.setBounds(5, 556, 131, 23);
+		rdbtnKtlcd.setBounds(5, 612, 131, 23);
 		contentPane.add(rdbtnKtlcd);
 		
 		JLabel lblMotorSpeed = new JLabel("Motor Speed");
@@ -503,14 +509,78 @@ public class OSEC extends JFrame {
 		contentPane.add(rdbtnLeft);
 		
 		JRadioButton rdbtnDiganostics = new JRadioButton("Diganostics");
-		rdbtnDiganostics.setBounds(104, 445, 97, 23);
+		rdbtnDiganostics.setBounds(136, 457, 97, 23);
 		contentPane.add(rdbtnDiganostics);
 		
-		JRadioButton rdbtnRegen = new JRadioButton("Regen");
-		rdbtnRegen.setBounds(5, 445, 97, 23);
+		JRadioButton rdbtnRegen = new JRadioButton("linear");
+		rdbtnRegen.setBounds(5, 487, 97, 23);
+		Regen.add(rdbtnRegen);
 		contentPane.add(rdbtnRegen);
 		
+		JRadioButton rdbtnRegenDigital = new JRadioButton("digital");
+		rdbtnRegenDigital.setBounds(5, 513, 97, 23);
+		Regen.add(rdbtnRegenDigital);
+		contentPane.add(rdbtnRegenDigital);
 		
+		JRadioButton rdbtnNone_1 = new JRadioButton("None");
+		rdbtnNone_1.setSelected(true);
+		Regen.add(rdbtnNone_1);
+		rdbtnNone_1.setBounds(5, 460, 97, 23);
+		
+		contentPane.add(rdbtnNone_1);
+		
+		JLabel lblRegeneration = new JLabel("Regeneration");
+		lblRegeneration.setFont(new Font("Tahoma", Font.BOLD, 12));
+		lblRegeneration.setBounds(5, 440, 86, 14);
+		contentPane.add(lblRegeneration);
+		
+		
+		BufferedReader in = new BufferedReader(new FileReader("settings.ini"));
+		txtNumberOfPas.setText(in.readLine());
+		txtSpeedlimit.setText(in.readLine());
+		txtPasTimeout.setText(in.readLine());
+		txtWheelCircumference.setText(in.readLine());
+		txtSupportfactor.setText(in.readLine());
+		txtThrottlemin.setText(in.readLine());
+		txtThrottlemax.setText(in.readLine());
+		txtUndervoltage.setText(in.readLine());
+		txtMaxbatterycurrent.setText(in.readLine());
+		txtMaxregencurrent.setText(in.readLine());
+		txtMotor_specific_angle.setText(in.readLine());
+		txtBatteryCurcala.setText(in.readLine());
+		Assist_Level_1.setText(in.readLine());
+		Assist_Level_2.setText(in.readLine());
+		Assist_Level_3.setText(in.readLine());
+		Assist_Level_4.setText(in.readLine());
+		Assist_Level_5.setText(in.readLine());
+		Cheat_Time_1.setText(in.readLine());
+		Cheat_Time_2.setText(in.readLine());
+		Cheat_Time_3.setText(in.readLine());
+		ramp_end.setText(in.readLine());
+		p_factor.setText(in.readLine());
+		i_factor.setText(in.readLine());
+		GearRatio.setText(in.readLine());
+		CellsNumber.setText(in.readLine());
+		PAS_threshold.setText(in.readLine());
+		
+		rdbtnTorqueSensor.setSelected(Boolean.parseBoolean(in.readLine()));
+		rdbtnThrottlePas.setSelected(Boolean.parseBoolean(in.readLine()));
+		rdbtnThrottle.setSelected(Boolean.parseBoolean(in.readLine()));
+		rdbtnTorquesimulation.setSelected(Boolean.parseBoolean(in.readLine()));
+		rdbtnHigh.setSelected(Boolean.parseBoolean(in.readLine()));
+		rdbtnNormal.setSelected(Boolean.parseBoolean(in.readLine()));
+		rdbtnKtlcd.setSelected(Boolean.parseBoolean(in.readLine()));
+		rdbtnKingmeterJlcd.setSelected(Boolean.parseBoolean(in.readLine()));
+		rdbtnInternal.setSelected(Boolean.parseBoolean(in.readLine()));
+		rdbtnExternal.setSelected(Boolean.parseBoolean(in.readLine()));
+		rdbtnDiganostics.setSelected(Boolean.parseBoolean(in.readLine()));
+		rdbtnRegenDigital.setSelected(Boolean.parseBoolean(in.readLine()));
+		rdbtnRegen.setSelected(Boolean.parseBoolean(in.readLine()));
+		rdbtnLeft.setSelected(Boolean.parseBoolean(in.readLine()));
+		rdbtnRight.setSelected(Boolean.parseBoolean(in.readLine()));
+		
+		
+		in.close();
 		
 		
 		JButton btnWriteoptionsbyte = new JButton("Write Option Bytes");
@@ -552,8 +622,13 @@ public class OSEC extends JFrame {
 		
 			public void actionPerformed(ActionEvent arg0) {
 		        PrintWriter pWriter = null; 
+		        PrintWriter iWriter = null; 
 		        try { 
-		            pWriter = new PrintWriter(new BufferedWriter(new FileWriter("config.h"))); 
+		    	    //FileWriter fw = new FileWriter("settings.ini");
+		    	    //BufferedWriter bw = new BufferedWriter(fw);
+		        	
+		    	    iWriter = new PrintWriter(new BufferedWriter(new FileWriter("settings.ini"))); 
+		        	pWriter = new PrintWriter(new BufferedWriter(new FileWriter("config.h"))); 
 		            pWriter.println("/*\r\n" + 
 		            		" * config.h\r\n" + 
 		            		" *\r\n" + 
@@ -565,89 +640,150 @@ public class OSEC extends JFrame {
 		            		"#define CONFIG_H_\r\n"); 
 		            
 		            String text_to_save = "#define NUMBER_OF_PAS_MAGS " + txtNumberOfPas.getText();
+		            iWriter.println(txtNumberOfPas.getText());
 		            pWriter.println(text_to_save); 
+		            
 		            text_to_save = "#define limit " + txtSpeedlimit.getText();
+		            iWriter.println(txtSpeedlimit.getText());
 		            pWriter.println(text_to_save); 
+		            
 		            text_to_save = "#define timeout " + txtPasTimeout.getText();
+		            iWriter.println(txtPasTimeout.getText());
 		            pWriter.println(text_to_save); 
+		            
 		            text_to_save = "#define wheel_circumference " + txtWheelCircumference.getText()+"L";
+		            iWriter.println(txtWheelCircumference.getText());
 		            pWriter.println(text_to_save); 
+		            
 		            text_to_save = "#define fummelfaktor " + txtSupportfactor.getText()+"L";
+		            iWriter.println(txtSupportfactor.getText());
 		            pWriter.println(text_to_save); 
+		            
 		            text_to_save = "#define ADC_THROTTLE_MIN_VALUE " + txtThrottlemin.getText();
+		            iWriter.println(txtThrottlemin.getText());
 		            pWriter.println(text_to_save); 
+		            
 		            text_to_save = "#define ADC_THROTTLE_MAX_VALUE " + txtThrottlemax.getText();
+		            iWriter.println(txtThrottlemax.getText());
 		            pWriter.println(text_to_save); 
+		            
 		            text_to_save = "#define BATTERY_VOLTAGE_MIN_VALUE " + txtUndervoltage.getText();
+		            iWriter.println(txtUndervoltage.getText());
 		            pWriter.println(text_to_save); 
+		            
 		            text_to_save = "#define BATTERY_CURRENT_MAX_VALUE " + txtMaxbatterycurrent.getText()+"L";
+		            iWriter.println(txtMaxbatterycurrent.getText());
 		            pWriter.println(text_to_save); 
+		            
 		            text_to_save = "#define REGEN_CURRENT_MAX_VALUE " + txtMaxregencurrent.getText()+"L";
+		            iWriter.println(txtMaxregencurrent.getText());
 		            pWriter.println(text_to_save); 
+		            
 		            text_to_save = "#define MOTOR_ROTOR_DELTA_PHASE_ANGLE_RIGHT " + txtMotor_specific_angle.getText();
+		            iWriter.println(txtMotor_specific_angle.getText());
 		            pWriter.println(text_to_save); 
+		            
 		            text_to_save = "#define current_cal_a " + txtBatteryCurcala.getText();
+		            iWriter.println(txtBatteryCurcala.getText());
 		            pWriter.println(text_to_save); 
+		            
 		            text_to_save = "#define LEVEL_1 " + Assist_Level_1.getText();
+		            iWriter.println(Assist_Level_1.getText());
 		            pWriter.println(text_to_save); 
+		            
 		            text_to_save = "#define LEVEL_2 " + Assist_Level_2.getText();
+		            iWriter.println(Assist_Level_2.getText());
 		            pWriter.println(text_to_save); 
+		            
 		            text_to_save = "#define LEVEL_3 " + Assist_Level_3.getText();
+		            iWriter.println(Assist_Level_3.getText());
 		            pWriter.println(text_to_save);
+		            
 		            text_to_save = "#define LEVEL_4 " + Assist_Level_4.getText();
+		            iWriter.println(Assist_Level_4.getText());
 		            pWriter.println(text_to_save);
+		            
 		            text_to_save = "#define LEVEL_5 " + Assist_Level_5.getText();
+		            iWriter.println(Assist_Level_5.getText());
 		            pWriter.println(text_to_save);
+		            
 		            text_to_save = "#define CHEAT_TIME_1 " + Cheat_Time_1.getText();
+		            iWriter.println(Cheat_Time_1.getText());
 		            pWriter.println(text_to_save);
+		            
 		            text_to_save = "#define CHEAT_TIME_2 " + Cheat_Time_2.getText();
+		            iWriter.println(Cheat_Time_2.getText());
 		            pWriter.println(text_to_save);
+		            
 		            text_to_save = "#define CHEAT_TIME_3 " + Cheat_Time_3.getText();
+		            iWriter.println(Cheat_Time_3.getText());
 		            pWriter.println(text_to_save);
+		            
 		            text_to_save = "#define RAMP_END " + ramp_end.getText();
+		            iWriter.println(ramp_end.getText());
 		            pWriter.println(text_to_save);
+		            
 		            text_to_save = "#define P_FACTOR " + p_factor.getText();
+		            iWriter.println(p_factor.getText());
 		            pWriter.println(text_to_save); 
+		            
 		            text_to_save = "#define I_FACTOR " + i_factor.getText();
+		            iWriter.println(i_factor.getText());
 		            pWriter.println(text_to_save); 
+		            
 		            text_to_save = "#define GEAR_RATIO " + GearRatio.getText()+"L";
+		            iWriter.println(GearRatio.getText());
 		            pWriter.println(text_to_save); 	
+		            
 		            text_to_save = "#define BATTERY_LI_ION_CELLS_NUMBER " + CellsNumber.getText();
+		            iWriter.println(CellsNumber.getText());
 		            pWriter.println(text_to_save); 
+		            
 		            text_to_save = "#define PAS_THRESHOLD " + PAS_threshold.getText();
+		            iWriter.println(PAS_threshold.getText());
 		            pWriter.println(text_to_save); 	
 		            
 		    		if (rdbtnTorqueSensor.isSelected()){ 
 			            text_to_save = "#define TORQUESENSOR";
-			            pWriter.println(text_to_save); 		                
+			            pWriter.println(text_to_save); 			            
 		    		}
+		    		iWriter.println(rdbtnTorqueSensor.isSelected());
+		    		
 		    		if (rdbtnThrottlePas.isSelected()){ 
 			            text_to_save = "#define THROTTLE_AND_PAS";
 			            pWriter.println(text_to_save); 		                
 		    		}
+		    		iWriter.println(rdbtnThrottlePas.isSelected());
+		    		
 		    		if (rdbtnThrottle.isSelected()){ 
 			            text_to_save = "#define THROTTLE";
 			            pWriter.println(text_to_save); 		                
 		    		}
+		    		iWriter.println(rdbtnThrottle.isSelected());
+		    		
 		    		if (rdbtnTorquesimulation.isSelected()){ 
 			            text_to_save = "#define TORQUE_SIMULATION";
 			            pWriter.println(text_to_save); 		                
 		    		}
+		    		iWriter.println(rdbtnTorquesimulation.isSelected());
 		    		
 		    		if (rdbtnHigh.isSelected()){ 
 			            text_to_save = "#define PWM_CYCLES_SECOND 20833L";
 			            pWriter.println(text_to_save); 		                
 		    		}
+		    		iWriter.println(rdbtnHigh.isSelected());
 		    		
 		    		if (rdbtnNormal.isSelected()){ 
 			            text_to_save = "#define PWM_CYCLES_SECOND 15625L";
 			            pWriter.println(text_to_save); 		                
 		    		}
+		    		iWriter.println(rdbtnNormal.isSelected());
 		    		
 		    		if (rdbtnKtlcd.isSelected()){ 
 			            text_to_save = "#define DISPLAY_TYPE_KT_LCD3";
 			            pWriter.println(text_to_save); 		                
 		    		}
+		    		iWriter.println(rdbtnKtlcd.isSelected());
 		    		
 		    		if (rdbtnKingmeterJlcd.isSelected()){ 
 			            text_to_save = "#define DISPLAY_TYPE_KINGMETER_618U (1<<4) // King-Meter 618U protocol (KM5s, EBS-LCD2, J-LCD, SW-LCD)";
@@ -657,38 +793,53 @@ public class OSEC extends JFrame {
 			            text_to_save = "#define DISPLAY_TYPE DISPLAY_TYPE_KINGMETER  // Set your display type here. CHANGES ONLY HERE!";
 			            pWriter.println(text_to_save);
 		    		}
+		    		iWriter.println(rdbtnKingmeterJlcd.isSelected());
 		    		
 		    		if (rdbtnInternal.isSelected()){ 
 			            text_to_save = "#define SPEEDSENSOR_INTERNAL";
 			            pWriter.println(text_to_save); 		                
 		    		}
+		    		iWriter.println(rdbtnInternal.isSelected());
 		    		
 		    		if (rdbtnExternal.isSelected()){ 
 			            text_to_save = "#define SPEEDSENSOR_EXTERNAL";
 			            pWriter.println(text_to_save); 		                
 		    		}
+		    		iWriter.println(rdbtnExternal.isSelected());
 		    		
 		    		if (rdbtnDiganostics.isSelected()){ 
 			            text_to_save = "#define DIAGNOSTICS";
 			            pWriter.println(text_to_save); 		                
 		    		}
+		    		iWriter.println(rdbtnDiganostics.isSelected());
+		    		
+		    		if (rdbtnRegenDigital.isSelected()){ 
+			            text_to_save = "#define REGEN_DIGITAL";
+			            pWriter.println(text_to_save); 		                
+		    		}
+		    		iWriter.println(rdbtnRegenDigital.isSelected());
 		    		
 		    		if (rdbtnRegen.isSelected()){ 
 			            text_to_save = "#define REGEN";
 			            pWriter.println(text_to_save); 		                
 		    		}
+		    		iWriter.println(rdbtnRegen.isSelected());
 		    		
 		    		if (rdbtnLeft.isSelected()){ 
 			            text_to_save = "#define PAS_DIRECTION 0";
 			            pWriter.println(text_to_save); 		                
 		    		}
+		    		iWriter.println(rdbtnLeft.isSelected());
 		    		
 		    		if (rdbtnRight.isSelected()){ 
 			            text_to_save = "#define PAS_DIRECTION 1";
 			            pWriter.println(text_to_save); 		                
 		    		}
+		    		iWriter.println(rdbtnRight.isSelected());
+		    		
 		            pWriter.println("\r\n#endif /* CONFIG_H_ */"); 
 		            
+		            iWriter.close();
 		            
 		        } catch (IOException ioe) { 
 		            ioe.printStackTrace(); 
@@ -696,6 +847,7 @@ public class OSEC extends JFrame {
 		            if (pWriter != null){ 
 		                pWriter.flush(); 
 		                pWriter.close(); 
+		        	    
 		            } 
 			}
 		        try {
@@ -711,12 +863,6 @@ public class OSEC extends JFrame {
 		btnWriteConfiguration.setBounds(382, 495, 167, 58);
 		contentPane.add(btnWriteConfiguration);
 		
-
-		
-	
-
-		
-
-		
+  
 	}
 }
