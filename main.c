@@ -321,6 +321,7 @@ if (ui8_cheat_state!=4)
 if(ui8_cheat_state==0 && !GPIO_ReadInputPin(BRAKE__PORT, BRAKE__PIN)) //first step, brake on.
   {
     ui8_cheat_state=1;
+    //printf("cheatstate 1");
   }
 if(ui8_cheat_state==1) //second step, make sure the brake is hold according to definded time
   {
@@ -334,6 +335,7 @@ if(ui8_cheat_state==1) //second step, make sure the brake is hold according to d
     {
       ui8_cheat_state=2;
       ui8_cheat_counter=0;
+      //printf("cheatstate 2");
     }
     else if (!GPIO_ReadInputPin(BRAKE__PORT, BRAKE__PIN)&&ui8_cheat_counter>CHEAT_TIME_1+25) //brake is released too late
         {
@@ -354,6 +356,7 @@ if(ui8_cheat_state==2) //third step, make sure the brake is released according t
     {
       ui8_cheat_state=3;
       ui8_cheat_counter=0;
+      //printf("cheatstate 3");
     }
     else if (GPIO_ReadInputPin(BRAKE__PORT, BRAKE__PIN)&&ui8_cheat_counter>CHEAT_TIME_2+25) //brake is hold too late
         {
@@ -374,6 +377,7 @@ if(ui8_cheat_state==3) //second step, make sure the brake is hold according to d
     {
       ui8_cheat_state=4;
       ui8_cheat_counter=0;
+      //printf("cheatstate 4");
     }
     else if (!GPIO_ReadInputPin(BRAKE__PORT, BRAKE__PIN)&&ui8_cheat_counter>CHEAT_TIME_3+25) //brake is released too late
         {
@@ -407,7 +411,7 @@ if(ui8_cheat_state==3) //second step, make sure the brake is hold according to d
       //getchar1 ();
 
 #ifdef DIAGNOSTICS
-	  printf("%d, %d, %d, %d, %d\r\n", ui16_setpoint, ui16_motor_speed_erps, ui16_BatteryCurrent, ui16_adc_read_battery_voltage(),ui8_position_correction_value);
+	 printf("%d, %d, %d, %d, %d\r\n", ui16_setpoint, ui16_motor_speed_erps, ui16_BatteryCurrent, ui16_adc_read_battery_voltage(),ui8_position_correction_value);
 #endif
 	  //printf("erps %d, motorstate %d, cyclecountertotal %d\r\n", ui16_motor_speed_erps, ui8_motor_state, ui16_PWM_cycles_counter_total);
 

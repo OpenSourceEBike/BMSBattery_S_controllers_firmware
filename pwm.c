@@ -627,7 +627,7 @@ void pwm_init (void)
   TIM1_ITConfig(TIM1_IT_UPDATE, ENABLE);
 
   TIM1_Cmd(ENABLE); // TIM1 counter enable
-  TIM1_CtrlPWMOutputs(ENABLE); // main Output Enable
+  TIM1_CtrlPWMOutputs(DISABLE); // main Output disable for start up
 }
 
 void pwm_duty_cycle_controller (void)

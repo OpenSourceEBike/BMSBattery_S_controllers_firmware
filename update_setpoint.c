@@ -93,7 +93,7 @@ uint16_t update_setpoint (uint16_t speed, uint16_t PAS, uint16_t sumtorque, uint
       TIM1_CtrlPWMOutputs(DISABLE);
       uint_PWM_Enable=0; // highest priority: Stop motor for undervoltage protection
       ui32_setpoint=0;
-      printf("Low voltage! %d\n",ui8_BatteryVoltage);
+      printf("Low voltage! %d\r\n",ui8_BatteryVoltage);
     }
 
   //check if rider is braking
@@ -164,6 +164,7 @@ uint16_t update_setpoint (uint16_t speed, uint16_t PAS, uint16_t sumtorque, uint
   uint32_current_target = CheckSpeed ((uint16_t)float_temp, (uint16_t) ui32_erps_filtered); //limit speed
 #endif
 
+
 #ifdef SPEEDSENSOR_EXTERNAL
   uint32_current_target = CheckSpeed ((uint16_t)float_temp, (uint16_t) ui32_SPEED_km_h); //limit speed
 #endif
@@ -209,11 +210,13 @@ uint16_t update_setpoint (uint16_t speed, uint16_t PAS, uint16_t sumtorque, uint
    //printf("%lu, %d, %d, %d\r\n", ui32_setpoint, ui8_position_correction_value, ui16_BatteryCurrent, (uint16_t) uint32_current_target);
 #endif
 
- if (!uint_PWM_Enable) //enable PWM if disabled
+ if (!uint_PWM_Enable && ui8_BatteryVoltage>BATTERY_VOLTAGE_MIN_VALUE+8 ) //enable PWM if disabled and voltage is 2V higher than min, some hysteresis
+
+
      {
         TIM1_CtrlPWMOutputs(ENABLE);
         uint_PWM_Enable=1;
-        //printf("PWM enabled!\n");
+        printf("PWM enabled!\r\n");
      }
  } //end of else
 
