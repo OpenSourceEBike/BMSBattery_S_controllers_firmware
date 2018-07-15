@@ -39,7 +39,8 @@ uint16_t ui16_BatteryCurrent; //Battery Current read from ADC8
 uint16_t ui16_current_cal_b;
 uint8_t ui8_BatteryVoltage; //Battery Voltage read from ADC
 uint16_t ui16_BatteryVoltage_accumulated;
-uint8_t ui8_regen_throttle; //regen throttle read from ADC
+uint8_t ui8_regen_throttle; //regen throttle read from ADC X4
+uint8_t ui8_motor_temperature; //temperature read from ADC X4
 uint8_t ui8_regen_flag=0; //regen flag for shifting from +90° to -90°
 static uint16_t ui16_PAS_accumulated = 64000L; // for filtering of PAS value
 static uint32_t ui32_erps_accumulated; //for filtering of erps
@@ -67,7 +68,7 @@ uint16_t update_setpoint (uint16_t speed, uint16_t PAS, uint16_t sumtorque, uint
   ui32_erps_accumulated+=ui16_motor_speed_erps;
   ui32_erps_filtered=ui32_erps_accumulated>>3;
 
-  ui8_regen_throttle = map (ui8_adc_read_regen_throttle () , ADC_THROTTLE_MIN_VALUE, ADC_THROTTLE_MAX_VALUE, 0, SETPOINT_MAX_VALUE); //map throttle to limits
+
   //ui8_position_correction_value=127+sumtorque;
   ui32_SPEED_km_h=(wheel_circumference*PWM_CYCLES_SECOND*36L)/(10L*(uint32_t)speed);			//calculate speed in m/h conversion fr	om sec to hour --> *3600, conversion from mm to km --> /1000000, tic frequency 15625 Hz
   //printf("speed km/h %lu\r\n",ui32_SPEED_km_h);
@@ -77,6 +78,7 @@ uint16_t update_setpoint (uint16_t speed, uint16_t PAS, uint16_t sumtorque, uint
 #ifdef REGEN
 
   //check if regen is wanted
+  ui8_regen_throttle = map (ui8_adc_read_regen_throttle () , ADC_THROTTLE_MIN_VALUE, ADC_THROTTLE_MAX_VALUE, 0, SETPOINT_MAX_VALUE); //map throttle to limits
     if(ui8_regen_throttle>2){
     float_temp=(float)ui8_regen_throttle*(float)(REGEN_CURRENT_MAX_VALUE-ui16_current_cal_b)/255.0+(float)ui16_current_cal_b;
     ui32_setpoint= PI_control(ui16_BatteryCurrent, (uint16_t) float_temp);
@@ -88,6 +90,7 @@ uint16_t update_setpoint (uint16_t speed, uint16_t PAS, uint16_t sumtorque, uint
 #endif
       //check for undervoltage
 #ifndef REGEN
+      ui8_motor_temperature=ui8_adc_read_regen_throttle ()*2-50; //calibration for tpm36 temperature sensor
       if(ui8_BatteryVoltage<BATTERY_VOLTAGE_MIN_VALUE){
 #endif
       TIM1_CtrlPWMOutputs(DISABLE);
@@ -101,7 +104,7 @@ uint16_t update_setpoint (uint16_t speed, uint16_t PAS, uint16_t sumtorque, uint
 #ifdef REGEN_DIGITAL
             ui32_setpoint= PI_control(ui16_BatteryCurrent, REGEN_CURRENT_MAX_VALUE);  //Curret target = max regen,
             if (ui32_setpoint==0){ui32_setpoint=ui16_motor_speed_erps*2;} //try to get best regen at Low Speeds for BionX IGH
-#else if
+#else
             ui32_setpoint= PI_control(ui16_BatteryCurrent, ui16_current_cal_b);//Curret target = 0 A, this is to keep the integral part of the PI-control up to date
 #endif
 
@@ -168,6 +171,11 @@ uint16_t update_setpoint (uint16_t speed, uint16_t PAS, uint16_t sumtorque, uint
 #ifdef SPEEDSENSOR_EXTERNAL
   uint32_current_target = CheckSpeed ((uint16_t)float_temp, (uint16_t) ui32_SPEED_km_h); //limit speed
 #endif
+
+  if(setpoint_old>0 && (uint32_current_target-ui16_current_cal_b)*255/setpoint_old>BATTERY_PHASE_MAX_VALUE-ui16_current_cal_b){  // limit phase current according to Phase Current = battery current/duty cycle
+      uint32_current_target=(BATTERY_PHASE_MAX_VALUE-ui16_current_cal_b)*setpoint_old/255+ui16_current_cal_b;
+     // printf("Phase Current limited! %d, %d, %d\r\n", (uint16_t)uint32_current_target,(uint16_t)float_temp, setpoint_old );
+  }
 
   ui32_setpoint= PI_control(ui16_BatteryCurrent, (uint16_t) uint32_current_target);
   if (ui32_setpoint<5)ui32_setpoint=0;

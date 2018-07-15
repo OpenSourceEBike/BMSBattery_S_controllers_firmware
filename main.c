@@ -265,7 +265,7 @@ int main (void)
 #ifdef TORQUESENSOR
       if (ui16_PAS<timeout){PAS_dir=1;} //only PAS timeout for Torquesensor Mode.
 
-#else if
+#else
 
       if (PAS_act>3){PAS_dir=1;} //set direction only if enough pulses in the right direction are detected.
 
@@ -411,7 +411,7 @@ if(ui8_cheat_state==3) //second step, make sure the brake is hold according to d
       //getchar1 ();
 
 #ifdef DIAGNOSTICS
-	 printf("%d, %d, %d, %d, %d\r\n", ui16_setpoint, ui16_motor_speed_erps, ui16_BatteryCurrent, ui16_adc_read_battery_voltage(),ui8_position_correction_value);
+	 printf("%d, %d, %d, %d, %d\r\n", ui16_setpoint, ui16_motor_speed_erps, ui16_BatteryCurrent, ui16_adc_read_battery_voltage(),ui8_motor_temperature);
 #endif
 	  //printf("erps %d, motorstate %d, cyclecountertotal %d\r\n", ui16_motor_speed_erps, ui8_motor_state, ui16_PWM_cycles_counter_total);
 
