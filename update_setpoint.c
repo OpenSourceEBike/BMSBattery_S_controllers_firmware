@@ -40,7 +40,7 @@ uint16_t ui16_current_cal_b;
 uint8_t ui8_BatteryVoltage; //Battery Voltage read from ADC
 uint16_t ui16_BatteryVoltage_accumulated;
 uint8_t ui8_regen_throttle; //regen throttle read from ADC X4
-uint8_t ui8_motor_temperature; //temperature read from ADC X4
+int8_t i8_motor_temperature; //temperature read from ADC X4
 uint8_t ui8_regen_flag=0; //regen flag for shifting from +90° to -90°
 static uint16_t ui16_PAS_accumulated = 64000L; // for filtering of PAS value
 static uint32_t ui32_erps_accumulated; //for filtering of erps
@@ -90,7 +90,7 @@ uint16_t update_setpoint (uint16_t speed, uint16_t PAS, uint16_t sumtorque, uint
 #endif
       //check for undervoltage
 #ifndef REGEN
-      ui8_motor_temperature=ui8_adc_read_regen_throttle ()*2-50; //calibration for tpm36 temperature sensor
+      i8_motor_temperature=(int8_t)((float)ui16_adc_read_regen_throttle ()*TEMP_CAL_A+TEMP_CAL_B); //calibration for tpm36 temperature sensor
       if(ui8_BatteryVoltage<BATTERY_VOLTAGE_MIN_VALUE){
 #endif
       TIM1_CtrlPWMOutputs(DISABLE);

@@ -22,7 +22,7 @@ extern uint32_t ui32_SPEED_km_h;
 extern uint32_t ui32_erps_filtered;
 extern uint16_t ui16_current_cal_b;
 extern uint8_t ui8_regen_throttle;
-extern uint8_t ui8_motor_temperature;
+extern int8_t i8_motor_temperature;
 extern uint8_t ui8_regen_flag;
 
 

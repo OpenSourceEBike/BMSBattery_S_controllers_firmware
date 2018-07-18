@@ -117,6 +117,18 @@ uint8_t ui8_adc_read_regen_throttle (void)
   return *(uint8_t*)(0x53EE);
 }
 
+uint16_t ui16_adc_read_regen_throttle (void)
+{
+  uint16_t temph;
+  uint8_t templ;
+
+  templ = *(uint8_t*)(0x53EF);
+  temph = *(uint8_t*)(0x53EE);
+
+  return ((uint16_t) temph) << 2 | ((uint16_t) templ);
+
+}
+
 uint8_t ui8_adc_read_motor_total_current (void)
 {
 // 0x53E0 + 2*8 = 0x53F0

@@ -21,6 +21,8 @@
 #define REGEN_CURRENT_MAX_VALUE 251L
 #define MOTOR_ROTOR_DELTA_PHASE_ANGLE_RIGHT 238
 #define current_cal_a 10
+#define TEMP_CAL_A 1.6
+#define TEMP_CAL_B 110.4
 #define LEVEL_1 20
 #define LEVEL_2 40
 #define LEVEL_3 60
@@ -37,7 +39,7 @@
 #define PAS_THRESHOLD 1.7
 #define THROTTLE
 #define PWM_CYCLES_SECOND 15625L
-//#define DISPLAY_TYPE_KT_LCD3
+#define DISPLAY_TYPE_KT_LCD3
 #define SPEEDSENSOR_EXTERNAL
 #define DIAGNOSTICS
 #define REGEN_DIGITAL
