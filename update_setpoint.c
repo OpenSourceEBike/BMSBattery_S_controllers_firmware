@@ -90,6 +90,7 @@ uint16_t update_setpoint (uint16_t speed, uint16_t PAS, uint16_t sumtorque, uint
 #endif
       //check for undervoltage
 #ifndef REGEN
+
       i8_motor_temperature=(int8_t)((float)ui16_adc_read_regen_throttle ()*TEMP_CAL_A+TEMP_CAL_B); //calibration for tpm36 temperature sensor
       if(ui8_BatteryVoltage<BATTERY_VOLTAGE_MIN_VALUE){
 #endif

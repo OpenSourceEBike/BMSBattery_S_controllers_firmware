@@ -22,7 +22,7 @@
 #define MOTOR_ROTOR_DELTA_PHASE_ANGLE_RIGHT 238
 #define current_cal_a 10
 #define TEMP_CAL_A 1.6
-#define TEMP_CAL_B 110.4
+#define TEMP_CAL_B -110.4
 #define LEVEL_1 20
 #define LEVEL_2 40
 #define LEVEL_3 60
