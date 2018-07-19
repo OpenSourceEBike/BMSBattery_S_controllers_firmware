@@ -1,4 +1,4 @@
-PATH = %PATH%;C:\Program Files (x86)\STMicroelectronics\st_toolset\stvp;C:\SDCC\usr\local\bin;%~p0\tools\cygwin\bin
+PATH = %PATH%;C:\Program Files (x86)\STMicroelectronics\st_toolset\stvp;C:\SDCC\usr\local\bin;%~dp0tools\cygwin\bin
 
 del main.hex
 make -f Makefile_windows clean
