@@ -222,14 +222,47 @@ int main (void)
         }
 //in case of THROTTLEANDPAS or THORQUE_SIMULATION, process the PAS routine
 #if defined(THROTTLE_AND_PAS)
-	      if (ui8_PAS_Flag == 1)
-	      	              {
-	      	                ui16_PAS=ui16_PAS_Counter; 		//save recent cadence
-	      	                //printf("PAStic %d\n", ui16_PAS_Counter);
-	      	                ui16_PAS_Counter=0;			//reset PAS Counter
+    if (ui8_PAS_Flag == 1)
+        {
+          ui16_PAS=ui16_PAS_Counter; 		//save recent cadence
+          ui16_PAS_High=ui16_PAS_High_Counter;
 
-	      	                ui8_PAS_Flag =0; 			//reset interrupt flag
-	      	          }
+
+
+    #if (PAS_DIRECTION)
+          if((float)ui16_PAS/(float)ui16_PAS_High>PAS_THRESHOLD){
+    	  if (PAS_act<7) {PAS_act++;}
+          }
+          else{
+    	  if (PAS_act>0) {PAS_act--;}
+          }
+
+    #endif
+
+    #if (!PAS_DIRECTION)
+          if((float)ui16_PAS/(float)ui16_PAS_High<PAS_THRESHOLD){
+
+    	  if (PAS_act<7) {PAS_act++;}
+          }
+          else{
+    	  if (PAS_act>0) {PAS_act--;}
+          }
+    #endif
+
+
+          if (PAS_act>3){PAS_dir=1;} //set direction only if enough pulses in the right direction are detected.
+
+
+          else{PAS_dir=0;}
+
+          ui16_PAS_Counter=1;
+          ui16_PAS_High_Counter=1;//reset PAS Counter
+
+
+
+          ui8_PAS_Flag =0; 			//reset interrupt flag
+        }
+
 #endif
 
 
