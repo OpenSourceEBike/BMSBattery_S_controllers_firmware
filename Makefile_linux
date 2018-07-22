@@ -31,12 +31,14 @@ ELF_SECTIONS_TO_REMOVE = -R DATA -R INITIALIZED -R SSEG -R .debug_line -R .debug
 EXTRASRCS = \
 	$(SDIR)/stm8s_itc.c \
 	$(SDIR)/stm8s_clk.c \
+	$(SDIR)/stm8s_iwdg.c \
 	$(SDIR)/stm8s_gpio.c \
 	$(SDIR)/stm8s_exti.c \
 	$(SDIR)/stm8s_uart2.c \
 	$(SDIR)/stm8s_tim1.c \
 	$(SDIR)/stm8s_tim2.c \
 	$(SDIR)/stm8s_adc1.c \
+	$(SDIR)/stm8s_flash.c \
 	gpio.c \
 	utils.c \
 	cruise_control.c \
@@ -49,6 +51,8 @@ EXTRASRCS = \
 	PAS.c \
 	SPEED.c \
 	update_setpoint.c \
+	display.c \
+	display_kingmeter.c
 
 HEADERS = adc.h  brake.h  cruise_control.h  gpio.h  interrupts.h  main.h  motor.h  pwm.h  timers.h  uart.h  utils.h  PAS.h  SPEED.h  update_setpoint.h
 
