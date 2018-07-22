@@ -203,6 +203,8 @@ uint16_t update_setpoint (uint16_t speed, uint16_t PAS, uint16_t sumtorque, uint
       uint32_current_target= (i16_assistlevel[ui8_assistlevel_global-1]*(BATTERY_CURRENT_MAX_VALUE-ui16_current_cal_b)/100+ui16_current_cal_b);
       //printf("current_target %d\r\n", (int16_t)uint32_current_target);
     }
+  float_temp=(float)sumtorque*(float)(BATTERY_CURRENT_MAX_VALUE-ui16_current_cal_b)/255.0+(float)ui16_current_cal_b; //calculate current target
+  if ((int32_t)float_temp>uint32_current_target)uint32_current_target=(int32_t)float_temp; //override torque simulation with throttle
 
 #ifdef SPEEDSENSOR_INTERNAL
   uint32_current_target = CheckSpeed ((uint16_t)uint32_current_target, (uint16_t) ui32_erps_filtered); //limit speed
@@ -212,6 +214,10 @@ uint16_t update_setpoint (uint16_t speed, uint16_t PAS, uint16_t sumtorque, uint
   uint32_current_target = CheckSpeed ((uint16_t)uint32_current_target, (uint16_t) ui32_SPEED_km_h); //limit speed
 #endif
 
+  if(setpoint_old>0 && (uint32_current_target-ui16_current_cal_b)*255/setpoint_old>PHASE_CURRENT_MAX_VALUE-ui16_current_cal_b){  // limit phase current according to Phase Current = battery current/duty cycle
+      uint32_current_target=(PHASE_CURRENT_MAX_VALUE-ui16_current_cal_b)*setpoint_old/255+ui16_current_cal_b;
+     // printf("Phase Current limited! %d, %d, %d\r\n", (uint16_t)uint32_current_target,(uint16_t)float_temp, setpoint_old );
+  }
   ui32_setpoint= PI_control(ui16_BatteryCurrent, uint32_current_target);
     if (ui32_setpoint<5)ui32_setpoint=0;
     if (ui32_setpoint>255)ui32_setpoint=255;

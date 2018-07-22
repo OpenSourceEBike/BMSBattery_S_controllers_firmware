@@ -215,10 +215,12 @@ int main (void)
 	//printf("%d\r\n", ui16_SPEED);
 	//printf("SPEEDtic\n");
     }
-    if (ui16_SPEED_Counter>64000L)
+    if (ui16_SPEED_Counter>64000L && ui16_SPEED!=64000)
         {
     	ui16_SPEED=64000; 	//Set Display to 0 km/h
+
     	PAS_act=0;		//Set PAS indicator to 0 to avoid motor startig, if pushing backwards from standstill
+    	//printf("disable\r\n");
         }
 //in case of THROTTLEANDPAS or THORQUE_SIMULATION, process the PAS routine
 #if defined(THROTTLE_AND_PAS)
@@ -278,9 +280,11 @@ int main (void)
 #if (PAS_DIRECTION)
       if((float)ui16_PAS/(float)ui16_PAS_High>PAS_THRESHOLD){
 	  if (PAS_act<7) {PAS_act++;}
+	  //printf("increment\r\n");
       }
       else{
 	  if (PAS_act>0) {PAS_act--;}
+	  //printf("decrement\r\n");
       }
 
 #endif
@@ -312,8 +316,9 @@ int main (void)
 
       ui8_PAS_Flag =0; 			//reset interrupt flag
 
-      ui8_temp = ui8_adc_read_throttle (); //read in recent torque value
 
+#ifdef TORQUESENSOR
+      ui8_temp = ui8_adc_read_throttle (); //read in recent torque value
       ui16_torque[ui8_torque_index]= (uint8_t) map (ui8_temp , ADC_THROTTLE_MIN_VALUE, ADC_THROTTLE_MAX_VALUE, 0, SETPOINT_MAX_VALUE); //map throttle to limits
       ui16_sum_torque = 0;
       for(a = 0; a < NUMBER_OF_PAS_MAGS; a++) {			// sum up array content
@@ -323,6 +328,9 @@ int main (void)
       ui8_torque_index++;
       if (ui8_torque_index>NUMBER_OF_PAS_MAGS-1){ui8_torque_index=0;} //reset index counter
       //printf("%d,%d,%d,%d,%d\r\n",ui8_temp, ui16_sum_torque, ui16_PAS, ui16_PAS_High, PAS_act);
+
+
+#endif
     }
 
 
@@ -338,7 +346,7 @@ int main (void)
 	    ui8_slowloop_flag=0; //reset flag for slow loop
 	    ui8_veryslowloop_counter++; // increase counter for very slow loop
 
-#if defined(THROTTLE)  || defined(THROTTLE_AND_PAS) // read in Throttle value an map it to margins
+#if defined(THROTTLE)  || defined(THROTTLE_AND_PAS) || defined (TORQUE_SIMULATION) // read in Throttle value an map it to margins
 	    ui16_throttle_accumulated -= ui16_throttle_accumulated>>3;
 	    ui16_throttle_accumulated += ui8_adc_read_throttle ();
 
@@ -444,7 +452,7 @@ if(ui8_cheat_state==3) //second step, make sure the brake is hold according to d
       //getchar1 ();
 
 #ifdef DIAGNOSTICS
-	 printf("%d, %d, %d, %d, %d\r\n", ui16_setpoint, ui16_motor_speed_erps, ui16_BatteryCurrent, ui16_adc_read_battery_voltage(), i8_motor_temperature);
+	 printf("%d, %d, %d, %d, %d\r\n", ui16_setpoint, ui16_motor_speed_erps, ui16_BatteryCurrent,(uint16_t) (1000*(float)ui16_PAS/(float)ui16_PAS_High), PAS_act);
 #endif
 	  //printf("erps %d, motorstate %d, cyclecountertotal %d\r\n", ui16_motor_speed_erps, ui8_motor_state, ui16_PWM_cycles_counter_total);
 
