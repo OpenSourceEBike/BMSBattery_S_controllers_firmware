@@ -124,7 +124,7 @@ uint16_t update_setpoint (uint16_t speed, uint16_t PAS, uint16_t sumtorque, uint
 
   //check if pedals are turning
 #ifndef THROTTLE
-  else if (ui16_PAS_Counter>timeout || !PAS_dir){
+  else if ((ui16_PAS_Counter>timeout || !PAS_dir)&&!(ui8_cheat_state==4 && sumtorque>5)){
             ui32_setpoint= PI_control(ui16_BatteryCurrent, ui16_current_cal_b);//Curret target = 0 A, this is to keep the integral part of the PI-control up to date
                   if (ui32_setpoint<5){ui32_setpoint=0;}
                   if (ui32_setpoint>255){ui32_setpoint=255;}

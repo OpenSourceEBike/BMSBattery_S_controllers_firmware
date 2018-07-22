@@ -367,6 +367,7 @@ if(ui8_cheat_state==0 && !GPIO_ReadInputPin(BRAKE__PORT, BRAKE__PIN)) //first st
 if(ui8_cheat_state==1) //second step, make sure the brake is hold according to definded time
   {
     ui8_cheat_counter++;
+
     if (GPIO_ReadInputPin(BRAKE__PORT, BRAKE__PIN)&&ui8_cheat_counter<CHEAT_TIME_1) //brake is released too early
       {
 	ui8_cheat_state=0;
@@ -428,7 +429,8 @@ if(ui8_cheat_state==3) //second step, make sure the brake is hold according to d
   }
 
   }
-//end of cheatprocedure
+//end of cheatprocedure //
+
 
 	      ui16_setpoint = (uint16_t)update_setpoint (ui16_SPEED,ui16_PAS,ui16_sum_torque,ui16_setpoint); //update setpoint
 
@@ -452,7 +454,7 @@ if(ui8_cheat_state==3) //second step, make sure the brake is hold according to d
       //getchar1 ();
 
 #ifdef DIAGNOSTICS
-	 printf("%d, %d, %d, %d, %d\r\n", ui16_setpoint, ui16_motor_speed_erps, ui16_BatteryCurrent,(uint16_t) (1000*(float)ui16_PAS/(float)ui16_PAS_High), PAS_act);
+	 printf("%d, %d, %d, %d, %d\r\n", ui16_setpoint, ui16_motor_speed_erps, ui16_BatteryCurrent,ui8_cheat_state, ui8_cheat_counter);
 #endif
 	  //printf("erps %d, motorstate %d, cyclecountertotal %d\r\n", ui16_motor_speed_erps, ui8_motor_state, ui16_PWM_cycles_counter_total);
 
