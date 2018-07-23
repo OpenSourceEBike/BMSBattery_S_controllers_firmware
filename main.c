@@ -428,9 +428,12 @@ if(ui8_cheat_state==3) //second step, make sure the brake is hold according to d
         }
   }
 // wait 3 seconds in state 4 for display feedback
-  if(ui8_cheat_state==4 && ui8_cheat_counter > 150){
-    ui8_cheat_state=5;
-    ui8_cheat_counter=0;
+  if(ui8_cheat_state==4){
+      ui8_cheat_counter++;
+      if(ui8_cheat_counter>150){
+	   ui8_cheat_state=5;
+	   ui8_cheat_counter=0;
+      }
   }
 
   }
