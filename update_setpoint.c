@@ -133,7 +133,7 @@ uint16_t update_setpoint (uint16_t speed, uint16_t PAS, uint16_t sumtorque, uint
   }
 #endif
  // check if pedals are turning in torquesensor mode, throttle active in offroad mode doesn't work here
-#if defined(TORQUESENSOSR)
+#if defined(TORQUESENSOR)
   else if (ui16_PAS_Counter>timeout || !PAS_dir){
             ui32_setpoint= PI_control(ui16_BatteryCurrent, ui16_current_cal_b);//Curret target = 0 A, this is to keep the integral part of the PI-control up to date
                   if (ui32_setpoint<5){ui32_setpoint=0;}
