@@ -122,9 +122,19 @@ uint16_t update_setpoint (uint16_t speed, uint16_t PAS, uint16_t sumtorque, uint
         printf("erps too high!\r\n");
     }
 
-  //check if pedals are turning
-#ifndef THROTTLE
-  else if ((ui16_PAS_Counter>timeout || !PAS_dir)&&!(ui8_cheat_state==4 && sumtorque>5)){
+  //check if pedals are turning with throttle active in offroad mode
+#if defined(THROTTLE_AND_PAS) || defined (TORQUE_SIMULATION)
+  else if ((ui16_PAS_Counter>timeout || !PAS_dir)&&!(ui8_cheat_state==5 && sumtorque>5)){
+            ui32_setpoint= PI_control(ui16_BatteryCurrent, ui16_current_cal_b);//Curret target = 0 A, this is to keep the integral part of the PI-control up to date
+                  if (ui32_setpoint<5){ui32_setpoint=0;}
+                  if (ui32_setpoint>255){ui32_setpoint=255;}
+     //printf("P, %lu, %d, %d, %d\r\n", ui32_setpoint, sumtorque, ui16_BatteryCurrent, (uint16_t) ui16_current_cal_b);
+     // printf("you are not pedaling!\r\n");
+  }
+#endif
+ // check if pedals are turning in torquesensor mode, throttle active in offroad mode doesn't work here
+#if defined(TORQUESENSOSR)
+  else if (ui16_PAS_Counter>timeout || !PAS_dir){
             ui32_setpoint= PI_control(ui16_BatteryCurrent, ui16_current_cal_b);//Curret target = 0 A, this is to keep the integral part of the PI-control up to date
                   if (ui32_setpoint<5){ui32_setpoint=0;}
                   if (ui32_setpoint>255){ui32_setpoint=255;}
@@ -260,7 +270,7 @@ uint32_t CheckSpeed (uint16_t current_target, uint16_t erps)
 {
   //printf("Speed %d, %d\r\n", erps, ui16_erps_limit_lower);
   //ramp down motor power if you are riding too fast and speed liming is active
-  if (erps>ui16_erps_limit_lower && ui8_cheat_state!=4){
+  if (erps>ui16_erps_limit_lower && ui8_cheat_state!=5){
 
 	if (erps>ui16_erps_limit_higher){ //if you are riding much too fast, stop motor immediately
 	    current_target=ui16_current_cal_b;
@@ -280,7 +290,7 @@ uint32_t CheckSpeed (uint16_t current_target, uint16_t speed)
 {
 
   //ramp down motor power if you are riding too fast and speed liming is active
-  if (speed>limit*1000 && ui8_cheat_state!=4){
+  if (speed>limit*1000 && ui8_cheat_state!=5){
       //printf("Vor %d, %d\r\n", current_target-ui16_current_cal_b, speed);
 	if (speed>(limit+2)*1000){ //if you are riding much too fast, stop motor immediately
 	    current_target=ui16_current_cal_b;

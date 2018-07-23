@@ -209,6 +209,14 @@ ui8_tx_buffer [0] = 65;
   // B3: speed, wheel rotation period, ms; period(ms)=B3*256+B4;
   ui8_tx_buffer [3] = (ui16_wheel_period_ms >> 8) & 0xff;
   ui8_tx_buffer [4] = ui16_wheel_period_ms & 0xff;
+
+  //Send confirming signal for activating offroad mode
+   if (ui8_cheat_state==4){ //quitting signal for offroad mode enabled. Shows about 80 km/h for three seconds
+
+  	  ui8_tx_buffer [3] = (100 >> 8) & 0xff; //100ms are about 80 km/h @ 28" 2200mm wheel circumference
+  	  ui8_tx_buffer [4] = 100 & 0xff;
+   }
+
   // B5: error info display
   ui8_tx_buffer [5] = ui16_error;
   // B6: CRC: xor B1,B2,B3,B4,B5,B7,B8,B9,B10,B11

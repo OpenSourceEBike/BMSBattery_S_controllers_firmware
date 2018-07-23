@@ -357,7 +357,7 @@ int main (void)
 
 //start of cheat procedure
 
-if (ui8_cheat_state!=4)
+if (ui8_cheat_state!=5)
   {
 if(ui8_cheat_state==0 && !GPIO_ReadInputPin(BRAKE__PORT, BRAKE__PIN)) //first step, brake on.
   {
@@ -426,6 +426,11 @@ if(ui8_cheat_state==3) //second step, make sure the brake is hold according to d
           ui8_cheat_state=0;
           ui8_cheat_counter=0;
         }
+  }
+// wait 3 seconds in state 4 for display feedback
+  if(ui8_cheat_state==4 && ui8_cheat_counter > 150){
+    ui8_cheat_state=5;
+    ui8_cheat_counter=0;
   }
 
   }
