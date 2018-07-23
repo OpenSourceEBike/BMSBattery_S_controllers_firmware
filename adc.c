@@ -13,6 +13,7 @@
 #include "stm8s_adc1.h"
 #include "adc.h"
 #include "update_setpoint.h"
+#include "timers.h"
 
 
 
@@ -20,7 +21,7 @@
 void adc_init (void)
 {
  uint8_t ui8_i;
- //uint16_t ui16_counter;
+ uint16_t ui16_counter;
 
   //init GPIO for the used ADC pins
   GPIO_Init(GPIOB,
@@ -52,24 +53,27 @@ void adc_init (void)
   // read and discard few samples of ADC, to make sure the next samples are ok
   for (ui8_i = 0; ui8_i < 8; ui8_i++)
   {
-    //ui16_counter = TIM2_GetCounter () + 10;
-    //while (TIM2_GetCounter () < ui16_counter) ; // delay
+    //ui16_counter = TIM2_GetCounter () + 1000;
+   // while (TIM2_GetCounter () < ui16_counter) ; // delay
+    delay_halfms(200);
     adc_trigger ();
-
-    printf("ACD init");
-  }
+    delay_halfms(200);
+    ui16_current_cal_b=ui16_adc_read_motor_total_current ();
+    }
 
   // read and average a few values of ADC
   ui16_current_cal_b = 0;
   for (ui8_i = 0; ui8_i < 16; ui8_i++)
   {
-
+    delay_halfms(30);
     adc_trigger ();
+    delay_halfms(30);
     ui16_current_cal_b += ui16_adc_read_motor_total_current ();
-    printf("ACD init");
+
   }
   ui16_current_cal_b >>= 4;
   ui16_current_cal_b -= 1;
+  printf("ui16_current_cal_b = %d\r\n", ui16_current_cal_b);
   //ui8_motor_total_current_offset = ui16_motor_total_current_offset_10b >> 2;
 }
 

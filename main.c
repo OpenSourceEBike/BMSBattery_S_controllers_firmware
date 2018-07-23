@@ -177,7 +177,7 @@ int main (void)
   for(a = 0; a < NUMBER_OF_PAS_MAGS;a++) {// array init
    ui16_torque[a]=0;
   }
-  printf("System initialized\n");
+  printf("System initialized\r\n");
   while (1)
   {
     static uint32_t ui32_counter = 0;
