@@ -23,6 +23,7 @@
 #define ADC_MOTOR_TOTAL_CURRENT_MAX 20 // 20 (8bits) ~ 2 Amps
 #define ADC_MOTOR_TOTAL_CURRENT_MAX_POSITIVE 90 // +2A
 #define ADC_MOTOR_TOTAL_CURRENT_MAX_NEGATIVE 70 // +2A
+#define CHEAT_TOLERANCE 40 // Tolerance for "morse" code detection
 
 //for Kunteng Displays
 #define COMMUNICATIONS_BATTERY_VOLTAGE	(BATTERY_LI_ION_CELLS_NUMBER * 3.45) // example: 7S battery, should be = 24
