@@ -30,6 +30,7 @@
 
 static uint32_t ui32_setpoint; // local version of setpoint
 uint32_t ui32_SPEED_km_h; //global variable Speed
+uint32_t ui32_SPEED_km_h_accumulated;
 int16_t i16_assistlevel[5]={LEVEL_1, LEVEL_2, LEVEL_3, LEVEL_4, LEVEL_5}; // difference between setpoint and actual value
 uint32_t uint32_current_target=0; //target for PI-Control
 float float_temp=0; //for float calculations
@@ -46,8 +47,6 @@ static uint16_t ui16_PAS_accumulated = 64000L; // for filtering of PAS value
 static uint32_t ui32_erps_accumulated; //for filtering of erps
 uint32_t ui32_erps_filtered; //filtered value of erps
 uint32_t ui32_temp;
-//uint16_t ui16_erps_limit_lower=((limit)*(GEAR_RATIO/wheel_circumference));
-//uint16_t ui16_erps_limit_higher=((limit+2)*(GEAR_RATIO/wheel_circumference));
 uint16_t ui16_erps_limit_lower=(uint16_t)((float)GEAR_RATIO*(float)limit*10000.0/((float)wheel_circumference*36.0));
 uint16_t ui16_erps_limit_higher=(uint16_t)((float)GEAR_RATIO*(float)(limit+2)*10000.0/((float)wheel_circumference*36.0));
 
@@ -69,9 +68,13 @@ uint16_t update_setpoint (uint16_t speed, uint16_t PAS, uint16_t sumtorque, uint
   ui32_erps_filtered=ui32_erps_accumulated>>3;
 
 
-  //ui8_position_correction_value=127+sumtorque;
-  ui32_SPEED_km_h=(wheel_circumference*PWM_CYCLES_SECOND*36L)/(10L*(uint32_t)speed);			//calculate speed in m/h conversion fr	om sec to hour --> *3600, conversion from mm to km --> /1000000, tic frequency 15625 Hz
-  //printf("speed km/h %lu\r\n",ui32_SPEED_km_h);
+if(ui8_SPEED_Tag){
+  ui32_SPEED_km_h_accumulated-=ui32_SPEED_km_h_accumulated>>2;
+  ui32_SPEED_km_h_accumulated+=(wheel_circumference*PWM_CYCLES_SECOND*36L)/(10L*(uint32_t)speed); // speed km/h*1000 from external sensor
+  ui32_SPEED_km_h=ui32_SPEED_km_h_accumulated>>2;			//calculate speed in m/h conversion fr	om sec to hour --> *3600, conversion from mm to km --> /1000000, tic frequency 15625 Hz
+  ui8_SPEED_Tag=0;
+  }
+
   if(ui16_SPEED_Counter>40000){ui32_SPEED_km_h=0;}     //if wheel isn't turning, reset speed
 
 
@@ -150,7 +153,7 @@ uint16_t update_setpoint (uint16_t speed, uint16_t PAS, uint16_t sumtorque, uint
       ui16_PAS_accumulated-=ui16_PAS_accumulated>>3;
       ui16_PAS_accumulated+=PAS;
       PAS=ui16_PAS_accumulated>>3;
-      uint32_current_target=((i16_assistlevel[ui8_assistlevel_global-1]*fummelfaktor*sumtorque))/(((uint32_t)PAS)<<6)+ui16_current_cal_b; 						//calculate setpoint
+      uint32_current_target=((i16_assistlevel[ui8_assistlevel_global-1]*fummelfaktor*sumtorque))/(((uint32_t)PAS)<<6)*(1+ui32_SPEED_km_h/(1000*limit))+ui16_current_cal_b; 						//calculate setpoint
       //printf("vor: spd %d, pas %d, sumtor %d, setpoint %lu\n", speed, PAS, sumtorque, ui32_setpoint);
       if (uint32_current_target>BATTERY_CURRENT_MAX_VALUE){
 	  //printf("Current target %lu\r\n", uint32_current_target);

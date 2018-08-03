@@ -47,15 +47,11 @@ float float_R = 0;
 uint8_t ui8_torque_index=0 ; 			//counter for torque array
 uint8_t a = 0; 					//loop counter
 
-//static uint16_t ui16_throttle_counter = 0;
-//uint16_t ui16_temp_delay = 0;
+
 static int16_t i16_deziAmps;
 
 uint8_t ui8_cheat_state = 0; 			//state of cheat procedure
 uint8_t ui8_cheat_counter = 0; 			//counter for cheat procedure
-
-
-
 
 uint8_t ui8_adc_read_throttle_busy = 0;
 uint16_t ui16_SPEED_Counter = 0; 	//time tics for speed measurement
@@ -67,8 +63,10 @@ uint8_t PAS_dir=0;			//PAS direction flag
 uint8_t PAS_act=3;			//recent PAS direction reading
 uint8_t PAS_old=4;			//last PAS direction reading
 uint16_t ui16_PAS = 32000;		//cadence in timetics
+uint32_t ui32_PAS_accumulated = 0;	//cadence in timetics
 uint8_t ui8_PAS_Flag = 0; 		//flag for PAS interrupt
 uint8_t ui8_SPEED_Flag = 0; 		//flag for SPEED interrupt
+uint8_t ui8_SPEED_Tag = 0; 		//flag for SPEED update in update_setpoint
 uint8_t uint8_t_rotorposition [7] = {
     0 ,
     42 ,
@@ -212,8 +210,8 @@ int main (void)
 	ui16_SPEED=ui16_SPEED_Counter; 	//save recent speed
 	ui16_SPEED_Counter=0;		//reset speed counter
 	ui8_SPEED_Flag =0; //reset interrupt flag
-	//printf("%d\r\n", ui16_SPEED);
-	//printf("SPEEDtic\n");
+	ui8_SPEED_Tag =1;
+
     }
     if (ui16_SPEED_Counter>64000L && ui16_SPEED!=64000)
         {
@@ -272,7 +270,11 @@ int main (void)
     //	Update cadence, torque and battery current after PAS interrupt occurrence
     if (ui8_PAS_Flag == 1)
     {
-      ui16_PAS=ui16_PAS_Counter; 		//save recent cadence
+
+	ui32_PAS_accumulated-=ui32_PAS_accumulated>>2;
+	ui32_PAS_accumulated+=ui16_PAS_Counter;
+	ui16_PAS=(uint16_t)(ui32_PAS_accumulated>>2); 		//save recent cadence average over 4 readings
+
       ui16_PAS_High=ui16_PAS_High_Counter;
 
 
@@ -462,7 +464,7 @@ if(ui8_cheat_state==3) //second step, make sure the brake is hold according to d
       //getchar1 ();
 
 #ifdef DIAGNOSTICS
-	 printf("%d, %d, %d, %d, %d\r\n", ui16_setpoint, ui16_motor_speed_erps, ui16_BatteryCurrent,ui8_cheat_state, ui8_cheat_counter);
+	 printf("%u, %lu, %u, %u, %u, %u\r\n", ui16_setpoint, uint32_current_target, ui16_BatteryCurrent, ui16_PAS, ui16_sum_torque, (uint16_t) ui32_SPEED_km_h);
 #endif
 	  //printf("erps %d, motorstate %d, cyclecountertotal %d\r\n", ui16_motor_speed_erps, ui8_motor_state, ui16_PWM_cycles_counter_total);
 

@@ -24,6 +24,7 @@ extern uint16_t ui16_current_cal_b;
 extern uint8_t ui8_regen_throttle;
 extern int8_t i8_motor_temperature;
 extern uint8_t ui8_regen_flag;
+extern uint32_t uint32_current_target;
 
 
 #endif /* _SPEED_H */

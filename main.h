@@ -90,7 +90,8 @@ extern uint16_t ui16_SPEED; 		//Speed duration of one wheel revolution (tics * 6
 extern uint16_t ui16_PAS_Counter;	//Counter for cadence
 extern uint16_t ui16_PAS_High_Counter;
 extern uint8_t ui8_PAS_Flag;		//Flag for PAS Interrupt detected
-extern uint8_t ui8_SPEED_Flag;		//Flag for PAS Interrupt detected
+extern uint8_t ui8_SPEED_Flag;		//Flag for Speed Interrupt detected
+extern uint8_t ui8_SPEED_Tag;		//Flag for Speed update in update setpoint
 extern uint8_t ui8_slowloop_flag;	//Flag for slow loop timing
 extern uint8_t ui8_assistlevel_global;
 extern uint8_t ui8_msg_received;
