@@ -131,9 +131,12 @@ int main (void)
 {
 //  static uint32_t ui32_cruise_counter = 0;
 //  static uint8_t ui8_cruise_duty_cycle = 0;
-  static uint16_t ui16_setpoint = 0;
-  static uint8_t ui8_temp = 0;
-  static int16_t i16_temp = 0;
+  static uint16_t ui16_setpoint;
+  static uint8_t ui8_temp;
+  static int16_t i16_temp;
+  ui16_setpoint=0;
+  ui8_temp=0;
+  i16_temp=0;
   uint16_t ui16_throttle_accumulated=0;
 
 
@@ -178,12 +181,14 @@ int main (void)
   printf("System initialized\r\n");
   while (1)
   {
-    static uint32_t ui32_counter = 0;
+    static uint32_t ui32_counter;
+    ui32_counter=0;
     uint16_t ui16_temp = 0;
 
     uint16_t ui32_temp = 0;
     uint8_t j = 0;//Schleifenzähler
-    static float f_temp = 0;
+    static float f_temp;
+    f_temp=0;
 #if (DISPLAY_TYPE & DISPLAY_TYPE_KINGMETER)
     // Update display after message received occurrence
     if (ui8_msg_received)
