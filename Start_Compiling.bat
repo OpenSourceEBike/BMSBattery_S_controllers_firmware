@@ -1,5 +1,5 @@
 PATH = %PATH%;C:\Program Files (x86)\STMicroelectronics\st_toolset\stvp;C:\SDCC\usr\local\bin;%~dp0tools\cygwin\bin
-
+sdcc --version
 del main.hex
 make -f Makefile_windows clean
 make -f Makefile_windows
