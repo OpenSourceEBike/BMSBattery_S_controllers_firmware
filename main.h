@@ -96,6 +96,7 @@ extern uint8_t ui8_assistlevel_global;
 extern uint8_t ui8_msg_received;
 extern uint8_t ui8_cheat_state;
 extern uint8_t PAS_dir;			//flag for pasdirection
+extern uint8_t ui8_SPEED_Tag; 		//flag for SPEED update in update_setpoint
 
 uint8_t update_advance_angle();
 #endif
