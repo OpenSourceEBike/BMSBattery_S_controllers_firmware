@@ -534,7 +534,7 @@ int main(void)
 					   uint8_t_hall_debug_order[2],
 					   uint8_t_hall_debug_order[3],
 					   uint8_t_hall_debug_order[4],
-					   uint8_t_hall_debug_order[5],
+					   uint8_t_hall_debug_order[5]
 					   
 					   );
 
