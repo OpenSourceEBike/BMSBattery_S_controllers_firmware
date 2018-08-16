@@ -208,8 +208,9 @@ int main (void)
 #endif
 
     // Update speed after speed interrupt occurrence
-    if (ui8_SPEED_Flag == 1)
+    if (ui8_SPEED_Flag && ui16_SPEED_Counter>1000)
     {
+
 	ui16_SPEED=ui16_SPEED_Counter; 	//save recent speed
 	ui16_SPEED_Counter=0;		//reset speed counter
 	ui8_SPEED_Flag =0; //reset interrupt flag
