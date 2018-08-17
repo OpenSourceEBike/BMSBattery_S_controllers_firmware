@@ -542,9 +542,13 @@ public class OSEC extends JFrame {
 		rdbtnLeft.setBounds(276, 453, 67, 23);
 		contentPane.add(rdbtnLeft);
 		
-		JRadioButton rdbtnDiganostics = new JRadioButton("Diganostics");
-		rdbtnDiganostics.setBounds(136, 457, 97, 23);
+		JRadioButton rdbtnDiganostics = new JRadioButton("Diag");
+		rdbtnDiganostics.setBounds(136, 457, 50, 23);
 		contentPane.add(rdbtnDiganostics);
+		
+		JRadioButton rdbtnMDiganostics = new JRadioButton("MDiag");
+		rdbtnMDiganostics.setBounds(186, 457, 50, 23);
+		contentPane.add(rdbtnMDiganostics);
 		
 		JRadioButton rdbtnRegen = new JRadioButton("linear");
 		rdbtnRegen.setBounds(5, 487, 97, 23);
@@ -615,7 +619,7 @@ public class OSEC extends JFrame {
 		rdbtnRegen.setSelected(Boolean.parseBoolean(in.readLine()));
 		rdbtnLeft.setSelected(Boolean.parseBoolean(in.readLine()));
 		rdbtnRight.setSelected(Boolean.parseBoolean(in.readLine()));
-		
+		rdbtnMDiganostics.setSelected(Boolean.parseBoolean(in.readLine()));
 		
 		in.close();
 		
@@ -887,6 +891,13 @@ public class OSEC extends JFrame {
 		    		}
 		    		iWriter.println(rdbtnRight.isSelected());
 		    		
+					if (rdbtnMDiganostics.isSelected()){ 
+			            text_to_save = "#define MDIAGNOSTICS";
+			            pWriter.println(text_to_save); 		                
+		    		}
+		    		iWriter.println(rdbtnMDiganostics.isSelected());
+					
+					
 		            pWriter.println("\r\n#endif /* CONFIG_H_ */"); 
 		            
 		            iWriter.close();
