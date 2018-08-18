@@ -1,6 +1,7 @@
 PATH = %PATH%;C:\Program Files\STMicroelectronics\st_toolset\stvp;C:\Program Files (x86)\STMicroelectronics\st_toolset\stvp;C:\SDCC\usr\local\bin;%~dp0tools\cygwin\bin
 
 del main.hex
+sdcc --version
 make -f Makefile_windows clean
 make -f Makefile_windows
 ren main.ihx main.hex

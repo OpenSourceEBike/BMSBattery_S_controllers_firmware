@@ -1,3 +1,5 @@
+Caution! this is not a professional project. Anything you do with this firmware is at your own risk.
+
 Please read the project documentation here: https://opensourceebikefirmware.bitbucket.io/
 
 This branch adds support for a Kingmeter J-LCD Display. 
