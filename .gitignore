@@ -14,3 +14,4 @@ main.hex
 !*.dll
 !*.exe
 Debug
+/tools/nbproject/private/
