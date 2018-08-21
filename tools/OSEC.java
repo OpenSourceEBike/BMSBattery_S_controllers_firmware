@@ -4,13 +4,15 @@ import java.io.*;
 import java.awt.Desktop;
 import java.net.URI;
 import java.net.URISyntaxException;
-
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
 import javax.swing.text.JTextComponent;
 import javax.swing.JTextField;
 import javax.swing.JButton;
+import javax.swing.ListSelectionModel;
 import javax.swing.JLabel;
 import javax.swing.AbstractAction;
 import java.awt.event.ActionEvent;
@@ -28,6 +30,19 @@ import javax.swing.JOptionPane;
 import javax.swing.JRadioButton;
 import javax.swing.ButtonGroup;
 import javax.swing.JList;
+import javax.swing.JScrollPane;
+import java.awt.Dimension;
+import java.util.List;
+import java.util.ArrayList;
+import java.io.File;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
+import javax.swing.DefaultListModel;
+import javax.swing.event.ListDataListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 
 public class OSEC extends JFrame {
 
@@ -82,7 +97,18 @@ public class OSEC extends JFrame {
 	private JTextField txtMaxphasecurrent;
 	private JTextField TempCalA;
 	private JTextField TempCalB;
-	
+	private JRadioButton rdbtnMDiganostics;
+	private JRadioButton rdbtnRight;
+	private JRadioButton rdbtnLeft;
+	private JRadioButton rdbtnRegen;
+	private JRadioButton rdbtnRegenDigital;
+	private JRadioButton rdbtnKingmeterJlcd;
+	private JRadioButton rdbtnKtlcd;
+	private JRadioButton rdbtnDiganostics;
+	private JRadioButton rdbtnTorquesimulation;
+	private JRadioButton rdbtnThrottle;
+	private JRadioButton rdbtnTorqueSensor;
+	private JRadioButton rdbtnThrottlePas;	
 	
 
 	/**
@@ -101,17 +127,71 @@ public class OSEC extends JFrame {
 			}
 		});
 	}
+	
+	
+	public void loadSettings(File f) throws IOException{
+		
+		BufferedReader in = new BufferedReader(new FileReader(f));
+		txtNumberOfPas.setText(in.readLine());
+		txtSpeedlimit.setText(in.readLine());
+		txtPasTimeout.setText(in.readLine());
+		txtWheelCircumference.setText(in.readLine());
+		txtSupportfactor.setText(in.readLine());
+		txtThrottlemin.setText(in.readLine());
+		txtThrottlemax.setText(in.readLine());
+		txtUndervoltage.setText(in.readLine());
+		txtMaxbatterycurrent.setText(in.readLine());
+		txtMaxphasecurrent.setText(in.readLine());
+		txtMaxregencurrent.setText(in.readLine());
+		txtMotor_specific_angle.setText(in.readLine());
+		txtBatteryCurcala.setText(in.readLine());
+		TempCalA.setText(in.readLine());
+		TempCalB.setText(in.readLine());
+		Assist_Level_1.setText(in.readLine());
+		Assist_Level_2.setText(in.readLine());
+		Assist_Level_3.setText(in.readLine());
+		Assist_Level_4.setText(in.readLine());
+		Assist_Level_5.setText(in.readLine());
+		Cheat_Time_1.setText(in.readLine());
+		Cheat_Time_2.setText(in.readLine());
+		Cheat_Time_3.setText(in.readLine());
+		ramp_end.setText(in.readLine());
+		p_factor.setText(in.readLine());
+		i_factor.setText(in.readLine());
+		GearRatio.setText(in.readLine());
+		CellsNumber.setText(in.readLine());
+		PAS_threshold.setText(in.readLine());
+		
+		rdbtnTorqueSensor.setSelected(Boolean.parseBoolean(in.readLine()));
+		rdbtnThrottlePas.setSelected(Boolean.parseBoolean(in.readLine()));
+		rdbtnThrottle.setSelected(Boolean.parseBoolean(in.readLine()));
+		rdbtnTorquesimulation.setSelected(Boolean.parseBoolean(in.readLine()));
+		rdbtnHigh.setSelected(Boolean.parseBoolean(in.readLine()));
+		rdbtnNormal.setSelected(Boolean.parseBoolean(in.readLine()));
+		rdbtnKtlcd.setSelected(Boolean.parseBoolean(in.readLine()));
+		rdbtnKingmeterJlcd.setSelected(Boolean.parseBoolean(in.readLine()));
+		rdbtnInternal.setSelected(Boolean.parseBoolean(in.readLine()));
+		rdbtnExternal.setSelected(Boolean.parseBoolean(in.readLine()));
+		rdbtnDiganostics.setSelected(Boolean.parseBoolean(in.readLine()));
+		rdbtnRegenDigital.setSelected(Boolean.parseBoolean(in.readLine()));
+		rdbtnRegen.setSelected(Boolean.parseBoolean(in.readLine()));
+		rdbtnLeft.setSelected(Boolean.parseBoolean(in.readLine()));
+		rdbtnRight.setSelected(Boolean.parseBoolean(in.readLine()));
+		rdbtnMDiganostics.setSelected(Boolean.parseBoolean(in.readLine()));
+		
+		in.close();
+	}
 
+	
 	/**
 	 * Create the frame.
 	 * @throws IOException 
 	 */
 	public OSEC() throws IOException {
 		
-
-
+	
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		setBounds(100, 100, 600, 706);
+		setBounds(100, 100, 960, 720);
 		contentPane = new JPanel();
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
 		setContentPane(contentPane);
@@ -123,6 +203,36 @@ public class OSEC extends JFrame {
 		lblTollesProgramm.setFont(new Font("Tahoma", Font.PLAIN, 18));
 		lblTollesProgramm.setBounds(114, 11, 326, 34);
 		contentPane.add(lblTollesProgramm);
+		
+		File f = new File("proven settings");
+		
+		DefaultListModel settingsFilesModel = new DefaultListModel();
+		for (File file : f.listFiles()){
+			settingsFilesModel.addElement(file);
+		}
+
+		JList settingsList = new JList(settingsFilesModel);
+		settingsList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+		settingsList.setLayoutOrientation(JList.VERTICAL);
+		settingsList.setVisibleRowCount(-1);
+	
+		JScrollPane listScroller = new JScrollPane(settingsList);
+		listScroller.setPreferredSize(new Dimension(280, 280));
+		listScroller.setBounds(600,90,280,280);
+		contentPane.add(listScroller);
+		
+		settingsList.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent  e) {
+				try {
+					settingsList.getSelectedValue();
+					loadSettings((File) settingsList.getSelectedValue());
+					settingsList.clearSelection();
+				} catch (IOException ex) {
+					Logger.getLogger(OSEC.class.getName()).log(Level.SEVERE, null, ex);
+				}
+			}
+		});
 		
 		JLabel lblPasTimeout = new JLabel("PAS Timeout");
 		lblPasTimeout.setBounds(5, 146, 101, 14);
@@ -542,9 +652,13 @@ public class OSEC extends JFrame {
 		rdbtnLeft.setBounds(276, 453, 67, 23);
 		contentPane.add(rdbtnLeft);
 		
-		JRadioButton rdbtnDiganostics = new JRadioButton("Diganostics");
-		rdbtnDiganostics.setBounds(136, 457, 97, 23);
+		JRadioButton rdbtnDiganostics = new JRadioButton("Input Diagnostics");
+		rdbtnDiganostics.setBounds(600, 407, 180, 23);
 		contentPane.add(rdbtnDiganostics);
+		
+		JRadioButton rdbtnMDiganostics = new JRadioButton("Motor Diagnostics");
+		rdbtnMDiganostics.setBounds(600, 430, 180, 23);
+		contentPane.add(rdbtnMDiganostics);
 		
 		JRadioButton rdbtnRegen = new JRadioButton("linear");
 		rdbtnRegen.setBounds(5, 487, 97, 23);
@@ -567,58 +681,6 @@ public class OSEC extends JFrame {
 		lblRegeneration.setFont(new Font("Tahoma", Font.BOLD, 12));
 		lblRegeneration.setBounds(5, 443, 86, 14);
 		contentPane.add(lblRegeneration);
-		
-		
-		BufferedReader in = new BufferedReader(new FileReader("settings.ini"));
-		txtNumberOfPas.setText(in.readLine());
-		txtSpeedlimit.setText(in.readLine());
-		txtPasTimeout.setText(in.readLine());
-		txtWheelCircumference.setText(in.readLine());
-		txtSupportfactor.setText(in.readLine());
-		txtThrottlemin.setText(in.readLine());
-		txtThrottlemax.setText(in.readLine());
-		txtUndervoltage.setText(in.readLine());
-		txtMaxbatterycurrent.setText(in.readLine());
-		txtMaxphasecurrent.setText(in.readLine());
-		txtMaxregencurrent.setText(in.readLine());
-		txtMotor_specific_angle.setText(in.readLine());
-		txtBatteryCurcala.setText(in.readLine());
-		TempCalA.setText(in.readLine());
-		TempCalB.setText(in.readLine());
-		Assist_Level_1.setText(in.readLine());
-		Assist_Level_2.setText(in.readLine());
-		Assist_Level_3.setText(in.readLine());
-		Assist_Level_4.setText(in.readLine());
-		Assist_Level_5.setText(in.readLine());
-		Cheat_Time_1.setText(in.readLine());
-		Cheat_Time_2.setText(in.readLine());
-		Cheat_Time_3.setText(in.readLine());
-		ramp_end.setText(in.readLine());
-		p_factor.setText(in.readLine());
-		i_factor.setText(in.readLine());
-		GearRatio.setText(in.readLine());
-		CellsNumber.setText(in.readLine());
-		PAS_threshold.setText(in.readLine());
-		
-		rdbtnTorqueSensor.setSelected(Boolean.parseBoolean(in.readLine()));
-		rdbtnThrottlePas.setSelected(Boolean.parseBoolean(in.readLine()));
-		rdbtnThrottle.setSelected(Boolean.parseBoolean(in.readLine()));
-		rdbtnTorquesimulation.setSelected(Boolean.parseBoolean(in.readLine()));
-		rdbtnHigh.setSelected(Boolean.parseBoolean(in.readLine()));
-		rdbtnNormal.setSelected(Boolean.parseBoolean(in.readLine()));
-		rdbtnKtlcd.setSelected(Boolean.parseBoolean(in.readLine()));
-		rdbtnKingmeterJlcd.setSelected(Boolean.parseBoolean(in.readLine()));
-		rdbtnInternal.setSelected(Boolean.parseBoolean(in.readLine()));
-		rdbtnExternal.setSelected(Boolean.parseBoolean(in.readLine()));
-		rdbtnDiganostics.setSelected(Boolean.parseBoolean(in.readLine()));
-		rdbtnRegenDigital.setSelected(Boolean.parseBoolean(in.readLine()));
-		rdbtnRegen.setSelected(Boolean.parseBoolean(in.readLine()));
-		rdbtnLeft.setSelected(Boolean.parseBoolean(in.readLine()));
-		rdbtnRight.setSelected(Boolean.parseBoolean(in.readLine()));
-		
-		
-		in.close();
-		
 		
 		JButton btnWriteoptionsbyte = new JButton("Write Option Bytes");
 		btnWriteoptionsbyte.setFont(new Font("Tahoma", Font.BOLD, 12));
@@ -664,7 +726,11 @@ public class OSEC extends JFrame {
 		    	    //FileWriter fw = new FileWriter("settings.ini");
 		    	    //BufferedWriter bw = new BufferedWriter(fw);
 		        	
-		    	    iWriter = new PrintWriter(new BufferedWriter(new FileWriter("settings.ini"))); 
+					
+					File newFile = new File("proven settings"+File.separator+new SimpleDateFormat("yyyyMMdd-HHmmssz").format(new Date())+".ini");
+					settingsFilesModel.add(0, newFile);
+					
+		    	    iWriter = new PrintWriter(new BufferedWriter(new FileWriter(newFile))); 
 		        	pWriter = new PrintWriter(new BufferedWriter(new FileWriter("config.h"))); 
 		            pWriter.println("/*\r\n" + 
 		            		" * config.h\r\n" + 
@@ -887,6 +953,13 @@ public class OSEC extends JFrame {
 		    		}
 		    		iWriter.println(rdbtnRight.isSelected());
 		    		
+					if (rdbtnMDiganostics.isSelected()){ 
+			            text_to_save = "#define MDIAGNOSTICS";
+			            pWriter.println(text_to_save); 		                
+		    		}
+		    		iWriter.println(rdbtnMDiganostics.isSelected());
+					
+					
 		            pWriter.println("\r\n#endif /* CONFIG_H_ */"); 
 		            
 		            iWriter.close();
