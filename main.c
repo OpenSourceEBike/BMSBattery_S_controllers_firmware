@@ -215,8 +215,9 @@ int main (void)
 		ui16_SPEED=ui16_SPEED_Counter; 	//save recent speed
 		ui16_SPEED_Counter=0;		//reset speed counter
 		ui8_SPEED_Tag =1;
+		ui8_SPEED_Flag =0; //reset interrupt flag
 	    }
-	ui8_SPEED_Flag =0; //reset interrupt flag
+
 
 
     }
