@@ -9,7 +9,7 @@
 #define CONFIG_H_
 
 #define NUMBER_OF_PAS_MAGS 16
-#define limit 25
+#define limit 26
 #define timeout 3125
 #define wheel_circumference 2200L
 #define fummelfaktor 32L
@@ -40,7 +40,7 @@
 #define THROTTLE
 #define PWM_CYCLES_SECOND 15625L
 #define DISPLAY_TYPE_KT_LCD3
-#define SPEEDSENSOR_INTERNAL
+#define SPEEDSENSOR_EXTERNAL
 //#define DIAGNOSTICS
 #define REGEN_DIGITAL
 #define PAS_DIRECTION 1

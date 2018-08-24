@@ -15,3 +15,4 @@ main.hex
 !*.exe
 Debug
 /tools/nbproject/private/
+/.metadata/

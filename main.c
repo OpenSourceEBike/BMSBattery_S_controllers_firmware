@@ -208,13 +208,16 @@ int main (void)
 #endif
 
     // Update speed after speed interrupt occurrence
-    if (ui8_SPEED_Flag && ui16_SPEED_Counter>1000)
+    if (ui8_SPEED_Flag)
     {
-
-	ui16_SPEED=ui16_SPEED_Counter; 	//save recent speed
-	ui16_SPEED_Counter=0;		//reset speed counter
+	    if (ui16_SPEED_Counter>1500)   //ignore spikes speed information, Do nothing if derived speed would be greater ca. 82km/h with 28" wheel
+	    {
+		ui16_SPEED=ui16_SPEED_Counter; 	//save recent speed
+		ui16_SPEED_Counter=0;		//reset speed counter
+		ui8_SPEED_Tag =1;
+	    }
 	ui8_SPEED_Flag =0; //reset interrupt flag
-	ui8_SPEED_Tag =1;
+
 
     }
     if (ui16_SPEED_Counter>64000L && ui16_SPEED!=64000)
@@ -222,7 +225,7 @@ int main (void)
     	ui16_SPEED=64000; 	//Set Display to 0 km/h
 
     	PAS_act=0;		//Set PAS indicator to 0 to avoid motor startig, if pushing backwards from standstill
-    	//printf("disable\r\n");
+
         }
 //in case of THROTTLEANDPAS or THORQUE_SIMULATION, process the PAS routine
 #if defined(THROTTLE_AND_PAS)
