@@ -15,3 +15,5 @@ main.hex
 !*.exe
 Debug
 /tools/nbproject/private/
+/tools/JavaConfigurator/nbproject/private/
+/tools/JavaConfigurator/build/
