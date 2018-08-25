@@ -518,14 +518,14 @@ int main(void)
 
 #ifdef DIAGNOSTICS
                 printf("CS: %3d, RT: %3d, STQ: %3d, PD: %3d, PA: %3d\r\n",
-					   ui8_cheat_state,
-                       ui8_regen_throttle, 
-					   ui16_sum_torque,
-                       PAS_dir, 
-					   PAS_act
-					   
-					   );
-                
+                       ui8_cheat_state,
+                       ui8_regen_throttle,
+                       ui16_sum_torque,
+                       PAS_dir,
+                       PAS_act
+
+                       );
+
                 //printf("erps %d, motorstate %d, cyclecountertotal %d\r\n", ui16_motor_speed_erps, ui8_motor_state, ui16_PWM_cycles_counter_total);
 
                 //printf("cheatstate, %d, km/h %lu, Voltage, %d, setpoint %d, erps %d, current %d, correction_value, %d\n", ui8_cheat_state, ui32_SPEED_km_h, ui8_BatteryVoltage, ui16_setpoint, ui16_motor_speed_erps, ui16_BatteryCurrent, ui8_position_correction_value);
@@ -536,28 +536,43 @@ int main(void)
                 //printf("%d, %d, %d, %d, %d, %d, %d,\r\n", ui8_position_correction_value, ui16_BatteryCurrent, ui16_setpoint, ui8_regen_throttle, ui16_motor_speed_erps, ui16_ADC_iq_current>>2,ui16_adc_read_battery_voltage());
 
 #endif                
-                
-#ifdef MDIAGNOSTICS
-                printf("T: %3d, RS: %3d, BC: %3d, CV: %3d, PC: %3d; PC: %3d, %3d, %3d, %3d, %3d, %3d; O: %3d, %3d, %3d, %3d, %3d, %3d\r\n",
-					   ui16_setpoint,
-                       ui16_motor_speed_erps, 
-					   ui16_BatteryCurrent-ui16_current_cal_b ,
-                       ui8_position_correction_value, 
-					   ui16_ADC_iq_current >> 2,
-					   uint8_t_hall_case[0],
-					   uint8_t_hall_case[1],
-					   uint8_t_hall_case[2],
-					   uint8_t_hall_case[3],
-					   uint8_t_hall_case[4],
-					   uint8_t_hall_case[5],
-					   uint8_t_hall_debug_order[0],
-					   uint8_t_hall_debug_order[1],
-					   uint8_t_hall_debug_order[2],
-					   uint8_t_hall_debug_order[3],
-					   uint8_t_hall_debug_order[4],
-					   uint8_t_hall_debug_order[5]
-					   
-					   );
+
+#ifdef BLUOSEC
+
+                printf("B%d AL%d A%d PD%d PA%d ST%3d T%3d X%d MS%d SR%05d CA%d CB%d VO%3d CT%3d SP%3d ER%3d BC%3d CV%3d PC%3d Z%03d%03d%03d%03d%03d%03d O%03d%03d%03d%03d%03d%03d\r\n",
+                       (int)brake_is_set(),
+                       ui8_assistlevel_global,
+                       MOTOR_ROTOR_DELTA_PHASE_ANGLE_RIGHT,
+                       PAS_dir,
+                       PAS_act,
+                       ui16_sum_torque,
+                       ui16_throttle_accumulated,
+                       ui8_cheat_state,
+                       ui8_motor_state,
+                       (uint16_t)(((float)wheel_circumference*36.0)/((float)GEAR_RATIO)),
+                       current_cal_a,
+                       ui16_current_cal_b,
+                       ui8_BatteryVoltage,
+                       uint32_current_target,
+                       ui16_setpoint,
+                       ui16_motor_speed_erps,
+                       ui16_BatteryCurrent,
+                       ui8_position_correction_value,
+                       ui16_ADC_iq_current >> 2,
+                       uint8_t_hall_case[0],
+                       uint8_t_hall_case[1],
+                       uint8_t_hall_case[2],
+                       uint8_t_hall_case[3],
+                       uint8_t_hall_case[4],
+                       uint8_t_hall_case[5],
+                       uint8_t_hall_debug_order[0],
+                       uint8_t_hall_debug_order[1],
+                       uint8_t_hall_debug_order[2],
+                       uint8_t_hall_debug_order[3],
+                       uint8_t_hall_debug_order[4],
+                       uint8_t_hall_debug_order[5]
+
+                       );
 
 #endif
 

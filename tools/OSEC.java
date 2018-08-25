@@ -652,11 +652,11 @@ public class OSEC extends JFrame {
 		rdbtnLeft.setBounds(276, 453, 67, 23);
 		contentPane.add(rdbtnLeft);
 		
-		JRadioButton rdbtnDiganostics = new JRadioButton("Input Diagnostics");
+		JRadioButton rdbtnDiganostics = new JRadioButton("Diagnostics");
 		rdbtnDiganostics.setBounds(600, 407, 180, 23);
 		contentPane.add(rdbtnDiganostics);
 		
-		JRadioButton rdbtnMDiganostics = new JRadioButton("Motor Diagnostics");
+		JRadioButton rdbtnMDiganostics = new JRadioButton("BluOsec Display");
 		rdbtnMDiganostics.setBounds(600, 430, 180, 23);
 		contentPane.add(rdbtnMDiganostics);
 		
@@ -954,7 +954,7 @@ public class OSEC extends JFrame {
 		    		iWriter.println(rdbtnRight.isSelected());
 		    		
 					if (rdbtnMDiganostics.isSelected()){ 
-			            text_to_save = "#define MDIAGNOSTICS";
+			            text_to_save = "#define BLUOSEC";
 			            pWriter.println(text_to_save); 		                
 		    		}
 		    		iWriter.println(rdbtnMDiganostics.isSelected());

@@ -71,7 +71,7 @@ void TIM1_UPD_OVF_TRG_BRK_IRQHandler(void) __interrupt(TIM1_UPD_OVF_TRG_BRK_IRQH
 
 void hall_sensor_init(void)
 {
-#ifdef MDIAGNOSTICS
+#ifdef BLUOSEC
     for (di = 0; di < 6; di++)
     {
         uint8_t_hall_debug_order[di] = 0;
@@ -88,7 +88,7 @@ void hall_sensors_read_and_action(void)
     hall_sensors = (GPIO_ReadInputData(HALL_SENSORS__PORT) & (HALL_SENSORS_MASK));
     if ((hall_sensors != hall_sensors_last) || (ui8_motor_state == MOTOR_STATE_COAST)) // let's run the code when motor is stopped/coast so it can pick right motor position for correct startup
     {
-#ifdef MDIAGNOSTICS
+#ifdef BLUOSEC
         ui8_hall_debug_counter++;
         if (ui8_hall_debug_counter > 5)
         {
@@ -111,7 +111,7 @@ void hall_sensors_read_and_action(void)
         case 3://rotor position 180 degree
             // full electric revolution recognized, reset counters read here the phase B current for FOC,
 
-#ifdef MDIAGNOSTICS
+#ifdef BLUOSEC
             uint8_t_hall_case[3] = ui8_adc_read_phase_B_current();
 #endif
             if (ui8_adc_read_throttle_busy == 0)
@@ -172,7 +172,7 @@ void hall_sensors_read_and_action(void)
             break;
 
         case 1: //rotor position 240 degree, do FOC control
-#ifdef MDIAGNOSTICS
+#ifdef BLUOSEC
             uint8_t_hall_case[4] = ui8_adc_read_phase_B_current();
 #endif
 
@@ -205,7 +205,7 @@ void hall_sensors_read_and_action(void)
             break;
 
         case 5: //rotor position 300 degree
-#ifdef MDIAGNOSTICS
+#ifdef BLUOSEC
             uint8_t_hall_case[5] = ui8_adc_read_phase_B_current();
 #endif
 
@@ -220,7 +220,7 @@ void hall_sensors_read_and_action(void)
 
         case 4: //rotor position 0 degree
             ui8_half_rotation_flag = 1;
-#ifdef MDIAGNOSTICS
+#ifdef BLUOSEC
             uint8_t_hall_case[0] = ui8_adc_read_phase_B_current();
 #endif
             debug_pin_reset();
@@ -233,7 +233,7 @@ void hall_sensors_read_and_action(void)
             break;
 
         case 6://rotor position 60 degree
-#ifdef MDIAGNOSTICS
+#ifdef BLUOSEC
             uint8_t_hall_case[1] = ui8_adc_read_phase_B_current();
 #endif
 
@@ -246,7 +246,7 @@ void hall_sensors_read_and_action(void)
             break;
 
         case 2://rotor position 120 degree
-#ifdef MDIAGNOSTICS
+#ifdef BLUOSEC
             uint8_t_hall_case[2] = ui8_adc_read_phase_B_current();
 #endif
 
