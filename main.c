@@ -539,7 +539,7 @@ int main(void)
 
 #ifdef BLUOSEC
 
-                printf("B%d AL%d A%d PD%d PA%d ST%3d T%3d X%d MS%d SR%05d CA%d CB%d VO%3d CT%3d SP%3d ER%3d BC%3d CV%3d PC%3d Z%03d%03d%03d%03d%03d%03d O%03d%03d%03d%03d%03d%03d\r\n",
+                printf("B%d AL%d A%d PD%d PA%d ST%3d T%3d X%d MS%d SR%05d CA%d CB%d VO%3d CT%3d SP%3d ER%3d BC%3d CV%3d PC%3d Z%03d%03d%03d%03d%03d%03d O%d%d%d%d%d%d\r\n",
                        (int)brake_is_set(),
                        ui8_assistlevel_global,
                        MOTOR_ROTOR_DELTA_PHASE_ANGLE_RIGHT,
