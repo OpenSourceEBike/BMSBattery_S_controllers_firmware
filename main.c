@@ -528,7 +528,7 @@ if(ui8_cheat_state==3) //second step, make sure the brake is hold according to d
                        ui16_sum_torque,
                        ui16_throttle_accumulated,
                        uint32_current_target,
-                       ui16_setpoint,
+                       ui16_setpoint
                        
                        );
 
