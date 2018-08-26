@@ -73,6 +73,16 @@
           <df name="tmp">
           </df>
         </df>
+        <df name="JavaConfigurator">
+          <df name="build">
+            <df name="classes">
+            </df>
+          </df>
+          <df name="src">
+          </df>
+          <df name="test">
+          </df>
+        </df>
         <df name="openocd-v0.10.0-scripts">
         </df>
       </df>
