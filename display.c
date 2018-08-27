@@ -300,7 +300,6 @@ void check_message()
 void UART2_IRQHandler(void) __interrupt(UART2_IRQHANDLER)
     {
 	if(UART2_GetFlagStatus(UART2_FLAG_RXNE) == SET){
-
 	ui8_rx_buffer[ui8_UARTCounter] = UART2_ReceiveData8();
 
 	ui8_UARTCounter++;
@@ -320,15 +319,75 @@ void UART2_IRQHandler(void) __interrupt(UART2_IRQHANDLER)
 	}
 	else //catch errors
 	  {
-	    if(UART2_GetFlagStatus(UART2_FLAG_OR_LHE) == SET)
+	    if(UART2_GetITStatus(UART2_IT_IDLE) == SET)
 	    {
-	      UART2_ReceiveData8();  // -> clear!
+
+		UART2_ReceiveData8();  // -> clear!
 	    }
-	    if(UART2_GetFlagStatus(UART2_FLAG_FE) == SET)
+	    if(UART2_GetITStatus(UART2_IT_LBDF) == SET)
 	    {
-	      UART2_ReceiveData8();  // -> clear!
+
+		UART2_ReceiveData8();  // -> clear!
 	    }
+	    if(UART2_GetITStatus(UART2_IT_OR) == SET)
+	    {
+
+		UART2_ReceiveData8();  // -> clear!
+	    }
+	    if(UART2_GetITStatus(UART2_IT_PE) == SET)
+	    {
+
+		UART2_ReceiveData8();  // -> clear!
+	    }
+
+
 	  } //end else
     }
 
+#endif //end of DISPLAY_TYPE_KT_LCD3
+
+#if !defined DISPLAY_TYPE_KT_LCD3 && !(DISPLAY_TYPE & DISPLAY_TYPE_KINGMETER)
+
+
+
+/****************************************************************************************************
+ * UART2 receive interrupt handler - receive data from and to the display
+ * for debug and BluOSEC Mode
+ ***************************************************************************************************/
+void UART2_IRQHandler(void) __interrupt(UART2_IRQHANDLER)
+    {
+
+
+	if(UART2_GetFlagStatus(UART2_FLAG_RXNE) == SET){
+		UART2_ReceiveData8();  // -> clear!
+
+		// do something with received byte in future
+
+		}
+		else //catch errors
+		  {
+		    if(UART2_GetITStatus(UART2_IT_IDLE) == SET)
+		    {
+
+			UART2_ReceiveData8();  // -> clear!
+		    }
+		    if(UART2_GetITStatus(UART2_IT_LBDF) == SET)
+		    {
+
+			UART2_ReceiveData8();  // -> clear!
+		    }
+		    if(UART2_GetITStatus(UART2_IT_OR) == SET)
+		    {
+
+			UART2_ReceiveData8();  // -> clear!
+		    }
+		    if(UART2_GetITStatus(UART2_IT_PE) == SET)
+		    {
+
+			UART2_ReceiveData8();  // -> clear!
+		    }
+
+
+		  } //end else
+	    }
 #endif

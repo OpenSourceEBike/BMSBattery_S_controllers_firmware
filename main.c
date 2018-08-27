@@ -116,15 +116,10 @@ void TIM1_UPD_OVF_TRG_BRK_IRQHandler(void) __interrupt(TIM1_UPD_OVF_TRG_BRK_IRQH
 void TIM2_UPD_OVF_TRG_BRK_IRQHandler(void) __interrupt(TIM2_UPD_OVF_TRG_BRK_IRQHANDLER);
 
 
-#if (DISPLAY_TYPE & DISPLAY_TYPE_KINGMETER)
-// UART2 receivce handler
-void UART2_IRQHandler(void) __interrupt(UART2_IRQHANDLER);
-#endif
 
-#ifdef DISPLAY_TYPE_KT_LCD3
 // UART2 receivce handler
 void UART2_IRQHandler(void) __interrupt(UART2_IRQHANDLER);
-#endif
+
 
 /////////////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////////////
@@ -221,9 +216,9 @@ int main (void)
 	    ui8_SPEED_Flag =0; //reset interrupt flag
 
     }
-    if (ui16_SPEED_Counter>64000L && ui16_SPEED!=64000)
+    if (ui16_SPEED_Counter>65529 && ui16_SPEED!=65530)
         {
-    	ui16_SPEED=64000; 	//Set Display to 0 km/h
+    	ui16_SPEED=65530; 	//Set Display to 0 km/h
 
     	PAS_act=0;		//Set PAS indicator to 0 to avoid motor startig, if pushing backwards from standstill
 
