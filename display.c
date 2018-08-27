@@ -252,7 +252,9 @@ ui8_tx_buffer [0] = 65;
   for (ui8_j = 0; ui8_j <= 11; ui8_j++)
   {
 #ifndef DIAGNOSTICS
+#ifndef BLUOSEC
     putchar (ui8_tx_buffer [ui8_j]);
+#endif
 #endif
   }
 }

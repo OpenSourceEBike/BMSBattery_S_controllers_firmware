@@ -116,6 +116,7 @@ void TIM1_UPD_OVF_TRG_BRK_IRQHandler(void) __interrupt(TIM1_UPD_OVF_TRG_BRK_IRQH
 void TIM2_UPD_OVF_TRG_BRK_IRQHandler(void) __interrupt(TIM2_UPD_OVF_TRG_BRK_IRQHANDLER);
 
 
+
 // UART2 receivce handler
 void UART2_IRQHandler(void) __interrupt(UART2_IRQHANDLER);
 
@@ -179,7 +180,7 @@ int main (void)
     uint16_t ui16_temp = 0;
 
     uint16_t ui32_temp = 0;
-    uint8_t j = 0;//Schleifenzähler
+    uint8_t j = 0;//SchleifenzÃ¤hler
     static float f_temp = 0;
 #if (DISPLAY_TYPE & DISPLAY_TYPE_KINGMETER)
     // Update display after message received occurrence
@@ -479,7 +480,54 @@ if(ui8_cheat_state==3) //second step, make sure the brake is hold according to d
 	  // printf("%d, %d, %d, %d, %d, %d\r\n", (uint16_t) uint8_t_hall_case[0], (uint16_t)uint8_t_hall_case[1],(uint16_t) uint8_t_hall_case[2],(uint16_t) uint8_t_hall_case[3], (uint16_t)uint8_t_hall_case[4], (uint16_t)uint8_t_hall_case[5]);
 	  //printf("%d, %d, %d, %d, %d, %d, %d,\r\n", ui8_position_correction_value, ui16_BatteryCurrent, ui16_setpoint, ui8_regen_throttle, ui16_motor_speed_erps, ui16_ADC_iq_current>>2,ui16_adc_read_battery_voltage());
 #endif
+         
+#ifdef BLUOSEC
 
+                printf("B%d AL%d A%d PD%d PA%d ST%3u T%3u X%d MS%d SR%05d CA%d CB%d VO%3d CT%3lu SP%3u ER%3d BC%3d CV%3d PC%3d Z%03d%03d%03d%03d%03d%03d O%d%d%d%d%d%d\r\n",
+                       (int)brake_is_set(),
+                       ui8_assistlevel_global,
+                       MOTOR_ROTOR_DELTA_PHASE_ANGLE_RIGHT,
+                       PAS_dir,
+                       PAS_act,
+                       ui16_sum_torque,
+                       ui16_throttle_accumulated,
+                       ui8_cheat_state,
+                       ui8_motor_state,
+                       (uint16_t)(((float)wheel_circumference*36.0)/((float)GEAR_RATIO)),
+                       current_cal_a,
+                       ui16_current_cal_b,
+                       ui8_BatteryVoltage,
+                       uint32_current_target,
+                       ui16_setpoint,
+                       ui16_motor_speed_erps,
+                       ui16_BatteryCurrent,
+                       ui8_position_correction_value,
+                       ui16_ADC_iq_current >> 2,
+                       uint8_t_hall_case[0],
+                       uint8_t_hall_case[1],
+                       uint8_t_hall_case[2],
+                       uint8_t_hall_case[3],
+                       uint8_t_hall_case[4],
+                       uint8_t_hall_case[5],
+                       uint8_t_hall_debug_order[0],
+                       uint8_t_hall_debug_order[1],
+                       uint8_t_hall_debug_order[2],
+                       uint8_t_hall_debug_order[3],
+                       uint8_t_hall_debug_order[4],
+                       uint8_t_hall_debug_order[5]
+
+                       );
+                
+//                printf("ST%3u T%3u CT%3lu SP%3u\r\n",
+//                       
+//                       ui16_sum_torque,
+//                       ui16_throttle_accumulated,
+//                       uint32_current_target,
+//                       ui16_setpoint
+//                       
+//                       );
+
+#endif
 
       //printf("correction angle %d, Current %d, Voltage %d, sumtorque %d, setpoint %d, km/h %lu\n",ui8_position_correction_value, i16_deziAmps, ui8_BatteryVoltage, ui16_sum_torque, ui16_setpoint, ui32_SPEED_km_h);
       }//end of very slow loop
