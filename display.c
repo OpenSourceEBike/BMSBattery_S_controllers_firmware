@@ -295,12 +295,11 @@ void check_message()
  * UART2 receive interrupt handler - receive data from and to the display
  *
  ***************************************************************************************************/
-void UART2_IRQHandler(void) __interrupt(UART2_IRQHANDLER)
+void UART2_IRQHandler(void) //__interrupt(UART2_IRQHANDLER)
     {
 	if(UART2_GetFlagStatus(UART2_FLAG_RXNE) == SET){
-
 	ui8_rx_buffer[ui8_UARTCounter] = UART2_ReceiveData8();
-
+	UART2_ClearITPendingBit(UART2_IT_RXNE); // reset Flag
 	ui8_UARTCounter++;
 
 	  if(ui8_rx_buffer[ui8_UARTCounter-1]==0x0E)                                      // Check for reception of complete message
@@ -318,15 +317,78 @@ void UART2_IRQHandler(void) __interrupt(UART2_IRQHANDLER)
 	}
 	else //catch errors
 	  {
-	    if(UART2_GetFlagStatus(UART2_FLAG_OR_LHE) == SET)
+	    if(UART2_GetITStatus(UART2_IT_IDLE) == SET)
 	    {
-	      UART2_ReceiveData8();  // -> clear!
+
+		UART2_ReceiveData8();  // -> clear!
 	    }
-	    if(UART2_GetFlagStatus(UART2_FLAG_FE) == SET)
+	    if(UART2_GetITStatus(UART2_IT_LBDF) == SET)
 	    {
-	      UART2_ReceiveData8();  // -> clear!
+
+		UART2_ReceiveData8();  // -> clear!
 	    }
+	    if(UART2_GetITStatus(UART2_IT_OR) == SET)
+	    {
+
+		UART2_ReceiveData8();  // -> clear!
+	    }
+	    if(UART2_GetITStatus(UART2_IT_PE) == SET)
+	    {
+
+		UART2_ReceiveData8();  // -> clear!
+	    }
+
+
 	  } //end else
     }
 
+#endif
+
+#if !defined DISPLAY_TYPE_KT_LCD3 && !(DISPLAY_TYPE & DISPLAY_TYPE_KINGMETER)
+
+
+
+/****************************************************************************************************
+ * UART2 receive interrupt handler - receive data from and to the display
+ * for debug and BluOSEC Mode
+ ***************************************************************************************************/
+volatile uint8_t ui8_lastbyte_received=0;
+
+void UART2_IRQHandler(void) __interrupt(UART2_IRQHANDLER)
+    {
+	if(UART2_GetFlagStatus(UART2_FLAG_RXNE) == SET){
+
+
+	ui8_lastbyte_received = UART2_ReceiveData8();
+	UART2_ClearITPendingBit(UART2_IT_RXNE); // reset Flag, not necessary
+
+
+
+	}
+	else //catch errors
+	  {
+	    if(UART2_GetITStatus(UART2_IT_IDLE) == SET)
+	    {
+
+		UART2_ReceiveData8();  // -> clear!
+	    }
+	    if(UART2_GetITStatus(UART2_IT_LBDF) == SET)
+	    {
+
+		UART2_ReceiveData8();  // -> clear!
+	    }
+	    if(UART2_GetITStatus(UART2_IT_OR) == SET)
+	    {
+
+		UART2_ReceiveData8();  // -> clear!
+	    }
+	    if(UART2_GetITStatus(UART2_IT_PE) == SET)
+	    {
+
+		UART2_ReceiveData8();  // -> clear!
+	    }
+
+
+	  } //end else
+    }
 #endif
