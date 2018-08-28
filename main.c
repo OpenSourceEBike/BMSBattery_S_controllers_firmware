@@ -180,7 +180,7 @@ int main (void)
     uint16_t ui16_temp = 0;
 
     uint16_t ui32_temp = 0;
-    uint8_t j = 0;//SchleifenzÃ¤hler
+    uint8_t j = 0;//Schleifenzähler
     static float f_temp = 0;
 #if (DISPLAY_TYPE & DISPLAY_TYPE_KINGMETER)
     // Update display after message received occurrence
@@ -463,7 +463,7 @@ if(ui8_cheat_state==3) //second step, make sure the brake is hold according to d
       //getchar1 ();
 
 #ifdef DIAGNOSTICS
-	 printf("%u, %u, %u, %u, %u\r\n", ui16_setpoint, ui16_motor_speed_erps, ui16_BatteryCurrent,ui16_PAS, ui16_SPEED);
+	 printf("%u,%u, %u, %u, %u, %u\r\n", ui8_control_state, ui16_setpoint, ui16_motor_speed_erps, ui16_BatteryCurrent, ui16_PAS, ui16_sum_torque);
 #endif
 	  //printf("erps %d, motorstate %d, cyclecountertotal %d\r\n", ui16_motor_speed_erps, ui8_motor_state, ui16_PWM_cycles_counter_total);
 
@@ -480,7 +480,7 @@ if(ui8_cheat_state==3) //second step, make sure the brake is hold according to d
 	  // printf("%d, %d, %d, %d, %d, %d\r\n", (uint16_t) uint8_t_hall_case[0], (uint16_t)uint8_t_hall_case[1],(uint16_t) uint8_t_hall_case[2],(uint16_t) uint8_t_hall_case[3], (uint16_t)uint8_t_hall_case[4], (uint16_t)uint8_t_hall_case[5]);
 	  //printf("%d, %d, %d, %d, %d, %d, %d,\r\n", ui8_position_correction_value, ui16_BatteryCurrent, ui16_setpoint, ui8_regen_throttle, ui16_motor_speed_erps, ui16_ADC_iq_current>>2,ui16_adc_read_battery_voltage());
 #endif
-         
+
 #ifdef BLUOSEC
 
                 printf("B%d AL%d A%d PD%d PA%d ST%3u T%3u X%d MS%d SR%05d CA%d CB%d VO%3d CT%3lu SP%3u ER%3d BC%3d CV%3d PC%3d Z%03d%03d%03d%03d%03d%03d O%d%d%d%d%d%d\r\n",
@@ -517,14 +517,14 @@ if(ui8_cheat_state==3) //second step, make sure the brake is hold according to d
                        uint8_t_hall_debug_order[5]
 
                        );
-                
+
 //                printf("ST%3u T%3u CT%3lu SP%3u\r\n",
-//                       
+//
 //                       ui16_sum_torque,
 //                       ui16_throttle_accumulated,
 //                       uint32_current_target,
 //                       ui16_setpoint
-//                       
+//
 //                       );
 
 #endif
@@ -536,5 +536,4 @@ if(ui8_cheat_state==3) //second step, make sure the brake is hold according to d
     }// end of slow loop
   }// end of while(1) loop
 }
-
 

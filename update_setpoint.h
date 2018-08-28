@@ -23,8 +23,8 @@ extern uint32_t ui32_erps_filtered;
 extern uint16_t ui16_current_cal_b;
 extern uint8_t ui8_regen_throttle;
 extern int8_t i8_motor_temperature;
-extern uint8_t ui8_regen_flag;
+extern uint8_t ui8_control_state;
 extern uint32_t uint32_current_target;
-extern uint8_t ui8_BatteryVoltage;
+
 
 #endif /* _SPEED_H */
