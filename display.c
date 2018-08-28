@@ -44,8 +44,8 @@ uint8_t battery_percent_fromcapacity=11; //hier nur als Konstante um Batterie no
 #ifdef BLUOSEC
 uint8_t ui8_rx_converted_buffer[4]; // for decoded ascii values
 uint8_t ui8_rx_buffer[11]; // modbus ascii with max 2 bytes payload
-//3A 3030 4141 3030 LRLR 0D0A 
-// :  0 0  A A  0 0      \r\n
+//:304130LR\r\n 
+//  0 A 0 
 uint8_t ui8_rx_buffer_counter = 0;
 #endif
 
