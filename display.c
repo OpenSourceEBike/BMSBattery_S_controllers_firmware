@@ -41,6 +41,14 @@ float current_display;
 uint8_t battery_percent_fromcapacity=11; //hier nur als Konstante um Batterie normal zu senden....
 
 
+#ifdef BLUOSEC
+uint8_t ui8_rx_converted_buffer[4]; // for decoded ascii values
+uint8_t ui8_rx_buffer[11]; // modbus ascii with max 2 bytes payload
+//3A 3030 4141 3030 LRLR 0D0A 
+// :  0 0  A A  0 0      \r\n
+uint8_t ui8_rx_buffer_counter = 0;
+#endif
+
 #ifdef DISPLAY_TYPE_KT_LCD3
 uint8_t ui8_tx_buffer[12];
 uint8_t ui8_j;
@@ -354,14 +362,56 @@ void UART2_IRQHandler(void) __interrupt(UART2_IRQHANDLER)
  * UART2 receive interrupt handler - receive data from and to the display
  * for debug and BluOSEC Mode
  ***************************************************************************************************/
+
+#ifdef BLUOSEC
+uint8_t int2hex(uint8_t in){
+    if (in <= 9)
+        return in+0x30;
+    return 0x41-10+in;
+    
+}
+uint8_t hex2int(uint8_t ch){
+    if (ch >= 0x30 && ch <= 0x39)
+        return ch - 0x30;
+    if (ch >= 0x41 && ch <= 0x46)
+        return ch - 0x41 + 10;
+    if (ch >= 0x61 && ch <= 0x66)
+        return ch - 0x61 + 10;
+    return -1;
+}
+uint8_t calcLRC(uint8_t ints[], uint8_t start, uint8_t end)
+{
+    uint8_t i;
+    uint8_t LRC = 0;
+    for (i = start; i <= end; i++){
+        LRC = LRC + ints[i];
+    }
+    return (~LRC)+1;
+}
+#endif
+
 void UART2_IRQHandler(void) __interrupt(UART2_IRQHANDLER)
     {
 
 
 	if(UART2_GetFlagStatus(UART2_FLAG_RXNE) == SET){
-		UART2_ReceiveData8();  // -> clear!
-
-		// do something with received byte in future
+		      
+#ifdef BLUOSEC            
+        ui8_rx_buffer[ui8_rx_buffer_counter++] = UART2_ReceiveData8();
+        ui8_rx_buffer_counter=ui8_rx_buffer_counter%11;
+        if (ui8_rx_buffer_counter == 0){
+            ui8_rx_converted_buffer[0]=hex2int(ui8_rx_buffer[1])<<+hex2int(ui8_rx_buffer[2]);
+            ui8_rx_converted_buffer[1]=hex2int(ui8_rx_buffer[2])<<+hex2int(ui8_rx_buffer[4]);
+            ui8_rx_converted_buffer[2]=hex2int(ui8_rx_buffer[5])<<+hex2int(ui8_rx_buffer[6]);
+            ui8_rx_converted_buffer[3]=hex2int(ui8_rx_buffer[6])<<+hex2int(ui8_rx_buffer[8]);
+            if (calcLRC(ui8_rx_converted_buffer,0,2)==ui8_rx_converted_buffer[3]){
+                // tja hier müsste jetzt in ui8_rx_converted_buffer[1] das kommando und ui8_rx_converted_buffer[2] der payload stehen
+            }
+        }
+#else 
+        UART2_ReceiveData8();// -> clear!
+#endif
+		
 
 		}
 		else //catch errors

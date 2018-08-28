@@ -95,6 +95,11 @@
       <in>utils.c</in>
       <in>utils.h</in>
     </df>
+    <logicalFolder name="StdPeriphLib"
+                   displayName="StdPeriphLib"
+                   projectFiles="true">
+      <itemPath>StdPeriphLib/README.md</itemPath>
+    </logicalFolder>
     <logicalFolder name="ExternalFiles"
                    displayName="Important Files"
                    projectFiles="false"
@@ -135,6 +140,8 @@
       <item path="SPEED.c" ex="false" tool="0" flavor2="0">
       </item>
       <item path="SPEED.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="StdPeriphLib/README.md" ex="false" tool="3" flavor2="0">
       </item>
       <item path="StdPeriphLib/inc/stm8s.h" ex="false" tool="3" flavor2="0">
       </item>
