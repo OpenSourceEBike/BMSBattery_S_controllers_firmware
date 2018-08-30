@@ -18,6 +18,7 @@
 #include "display_kingmeter.h"
 #include "adc.h"
 #include "update_setpoint.h"
+#include "BOcontrollerState.h"
 
 
 uint8_t ui8_counter = 0;
@@ -45,12 +46,6 @@ uint8_t ui8_motor_state = MOTOR_STATE_COAST;
 
 int8_t hall_sensors;
 int8_t hall_sensors_last = 0;
-uint8_t uint8_t_hall_case[7];
-int8_t int8_t_hall_counter=0;
-
-uint8_t uint8_t_hall_debug_order[6];
-uint8_t ui8_hall_debug_counter = 5;
-uint8_t di = 0;
 
 uint16_t ui16_ADC_iq_current = 0;
 uint16_t ui16_ADC_iq_current_accumulated = 4096;
@@ -71,12 +66,7 @@ void TIM1_UPD_OVF_TRG_BRK_IRQHandler(void) __interrupt(TIM1_UPD_OVF_TRG_BRK_IRQH
 
 void hall_sensor_init (void)
 {
-#ifdef BLUOSEC
-    for (di = 0; di < 6; di++)
-    {
-        uint8_t_hall_debug_order[di] = 0;
-    }
-#endif
+
   GPIO_Init(HALL_SENSORS__PORT,
 	    (GPIO_Pin_TypeDef)(HALL_SENSOR_A__PIN | HALL_SENSOR_B__PIN | HALL_SENSOR_C__PIN),
 	    GPIO_MODE_IN_FL_NO_IT);
@@ -88,16 +78,8 @@ void hall_sensors_read_and_action (void)
   hall_sensors = (GPIO_ReadInputData (HALL_SENSORS__PORT) & (HALL_SENSORS_MASK));
   if ((hall_sensors != hall_sensors_last) ||(ui8_motor_state == MOTOR_STATE_COAST)) // let's run the code when motor is stopped/coast so it can pick right motor position for correct startup
   {
-      
-#ifdef BLUOSEC
-        ui8_hall_debug_counter++;
-        if (ui8_hall_debug_counter > 5)
-        {
-            ui8_hall_debug_counter = 0;
+        updateHallOrder(hall_sensors);
 
-        }
-        uint8_t_hall_debug_order[ui8_hall_debug_counter] = hall_sensors;
-#endif
     //printf("hall change! %d, %d \n", hall_sensors, hall_sensors_last );
     hall_sensors_last = hall_sensors;
 
@@ -109,9 +91,9 @@ void hall_sensors_read_and_action (void)
       case 3://rotor position 180 degree
       // full electric revolution recognized, reset counters read here the phase B current for FOC,
 
-#ifdef BLUOSEC
+
 	uint8_t_hall_case[3]=ui8_adc_read_phase_B_current();
-#endif
+
       if (ui8_adc_read_throttle_busy == 0)
       {
 	debug_pin_set ();
@@ -168,9 +150,9 @@ void hall_sensors_read_and_action (void)
       break;
 
       case 1: //rotor position 240 degree, do FOC control
-#ifdef BLUOSEC
+
 	uint8_t_hall_case[4]=ui8_adc_read_phase_B_current ();
-#endif
+
 
 	if (ui16_motor_speed_erps > 3 && ui16_BatteryCurrent >ui16_current_cal_b+3) //normal riding,
 	      {
@@ -201,9 +183,9 @@ void hall_sensors_read_and_action (void)
       break;
 
       case 5: //rotor position 300 degree
-#ifdef BLUOSEC
+
 	uint8_t_hall_case[5]=ui8_adc_read_phase_B_current ();
-#endif
+
 
       if (ui8_motor_state != MOTOR_STATE_RUNNING_INTERPOLATION_360_DEGREES)
       {
@@ -216,9 +198,9 @@ void hall_sensors_read_and_action (void)
 
       case 4: //rotor position 0 degree
 	ui8_half_rotation_flag=1;
-#ifdef BLUOSEC
+
 	uint8_t_hall_case[0]=ui8_adc_read_phase_B_current ();
-#endif
+
 	debug_pin_reset ();
       if (ui8_motor_state != MOTOR_STATE_RUNNING_INTERPOLATION_360_DEGREES)
       {
@@ -229,9 +211,9 @@ void hall_sensors_read_and_action (void)
       break;
 
       case 6://rotor position 60 degree
-#ifdef BLUOSEC
+
 	uint8_t_hall_case[1]=ui8_adc_read_phase_B_current ();
-#endif
+
 
       if (ui8_motor_state != MOTOR_STATE_RUNNING_INTERPOLATION_360_DEGREES)
       {
@@ -242,9 +224,9 @@ void hall_sensors_read_and_action (void)
       break;
 
       case 2://rotor position 120 degree
-#ifdef BLUOSEC
+
 	uint8_t_hall_case[2]=ui8_adc_read_phase_B_current ();
-#endif
+
 
       if (ui8_motor_state != MOTOR_STATE_RUNNING_INTERPOLATION_360_DEGREES)
       {

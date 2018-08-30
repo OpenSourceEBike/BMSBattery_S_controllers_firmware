@@ -101,7 +101,9 @@ uint16_t update_setpoint (uint16_t speed, uint16_t PAS, uint16_t sumtorque, uint
       TIM1_CtrlPWMOutputs(DISABLE);
       uint_PWM_Enable=0; // highest priority: Stop motor for undervoltage protection
       ui32_setpoint=0;
+#ifdef DIAGNOSTICS
       printf("Low voltage! %d\r\n",ui8_BatteryVoltage);
+#endif
     }
 
   //check if rider is braking
@@ -123,7 +125,9 @@ uint16_t update_setpoint (uint16_t speed, uint16_t PAS, uint16_t sumtorque, uint
               ui32_setpoint= PI_control(ui32_erps_filtered, ui16_erps_max);//limit the erps to maximum value to have minimum 30 points of sine table for proper commutation
                     if (ui32_setpoint<5){ui32_setpoint=0;}
                     if (ui32_setpoint>255){ui32_setpoint=255;}
+#ifdef DIAGNOSTICS
         printf("erps too high!\r\n");
+#endif
     }
 
   //check if pedals are turning with throttle active in offroad mode
@@ -246,7 +250,9 @@ uint16_t update_setpoint (uint16_t speed, uint16_t PAS, uint16_t sumtorque, uint
      {
         TIM1_CtrlPWMOutputs(ENABLE);
         uint_PWM_Enable=1;
+#ifdef DIAGNOSTICS
         printf("PWM enabled!\r\n");
+#endif
      }
  } //end of else
 
@@ -279,11 +285,15 @@ uint32_t CheckSpeed (uint16_t current_target, uint16_t erps)
 
 	if (erps>ui16_erps_limit_higher){ //if you are riding much too fast, stop motor immediately
 	    current_target=ui16_current_cal_b;
+#ifdef DIAGNOSTICS
 	   printf("Speed much too high! %d, %d\r\n", erps,((limit+2)*GEAR_RATIO));
+#endif
 	}
 	else {
 	    current_target=((current_target-ui16_current_cal_b)*(ui16_erps_limit_higher-erps))/(ui16_erps_limit_higher-ui16_erps_limit_lower)+ui16_current_cal_b; 	//ramp down the motor power within 2 km/h, if you are riding too fast
-	   printf("Speed too high!\r\n");
+#ifdef DIAGNOSTICS
+			printf("Speed too high!\r\n");
+#endif
 	}
   }
     return ((uint32_t)current_target);

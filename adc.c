@@ -73,7 +73,9 @@ void adc_init (void)
   }
   ui16_current_cal_b >>= 4;
   ui16_current_cal_b -= 1;
+#ifdef DIAGNOSTICS
   printf("ui16_current_cal_b = %d\r\n", ui16_current_cal_b);
+#endif
   //ui8_motor_total_current_offset = ui16_motor_total_current_offset_10b >> 2;
 }
 

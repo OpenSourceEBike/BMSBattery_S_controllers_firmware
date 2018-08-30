@@ -29,7 +29,7 @@
 #include "config.h"
 #include "display.h"
 #include "display_kingmeter.h"
-
+#include "BOcontrollerState.h"
 
 //uint16_t ui16_LPF_angle_adjust = 0;
 //uint16_t ui16_LPF_angle_adjust_temp = 0;
@@ -145,6 +145,7 @@ int main (void)
   timer2_init ();
   uart_init ();
   pwm_init ();
+  controllerstate_init();
   hall_sensor_init ();
   adc_init ();
   PAS_init();
@@ -173,7 +174,9 @@ int main (void)
   for(a = 0; a < NUMBER_OF_PAS_MAGS;a++) {// array init
    ui16_torque[a]=0;
   }
+#ifdef DIAGNOSTICS
   printf("System initialized\r\n");
+#endif
   while (1)
   {
     static uint32_t ui32_counter = 0;
@@ -481,54 +484,6 @@ if(ui8_cheat_state==3) //second step, make sure the brake is hold according to d
 	  //printf("%d, %d, %d, %d, %d, %d, %d,\r\n", ui8_position_correction_value, ui16_BatteryCurrent, ui16_setpoint, ui8_regen_throttle, ui16_motor_speed_erps, ui16_ADC_iq_current>>2,ui16_adc_read_battery_voltage());
 #endif
          
-#ifdef BLUOSEC
-
-                printf("B%d AL%d A%d PD%d PA%d ST%3u T%3u X%d MS%d SR%05d CA%d CB%d VO%3d CT%3lu SP%3u ER%3d BC%3d CV%3d PC%3d Z%03d%03d%03d%03d%03d%03d O%d%d%d%d%d%d\r\n",
-                       (int)brake_is_set(),
-                       ui8_assistlevel_global,
-                       MOTOR_ROTOR_DELTA_PHASE_ANGLE_RIGHT,
-                       PAS_dir,
-                       PAS_act,
-                       ui16_sum_torque,
-                       ui16_throttle_accumulated,
-                       ui8_cheat_state,
-                       ui8_motor_state,
-                       (uint16_t)(((float)wheel_circumference*36.0)/((float)GEAR_RATIO)),
-                       current_cal_a,
-                       ui16_current_cal_b,
-                       ui8_BatteryVoltage,
-                       uint32_current_target,
-                       ui16_setpoint,
-                       ui16_motor_speed_erps,
-                       ui16_BatteryCurrent,
-                       ui8_position_correction_value,
-                       ui16_ADC_iq_current >> 2,
-                       uint8_t_hall_case[0],
-                       uint8_t_hall_case[1],
-                       uint8_t_hall_case[2],
-                       uint8_t_hall_case[3],
-                       uint8_t_hall_case[4],
-                       uint8_t_hall_case[5],
-                       uint8_t_hall_debug_order[0],
-                       uint8_t_hall_debug_order[1],
-                       uint8_t_hall_debug_order[2],
-                       uint8_t_hall_debug_order[3],
-                       uint8_t_hall_debug_order[4],
-                       uint8_t_hall_debug_order[5]
-
-                       );
-                
-//                printf("ST%3u T%3u CT%3lu SP%3u\r\n",
-//                       
-//                       ui16_sum_torque,
-//                       ui16_throttle_accumulated,
-//                       uint32_current_target,
-//                       ui16_setpoint
-//                       
-//                       );
-
-#endif
-
       //printf("correction angle %d, Current %d, Voltage %d, sumtorque %d, setpoint %d, km/h %lu\n",ui8_position_correction_value, i16_deziAmps, ui8_BatteryVoltage, ui16_sum_torque, ui16_setpoint, ui32_SPEED_km_h);
       }//end of very slow loop
 
