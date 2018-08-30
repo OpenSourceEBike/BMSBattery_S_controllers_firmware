@@ -18,6 +18,6 @@
 #ifndef BODISPLAY_H
 #define BODISPLAY_H
 
-
+#include "config.h"
 
 #endif /* BODISPLAY_H */

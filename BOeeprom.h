@@ -18,6 +18,6 @@
 #ifndef BOEEPROM_H
 #define BOEEPROM_H
 
-
+#include "config.h"
 
 #endif /* BOEEPROM_H */
