@@ -30,6 +30,7 @@
 #include "display.h"
 #include "display_kingmeter.h"
 #include "BOcontrollerState.h"
+#include "BOdisplay.h"
 
 //uint16_t ui16_LPF_angle_adjust = 0;
 //uint16_t ui16_LPF_angle_adjust_temp = 0;
@@ -41,7 +42,7 @@ uint16_t ui16_log2 = 0;
 uint8_t ui8_log = 0;
 uint8_t ui8_i= 0; 				//counter for ... next loop
 uint16_t ui16_torque[NUMBER_OF_PAS_MAGS]; 	//array for torque values of one crank revolution
-uint16_t ui16_sum_torque = 0; 			//sum of array elements
+
 float float_kv = 0;
 float float_R = 0;
 uint8_t ui8_torque_index=0 ; 			//counter for torque array
@@ -51,11 +52,7 @@ uint8_t a = 0; 					//loop counter
 //uint16_t ui16_temp_delay = 0;
 static int16_t i16_deziAmps;
 
-uint8_t ui8_cheat_state = 0; 			//state of cheat procedure
 uint8_t ui8_cheat_counter = 0; 			//counter for cheat procedure
-
-
-
 
 uint8_t ui8_adc_read_throttle_busy = 0;
 uint16_t ui16_SPEED_Counter = 0; 	//time tics for speed measurement
@@ -64,7 +61,6 @@ uint16_t ui16_PAS_Counter = 0; 		//time tics for cadence measurement
 uint16_t ui16_PAS_High_Counter = 1;	//time tics for direction detection
 uint16_t ui16_PAS_High=1;		//number of High readings on PAS
 uint8_t PAS_dir=0;			//PAS direction flag
-uint8_t PAS_act=3;			//recent PAS direction reading
 uint8_t PAS_old=4;			//last PAS direction reading
 uint16_t ui16_PAS = 32000;		//cadence in timetics
 uint8_t ui8_PAS_Flag = 0; 		//flag for PAS interrupt
@@ -80,8 +76,6 @@ uint8_t uint8_t_rotorposition [7] = {
     255
   };
 
-
-uint8_t ui8_assistlevel_global = 3;// for debugging of display communication
 
 /////////////////////////////////////////////////////////////////////////////////////////////
 //// Functions prototypes
@@ -129,10 +123,9 @@ int main (void)
 {
 //  static uint32_t ui32_cruise_counter = 0;
 //  static uint8_t ui8_cruise_duty_cycle = 0;
-  static uint16_t ui16_setpoint = 0;
+
   static uint8_t ui8_temp = 0;
   static int16_t i16_temp = 0;
-  uint16_t ui16_throttle_accumulated=0;
 
 
   //set clock at the max 16MHz
@@ -174,9 +167,9 @@ int main (void)
   for(a = 0; a < NUMBER_OF_PAS_MAGS;a++) {// array init
    ui16_torque[a]=0;
   }
-#ifdef DIAGNOSTICS
+//#ifdef DIAGNOSTICS
   printf("System initialized\r\n");
-#endif
+//#endif
   while (1)
   {
     static uint32_t ui32_counter = 0;
@@ -203,6 +196,10 @@ int main (void)
 	//printf("%d\n", ui16_SPEED);
 	check_message(); //Display aktualisieren aus Code vom Forumscontroller
         }
+#endif
+    
+#ifdef BLUOSEC
+    processBoMessage();
 #endif
 
     // Update speed after speed interrupt occurrence

@@ -31,6 +31,7 @@ Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301  USA
 #include "brake.h"
 #include "interrupts.h"
 #include "update_setpoint.h"
+#include "BOcontrollerState.h"
 
 display_view_type display_view;
 

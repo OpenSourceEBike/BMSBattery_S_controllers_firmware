@@ -21,6 +21,14 @@
 
 #include "config.h"
 
+extern uint8_t ui8_assistlevel_global;
+extern uint8_t PAS_act;
+extern uint16_t ui16_sum_torque; 
+extern uint8_t ui8_cheat_state;
+extern uint32_t uint32_current_target;
+extern uint16_t ui16_setpoint;
+extern uint16_t ui16_throttle_accumulated;
+
 extern uint8_t uint8_t_hall_case[7];
 extern uint8_t uint8_t_hall_debug_order[6];
 extern int8_t int8_t_hall_counter;

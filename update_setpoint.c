@@ -25,6 +25,7 @@
 #include "config.h"
 #include "utils.h"
 #include "brake.h"
+#include "BOcontrollerState.h"
 
 
 
@@ -32,7 +33,6 @@ static uint32_t ui32_setpoint; // local version of setpoint
 uint32_t ui32_SPEED_km_h; //global variable Speed
 static uint32_t ui32_SPEED_km_h_accumulated;
 int16_t i16_assistlevel[5]={LEVEL_1, LEVEL_2, LEVEL_3, LEVEL_4, LEVEL_5}; // difference between setpoint and actual value
-uint32_t uint32_current_target=0; //target for PI-Control
 float float_temp=0; //for float calculations
 int8_t uint_PWM_Enable=0; //flag for PWM state
 uint16_t ui16_BatteryCurrent_accumulated = 2496L; //8x current offset, for filtering or Battery Current

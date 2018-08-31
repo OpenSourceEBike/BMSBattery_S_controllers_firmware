@@ -21,6 +21,14 @@
 #include "stm8s_itc.h"
 #include "BOcontrollerState.h"
 
+uint8_t ui8_assistlevel_global = 3;// for debugging of display communication
+uint8_t PAS_act=3; //recent PAS direction reading
+uint16_t ui16_sum_torque = 0; //sum of array elements
+uint8_t ui8_cheat_state = 0; //state of cheat procedure
+uint32_t uint32_current_target=0; //target for PI-Control
+uint16_t ui16_setpoint = 0;
+uint16_t ui16_throttle_accumulated=0;
+
 uint8_t uint8_t_hall_case[7];
 uint8_t uint8_t_hall_order[6];
 int8_t int8_t_hall_counter = 0;

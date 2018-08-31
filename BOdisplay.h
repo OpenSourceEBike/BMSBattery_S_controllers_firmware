@@ -20,4 +20,6 @@
 
 #include "config.h"
 
+void processBoMessage();
+
 #endif /* BODISPLAY_H */

@@ -96,10 +96,13 @@
         <df name="openocd-v0.10.0-scripts">
         </df>
       </df>
+      <in>BOcontrollerState.asm</in>
       <in>BOcontrollerState.c</in>
       <in>BOcontrollerState.h</in>
+      <in>BOdisplay.asm</in>
       <in>BOdisplay.c</in>
       <in>BOdisplay.h</in>
+      <in>BOeeprom.asm</in>
       <in>BOeeprom.c</in>
       <in>BOeeprom.h</in>
       <in>PAS.asm</in>
