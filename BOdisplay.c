@@ -28,11 +28,11 @@
 #ifdef BLUOSEC
 
 // example
-//:3041305F\r\n 
+//:304100305F\r\n 
 //  0 A 0 (as chars)
-uint8_t ui8_rx_buffer[11]; // modbus ascii with max 2 bytes payload (array including padding)
-uint8_t ui8_tx_buffer[37]; // max 64 bytes ascii (16*8bit key + 16*8bit data points + bounced checksum(with key) + address + function + checksum) payload (array excluding padding)
-uint8_t ui8_rx_converted_buffer[4]; // for decoded ascii values
+uint8_t ui8_rx_buffer[13]; // modbus ascii with max 4 bytes payload (array including padding)
+uint8_t ui8_tx_buffer[41]; // (max 18*8bit key + 18*8bit data points + bounced checksum(+ key) + address + function + checksum) (array excluding padding)
+uint8_t ui8_rx_converted_buffer[5]; // for decoded ascii values
 
 uint8_t ui8_rx_buffer_counter = 0;
 uint8_t ui8_tx_buffer_counter = 0;
@@ -106,7 +106,7 @@ void UART2_IRQHandler(void) __interrupt(UART2_IRQHANDLER)
 
     if (UART2_GetFlagStatus(UART2_FLAG_RXNE) == SET)
     {
-        if (ui8_rx_buffer_counter < 11)
+        if (ui8_rx_buffer_counter < 13)
         {
             ui8_rx_buffer[ui8_rx_buffer_counter++] = UART2_ReceiveData8();
         }
@@ -137,80 +137,75 @@ void UART2_IRQHandler(void) __interrupt(UART2_IRQHANDLER)
     } //end else
 }
 
-//                printf("B%d AL%d A%d PD%d PA%d ST%3u T%3u X%d MS%d SR%05d CA%d CB%d VO%3d CT%3lu SP%3u ER%3d BC%3d CV%3d PC%3d Z%03d%03d%03d%03d%03d%03d O%d%d%d%d%d%d\r\n",
-///                       (int)brake_is_set(),
-///                       ui8_assistlevel_global,
-//                       MOTOR_ROTOR_DELTA_PHASE_ANGLE_RIGHT,
-//                       PAS_dir,
-///                       PAS_act,
-///                       ui16_sum_torque,
-///                       ui16_throttle_accumulated,
-///                       ui8_cheat_state,
-//*                       ui8_motor_state,
-//                       (uint16_t)(((float)wheel_circumference*36.0)/((float)GEAR_RATIO)),
-//                       current_cal_a,
-//                       ui16_current_cal_b,
-//*                       ui8_BatteryVoltage,
-///                       uint32_current_target,
-///                       ui16_setpoint,
-//*                       ui16_motor_speed_erps,
-//*                       ui16_BatteryCurrent,
-//*                       ui8_position_correction_value,
-//*                       ui16_ADC_iq_current >> 2,
-//                       uint8_t_hall_case[0],
-//                       uint8_t_hall_case[1],
-//                       uint8_t_hall_case[2],
-//                       uint8_t_hall_case[3],
-//                       uint8_t_hall_case[4],
-//                       uint8_t_hall_case[5],
-//                       uint8_t_hall_order[0],
-//                       uint8_t_hall_order[1],
-//                       uint8_t_hall_order[2],
-//                       uint8_t_hall_order[3],
-//                       uint8_t_hall_order[4],
-//                       uint8_t_hall_order[5]
-//
-//                       );
-
-void addBasicStateInfos(void)
+void addConfigStateInfos(void)
 {
-    addPayload(0x01, ui8_assistlevel_global);
-    addPayload(0x02, (int) brake_is_set());
-    addPayload(0x03, PAS_act);
-    addPayload(0x04, ui8_cheat_state);
+    addPayload(0x80, MOTOR_ROTOR_DELTA_PHASE_ANGLE_RIGHT);
+    addPayload(0x81, (uint16_t) (((float) wheel_circumference * 36.0) / ((float) GEAR_RATIO)));
+    addPayload(0x82, current_cal_a);
+    addPayload(0x83, ui16_current_cal_b);
+    addPayload(0x84, eeprom_magic_byte);
+}
 
-    //addPayload(0x10, ui8_motor_state);
-    //addPayload(0x11, ui8_BatteryVoltage);
-    //addPayload(0x13, ui16_motor_speed_erps);
-    //addPayload(0x14, ui16_BatteryCurrent);
-    //addPayload(0x15, ui8_position_correction_value);
-    //addPayload(0x16, ui16_ADC_iq_current >> 2);
+void addHallStateInfos(void)
+{
+    addPayload(0x00, uint8_t_hall_case[0]);
+    addPayload(0x01, uint8_t_hall_case[1]);
+    addPayload(0x02, uint8_t_hall_case[2]);
+    addPayload(0x03, uint8_t_hall_case[3]);
+    addPayload(0x04, uint8_t_hall_case[4]);
+    addPayload(0x05, uint8_t_hall_case[5]);
+    addPayload(0x10, uint8_t_hall_order[0]);
+    addPayload(0x11, uint8_t_hall_order[1]);
+    addPayload(0x12, uint8_t_hall_order[2]);
+    addPayload(0x13, uint8_t_hall_order[3]);
+    addPayload(0x14, uint8_t_hall_order[4]);
+    addPayload(0x15, uint8_t_hall_order[5]);
+}
 
-    addPayload(0x70, ui16_sum_torque);
-    addPayload(0x71, ui16_setpoint);
+void addRuntimeStateInfos(void)
+{
+    addPayload(0xA0, ui8_assistlevel_global);
+    addPayload(0xA1, (int) brake_is_set());
+    addPayload(0xA2, PAS_act);
+    addPayload(0xA3, PAS_dir);
+    addPayload(0xA4, ui8_offroad_state);
 
-    addPayload(0xA0, ui16_throttle_accumulated >> 8);
-    addPayload(0xA1, ui16_throttle_accumulated);
-    addPayload(0xA4, uint32_current_target >> 8);
-    addPayload(0xA5, uint32_current_target);
+    addPayload(0xC0, ui8_motor_state);
+    addPayload(0xC1, ui8_BatteryVoltage);
+    addPayload(0xC3, ui16_motor_speed_erps);
+    addPayload(0xC4, ui16_BatteryCurrent);
+    addPayload(0xC5, ui8_position_correction_value);
+    addPayload(0xC6, ui16_ADC_iq_current >> 2);
+
+    addPayload(0xD0, ui16_sum_torque);
+    addPayload(0xD1, ui16_setpoint);
+
+    addPayload(0xDA, ui16_throttle_accumulated >> 8);
+    addPayload(0xDB, ui16_throttle_accumulated);
+    addPayload(0xDC, uint32_current_target >> 8);
+    addPayload(0xDD, uint32_current_target);
+
+    // one more element left/avail (max18)
 }
 
 void gatherPayload(uint8_t function)
 {
     switch (function)
     {
-    case 0x41:addBasicStateInfos();
+    case FUN_RUNTIME_INFOS:addRuntimeStateInfos();
+        break;
+    case FUN_CONFIG_INFOS:addConfigStateInfos();
+        break;
+    case FUN_HALL_INFOS:addHallStateInfos();
         break;
     default:
-        addPayload(0x66, 0x66);
+        addPayload(CODE_ERROR, CODE_ERROR);
     }
 }
 
 void processBoMessage()
 {
-
-
-    if (ui8_rx_buffer_counter == 11)
+    if (ui8_rx_buffer_counter == 13)
     {
 
         uint8_t calculatedLrc;
@@ -219,22 +214,40 @@ void processBoMessage()
         ui8_rx_converted_buffer[1] = (hex2int(ui8_rx_buffer[3]) << 4) + hex2int(ui8_rx_buffer[4]);
         ui8_rx_converted_buffer[2] = (hex2int(ui8_rx_buffer[5]) << 4) + hex2int(ui8_rx_buffer[6]);
         ui8_rx_converted_buffer[3] = (hex2int(ui8_rx_buffer[7]) << 4) + hex2int(ui8_rx_buffer[8]);
-        calculatedLrc = calcLRC(ui8_rx_converted_buffer, 0, 3);
+        ui8_rx_converted_buffer[4] = (hex2int(ui8_rx_buffer[9]) << 4) + hex2int(ui8_rx_buffer[10]);
+        calculatedLrc = calcLRC(ui8_rx_converted_buffer, 0, 4);
 
-        //        printf("1234 LRC %u %u %u %u %u",
-        //               ui8_rx_converted_buffer[0],
-        //               ui8_rx_converted_buffer[1],
-        //               ui8_rx_converted_buffer[2],
-        //               ui8_rx_converted_buffer[3],
-        //               calculatedLrc);
 
-        if (calculatedLrc == ui8_rx_converted_buffer[3])
+        if (calculatedLrc == ui8_rx_converted_buffer[4])
         {
             uint8_t requestedFunction = ui8_rx_converted_buffer[1];
 
-            prepareBasePackage(0x30, 0x41);
-            gatherPayload(requestedFunction);
-            addPayload(0x30, calculatedLrc);
+            if (ui8_rx_converted_buffer[0] == DISPLAY_ADDRESS)
+            {
+                prepareBasePackage(DISPLAY_ADDRESS, requestedFunction);
+                gatherPayload(requestedFunction);
+                addPayload(CODE_LRC_CHECK, calculatedLrc);
+                signPackage();
+                sendPreparedPackage();
+            }
+            else if (ui8_rx_converted_buffer[0] == CONFIG_ADDRESS)
+            {
+                prepareBasePackage(CONFIG_ADDRESS, requestedFunction);
+                addPayload(CODE_LRC_CHECK, calculatedLrc);
+                signPackage();
+                sendPreparedPackage();
+            }
+        }
+        else
+        {
+            // let sender know what was received and what the correct lrc would have been
+            prepareBasePackage(ERROR_ADDRESS, ui8_rx_converted_buffer[1]);
+            addPayload(CODE_ERROR, ui8_rx_converted_buffer[0]);
+            addPayload(CODE_ERROR + 1, ui8_rx_converted_buffer[1]);
+            addPayload(CODE_ERROR + 2, ui8_rx_converted_buffer[2]);
+            addPayload(CODE_ERROR + 3, ui8_rx_converted_buffer[3]);
+            addPayload(CODE_ERROR + 4, ui8_rx_converted_buffer[4]);
+            addPayload(CODE_LRC_CHECK, calculatedLrc);
             signPackage();
             sendPreparedPackage();
         }

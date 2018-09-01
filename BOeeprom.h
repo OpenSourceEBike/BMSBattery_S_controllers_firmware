@@ -20,4 +20,11 @@
 
 #include "config.h"
 
+#define EEPROM_BASE_ADDRESS 			0x4001
+#define EEPROM_MAX_INIT_RANGE 0x0F // we should at least have 640 avail / 16 in use for now
+
+void eeprom_init (void);
+void eeprom_write (uint8_t adress_offset, uint8_t value);
+uint8_t eeprom_read(uint8_t address_offset);
+
 #endif /* BOEEPROM_H */

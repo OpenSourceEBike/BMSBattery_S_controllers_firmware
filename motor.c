@@ -28,11 +28,8 @@ uint16_t ui16_PWM_cycles_counter = 0;
 uint16_t ui16_PWM_cycles_counter_6 = 0;
 uint16_t ui16_PWM_cycles_counter_total = 0;
 
-uint16_t ui16_motor_speed_erps = 0;
 uint8_t ui8_motor_rotor_position = 0; // in 360/256 degrees
 uint8_t ui8_motor_rotor_absolute_position = 0; // in 360/256 degrees
-uint8_t ui8_position_correction_value = 127; // in 360/256 degrees
-
 uint8_t ui8_position_correction_value1 = 0; // in 360/256 degrees
 
 uint16_t ui16_PWM_cycles_counter_total_div_4 = 0;
@@ -42,14 +39,10 @@ uint16_t ui16_adc_current_phase_B = 0;
 uint16_t ui16_adc_current_phase_B_accumulated = 0;
 uint16_t ui16_adc_current_phase_B_filtered = 0;
 
-uint8_t ui8_motor_state = MOTOR_STATE_COAST;
-
 int8_t hall_sensors;
 int8_t hall_sensors_last = 0;
 
-uint16_t ui16_ADC_iq_current = 0;
 uint16_t ui16_ADC_iq_current_accumulated = 4096;
-uint16_t ui16_ADC_iq_current_filtered = 0;
 uint16_t ui16_iq_current_ma = 0;
 
 void TIM1_UPD_OVF_TRG_BRK_IRQHandler(void) __interrupt(TIM1_UPD_OVF_TRG_BRK_IRQHANDLER)

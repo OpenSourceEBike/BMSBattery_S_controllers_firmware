@@ -12,6 +12,7 @@
 #include "stm8s.h"
 #include "stm8s_uart2.h"
 #include "motor.h"
+#include "BOcontrollerState.h"
 
 uint8_t ui8_array_flag=0;
 

@@ -212,7 +212,7 @@ ui8_tx_buffer [0] = 65;
   ui8_tx_buffer [4] = ui16_wheel_period_ms & 0xff;
 
   //Send confirming signal for activating offroad mode
-   if (ui8_cheat_state==4){ //quitting signal for offroad mode enabled. Shows about 80 km/h for three seconds
+   if (ui8_offroad_state==4){ //quitting signal for offroad mode enabled. Shows about 80 km/h for three seconds
 
   	  ui8_tx_buffer [3] = (100 >> 8) & 0xff; //100ms are about 80 km/h @ 28" 2200mm wheel circumference
   	  ui8_tx_buffer [4] = 100 & 0xff;
@@ -347,7 +347,7 @@ void UART2_IRQHandler(void) __interrupt(UART2_IRQHANDLER)
 
 
 /****************************************************************************************************
- * UART2 receive interrupt handler - receive data from and to the display
+ * UART2 receive interrupt handler - fallback to clear rx buffer
  * for debug Mode
  ***************************************************************************************************/
 

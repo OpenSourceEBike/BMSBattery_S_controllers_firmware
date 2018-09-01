@@ -16,7 +16,54 @@
  */
 
 #include <stdio.h>
-#include "config.h"
+#include <stdint.h>
 #include "stm8s.h"
 #include "stm8s_itc.h"
+#include "stm8s_flash.h"
+#include "config.h"
 #include "BOeeprom.h"
+#include "BOcontrollerState.h"
+
+void eeprom_init(void)
+{
+    eeprom_magic_byte = eeprom_read(EEPROM_MAX_INIT_RANGE);
+    if (eeprom_magic_byte != EEPROM_INIT_MAGIC_BYTE)
+    {
+        // eeprom needs to be reset after flashing
+        uint8_t di;
+        FLASH_SetProgrammingTime(FLASH_PROGRAMTIME_STANDARD);
+        FLASH_Unlock(FLASH_MEMTYPE_DATA);
+        
+        for (di = 0; di < EEPROM_MAX_INIT_RANGE; di++)
+        {
+            while (!FLASH_GetFlagStatus(FLASH_FLAG_DUL));
+            FLASH_ProgramByte(EEPROM_BASE_ADDRESS + di, 0x00);
+            while (!FLASH_GetFlagStatus(FLASH_FLAG_EOP));
+        }
+
+        while (!FLASH_GetFlagStatus(FLASH_FLAG_DUL));
+        FLASH_ProgramByte(EEPROM_BASE_ADDRESS + EEPROM_MAX_INIT_RANGE, EEPROM_INIT_MAGIC_BYTE);
+        while (!FLASH_GetFlagStatus(FLASH_FLAG_EOP));
+
+        FLASH_Lock(FLASH_MEMTYPE_DATA);
+        
+        // reread to make sure everything went well
+        eeprom_magic_byte = eeprom_read(EEPROM_MAX_INIT_RANGE);
+    }
+  
+}
+
+uint8_t eeprom_read(uint8_t address_offset)
+{
+    return (FLASH_ReadByte(EEPROM_BASE_ADDRESS + address_offset));
+}
+
+void eeprom_write(uint8_t address_offset, uint8_t value)
+{
+    FLASH_SetProgrammingTime(FLASH_PROGRAMTIME_STANDARD);
+    FLASH_Unlock(FLASH_MEMTYPE_DATA);
+    while (!FLASH_GetFlagStatus(FLASH_FLAG_DUL));
+    FLASH_ProgramByte(EEPROM_BASE_ADDRESS + address_offset, value);
+    while (!FLASH_GetFlagStatus(FLASH_FLAG_EOP));
+    FLASH_Lock(FLASH_MEMTYPE_DATA);
+}

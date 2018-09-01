@@ -21,21 +21,32 @@
 
 #include "config.h"
 
+extern uint8_t eeprom_magic_byte;
 extern uint8_t ui8_assistlevel_global;
 extern uint8_t PAS_act;
+extern uint8_t PAS_dir;	//flag for pasdirection
 extern uint16_t ui16_sum_torque; 
-extern uint8_t ui8_cheat_state;
+extern uint8_t ui8_offroad_state;
 extern uint32_t uint32_current_target;
 extern uint16_t ui16_setpoint;
 extern uint16_t ui16_throttle_accumulated;
+extern uint16_t ui16_current_cal_b;
+extern uint8_t ui8_motor_state;
+extern uint8_t ui8_BatteryVoltage;
+extern uint16_t ui16_motor_speed_erps;
+extern uint16_t ui16_BatteryCurrent;
+extern uint8_t ui8_position_correction_value;
+extern uint16_t ui16_ADC_iq_current;
+extern uint16_t ui16_ADC_iq_current_filtered;
 
 extern uint8_t uint8_t_hall_case[7];
-extern uint8_t uint8_t_hall_debug_order[6];
+extern uint8_t uint8_t_hall_order[6];
 extern int8_t int8_t_hall_counter;
 extern uint8_t ui8_hall_debug_counter;
 
 void controllerstate_init (void);
 void updateHallOrder(uint8_t hall_sensors);
+void updateOffroadStatus(void);
 
 #endif /* BOCONTROLLERSTATE_H */
 

@@ -36,9 +36,6 @@ int16_t i16_assistlevel[5]={LEVEL_1, LEVEL_2, LEVEL_3, LEVEL_4, LEVEL_5}; // dif
 float float_temp=0; //for float calculations
 int8_t uint_PWM_Enable=0; //flag for PWM state
 uint16_t ui16_BatteryCurrent_accumulated = 2496L; //8x current offset, for filtering or Battery Current
-uint16_t ui16_BatteryCurrent; //Battery Current read from ADC8
-uint16_t ui16_current_cal_b;
-uint8_t ui8_BatteryVoltage; //Battery Voltage read from ADC
 uint16_t ui16_BatteryVoltage_accumulated;
 uint8_t ui8_regen_throttle; //regen throttle read from ADC X4
 int8_t i8_motor_temperature; //temperature read from ADC X4
@@ -132,7 +129,7 @@ uint16_t update_setpoint (uint16_t speed, uint16_t PAS, uint16_t sumtorque, uint
 
   //check if pedals are turning with throttle active in offroad mode
 #if defined(THROTTLE_AND_PAS) || defined (TORQUE_SIMULATION)
-  else if ((ui16_PAS_Counter>timeout || !PAS_dir)&&!(ui8_cheat_state==5 && sumtorque>2)){
+  else if ((ui16_PAS_Counter>timeout || !PAS_dir)&&!(ui8_offroad_state==5 && sumtorque>2)){
             ui32_setpoint= PI_control(ui16_BatteryCurrent, ui16_current_cal_b);//Curret target = 0 A, this is to keep the integral part of the PI-control up to date
                   if (ui32_setpoint<5){ui32_setpoint=0;}
                   if (ui32_setpoint>255){ui32_setpoint=255;}
@@ -281,7 +278,7 @@ uint32_t CheckSpeed (uint16_t current_target, uint16_t erps)
 {
   //printf("Speed %d, %d\r\n", erps, ui16_erps_limit_lower);
   //ramp down motor power if you are riding too fast and speed liming is active
-  if (erps>ui16_erps_limit_lower && ui8_cheat_state!=5){
+  if (erps>ui16_erps_limit_lower && ui8_offroad_state!=5){
 
 	if (erps>ui16_erps_limit_higher){ //if you are riding much too fast, stop motor immediately
 	    current_target=ui16_current_cal_b;
@@ -305,7 +302,7 @@ uint32_t CheckSpeed (uint16_t current_target, uint16_t speed)
 {
 
   //ramp down motor power if you are riding too fast and speed liming is active
-  if (speed>limit*1000 && ui8_cheat_state!=5){
+  if (speed>limit*1000 && ui8_offroad_state!=5){
       //printf("Vor %d, %d\r\n", current_target-ui16_current_cal_b, speed);
 	if (speed>(limit+2)*1000){ //if you are riding much too fast, stop motor immediately
 	    current_target=ui16_current_cal_b;

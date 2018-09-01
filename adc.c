@@ -14,6 +14,7 @@
 #include "adc.h"
 #include "update_setpoint.h"
 #include "timers.h"
+#include "BOcontrollerState.h"
 
 
 
@@ -62,7 +63,6 @@ void adc_init (void)
     }
 
   // read and average a few values of ADC
-  ui16_current_cal_b = 0;
   for (ui8_i = 0; ui8_i < 16; ui8_i++)
   {
     delay_halfms(30);
