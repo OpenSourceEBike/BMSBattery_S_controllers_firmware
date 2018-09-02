@@ -19,18 +19,11 @@
 #define MOTOR_STATE_RUNNING_INTERPOLATION_360_DEGREES 3
 
 extern uint8_t ui8_motor_rotor_position;
-extern uint8_t ui8_position_correction_value;
 extern uint8_t ui8_position_correction_value1;
 extern uint16_t ui16_speed_inverse;
-extern uint8_t ui8_motor_state;
 extern uint16_t ui16_PWM_cycles_counter_total;
-extern uint16_t ui16_motor_speed_erps;
-extern uint16_t ui16_ADC_iq_current;
 extern uint16_t ui16_iq_current_ma;
-extern uint16_t ui16_ADC_iq_current_filtered;
 extern uint16_t ui16_log;
-extern uint8_t uint8_t_hall_case[7];
-extern uint8_t uint8_t_hall_debug_order[6];
 
 
 void hall_sensor_init (void);

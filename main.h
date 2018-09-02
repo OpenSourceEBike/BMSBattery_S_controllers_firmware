@@ -23,7 +23,7 @@
 #define ADC_MOTOR_TOTAL_CURRENT_MAX 20 // 20 (8bits) ~ 2 Amps
 #define ADC_MOTOR_TOTAL_CURRENT_MAX_POSITIVE 90 // +2A
 #define ADC_MOTOR_TOTAL_CURRENT_MAX_NEGATIVE 70 // +2A
-#define CHEAT_TOLERANCE 40 // Tolerance for "morse" code detection
+#define MORSE_TOLERANCE 40 // Tolerance for "morse" code detection
 
 //for Kunteng Displays
 #define COMMUNICATIONS_BATTERY_VOLTAGE	(BATTERY_LI_ION_CELLS_NUMBER * 3.45) // example: 7S battery, should be = 24
@@ -62,7 +62,7 @@
 #define MOTOR_ROTOR_DELTA_PHASE_ANGLE_RIGHT 92 // best value found
 #endif
 
-#define PWM_CYCLES_COUNTER_MAX 3000 // bei höheren Werten wird angenommen, der Motor steht.
+#define PWM_CYCLES_COUNTER_MAX 3000 // bei hï¿½heren Werten wird angenommen, der Motor steht.
 
 
 // 2 seconds to get up to max PWM duty cycle value of 255 (127 * 255 * 64us ~= 2 seconds)
@@ -94,8 +94,6 @@ extern uint8_t ui8_SPEED_Flag;		//Flag for PAS Interrupt detected
 extern uint8_t ui8_slowloop_flag;	//Flag for slow loop timing
 extern uint8_t ui8_assistlevel_global;
 extern uint8_t ui8_msg_received;
-extern uint8_t ui8_cheat_state;
-extern uint8_t PAS_dir;			//flag for pasdirection
 extern uint8_t ui8_SPEED_Tag; 		//flag for SPEED update in update_setpoint
 
 uint8_t update_advance_angle();

@@ -31,6 +31,7 @@ Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301  USA
 #include "brake.h"
 #include "interrupts.h"
 #include "update_setpoint.h"
+#include "BOcontrollerState.h"
 
 display_view_type display_view;
 
@@ -211,7 +212,7 @@ ui8_tx_buffer [0] = 65;
   ui8_tx_buffer [4] = ui16_wheel_period_ms & 0xff;
 
   //Send confirming signal for activating offroad mode
-   if (ui8_cheat_state==4){ //quitting signal for offroad mode enabled. Shows about 80 km/h for three seconds
+   if (ui8_offroad_state==4){ //quitting signal for offroad mode enabled. Shows about 80 km/h for three seconds
 
   	  ui8_tx_buffer [3] = (100 >> 8) & 0xff; //100ms are about 80 km/h @ 28" 2200mm wheel circumference
   	  ui8_tx_buffer [4] = 100 & 0xff;
@@ -251,11 +252,7 @@ ui8_tx_buffer [0] = 65;
   // send the package over UART
   for (ui8_j = 0; ui8_j <= 11; ui8_j++)
   {
-#ifndef DIAGNOSTICS
-#ifndef BLUOSEC
     putchar (ui8_tx_buffer [ui8_j]);
-#endif
-#endif
   }
 }
 
@@ -346,23 +343,20 @@ void UART2_IRQHandler(void) __interrupt(UART2_IRQHANDLER)
 
 #endif //end of DISPLAY_TYPE_KT_LCD3
 
-#if !defined DISPLAY_TYPE_KT_LCD3 && !(DISPLAY_TYPE & DISPLAY_TYPE_KINGMETER)
-
+#if !defined DISPLAY_TYPE_KT_LCD3 && !defined BLUOSEC && !(DISPLAY_TYPE & DISPLAY_TYPE_KINGMETER)
 
 
 /****************************************************************************************************
- * UART2 receive interrupt handler - receive data from and to the display
- * for debug and BluOSEC Mode
+ * UART2 receive interrupt handler - fallback to clear rx buffer
+ * for debug Mode
  ***************************************************************************************************/
+
 void UART2_IRQHandler(void) __interrupt(UART2_IRQHANDLER)
     {
 
-
 	if(UART2_GetFlagStatus(UART2_FLAG_RXNE) == SET){
-		UART2_ReceiveData8();  // -> clear!
-
-		// do something with received byte in future
-
+		      
+        UART2_ReceiveData8();// -> clear!
 		}
 		else //catch errors
 		  {

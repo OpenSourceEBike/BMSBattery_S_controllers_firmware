@@ -38,38 +38,28 @@
           <in>stm8s_wwdg.h</in>
         </df>
         <df name="src">
-          <in>stm8s_adc1.asm</in>
           <in>stm8s_adc1.c</in>
           <in>stm8s_adc2.c</in>
           <in>stm8s_awu.c</in>
           <in>stm8s_beep.c</in>
           <in>stm8s_can.c</in>
-          <in>stm8s_clk.asm</in>
           <in>stm8s_clk.c</in>
-          <in>stm8s_exti.asm</in>
           <in>stm8s_exti.c</in>
-          <in>stm8s_flash.asm</in>
           <in>stm8s_flash.c</in>
-          <in>stm8s_gpio.asm</in>
           <in>stm8s_gpio.c</in>
           <in>stm8s_i2c.c</in>
           <in>stm8s_it.c</in>
-          <in>stm8s_itc.asm</in>
           <in>stm8s_itc.c</in>
-          <in>stm8s_iwdg.asm</in>
           <in>stm8s_iwdg.c</in>
           <in>stm8s_rst.c</in>
           <in>stm8s_spi.c</in>
-          <in>stm8s_tim1.asm</in>
           <in>stm8s_tim1.c</in>
-          <in>stm8s_tim2.asm</in>
           <in>stm8s_tim2.c</in>
           <in>stm8s_tim3.c</in>
           <in>stm8s_tim4.c</in>
           <in>stm8s_tim5.c</in>
           <in>stm8s_tim6.c</in>
           <in>stm8s_uart1.c</in>
-          <in>stm8s_uart2.asm</in>
           <in>stm8s_uart2.c</in>
           <in>stm8s_uart3.c</in>
           <in>stm8s_uart4.c</in>
@@ -87,6 +77,14 @@
           <df name="build">
             <df name="classes">
             </df>
+            <df name="empty">
+            </df>
+            <df name="generated-sources">
+              <df name="ap-source-output">
+              </df>
+            </df>
+          </df>
+          <df name="dist">
           </df>
           <df name="src">
           </df>
@@ -96,51 +94,42 @@
         <df name="openocd-v0.10.0-scripts">
         </df>
       </df>
-      <in>PAS.asm</in>
+      <in>BOcontrollerState.c</in>
+      <in>BOcontrollerState.h</in>
+      <in>BOdisplay.c</in>
+      <in>BOdisplay.h</in>
+      <in>BOeeprom.c</in>
+      <in>BOeeprom.h</in>
       <in>PAS.c</in>
       <in>PAS.h</in>
-      <in>SPEED.asm</in>
       <in>SPEED.c</in>
       <in>SPEED.h</in>
-      <in>adc.asm</in>
       <in>adc.c</in>
       <in>adc.h</in>
-      <in>brake.asm</in>
       <in>brake.c</in>
       <in>brake.h</in>
       <in>config.h</in>
-      <in>cruise_control.asm</in>
       <in>cruise_control.c</in>
       <in>cruise_control.h</in>
-      <in>display.asm</in>
       <in>display.c</in>
       <in>display.h</in>
-      <in>display_kingmeter.asm</in>
       <in>display_kingmeter.c</in>
       <in>display_kingmeter.h</in>
-      <in>gpio.asm</in>
       <in>gpio.c</in>
       <in>gpio.h</in>
       <in>interrupts.h</in>
-      <in>main.asm</in>
       <in>main.c</in>
       <in>main.h</in>
-      <in>motor.asm</in>
       <in>motor.c</in>
       <in>motor.h</in>
-      <in>pwm.asm</in>
       <in>pwm.c</in>
       <in>pwm.h</in>
-      <in>timers.asm</in>
       <in>timers.c</in>
       <in>timers.h</in>
-      <in>uart.asm</in>
       <in>uart.c</in>
       <in>uart.h</in>
-      <in>update_setpoint.asm</in>
       <in>update_setpoint.c</in>
       <in>update_setpoint.h</in>
-      <in>utils.asm</in>
       <in>utils.c</in>
       <in>utils.h</in>
     </df>

@@ -7,15 +7,34 @@
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
-            <file>file:/G:/osebikefw/config.h</file>
-            <file>file:/G:/osebikefw/main.c</file>
+            <file>file:/G:/osebikefw/BOeeprom.h</file>
+            <file>file:/G:/osebikefw/BOdisplay.c</file>
+            <file>file:/G:/osebikefw/BOeeprom.c</file>
+            <file>file:/G:/osebikefw/Start_Compiling.bat</file>
+            <file>file:/G:/osebikefw/BOdisplay.h</file>
+            <file>file:/G:/osebikefw/StdPeriphLib/inc/stm8s_gpio.h</file>
+            <file>file:/G:/osebikefw/SPEED.c</file>
             <file>file:/G:/osebikefw/motor.c</file>
+            <file>file:/G:/osebikefw/SPEED.h</file>
+            <file>file:/G:/osebikefw/motor.h</file>
+            <file>file:/G:/osebikefw/display_kingmeter.h</file>
+            <file>file:/G:/osebikefw/main.c</file>
             <file>file:/G:/osebikefw/pwm.c</file>
+            <file>file:/G:/osebikefw/BOcontrollerState.c</file>
+            <file>file:/G:/osebikefw/adc.h</file>
+            <file>file:/G:/osebikefw/BOcontrollerState.h</file>
+            <file>file:/G:/osebikefw/display_kingmeter.c</file>
+            <file>file:/G:/osebikefw/main.h</file>
+            <file>file:/G:/osebikefw/uart.h</file>
+            <file>file:/G:/osebikefw/uart.c</file>
+            <file>file:/G:/osebikefw/gpio.h</file>
+            <file>file:/G:/osebikefw/display.h</file>
+            <file>file:/G:/osebikefw/adc.c</file>
             <file>file:/G:/osebikefw/brake.c</file>
             <file>file:/G:/osebikefw/update_setpoint.c</file>
-            <file>file:/G:/osebikefw/main.h</file>
-            <file>file:/G:/osebikefw/utils.c</file>
+            <file>file:/G:/osebikefw/cruise_control.h</file>
             <file>file:/G:/osebikefw/display.c</file>
+            <file>file:/G:/osebikefw/update_setpoint.h</file>
         </group>
     </open-files>
 </project-private>

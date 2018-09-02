@@ -25,6 +25,7 @@
 #include "config.h"
 #include "utils.h"
 #include "brake.h"
+#include "BOcontrollerState.h"
 
 
 
@@ -32,30 +33,36 @@ static uint32_t ui32_setpoint; // local version of setpoint
 uint32_t ui32_SPEED_km_h; //global variable Speed
 static uint32_t ui32_SPEED_km_h_accumulated;
 int16_t i16_assistlevel[5]={LEVEL_1, LEVEL_2, LEVEL_3, LEVEL_4, LEVEL_5}; // difference between setpoint and actual value
-uint32_t uint32_current_target=0; //target for PI-Control
 float float_temp=0; //for float calculations
 int8_t uint_PWM_Enable=0; //flag for PWM state
 uint16_t ui16_BatteryCurrent_accumulated = 2496L; //8x current offset, for filtering or Battery Current
-uint16_t ui16_BatteryCurrent; //Battery Current read from ADC8
-uint16_t ui16_current_cal_b;
-uint8_t ui8_BatteryVoltage; //Battery Voltage read from ADC
 uint16_t ui16_BatteryVoltage_accumulated;
 uint8_t ui8_regen_throttle; //regen throttle read from ADC X4
 int8_t i8_motor_temperature; //temperature read from ADC X4
-uint8_t ui8_control_state=0; //regen flag for shifting from +90° to -90°
+uint8_t ui8_regen_flag=0; //regen flag for shifting from +90° to -90°
 static uint16_t ui16_PAS_accumulated = 64000L; // for filtering of PAS value
 static uint32_t ui32_erps_accumulated; //for filtering of erps
 uint32_t ui32_erps_filtered; //filtered value of erps
 uint32_t ui32_temp;
-//uint16_t ui16_erps_limit_lower=((limit)*(GEAR_RATIO/wheel_circumference));
-//uint16_t ui16_erps_limit_higher=((limit+2)*(GEAR_RATIO/wheel_circumference));
-uint16_t ui16_erps_limit_lower=(uint16_t)((float)GEAR_RATIO*(float)limit*10000.0/((float)wheel_circumference*36.0));
-uint16_t ui16_erps_limit_higher=(uint16_t)((float)GEAR_RATIO*(float)(limit+2)*10000.0/((float)wheel_circumference*36.0));
+//uint16_t ui16_erps_limit_lower=((ui8_speedlimit_kph)*(GEAR_RATIO/wheel_circumference));
+//uint16_t ui16_erps_limit_higher=((ui8_speedlimit_kph+2)*(GEAR_RATIO/wheel_circumference));
+uint16_t ui16_erps_limit_lower;
+uint16_t ui16_erps_limit_higher;
 
 uint16_t ui16_erps_max=PWM_CYCLES_SECOND/30; //limit erps to have minimum 30 points on the sine curve for proper commutation
 
+void setpoint_init(void)
+{
+    ui16_erps_limit_lower=(uint16_t)((float)GEAR_RATIO*(float)ui8_speedlimit_kph*10000.0/((float)wheel_circumference*36.0));
+    ui16_erps_limit_higher=(uint16_t)((float)GEAR_RATIO*(float)(ui8_speedlimit_kph+2)*10000.0/((float)wheel_circumference*36.0));
+}
+
 uint16_t update_setpoint (uint16_t speed, uint16_t PAS, uint16_t sumtorque, uint16_t setpoint_old)
 {
+  
+  ui16_erps_limit_lower=(uint16_t)((float)GEAR_RATIO*(float)ui8_speedlimit_kph*10000.0/((float)wheel_circumference*36.0));
+  ui16_erps_limit_higher=(uint16_t)((float)GEAR_RATIO*(float)(ui8_speedlimit_kph+2)*10000.0/((float)wheel_circumference*36.0));
+    
   ui16_BatteryCurrent_accumulated -= ui16_BatteryCurrent_accumulated>>3;
   ui16_BatteryCurrent_accumulated += ui16_adc_read_motor_total_current();
   ui16_BatteryCurrent = ui16_BatteryCurrent_accumulated>>3;
@@ -102,8 +109,10 @@ uint16_t update_setpoint (uint16_t speed, uint16_t PAS, uint16_t sumtorque, uint
       TIM1_CtrlPWMOutputs(DISABLE);
       uint_PWM_Enable=0; // highest priority: Stop motor for undervoltage protection
       ui32_setpoint=0;
-      //printf("Low voltage! %d\r\n",ui8_BatteryVoltage);
       ui8_control_state=2;
+#ifdef DIAGNOSTICS
+      printf("Low voltage! %d\r\n",ui8_BatteryVoltage);
+#endif
     }
 
   //check if rider is braking
@@ -118,7 +127,9 @@ uint16_t update_setpoint (uint16_t speed, uint16_t PAS, uint16_t sumtorque, uint
             if (ui32_setpoint<5){ui32_setpoint=0;}
             if (ui32_setpoint>255){ui32_setpoint=255;}
             ui8_control_state=3;
-      //printf("you are braking!\r\n");REGEN_CURRENT_MAX_VALUE
+#ifdef DIAGNOSTICS            
+      printf("you are braking!\r\n");REGEN_CURRENT_MAX_VALUE
+#endif            
   }
 
   //limit max erps
@@ -127,18 +138,22 @@ uint16_t update_setpoint (uint16_t speed, uint16_t PAS, uint16_t sumtorque, uint
                     if (ui32_setpoint<5){ui32_setpoint=0;}
                     if (ui32_setpoint>255){ui32_setpoint=255;}
               ui8_control_state=4;
+#ifdef DIAGNOSTICS
         printf("erps too high!\r\n");
+#endif
     }
 
   //check if pedals are turning with throttle active in offroad mode
 #if defined(THROTTLE_AND_PAS) || defined (TORQUE_SIMULATION)
-  else if ((ui16_PAS_Counter>timeout || !PAS_dir)&&!(ui8_cheat_state==5 && sumtorque>2)){
+  else if ((ui16_PAS_Counter>timeout || !PAS_dir)&&!(ui8_offroad_state==5 && sumtorque>2)){
             ui32_setpoint= PI_control(ui16_BatteryCurrent, ui16_current_cal_b);//Curret target = 0 A, this is to keep the integral part of the PI-control up to date
                   if (ui32_setpoint<5){ui32_setpoint=0;}
                   if (ui32_setpoint>255){ui32_setpoint=255;}
+            ui8_control_state=5;
+#ifdef DIAGNOSTICS            
      //printf("P, %lu, %d, %d, %d\r\n", ui32_setpoint, sumtorque, ui16_BatteryCurrent, (uint16_t) ui16_current_cal_b);
-     // printf("you are not pedaling!\r\n");
-                  ui8_control_state=5;
+     printf("you are not pedaling!\r\n");
+#endif            
   }
 #endif
  // check if pedals are turning in torquesensor mode, throttle active in offroad mode doesn't work here
@@ -147,9 +162,11 @@ uint16_t update_setpoint (uint16_t speed, uint16_t PAS, uint16_t sumtorque, uint
             ui32_setpoint= PI_control(ui16_BatteryCurrent, ui16_current_cal_b);//Curret target = 0 A, this is to keep the integral part of the PI-control up to date
                   if (ui32_setpoint<5){ui32_setpoint=0;}
                   if (ui32_setpoint>255){ui32_setpoint=255;}
+            ui8_control_state=5;
+#ifdef DIAGNOSTICS            
      //printf("P, %lu, %d, %d, %d\r\n", ui32_setpoint, sumtorque, ui16_BatteryCurrent, (uint16_t) ui16_current_cal_b);
-     // printf("you are not pedaling!\r\n");
-                  ui8_control_state=5;
+     printf("you are not pedaling!\r\n");
+#endif            
   }
 #endif
 
@@ -161,7 +178,7 @@ uint16_t update_setpoint (uint16_t speed, uint16_t PAS, uint16_t sumtorque, uint
       ui16_PAS_accumulated+=PAS;
       PAS=ui16_PAS_accumulated>>3;
       //uint32_current_target=((i16_assistlevel[ui8_assistlevel_global-1]*fummelfaktor*sumtorque))/(((uint32_t)PAS)<<6)+ui16_current_cal_b; 						//calculate setpoint
-      uint32_current_target=(((i16_assistlevel[ui8_assistlevel_global-1]*fummelfaktor*sumtorque))/(((uint32_t)PAS)<<6)*(1000+ui32_SPEED_km_h/limit))/1000+ui16_current_cal_b;
+      uint32_current_target=(((i16_assistlevel[ui8_assistlevel_global-1]*fummelfaktor*sumtorque))/(((uint32_t)PAS)<<6)*(1000+ui32_SPEED_km_h/ui8_speedlimit_kph))/1000+ui16_current_cal_b;
       //printf("vor: spd %d, pas %d, sumtor %d, setpoint %lu\n", speed, PAS, sumtorque, ui32_setpoint);
       if (uint32_current_target>BATTERY_CURRENT_MAX_VALUE){
 	  //printf("Current target %lu\r\n", uint32_current_target);
@@ -185,6 +202,7 @@ uint16_t update_setpoint (uint16_t speed, uint16_t PAS, uint16_t sumtorque, uint
 
 #if defined(THROTTLE)  || defined(THROTTLE_AND_PAS)
   float_temp=(float)sumtorque*(float)(BATTERY_CURRENT_MAX_VALUE-ui16_current_cal_b)/255.0+(float)ui16_current_cal_b; //calculate current target
+
   ui8_control_state=7;
 #ifdef SPEEDSENSOR_INTERNAL
   uint32_current_target = CheckSpeed ((uint16_t)float_temp, (uint16_t) ui32_erps_filtered); //limit speed
@@ -197,7 +215,7 @@ uint16_t update_setpoint (uint16_t speed, uint16_t PAS, uint16_t sumtorque, uint
 
   if(setpoint_old>0 && (uint32_current_target-ui16_current_cal_b)*255/setpoint_old>PHASE_CURRENT_MAX_VALUE-ui16_current_cal_b){  // limit phase current according to Phase Current = battery current/duty cycle
       uint32_current_target=(PHASE_CURRENT_MAX_VALUE-ui16_current_cal_b)*setpoint_old/255+ui16_current_cal_b;
-      ui8_control_state=8;
+     ui8_control_state=8;
       // printf("Phase Current limited! %d, %d, %d\r\n", (uint16_t)uint32_current_target,(uint16_t)float_temp, setpoint_old );
   }
 
@@ -226,11 +244,11 @@ uint16_t update_setpoint (uint16_t speed, uint16_t PAS, uint16_t sumtorque, uint
       uint32_current_target= (i16_assistlevel[ui8_assistlevel_global-1]*(BATTERY_CURRENT_MAX_VALUE-ui16_current_cal_b)/100+ui16_current_cal_b);
       //printf("current_target %d\r\n", (int16_t)uint32_current_target);
     }
-  ui8_control_state=9;
+   ui8_control_state=9;
   float_temp=(float)sumtorque*(float)(BATTERY_CURRENT_MAX_VALUE-ui16_current_cal_b)/255.0+(float)ui16_current_cal_b; //calculate current target
   if ((int32_t)float_temp>uint32_current_target){
-      uint32_current_target=(int32_t)float_temp; //override torque simulation with throttle
-      ui8_control_state=10;
+    uint32_current_target=(int32_t)float_temp; //override torque simulation with throttle
+    ui8_control_state=10;
   }
 
 #ifdef SPEEDSENSOR_INTERNAL
@@ -243,8 +261,7 @@ uint16_t update_setpoint (uint16_t speed, uint16_t PAS, uint16_t sumtorque, uint
 
   if(setpoint_old>0 && (uint32_current_target-ui16_current_cal_b)*255/setpoint_old>PHASE_CURRENT_MAX_VALUE-ui16_current_cal_b){  // limit phase current according to Phase Current = battery current/duty cycle
       uint32_current_target=(PHASE_CURRENT_MAX_VALUE-ui16_current_cal_b)*setpoint_old/255+ui16_current_cal_b;
-
-      ui8_control_state=8;
+     ui8_control_state=8;
       // printf("Phase Current limited! %d, %d, %d\r\n", (uint16_t)uint32_current_target,(uint16_t)float_temp, setpoint_old );
   }
   ui32_setpoint= PI_control(ui16_BatteryCurrent, uint32_current_target);
@@ -260,7 +277,9 @@ uint16_t update_setpoint (uint16_t speed, uint16_t PAS, uint16_t sumtorque, uint
      {
         TIM1_CtrlPWMOutputs(ENABLE);
         uint_PWM_Enable=1;
+#ifdef DIAGNOSTICS
         printf("PWM enabled!\r\n");
+#endif
      }
  } //end of else
 
@@ -289,17 +308,21 @@ uint32_t CheckSpeed (uint16_t current_target, uint16_t erps)
 {
   //printf("Speed %d, %d\r\n", erps, ui16_erps_limit_lower);
   //ramp down motor power if you are riding too fast and speed liming is active
-  if (erps>ui16_erps_limit_lower && ui8_cheat_state!=5){
+  if (erps>ui16_erps_limit_lower && ui8_offroad_state!=5){
 
 	if (erps>ui16_erps_limit_higher){ //if you are riding much too fast, stop motor immediately
 	    current_target=ui16_current_cal_b;
-	   //printf("Speed much too high! %d, %d\r\n", erps,((limit+2)*GEAR_RATIO));
-	    ui8_control_state=11;
+            ui8_control_state=11;
+#ifdef DIAGNOSTICS
+	   printf("Speed much too high! %d, %d\r\n", erps,((ui8_speedlimit_kph+2)*GEAR_RATIO));
+#endif
 	}
 	else {
 	    current_target=((current_target-ui16_current_cal_b)*(ui16_erps_limit_higher-erps))/(ui16_erps_limit_higher-ui16_erps_limit_lower)+ui16_current_cal_b; 	//ramp down the motor power within 2 km/h, if you are riding too fast
-	  // printf("Speed too high!\r\n");
-	    ui8_control_state=12;
+            ui8_control_state=12;
+#ifdef DIAGNOSTICS
+			printf("Speed too high!\r\n");
+#endif
 	}
   }
     return ((uint32_t)current_target);
@@ -311,23 +334,23 @@ uint32_t CheckSpeed (uint16_t current_target, uint16_t speed)
 {
 
   //ramp down motor power if you are riding too fast and speed liming is active
-  if (speed>limit*1000 && ui8_cheat_state!=5){
+  if (speed>ui8_speedlimit_kph*1000 && ui8_offroad_state!=5){
       //printf("Vor %d, %d\r\n", current_target-ui16_current_cal_b, speed);
-	if (speed>(limit+2)*1000){ //if you are riding much too fast, stop motor immediately
+	if (speed>(ui8_speedlimit_kph+2)*1000){ //if you are riding much too fast, stop motor immediately
 	    current_target=ui16_current_cal_b;
+            ui8_control_state=13;
 	   //printf("Speed much too high! %d, %d\r\n", current_target, speed);
-	    ui8_control_state=13;
 	}
 	else {
 
 	    ui32_temp=((current_target-ui16_current_cal_b));
 	    //printf("Substraktion %d, %lu\r\n", current_target, ui32_temp) ;
-	    ui32_temp *=((limit+2)*1000-speed);
+	    ui32_temp *=((ui8_speedlimit_kph+2)*1000-speed);
 	    //printf("Mal %d, %lu\r\n", current_target, ui32_temp) ;
 	    current_target=(uint16_t)(ui32_temp/2000+ui16_current_cal_b); 	//ramp down the motor power within 2 km/h, if you are riding too fast
-	    //printf("Speed too high!\r\n");
-	    //printf("Ramp down: %d, %d\r\n", current_target, speed) ;
 	    ui8_control_state=14;
+            //printf("Speed too high!\r\n");
+	    //printf("Ramp down: %d, %d\r\n", current_target, speed) ;
 	}
   }
     return ((uint32_t)current_target);

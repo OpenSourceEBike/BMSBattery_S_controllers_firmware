@@ -29,7 +29,9 @@
 #include "config.h"
 #include "display.h"
 #include "display_kingmeter.h"
-
+#include "BOcontrollerState.h"
+#include "BOdisplay.h"
+#include "BOeeprom.h"
 
 //uint16_t ui16_LPF_angle_adjust = 0;
 //uint16_t ui16_LPF_angle_adjust_temp = 0;
@@ -41,7 +43,7 @@ uint16_t ui16_log2 = 0;
 uint8_t ui8_log = 0;
 uint8_t ui8_i= 0; 				//counter for ... next loop
 uint16_t ui16_torque[NUMBER_OF_PAS_MAGS]; 	//array for torque values of one crank revolution
-uint16_t ui16_sum_torque = 0; 			//sum of array elements
+
 float float_kv = 0;
 float float_R = 0;
 uint8_t ui8_torque_index=0 ; 			//counter for torque array
@@ -51,20 +53,12 @@ uint8_t a = 0; 					//loop counter
 //uint16_t ui16_temp_delay = 0;
 static int16_t i16_deziAmps;
 
-uint8_t ui8_cheat_state = 0; 			//state of cheat procedure
-uint8_t ui8_cheat_counter = 0; 			//counter for cheat procedure
-
-
-
-
 uint8_t ui8_adc_read_throttle_busy = 0;
 uint16_t ui16_SPEED_Counter = 0; 	//time tics for speed measurement
 uint16_t ui16_SPEED = 64000; 		//speed in timetics
 uint16_t ui16_PAS_Counter = 0; 		//time tics for cadence measurement
 uint16_t ui16_PAS_High_Counter = 1;	//time tics for direction detection
 uint16_t ui16_PAS_High=1;		//number of High readings on PAS
-uint8_t PAS_dir=0;			//PAS direction flag
-uint8_t PAS_act=3;			//recent PAS direction reading
 uint8_t PAS_old=4;			//last PAS direction reading
 uint16_t ui16_PAS = 32000;		//cadence in timetics
 uint8_t ui8_PAS_Flag = 0; 		//flag for PAS interrupt
@@ -80,8 +74,6 @@ uint8_t uint8_t_rotorposition [7] = {
     255
   };
 
-
-uint8_t ui8_assistlevel_global = 3;// for debugging of display communication
 
 /////////////////////////////////////////////////////////////////////////////////////////////
 //// Functions prototypes
@@ -129,10 +121,9 @@ int main (void)
 {
 //  static uint32_t ui32_cruise_counter = 0;
 //  static uint8_t ui8_cruise_duty_cycle = 0;
-  static uint16_t ui16_setpoint = 0;
+
   static uint8_t ui8_temp = 0;
   static int16_t i16_temp = 0;
-  uint16_t ui16_throttle_accumulated=0;
 
 
   //set clock at the max 16MHz
@@ -144,11 +135,14 @@ int main (void)
   debug_pin_init ();
   timer2_init ();
   uart_init ();
+  eeprom_init();
+  controllerstate_init();
   pwm_init ();
   hall_sensor_init ();
   adc_init ();
   PAS_init();
   SPEED_init();
+  setpoint_init();
   display_init();
 
 //  ITC_SetSoftwarePriority (ITC_IRQ_TIM1_OVF, ITC_PRIORITYLEVEL_2);
@@ -173,14 +167,16 @@ int main (void)
   for(a = 0; a < NUMBER_OF_PAS_MAGS;a++) {// array init
    ui16_torque[a]=0;
   }
+#ifdef DIAGNOSTICS
   printf("System initialized\r\n");
+#endif
   while (1)
   {
     static uint32_t ui32_counter = 0;
     uint16_t ui16_temp = 0;
 
     uint16_t ui32_temp = 0;
-    uint8_t j = 0;//Schleifenzähler
+    uint8_t j = 0;//SchleifenzÃ¤hler
     static float f_temp = 0;
 #if (DISPLAY_TYPE & DISPLAY_TYPE_KINGMETER)
     // Update display after message received occurrence
@@ -200,6 +196,10 @@ int main (void)
 	//printf("%d\n", ui16_SPEED);
 	check_message(); //Display aktualisieren aus Code vom Forumscontroller
         }
+#endif
+    
+#ifdef BLUOSEC
+    processBoMessage();
 #endif
 
     // Update speed after speed interrupt occurrence
@@ -355,92 +355,9 @@ int main (void)
 
 	    ui16_sum_torque = (uint8_t) map (ui8_temp , ADC_THROTTLE_MIN_VALUE, ADC_THROTTLE_MAX_VALUE, 0, SETPOINT_MAX_VALUE); //map throttle to limits
 #endif
-
-//start of cheat procedure
-
-if (ui8_cheat_state!=5)
-  {
-if(ui8_cheat_state==0 && !GPIO_ReadInputPin(BRAKE__PORT, BRAKE__PIN)) //first step, brake on.
-  {
-    ui8_cheat_state=1;
-    //printf("cheatstate 1");
-  }
-if(ui8_cheat_state==1) //second step, make sure the brake is hold according to definded time
-  {
-    ui8_cheat_counter++;
-
-    if (GPIO_ReadInputPin(BRAKE__PORT, BRAKE__PIN)&&ui8_cheat_counter<CHEAT_TIME_1) //brake is released too early
-      {
-	ui8_cheat_state=0;
-	ui8_cheat_counter=0;
-      }
-    else if (GPIO_ReadInputPin(BRAKE__PORT, BRAKE__PIN) && ui8_cheat_counter>CHEAT_TIME_1+CHEAT_TOLERANCE) //brake is released according to cheatcode
-    {
-      ui8_cheat_state=2;
-      ui8_cheat_counter=0;
-      //printf("cheatstate 2");
-    }
-    else if (!GPIO_ReadInputPin(BRAKE__PORT, BRAKE__PIN)&&ui8_cheat_counter>CHEAT_TIME_1+CHEAT_TOLERANCE) //brake is released too late
-        {
-          ui8_cheat_state=0;
-          ui8_cheat_counter=0;
-        }
-  }
-
-if(ui8_cheat_state==2) //third step, make sure the brake is released according to definded time
-  {
-    ui8_cheat_counter++;
-    if (!GPIO_ReadInputPin(BRAKE__PORT, BRAKE__PIN)&&ui8_cheat_counter<CHEAT_TIME_2) //brake is hold too early
-      {
-	ui8_cheat_state=0;
-	ui8_cheat_counter=0;
-      }
-    else if (!GPIO_ReadInputPin(BRAKE__PORT, BRAKE__PIN) && ui8_cheat_counter>CHEAT_TIME_2+CHEAT_TOLERANCE) //brake is hold according to cheatcode
-    {
-      ui8_cheat_state=3;
-      ui8_cheat_counter=0;
-      //printf("cheatstate 3");
-    }
-    else if (GPIO_ReadInputPin(BRAKE__PORT, BRAKE__PIN)&&ui8_cheat_counter>CHEAT_TIME_2+CHEAT_TOLERANCE) //brake is hold too late
-        {
-          ui8_cheat_state=0;
-          ui8_cheat_counter=0;
-        }
-  }
-
-if(ui8_cheat_state==3) //second step, make sure the brake is hold according to definded time
-  {
-    ui8_cheat_counter++;
-    if (GPIO_ReadInputPin(BRAKE__PORT, BRAKE__PIN)&&ui8_cheat_counter<CHEAT_TIME_3) //brake is released too early
-      {
-	ui8_cheat_state=0;
-	ui8_cheat_counter=0;
-      }
-    else if (GPIO_ReadInputPin(BRAKE__PORT, BRAKE__PIN) && ui8_cheat_counter>CHEAT_TIME_3+CHEAT_TOLERANCE) //brake is released according to cheatcode
-    {
-      ui8_cheat_state=4;
-      ui8_cheat_counter=0;
-      //printf("cheatstate 4");
-    }
-    else if (!GPIO_ReadInputPin(BRAKE__PORT, BRAKE__PIN)&&ui8_cheat_counter>CHEAT_TIME_3+CHEAT_TOLERANCE) //brake is released too late
-        {
-          ui8_cheat_state=0;
-          ui8_cheat_counter=0;
-        }
-  }
-// wait 3 seconds in state 4 for display feedback
-  if(ui8_cheat_state==4){
-      ui8_cheat_counter++;
-      if(ui8_cheat_counter>150){
-	   ui8_cheat_state=5;
-	   ui8_cheat_counter=0;
-      }
-  }
-
-  }
-//end of cheatprocedure //
-
-
+            
+            
+            updateOffroadStatus();
 	      ui16_setpoint = (uint16_t)update_setpoint (ui16_SPEED,ui16_PAS,ui16_sum_torque,ui16_setpoint); //update setpoint
 
 
@@ -463,14 +380,14 @@ if(ui8_cheat_state==3) //second step, make sure the brake is hold according to d
       //getchar1 ();
 
 #ifdef DIAGNOSTICS
-	 printf("%u,%u, %u, %u, %u, %u\r\n", ui8_control_state, ui16_setpoint, ui16_motor_speed_erps, ui16_BatteryCurrent, ui16_PAS, ui16_sum_torque);
-#endif
+	printf("%u,%u, %u, %u, %u, %u\r\n", ui8_control_state, ui16_setpoint, ui16_motor_speed_erps, ui16_BatteryCurrent, ui16_PAS, ui16_sum_torque);
+
 	  //printf("erps %d, motorstate %d, cyclecountertotal %d\r\n", ui16_motor_speed_erps, ui8_motor_state, ui16_PWM_cycles_counter_total);
 
-      //printf("cheatstate, %d, km/h %lu, Voltage, %d, setpoint %d, erps %d, current %d, correction_value, %d\n", ui8_cheat_state, ui32_SPEED_km_h, ui8_BatteryVoltage, ui16_setpoint, ui16_motor_speed_erps, ui16_BatteryCurrent, ui8_position_correction_value);
+      //printf("cheatstate, %d, km/h %lu, Voltage, %d, setpoint %d, erps %d, current %d, correction_value, %d\n", ui8_offroad_state, ui32_SPEED_km_h, ui8_BatteryVoltage, ui16_setpoint, ui16_motor_speed_erps, ui16_BatteryCurrent, ui8_position_correction_value);
 
 	//printf("kv %d, erps %d, R %d\n", (uint16_t)(float_kv*10.0) , ui16_motor_speed_erps, (uint16_t)(float_R*1000.0));
-#ifdef LOGPHASECURRENT
+
 	  /*for(a = 0; a < 6; a++) {			// sum up array content
 	  	   putchar(uint8_t_hall_case[a]);
 	  	   }
@@ -479,61 +396,15 @@ if(ui8_cheat_state==3) //second step, make sure the brake is hold according to d
 	  putchar(255);*/
 	  // printf("%d, %d, %d, %d, %d, %d\r\n", (uint16_t) uint8_t_hall_case[0], (uint16_t)uint8_t_hall_case[1],(uint16_t) uint8_t_hall_case[2],(uint16_t) uint8_t_hall_case[3], (uint16_t)uint8_t_hall_case[4], (uint16_t)uint8_t_hall_case[5]);
 	  //printf("%d, %d, %d, %d, %d, %d, %d,\r\n", ui8_position_correction_value, ui16_BatteryCurrent, ui16_setpoint, ui8_regen_throttle, ui16_motor_speed_erps, ui16_ADC_iq_current>>2,ui16_adc_read_battery_voltage());
-#endif
 
-#ifdef BLUOSEC
-
-                printf("B%d AL%d A%d PD%d PA%d ST%3u T%3u X%d MS%d SR%05d CA%d CB%d VO%3d CT%3lu SP%3u ER%3d BC%3d CV%3d PC%3d Z%03d%03d%03d%03d%03d%03d O%d%d%d%d%d%d\r\n",
-                       (int)brake_is_set(),
-                       ui8_assistlevel_global,
-                       MOTOR_ROTOR_DELTA_PHASE_ANGLE_RIGHT,
-                       PAS_dir,
-                       PAS_act,
-                       ui16_sum_torque,
-                       ui16_throttle_accumulated,
-                       ui8_cheat_state,
-                       ui8_motor_state,
-                       (uint16_t)(((float)wheel_circumference*36.0)/((float)GEAR_RATIO)),
-                       current_cal_a,
-                       ui16_current_cal_b,
-                       ui8_BatteryVoltage,
-                       uint32_current_target,
-                       ui16_setpoint,
-                       ui16_motor_speed_erps,
-                       ui16_BatteryCurrent,
-                       ui8_position_correction_value,
-                       ui16_ADC_iq_current >> 2,
-                       uint8_t_hall_case[0],
-                       uint8_t_hall_case[1],
-                       uint8_t_hall_case[2],
-                       uint8_t_hall_case[3],
-                       uint8_t_hall_case[4],
-                       uint8_t_hall_case[5],
-                       uint8_t_hall_debug_order[0],
-                       uint8_t_hall_debug_order[1],
-                       uint8_t_hall_debug_order[2],
-                       uint8_t_hall_debug_order[3],
-                       uint8_t_hall_debug_order[4],
-                       uint8_t_hall_debug_order[5]
-
-                       );
-
-//                printf("ST%3u T%3u CT%3lu SP%3u\r\n",
-//
-//                       ui16_sum_torque,
-//                       ui16_throttle_accumulated,
-//                       uint32_current_target,
-//                       ui16_setpoint
-//
-//                       );
-
-#endif
-
+         
       //printf("correction angle %d, Current %d, Voltage %d, sumtorque %d, setpoint %d, km/h %lu\n",ui8_position_correction_value, i16_deziAmps, ui8_BatteryVoltage, ui16_sum_torque, ui16_setpoint, ui32_SPEED_km_h);
+#endif
       }//end of very slow loop
 
 
     }// end of slow loop
   }// end of while(1) loop
 }
+
 
