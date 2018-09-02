@@ -22,7 +22,8 @@
 #include "stm8s_flash.h"
 #include "config.h"
 #include "BOeeprom.h"
-#include "BOcontrollerState.h"
+
+uint8_t eeprom_magic_byte = 0;
 
 void eeprom_init(void)
 {

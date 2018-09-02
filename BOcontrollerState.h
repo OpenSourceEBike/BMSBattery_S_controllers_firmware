@@ -21,8 +21,7 @@
 
 #include "config.h"
 
-extern uint8_t ui8_control_state=0; 
-extern uint8_t eeprom_magic_byte;
+extern uint8_t ui8_control_state; 
 extern uint8_t ui8_assistlevel_global;
 extern uint8_t PAS_act;
 extern uint8_t PAS_dir;	//flag for pasdirection
@@ -39,6 +38,7 @@ extern uint16_t ui16_BatteryCurrent;
 extern uint8_t ui8_position_correction_value;
 extern uint16_t ui16_ADC_iq_current;
 extern uint16_t ui16_ADC_iq_current_filtered;
+extern uint8_t ui8_speedlimit_kph;
 
 extern uint8_t uint8_t_hall_case[7];
 extern uint8_t uint8_t_hall_order[6];

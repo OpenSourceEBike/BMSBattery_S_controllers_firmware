@@ -20,19 +20,21 @@
 
 #include "config.h"
 
-#define EEPROM_BASE_ADDRESS 			0x4000
+extern uint8_t eeprom_magic_byte;
+
+#define EEPROM_BASE_ADDRESS    0x4000
 #define EEPROM_MAX_INIT_RANGE 0x1F // we should at least have 640 avail / 32 in use for now
 
 typedef enum
 {
-
-    OFFSET_MOTOR_SPECIFIC_ANGLE=((uint8_t) 0x01),
-    OFFSET_MAX_SPEED=((uint8_t) 0x02),
+    OFFSET_MOTOR_SPECIFIC_ANGLE = ((uint8_t) 0x01),
+    OFFSET_MAX_SPEED = ((uint8_t) 0x02),
+    OFFSET_ASSIST_LEVEL = ((uint8_t) 0x03)
 
 } BO_EEPROM_OFFSETS;
 
-void eeprom_init (void);
-void eeprom_write (uint8_t adress_offset, uint8_t value);
+void eeprom_init(void);
+uint8_t eeprom_write(uint8_t adress_offset, uint8_t value);
 uint8_t eeprom_read(uint8_t address_offset);
 
 #endif /* BOEEPROM_H */

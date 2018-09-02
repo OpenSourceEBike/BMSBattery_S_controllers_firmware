@@ -22,6 +22,7 @@
 #include "stm8s_itc.h"
 #include "BOdisplay.h"
 #include "interrupts.h"
+#include "BOeeprom.h"
 #include "brake.h" // ugly crossrefernce for brake_is_set(), FIXME
 #include "BOcontrollerState.h"
 
@@ -144,23 +145,23 @@ void addConfigStateInfos(void)
     addPayload(CODE_CURRENT_CAL_A, current_cal_a);
     addPayload(CODE_CURRENT_CAL_B, ui16_current_cal_b);
     addPayload(CODE_EEPROM_MAGIC_BYTE, eeprom_magic_byte);
-    addPayload(CODE_MAX_SPEED, limit);
+    addPayload(CODE_MAX_SPEED, ui8_speedlimit_kph);
 }
 
 void addHallStateInfos(void)
 {
-    addPayload(CODE_CURRENT_AT_HALL_POSITION_BASE+0x00, uint8_t_hall_case[0]);
-    addPayload(CODE_CURRENT_AT_HALL_POSITION_BASE+0x01, uint8_t_hall_case[1]);
-    addPayload(CODE_CURRENT_AT_HALL_POSITION_BASE+0x02, uint8_t_hall_case[2]);
-    addPayload(CODE_CURRENT_AT_HALL_POSITION_BASE+0x03, uint8_t_hall_case[3]);
-    addPayload(CODE_CURRENT_AT_HALL_POSITION_BASE+0x04, uint8_t_hall_case[4]);
-    addPayload(CODE_CURRENT_AT_HALL_POSITION_BASE+0x05, uint8_t_hall_case[5]);
-    addPayload(CODE_HALL_ORDER_BASE+0x00, uint8_t_hall_order[0]);
-    addPayload(CODE_HALL_ORDER_BASE+0x01, uint8_t_hall_order[1]);
-    addPayload(CODE_HALL_ORDER_BASE+0x02, uint8_t_hall_order[2]);
-    addPayload(CODE_HALL_ORDER_BASE+0x03, uint8_t_hall_order[3]);
-    addPayload(CODE_HALL_ORDER_BASE+0x04, uint8_t_hall_order[4]);
-    addPayload(CODE_HALL_ORDER_BASE+0x05, uint8_t_hall_order[5]);
+    addPayload(CODE_CURRENT_AT_HALL_POSITION_BASE + 0x00, uint8_t_hall_case[0]);
+    addPayload(CODE_CURRENT_AT_HALL_POSITION_BASE + 0x01, uint8_t_hall_case[1]);
+    addPayload(CODE_CURRENT_AT_HALL_POSITION_BASE + 0x02, uint8_t_hall_case[2]);
+    addPayload(CODE_CURRENT_AT_HALL_POSITION_BASE + 0x03, uint8_t_hall_case[3]);
+    addPayload(CODE_CURRENT_AT_HALL_POSITION_BASE + 0x04, uint8_t_hall_case[4]);
+    addPayload(CODE_CURRENT_AT_HALL_POSITION_BASE + 0x05, uint8_t_hall_case[5]);
+    addPayload(CODE_HALL_ORDER_BASE + 0x00, uint8_t_hall_order[0]);
+    addPayload(CODE_HALL_ORDER_BASE + 0x01, uint8_t_hall_order[1]);
+    addPayload(CODE_HALL_ORDER_BASE + 0x02, uint8_t_hall_order[2]);
+    addPayload(CODE_HALL_ORDER_BASE + 0x03, uint8_t_hall_order[3]);
+    addPayload(CODE_HALL_ORDER_BASE + 0x04, uint8_t_hall_order[4]);
+    addPayload(CODE_HALL_ORDER_BASE + 0x05, uint8_t_hall_order[5]);
 }
 
 void addRuntimeStateInfos(void)
@@ -187,7 +188,7 @@ void addRuntimeStateInfos(void)
     addPayload(CODE_CURRENT_TARGET, uint32_current_target);
 
     addPayload(CODE_SETPOINT_STATE, ui8_control_state);
-    
+
     // no more elements left/avail (max18)
 }
 
@@ -195,9 +196,11 @@ void gatherDynamicPayload(uint8_t function)
 {
     switch (function)
     {
-    case FUN_RUNTIME_INFOS:addRuntimeStateInfos();
+    case FUN_RUNTIME_INFOS:
+        addRuntimeStateInfos();
         break;
-    case FUN_HALL_INFOS:addHallStateInfos();
+    case FUN_HALL_INFOS:
+        addHallStateInfos();
         break;
     default:
         addPayload(CODE_ERROR, CODE_ERROR);
@@ -213,6 +216,31 @@ void gatherStaticPayload(uint8_t function)
     default:
         addPayload(CODE_ERROR, CODE_ERROR);
     }
+}
+
+uint8_t digestConfigRequest(uint8_t configAddress, uint8_t requestedCode, uint8_t requestedValue)
+{
+    switch (requestedCode)
+    {
+    case CODE_MAX_SPEED:
+        ui8_speedlimit_kph = requestedValue;
+        if (configAddress == EEPROM_ADDRESS){
+            eeprom_write(OFFSET_MAX_SPEED,requestedValue);
+        }
+        return ui8_speedlimit_kph;
+        break;
+    case CODE_ASSIST_LEVEL:
+        ui8_assistlevel_global = requestedValue;
+        if (configAddress == EEPROM_ADDRESS){
+            eeprom_write(OFFSET_ASSIST_LEVEL,requestedValue);
+        }
+        return ui8_assistlevel_global;
+        break;
+    default:
+        addPayload(CODE_ERROR, CODE_ERROR);
+        return 0;
+    }
+
 }
 
 void processBoMessage()
@@ -233,6 +261,8 @@ void processBoMessage()
         if (calculatedLrc == ui8_rx_converted_buffer[4])
         {
             uint8_t requestedFunction = ui8_rx_converted_buffer[1];
+            uint8_t requestedCode = ui8_rx_converted_buffer[2];
+            uint8_t requestedValue = ui8_rx_converted_buffer[3];
 
             if (ui8_rx_converted_buffer[0] == DYNAMIC_DATA_ADDRESS)
             {
@@ -250,9 +280,10 @@ void processBoMessage()
                 signPackage();
                 sendPreparedPackage();
             }
-            else if (ui8_rx_converted_buffer[0] == CONFIG_ADDRESS)
+            else if ((ui8_rx_converted_buffer[0] == CONFIG_ADDRESS)||(ui8_rx_converted_buffer[0] == EEPROM_ADDRESS))
             {
                 prepareBasePackage(CONFIG_ADDRESS, requestedFunction);
+                addPayload(requestedCode, digestConfigRequest(ui8_rx_converted_buffer[0], requestedCode, requestedValue));
                 addPayload(CODE_LRC_CHECK, calculatedLrc);
                 signPackage();
                 sendPreparedPackage();

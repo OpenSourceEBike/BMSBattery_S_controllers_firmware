@@ -135,13 +135,14 @@ int main (void)
   debug_pin_init ();
   timer2_init ();
   uart_init ();
-  pwm_init ();
-  controllerstate_init();
   eeprom_init();
+  controllerstate_init();
+  pwm_init ();
   hall_sensor_init ();
   adc_init ();
   PAS_init();
   SPEED_init();
+  setpoint_init();
   display_init();
 
 //  ITC_SetSoftwarePriority (ITC_IRQ_TIM1_OVF, ITC_PRIORITYLEVEL_2);

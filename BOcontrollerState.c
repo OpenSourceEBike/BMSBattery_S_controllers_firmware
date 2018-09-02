@@ -21,9 +21,9 @@
 #include "stm8s_itc.h"
 #include "stm8s_gpio.h"
 #include "gpio.h"
+#include "BOeeprom.h"
 #include "BOcontrollerState.h"
 
-uint8_t eeprom_magic_byte = 0;
 uint8_t ui8_assistlevel_global = 3; // for debugging of display communication
 uint8_t PAS_act = 3; //recent PAS direction reading
 uint8_t PAS_dir = 0; //PAS direction flag
@@ -36,11 +36,12 @@ uint16_t ui16_current_cal_b = 0;
 uint8_t ui8_motor_state = 0;
 uint8_t ui8_BatteryVoltage = 0; //Battery Voltage read from ADC
 uint16_t ui16_motor_speed_erps = 0;
-uint16_t ui16_BatteryCurrent=0; //Battery Current read from ADC8
+uint16_t ui16_BatteryCurrent = 0; //Battery Current read from ADC8
 uint8_t ui8_position_correction_value = 127; // in 360/256 degrees
 uint16_t ui16_ADC_iq_current = 0;
 uint16_t ui16_ADC_iq_current_filtered = 0;
-uint8_t ui8_control_state=0;
+uint8_t ui8_control_state = 0;
+uint8_t ui8_speedlimit_kph = 0;
 
 uint8_t uint8_t_hall_case[7];
 uint8_t uint8_t_hall_order[6];
@@ -53,6 +54,17 @@ uint8_t ui8_offroad_counter = 0; //counter for offroad switching procedure
 void controllerstate_init()
 {
     uint8_t di;
+    uint8_t eepromVal;
+    
+    // convert static defines to volatile vars
+    ui8_speedlimit_kph = limit;
+
+    // read in overrides from eeprom if they are > 0, assuming 0s are uninitialized
+    eepromVal = eeprom_read(OFFSET_MAX_SPEED);
+    if (eepromVal > 0) ui8_speedlimit_kph = eepromVal;
+    eepromVal = eeprom_read(OFFSET_ASSIST_LEVEL);
+    if (eepromVal > 0) ui8_assistlevel_global = eepromVal;
+
     for (di = 0; di < 6; di++)
     {
         uint8_t_hall_order[di] = 0;
