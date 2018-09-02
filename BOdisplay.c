@@ -187,7 +187,7 @@ void addRuntimeStateInfos(void)
     addPayload(CODE_CURRENT_TARGET, uint32_current_target);
 
     addPayload(CODE_SETPOINT_STATE, ui8_control_state);
-    ui8_control_state
+    
     // no more elements left/avail (max18)
 }
 
