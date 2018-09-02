@@ -40,6 +40,7 @@ uint16_t ui16_BatteryCurrent=0; //Battery Current read from ADC8
 uint8_t ui8_position_correction_value = 127; // in 360/256 degrees
 uint16_t ui16_ADC_iq_current = 0;
 uint16_t ui16_ADC_iq_current_filtered = 0;
+uint8_t ui8_control_state=0;
 
 uint8_t uint8_t_hall_case[7];
 uint8_t uint8_t_hall_order[6];

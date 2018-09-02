@@ -139,64 +139,76 @@ void UART2_IRQHandler(void) __interrupt(UART2_IRQHANDLER)
 
 void addConfigStateInfos(void)
 {
-    addPayload(0x80, MOTOR_ROTOR_DELTA_PHASE_ANGLE_RIGHT);
-    addPayload(0x81, (uint16_t) (((float) wheel_circumference * 36.0) / ((float) GEAR_RATIO)));
-    addPayload(0x82, current_cal_a);
-    addPayload(0x83, ui16_current_cal_b);
-    addPayload(0x84, eeprom_magic_byte);
+    addPayload(CODE_MOTOR_SPECIFIC_ANGLE, MOTOR_ROTOR_DELTA_PHASE_ANGLE_RIGHT);
+    addPayload(CODE_ERPS_FACTOR, (uint16_t) (((float) wheel_circumference * 36.0) / ((float) GEAR_RATIO)));
+    addPayload(CODE_CURRENT_CAL_A, current_cal_a);
+    addPayload(CODE_CURRENT_CAL_B, ui16_current_cal_b);
+    addPayload(CODE_EEPROM_MAGIC_BYTE, eeprom_magic_byte);
+    addPayload(CODE_MAX_SPEED, limit);
 }
 
 void addHallStateInfos(void)
 {
-    addPayload(0x00, uint8_t_hall_case[0]);
-    addPayload(0x01, uint8_t_hall_case[1]);
-    addPayload(0x02, uint8_t_hall_case[2]);
-    addPayload(0x03, uint8_t_hall_case[3]);
-    addPayload(0x04, uint8_t_hall_case[4]);
-    addPayload(0x05, uint8_t_hall_case[5]);
-    addPayload(0x10, uint8_t_hall_order[0]);
-    addPayload(0x11, uint8_t_hall_order[1]);
-    addPayload(0x12, uint8_t_hall_order[2]);
-    addPayload(0x13, uint8_t_hall_order[3]);
-    addPayload(0x14, uint8_t_hall_order[4]);
-    addPayload(0x15, uint8_t_hall_order[5]);
+    addPayload(CODE_CURRENT_AT_HALL_POSITION_BASE+0x00, uint8_t_hall_case[0]);
+    addPayload(CODE_CURRENT_AT_HALL_POSITION_BASE+0x01, uint8_t_hall_case[1]);
+    addPayload(CODE_CURRENT_AT_HALL_POSITION_BASE+0x02, uint8_t_hall_case[2]);
+    addPayload(CODE_CURRENT_AT_HALL_POSITION_BASE+0x03, uint8_t_hall_case[3]);
+    addPayload(CODE_CURRENT_AT_HALL_POSITION_BASE+0x04, uint8_t_hall_case[4]);
+    addPayload(CODE_CURRENT_AT_HALL_POSITION_BASE+0x05, uint8_t_hall_case[5]);
+    addPayload(CODE_HALL_ORDER_BASE+0x00, uint8_t_hall_order[0]);
+    addPayload(CODE_HALL_ORDER_BASE+0x01, uint8_t_hall_order[1]);
+    addPayload(CODE_HALL_ORDER_BASE+0x02, uint8_t_hall_order[2]);
+    addPayload(CODE_HALL_ORDER_BASE+0x03, uint8_t_hall_order[3]);
+    addPayload(CODE_HALL_ORDER_BASE+0x04, uint8_t_hall_order[4]);
+    addPayload(CODE_HALL_ORDER_BASE+0x05, uint8_t_hall_order[5]);
 }
 
 void addRuntimeStateInfos(void)
 {
-    addPayload(0xA0, ui8_assistlevel_global);
-    addPayload(0xA1, (int) brake_is_set());
-    addPayload(0xA2, PAS_act);
-    addPayload(0xA3, PAS_dir);
-    addPayload(0xA4, ui8_offroad_state);
+    addPayload(CODE_ASSIST_LEVEL, ui8_assistlevel_global);
+    addPayload(CODE_BRAKE_STATUS, (int) brake_is_set());
+    addPayload(CODE_PAS_ACTIVE, PAS_act);
+    addPayload(CODE_PAS_DIRECTION, PAS_dir);
+    addPayload(CODE_OFFROAD, ui8_offroad_state);
 
-    addPayload(0xC0, ui8_motor_state);
-    addPayload(0xC1, ui8_BatteryVoltage);
-    addPayload(0xC3, ui16_motor_speed_erps);
-    addPayload(0xC4, ui16_BatteryCurrent);
-    addPayload(0xC5, ui8_position_correction_value);
-    addPayload(0xC6, ui16_ADC_iq_current >> 2);
+    addPayload(CODE_MOTOR_STATE, ui8_motor_state);
+    addPayload(CODE_BATTERY_VOLTAGE, ui8_BatteryVoltage);
+    addPayload(CODE_ER_SPEED, ui16_motor_speed_erps);
+    addPayload(CODE_BATTERY_CURRENT, ui16_BatteryCurrent);
+    addPayload(CODE_CORRECTION_VALUE, ui8_position_correction_value);
+    addPayload(CODE_PHASE_CURRENT, ui16_ADC_iq_current >> 2);
 
-    addPayload(0xD0, ui16_sum_torque);
-    addPayload(0xD1, ui16_setpoint);
+    addPayload(CODE_SUM_TORQUE, ui16_sum_torque);
+    addPayload(CODE_SETPOINT, ui16_setpoint);
 
-    addPayload(0xDA, ui16_throttle_accumulated >> 8);
-    addPayload(0xDB, ui16_throttle_accumulated);
-    addPayload(0xDC, uint32_current_target >> 8);
-    addPayload(0xDD, uint32_current_target);
+    addPayload(CODE_THROTTLE_HIGH_BYTE, ui16_throttle_accumulated >> 8);
+    addPayload(CODE_THROTTLE, ui16_throttle_accumulated);
+    addPayload(CODE_CURRENT_TARGET_HIGH_BYTE, uint32_current_target >> 8);
+    addPayload(CODE_CURRENT_TARGET, uint32_current_target);
 
-    // one more element left/avail (max18)
+    addPayload(CODE_SETPOINT_STATE, ui8_control_state);
+    ui8_control_state
+    // no more elements left/avail (max18)
 }
 
-void gatherPayload(uint8_t function)
+void gatherDynamicPayload(uint8_t function)
 {
     switch (function)
     {
     case FUN_RUNTIME_INFOS:addRuntimeStateInfos();
         break;
-    case FUN_CONFIG_INFOS:addConfigStateInfos();
-        break;
     case FUN_HALL_INFOS:addHallStateInfos();
+        break;
+    default:
+        addPayload(CODE_ERROR, CODE_ERROR);
+    }
+}
+
+void gatherStaticPayload(uint8_t function)
+{
+    switch (function)
+    {
+    case FUN_CONFIG_INFOS:addConfigStateInfos();
         break;
     default:
         addPayload(CODE_ERROR, CODE_ERROR);
@@ -222,10 +234,18 @@ void processBoMessage()
         {
             uint8_t requestedFunction = ui8_rx_converted_buffer[1];
 
-            if (ui8_rx_converted_buffer[0] == DISPLAY_ADDRESS)
+            if (ui8_rx_converted_buffer[0] == DYNAMIC_DATA_ADDRESS)
             {
-                prepareBasePackage(DISPLAY_ADDRESS, requestedFunction);
-                gatherPayload(requestedFunction);
+                prepareBasePackage(DYNAMIC_DATA_ADDRESS, requestedFunction);
+                gatherDynamicPayload(requestedFunction);
+                addPayload(CODE_LRC_CHECK, calculatedLrc);
+                signPackage();
+                sendPreparedPackage();
+            }
+            else if (ui8_rx_converted_buffer[0] == STATIC_DATA_ADDRESS)
+            {
+                prepareBasePackage(STATIC_DATA_ADDRESS, requestedFunction);
+                gatherStaticPayload(requestedFunction);
                 addPayload(CODE_LRC_CHECK, calculatedLrc);
                 signPackage();
                 sendPreparedPackage();

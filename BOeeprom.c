@@ -26,15 +26,15 @@
 
 void eeprom_init(void)
 {
-    eeprom_magic_byte = eeprom_read(EEPROM_MAX_INIT_RANGE);
+    eeprom_magic_byte = (FLASH_ReadByte(EEPROM_BASE_ADDRESS + EEPROM_MAX_INIT_RANGE));
     if (eeprom_magic_byte != EEPROM_INIT_MAGIC_BYTE)
     {
         // eeprom needs to be reset after flashing
         uint8_t di;
         FLASH_SetProgrammingTime(FLASH_PROGRAMTIME_STANDARD);
         FLASH_Unlock(FLASH_MEMTYPE_DATA);
-        
-        for (di = 0; di < EEPROM_MAX_INIT_RANGE; di++)
+
+        for (di = 1; di < EEPROM_MAX_INIT_RANGE; di++)
         {
             while (!FLASH_GetFlagStatus(FLASH_FLAG_DUL));
             FLASH_ProgramByte(EEPROM_BASE_ADDRESS + di, 0x00);
@@ -46,24 +46,38 @@ void eeprom_init(void)
         while (!FLASH_GetFlagStatus(FLASH_FLAG_EOP));
 
         FLASH_Lock(FLASH_MEMTYPE_DATA);
-        
-        // reread to make sure everything went well
-        eeprom_magic_byte = eeprom_read(EEPROM_MAX_INIT_RANGE);
+
+        // reread to check everything went well
+        eeprom_magic_byte = (FLASH_ReadByte(EEPROM_BASE_ADDRESS + EEPROM_MAX_INIT_RANGE));
     }
-  
+
 }
 
 uint8_t eeprom_read(uint8_t address_offset)
 {
+    // only values between 1 and EEPROM_MAX_INIT_RANGE allowed
+    if ((address_offset<1)||(address_offset > EEPROM_MAX_INIT_RANGE - 1))
+    {
+        return 0;
+    }
+    
     return (FLASH_ReadByte(EEPROM_BASE_ADDRESS + address_offset));
 }
 
-void eeprom_write(uint8_t address_offset, uint8_t value)
+uint8_t eeprom_write(uint8_t address_offset, uint8_t value)
 {
+    // magic byte at EEPROM_MAX_INIT_RANGE, only values between 1 and EEPROM_MAX_INIT_RANGE allowed
+    if ((address_offset<1)||(address_offset > EEPROM_MAX_INIT_RANGE - 1))
+    {
+        return 1;
+    }
+
     FLASH_SetProgrammingTime(FLASH_PROGRAMTIME_STANDARD);
     FLASH_Unlock(FLASH_MEMTYPE_DATA);
     while (!FLASH_GetFlagStatus(FLASH_FLAG_DUL));
     FLASH_ProgramByte(EEPROM_BASE_ADDRESS + address_offset, value);
     while (!FLASH_GetFlagStatus(FLASH_FLAG_EOP));
     FLASH_Lock(FLASH_MEMTYPE_DATA);
+
+    return 0;
 }

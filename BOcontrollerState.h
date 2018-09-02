@@ -21,6 +21,7 @@
 
 #include "config.h"
 
+extern uint8_t ui8_control_state=0; 
 extern uint8_t eeprom_magic_byte;
 extern uint8_t ui8_assistlevel_global;
 extern uint8_t PAS_act;
