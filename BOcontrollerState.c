@@ -51,7 +51,7 @@ uint8_t ui8_hall_order_counter = 5;
 //for internal use only
 uint8_t ui8_offroad_counter = 0; //counter for offroad switching procedure
 
-void controllerstate_init()
+void controllerstate_init(void)
 {
     uint8_t di;
     uint8_t eepromVal;
