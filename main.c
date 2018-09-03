@@ -320,7 +320,7 @@ int main (void)
 
 #ifdef TORQUESENSOR
       ui8_temp = ui8_adc_read_throttle (); //read in recent torque value
-      ui16_torque[ui8_torque_index]= (uint8_t) map (ui8_temp , ADC_THROTTLE_MIN_VALUE, ADC_THROTTLE_MAX_VALUE, 0, SETPOINT_MAX_VALUE); //map throttle to limits
+      ui16_torque[ui8_torque_index]= (uint8_t) map (ui8_temp , ui8_throttle_min_range, ui8_throttle_max_range, 0, SETPOINT_MAX_VALUE); //map throttle to limits
       ui16_sum_torque = 0;
       for(a = 0; a < NUMBER_OF_PAS_MAGS; a++) {			// sum up array content
 	   ui16_sum_torque+= ui16_torque[a];
@@ -353,7 +353,7 @@ int main (void)
 
 	    ui8_temp= ui16_throttle_accumulated>>3; //read in value from adc
 
-	    ui16_sum_torque = (uint8_t) map (ui8_temp , ADC_THROTTLE_MIN_VALUE, ADC_THROTTLE_MAX_VALUE, 0, SETPOINT_MAX_VALUE); //map throttle to limits
+	    ui16_sum_torque = (uint8_t) map (ui8_temp , ui8_throttle_min_range, ui8_throttle_max_range, 0, SETPOINT_MAX_VALUE); //map throttle to limits
 #endif
             
             

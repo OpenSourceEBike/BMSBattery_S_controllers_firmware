@@ -23,6 +23,8 @@
 
 extern uint32_t uint32_icc_signals; // inter component communication, very simplistig way of signalling stuff via a shared var
 
+extern uint8_t ui8_throttle_min_range; 
+extern uint8_t ui8_throttle_max_range; 
 extern uint8_t ui8_control_state; 
 extern uint8_t ui8_assistlevel_global;
 extern uint8_t PAS_act;

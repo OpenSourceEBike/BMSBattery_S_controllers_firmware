@@ -44,6 +44,8 @@ uint16_t ui16_ADC_iq_current = 0;
 uint16_t ui16_ADC_iq_current_filtered = 0;
 uint8_t ui8_control_state = 0;
 uint8_t ui8_speedlimit_kph = 0;
+uint8_t ui8_throttle_min_range=0; 
+uint8_t ui8_throttle_max_range=255; 
 
 uint8_t uint8_t_hall_case[7];
 uint8_t uint8_t_hall_order[6];
@@ -60,12 +62,18 @@ void controllerstate_init(void)
 
     // convert static defines to volatile vars
     ui8_speedlimit_kph = limit;
+    ui8_throttle_min_range = ADC_THROTTLE_MIN_VALUE;
+    ui8_throttle_max_range = ADC_THROTTLE_MAX_VALUE;
 
     // read in overrides from eeprom if they are > 0, assuming 0s are uninitialized
     eepromVal = eeprom_read(OFFSET_MAX_SPEED);
     if (eepromVal > 0) ui8_speedlimit_kph = eepromVal;
     eepromVal = eeprom_read(OFFSET_ASSIST_LEVEL);
     if (eepromVal > 0) ui8_assistlevel_global = eepromVal;
+    eepromVal = eeprom_read(OFFSET_THROTTLE_MIN_RANGE);
+    if (eepromVal > 0) ui8_throttle_min_range = eepromVal;
+    eepromVal = eeprom_read(OFFSET_THROTTLE_MAX_RANGE);
+    if (eepromVal > 0) ui8_throttle_max_range = eepromVal;
 
     for (di = 0; di < 6; di++)
     {

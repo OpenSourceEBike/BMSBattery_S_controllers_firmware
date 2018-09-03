@@ -146,6 +146,9 @@ void addConfigStateInfos(void)
     addPayload(CODE_CURRENT_CAL_B, ui16_current_cal_b);
     addPayload(CODE_EEPROM_MAGIC_BYTE, eeprom_magic_byte);
     addPayload(CODE_MAX_SPEED, ui8_speedlimit_kph);
+    addPayload(CODE_THROTTLE_MIN_RANGE, ui8_throttle_min_range);
+    addPayload(CODE_THROTTLE_MAX_RANGE, ui8_throttle_max_range);
+
 }
 
 void addHallStateInfos(void)
@@ -236,6 +239,20 @@ uint8_t digestConfigRequest(uint8_t configAddress, uint8_t requestedCode, uint8_
             eeprom_write(OFFSET_ASSIST_LEVEL,requestedValue);
         }
         return ui8_assistlevel_global;
+        break;
+    case CODE_THROTTLE_MIN_RANGE:
+        ui8_throttle_min_range = requestedValue;
+        if (configAddress == EEPROM_ADDRESS){
+            eeprom_write(OFFSET_THROTTLE_MIN_RANGE,requestedValue);
+        }
+        return ui8_throttle_min_range;
+        break;
+    case CODE_THROTTLE_MAX_RANGE:
+        ui8_throttle_max_range = requestedValue;
+        if (configAddress == EEPROM_ADDRESS){
+            eeprom_write(OFFSET_THROTTLE_MAX_RANGE,requestedValue);
+        }
+        return ui8_throttle_max_range;
         break;
     default:
         addPayload(CODE_ERROR, CODE_ERROR);

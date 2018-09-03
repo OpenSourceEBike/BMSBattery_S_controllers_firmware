@@ -40,6 +40,7 @@ typedef enum
     CODE_PAS_ACTIVE = ((uint8_t) 0xA2),
     CODE_PAS_DIRECTION = ((uint8_t) 0xA3),
     CODE_OFFROAD = ((uint8_t) 0xA4),
+
     CODE_MOTOR_STATE = ((uint8_t) 0xC0),
     CODE_BATTERY_VOLTAGE = ((uint8_t) 0xC1),
     CODE_ER_SPEED = ((uint8_t) 0xC3),
@@ -62,6 +63,9 @@ typedef enum
     CODE_CURRENT_CAL_B = ((uint8_t) 0x83),
     CODE_EEPROM_MAGIC_BYTE = ((uint8_t) 0x84),
     CODE_MAX_SPEED = ((uint8_t) 0x85),
+
+    CODE_THROTTLE_MIN_RANGE = ((uint8_t) 0x86),
+    CODE_THROTTLE_MAX_RANGE = ((uint8_t) 0x87),
 
     CODE_HALL_ORDER_BASE = ((uint8_t) 0x10),
     CODE_CURRENT_AT_HALL_POSITION_BASE = ((uint8_t) 0x00)

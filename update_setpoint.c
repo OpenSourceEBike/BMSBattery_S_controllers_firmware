@@ -91,7 +91,7 @@ uint16_t update_setpoint (uint16_t speed, uint16_t PAS, uint16_t sumtorque, uint
 #ifdef REGEN
 
   //check if regen is wanted
-  ui8_regen_throttle = map (ui8_adc_read_regen_throttle () , ADC_THROTTLE_MIN_VALUE, ADC_THROTTLE_MAX_VALUE, 0, SETPOINT_MAX_VALUE); //map throttle to limits
+  ui8_regen_throttle = map (ui8_adc_read_regen_throttle () , ui8_throttle_min_range, ui8_throttle_max_range, 0, SETPOINT_MAX_VALUE); //map throttle to limits
     if(ui8_regen_throttle>2){
     float_temp=(float)ui8_regen_throttle*(float)(REGEN_CURRENT_MAX_VALUE-ui16_current_cal_b)/255.0+(float)ui16_current_cal_b;
     ui32_setpoint= PI_control(ui16_BatteryCurrent, (uint16_t) float_temp);
