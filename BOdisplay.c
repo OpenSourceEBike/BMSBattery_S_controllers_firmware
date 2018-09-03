@@ -227,6 +227,7 @@ uint8_t digestConfigRequest(uint8_t configAddress, uint8_t requestedCode, uint8_
         if (configAddress == EEPROM_ADDRESS){
             eeprom_write(OFFSET_MAX_SPEED,requestedValue);
         }
+        setSignal(SIGNAL_SPEEDLIMIT_CHANGED);
         return ui8_speedlimit_kph;
         break;
     case CODE_ASSIST_LEVEL:

@@ -21,6 +21,8 @@
 
 #include "config.h"
 
+extern uint32_t uint32_icc_signals; // inter component communication, very simplistig way of signalling stuff via a shared var
+
 extern uint8_t ui8_control_state; 
 extern uint8_t ui8_assistlevel_global;
 extern uint8_t PAS_act;
@@ -45,9 +47,18 @@ extern uint8_t uint8_t_hall_order[6];
 extern int8_t int8_t_hall_counter;
 extern uint8_t ui8_hall_debug_counter;
 
+void setSignal(uint8_t signal);
+uint8_t readAndClearSignal(uint8_t signal);
 void controllerstate_init (void);
 void updateHallOrder(uint8_t hall_sensors);
 void updateOffroadStatus(void);
+
+typedef enum
+{
+    // values from 0-31 are allowed as signals are stored in a single uint32_t
+    SIGNAL_SPEEDLIMIT_CHANGED = ((uint8_t) 0x00),
+    
+} ICC_SIGNALS;
 
 #endif /* BOCONTROLLERSTATE_H */
 

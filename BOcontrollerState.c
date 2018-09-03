@@ -24,6 +24,8 @@
 #include "BOeeprom.h"
 #include "BOcontrollerState.h"
 
+uint32_t uint32_icc_signals = 0;
+
 uint8_t ui8_assistlevel_global = 3; // for debugging of display communication
 uint8_t PAS_act = 3; //recent PAS direction reading
 uint8_t PAS_dir = 0; //PAS direction flag
@@ -55,7 +57,7 @@ void controllerstate_init(void)
 {
     uint8_t di;
     uint8_t eepromVal;
-    
+
     // convert static defines to volatile vars
     ui8_speedlimit_kph = limit;
 
@@ -69,6 +71,21 @@ void controllerstate_init(void)
     {
         uint8_t_hall_order[di] = 0;
     }
+}
+
+void setSignal(uint8_t signal)
+{
+    uint32_icc_signals |= 1 << signal;
+}
+
+uint8_t readAndClearSignal(uint8_t signal)
+{
+    if ((uint32_icc_signals & (1 << signal)) > 0)
+    {
+        uint32_icc_signals &= ~(1 << signal);
+        return 1;
+    }
+    return 0;
 }
 
 void updateHallOrder(uint8_t hall_sensors)

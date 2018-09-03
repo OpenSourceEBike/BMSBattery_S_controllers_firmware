@@ -60,9 +60,11 @@ void setpoint_init(void)
 uint16_t update_setpoint (uint16_t speed, uint16_t PAS, uint16_t sumtorque, uint16_t setpoint_old)
 {
   
-  ui16_erps_limit_lower=(uint16_t)((float)GEAR_RATIO*(float)ui8_speedlimit_kph*10000.0/((float)wheel_circumference*36.0));
-  ui16_erps_limit_higher=(uint16_t)((float)GEAR_RATIO*(float)(ui8_speedlimit_kph+2)*10000.0/((float)wheel_circumference*36.0));
-    
+  if (readAndClearSignal(SIGNAL_SPEEDLIMIT_CHANGED) == 1){
+      // need to update limits after speed limit change
+      ui16_erps_limit_lower=(uint16_t)((float)GEAR_RATIO*(float)ui8_speedlimit_kph*10000.0/((float)wheel_circumference*36.0));
+      ui16_erps_limit_higher=(uint16_t)((float)GEAR_RATIO*(float)(ui8_speedlimit_kph+2)*10000.0/((float)wheel_circumference*36.0));
+  }
   ui16_BatteryCurrent_accumulated -= ui16_BatteryCurrent_accumulated>>3;
   ui16_BatteryCurrent_accumulated += ui16_adc_read_motor_total_current();
   ui16_BatteryCurrent = ui16_BatteryCurrent_accumulated>>3;
