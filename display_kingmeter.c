@@ -20,6 +20,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 // Includes
 
+#include <stdio.h>
 #include "stm8s.h"
 #include "config.h"
 #include "display_kingmeter.h"
@@ -230,7 +231,7 @@ static void KM_618U_Service(KINGMETER_t* KM_ctx)
 	   for(j =0; j<6; j++)
         	{
         	  KM_ctx->RxBuff[j] = ui8_rx[j];
-        	  //putbyte(ui8_rx[j]);
+        	  //putchar(ui8_rx[j]);
         	}
 	   KM_ctx->RxState = RXSTATE_SENDTXMSG;
 	  }
@@ -270,15 +271,15 @@ static void KM_618U_Service(KINGMETER_t* KM_ctx)
         // Send prepared message
         TxBuff[7] = 0x00;
 
-        putbyte(TxBuff[0]);                           // Send StartCode
+        putchar(TxBuff[0]);                           // Send StartCode
 
         for(i=1; i<7; i++)
         {
-            putbyte(TxBuff[i]);                       // Send TxBuff[1..6]
+            putchar(TxBuff[i]);                       // Send TxBuff[1..6]
             TxBuff[7] ^= TxBuff[i];                   // Calculate XOR CheckSum
         }
 
-        putbyte(TxBuff[7]);                          // Send XOR CheckSum
+        putchar(TxBuff[7]);                          // Send XOR CheckSum
 
     }
 

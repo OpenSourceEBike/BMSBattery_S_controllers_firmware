@@ -106,7 +106,6 @@ clean:
 	@$(ENTF) *.sym
 	@$(ENTF) *.cdb
 	@$(ENTF) *.map
-	@$(ENTF) *.elf
 	@$(ENTF) *.adb 
 	@echo "Done."
 

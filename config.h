@@ -19,7 +19,7 @@
 #define BATTERY_CURRENT_MAX_VALUE 662L
 #define PHASE_CURRENT_MAX_VALUE 532L
 #define REGEN_CURRENT_MAX_VALUE 162L
-#define MOTOR_ROTOR_DELTA_PHASE_ANGLE_RIGHT 197
+#define MOTOR_ROTOR_DELTA_PHASE_ANGLE_RIGHT 195
 #define current_cal_a 10
 #define TEMP_CAL_A 1.6
 #define TEMP_CAL_B -110.4
@@ -37,10 +37,14 @@
 #define GEAR_RATIO 24L
 #define BATTERY_LI_ION_CELLS_NUMBER 13
 #define PAS_THRESHOLD 1.7
-#define THROTTLE
+#define TORQUESENSOR
 #define PWM_CYCLES_SECOND 15625L
+#define DISPLAY_TYPE_KINGMETER_618U (1<<4) // King-Meter 618U protocol (KM5s, EBS-LCD2, J-LCD, SW-LCD)
+#define DISPLAY_TYPE_KINGMETER (DISPLAY_TYPE_KINGMETER_618U|DISPLAY_TYPE_KINGMETER_901U)
+#define DISPLAY_TYPE DISPLAY_TYPE_KINGMETER  // Set your display type here. CHANGES ONLY HERE!
 #define SPEEDSENSOR_EXTERNAL
+#define REGEN_DIGITAL
 #define PAS_DIRECTION 0
-#define EEPROM_INIT_MAGIC_BYTE 171 // makes sure (chance of fail 1/255) eeprom is invalidated after flashing new config
+#define EEPROM_INIT_MAGIC_BYTE 38 // makes sure (chance of fail 1/255) eeprom is invalidated after flashing new config
 
 #endif /* CONFIG_H_ */
