@@ -48,6 +48,18 @@ import java.nio.file.Paths;
 import java.util.Arrays;
 
 public class OSEC extends JFrame {
+	
+	public class FileContainer {
+
+		public FileContainer(File file) {
+			this.file = file;
+		}
+		public File file;
+		@Override
+		public String toString(){
+			return file.getName();
+		}
+	}
 
 	private JPanel contentPane;
 	private JTextField txtPasTimeout;
@@ -116,6 +128,7 @@ public class OSEC extends JFrame {
 	private JRadioButton rdbtnNone;
 	
 	private File settingsDir;
+	private File lastSettingsFile=null;
 
 	/**
 	 * Launch the application.
@@ -215,14 +228,23 @@ public class OSEC extends JFrame {
 		contentPane.add(lblTollesProgramm);
 
 		settingsDir = new File(Paths.get(".").toAbsolutePath().normalize().toString());
-		while (!Arrays.asList(settingsDir.list()).contains("proven settings")) {
+		while (!Arrays.asList(settingsDir.list()).contains("experimental settings")) {
 			settingsDir = settingsDir.getParentFile();
 		}
-		settingsDir = new File(settingsDir.getAbsolutePath() + File.separator + "proven settings");
+		settingsDir = new File(settingsDir.getAbsolutePath() + File.separator + "experimental settings");
 
 		DefaultListModel settingsFilesModel = new DefaultListModel();
 		for (File file : settingsDir.listFiles()) {
-			settingsFilesModel.addElement(file);
+			settingsFilesModel.addElement(new FileContainer(file));
+			
+			if (lastSettingsFile == null){
+				lastSettingsFile=file;
+			}else{
+				if (file.getName().compareTo(lastSettingsFile.getName())>0){
+					lastSettingsFile=file;
+				}
+			}
+			
 		}
 
 		JList settingsList = new JList(settingsFilesModel);
@@ -240,7 +262,7 @@ public class OSEC extends JFrame {
 			public void mouseClicked(MouseEvent e) {
 				try {
 					settingsList.getSelectedValue();
-					loadSettings((File) settingsList.getSelectedValue());
+					loadSettings(((FileContainer) settingsList.getSelectedValue()).file);
 					settingsList.clearSelection();
 				} catch (IOException ex) {
 					Logger.getLogger(OSEC.class.getName()).log(Level.SEVERE, null, ex);
@@ -746,7 +768,7 @@ public class OSEC extends JFrame {
 					//BufferedWriter bw = new BufferedWriter(fw);
 
 					File newFile = new File(settingsDir + File.separator + new SimpleDateFormat("yyyyMMdd-HHmmssz").format(new Date()) + ".ini");
-					settingsFilesModel.add(0, newFile);
+					settingsFilesModel.add(0, new FileContainer(newFile));
 
 					iWriter = new PrintWriter(new BufferedWriter(new FileWriter(newFile)));
 					pWriter = new PrintWriter(new BufferedWriter(new FileWriter("config.h")));
@@ -1008,5 +1030,9 @@ public class OSEC extends JFrame {
 		btnWriteConfiguration.setBounds(600, 495, 320, 58);
 		contentPane.add(btnWriteConfiguration);
 
+		
+		if (lastSettingsFile != null){
+			loadSettings(lastSettingsFile);
+		}
 	}
 }
