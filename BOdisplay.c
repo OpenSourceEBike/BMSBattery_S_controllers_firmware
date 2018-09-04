@@ -141,8 +141,9 @@ void UART2_IRQHandler(void) __interrupt(UART2_IRQHANDLER)
 void addConfigStateInfos(void)
 {
     addPayload(CODE_MOTOR_SPECIFIC_ANGLE, MOTOR_ROTOR_DELTA_PHASE_ANGLE_RIGHT);
-    addPayload(CODE_ERPS_FACTOR, (uint16_t) (((float) wheel_circumference * 36.0) / ((float) GEAR_RATIO)));
+    addPayload(CODE_ERPS_FACTOR, (uint16_t) (((float) wheel_circumference) / ((float) GEAR_RATIO)));
     addPayload(CODE_CURRENT_CAL_A, current_cal_a);
+    addPayload(CODE_CURRENT_CAL_B_HIGH_BYTE, ui16_current_cal_b >> 8);
     addPayload(CODE_CURRENT_CAL_B, ui16_current_cal_b);
     addPayload(CODE_EEPROM_MAGIC_BYTE, eeprom_magic_byte);
     addPayload(CODE_MAX_SPEED, ui8_speedlimit_kph);

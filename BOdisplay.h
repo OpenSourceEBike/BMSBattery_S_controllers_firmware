@@ -60,7 +60,10 @@ typedef enum
     CODE_MOTOR_SPECIFIC_ANGLE = ((uint8_t) 0x80),
     CODE_ERPS_FACTOR = ((uint8_t) 0x81),
     CODE_CURRENT_CAL_A = ((uint8_t) 0x82),
-    CODE_CURRENT_CAL_B = ((uint8_t) 0x83),
+
+    CODE_CURRENT_CAL_B_HIGH_BYTE = ((uint8_t) 0x88),
+    CODE_CURRENT_CAL_B = ((uint8_t) 0x89),
+
     CODE_EEPROM_MAGIC_BYTE = ((uint8_t) 0x84),
     CODE_MAX_SPEED = ((uint8_t) 0x85),
 

@@ -61,7 +61,10 @@ void adc_init (void)
     delay_halfms(200);
     ui16_current_cal_b=ui16_adc_read_motor_total_current ();
     }
-
+  // is there a deeper meaning behind assigning the value 8 times above?
+  // compiler optimization?
+  // i don't dare to cleanup this code until I'm sure its just bad style :)
+  ui16_current_cal_b = 0;
   // read and average a few values of ADC
   for (ui8_i = 0; ui8_i < 16; ui8_i++)
   {
