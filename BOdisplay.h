@@ -70,6 +70,8 @@ typedef enum
     CODE_THROTTLE_MIN_RANGE = ((uint8_t) 0x86),
     CODE_THROTTLE_MAX_RANGE = ((uint8_t) 0x87),
 
+    CODE_RIDE_MODE = ((uint8_t) 0x90),
+
     CODE_HALL_ORDER_BASE = ((uint8_t) 0x10),
     CODE_CURRENT_AT_HALL_POSITION_BASE = ((uint8_t) 0x00)
 } BO_VALUE_CODES;

@@ -31,7 +31,8 @@ typedef enum
     OFFSET_MAX_SPEED = ((uint8_t) 0x02),
     OFFSET_ASSIST_LEVEL = ((uint8_t) 0x03),
     OFFSET_THROTTLE_MIN_RANGE = ((uint8_t) 0x04),
-    OFFSET_THROTTLE_MAX_RANGE = ((uint8_t) 0x05)
+    OFFSET_THROTTLE_MAX_RANGE = ((uint8_t) 0x05),
+    OFFSET_RIDE_MODE = ((uint8_t) 0x06)
 
 } BO_EEPROM_OFFSETS;
 

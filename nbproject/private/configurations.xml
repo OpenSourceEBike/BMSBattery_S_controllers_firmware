@@ -4,6 +4,8 @@
     <df root="." name="0">
       <df name=".settings">
       </df>
+      <df name="experimental settings">
+      </df>
       <df name="proven settings">
       </df>
       <df name="StdPeriphLib">
@@ -90,6 +92,7 @@
           </df>
           <df name="test">
           </df>
+          <in>config.h</in>
         </df>
         <df name="openocd-v0.10.0-scripts">
         </df>

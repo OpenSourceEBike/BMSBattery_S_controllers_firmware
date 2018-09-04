@@ -124,8 +124,8 @@ public class OSEC extends JFrame {
 	private JRadioButton rdbtnThrottle;
 	private JRadioButton rdbtnTorqueSensor;
 	private JRadioButton rdbtnThrottlePas;
-	private JRadioButton rdbtnNone_1;
-	private JRadioButton rdbtnNone;
+	private JRadioButton rdbtnNoRegen;
+	private JRadioButton rdbtnNodisplay;
 	
 	private File settingsDir;
 	private File lastSettingsFile=null;
@@ -196,9 +196,9 @@ public class OSEC extends JFrame {
 		rdbtnLeft.setSelected(Boolean.parseBoolean(in.readLine()));
 		rdbtnRight.setSelected(Boolean.parseBoolean(in.readLine()));
 		rdbtnBluOsecDisplay.setSelected(Boolean.parseBoolean(in.readLine()));
-		rdbtnNone_1.setSelected(Boolean.parseBoolean(in.readLine()));
-		rdbtnNone.setSelected(Boolean.parseBoolean(in.readLine()));
 		
+		rdbtnNodisplay.setSelected(Boolean.parseBoolean(in.readLine()));
+		rdbtnNoRegen.setSelected(Boolean.parseBoolean(in.readLine()));
 		in.close();
 	}
 
@@ -680,11 +680,11 @@ public class OSEC extends JFrame {
 		Regen.add(rdbtnRegenDigital);
 		contentPane.add(rdbtnRegenDigital);
 
-		rdbtnNone_1 = new JRadioButton("None");
-		rdbtnNone_1.setSelected(true);
-		Regen.add(rdbtnNone_1);
-		rdbtnNone_1.setBounds(15, 515, 97, 20);
-		contentPane.add(rdbtnNone_1);
+		rdbtnNoRegen = new JRadioButton("None");
+		rdbtnNoRegen.setSelected(true);
+		Regen.add(rdbtnNoRegen);
+		rdbtnNoRegen.setBounds(15, 515, 97, 20);
+		contentPane.add(rdbtnNoRegen);
 		
 		rdbtnRegen = new JRadioButton("linear");
 		rdbtnRegen.setBounds(15, 535, 97, 23);
@@ -700,11 +700,11 @@ public class OSEC extends JFrame {
 		lblDiplayType.setBounds(382, 490, 86, 20);
 		contentPane.add(lblDiplayType);
 
-		rdbtnNone = new JRadioButton("None");
-		rdbtnNone.setSelected(true);
-		displayButtonGroup.add(rdbtnNone);
-		rdbtnNone.setBounds(382, 515, 131, 20);
-		contentPane.add(rdbtnNone);
+		rdbtnNodisplay = new JRadioButton("None");
+		rdbtnNodisplay.setSelected(true);
+		displayButtonGroup.add(rdbtnNodisplay);
+		rdbtnNodisplay.setBounds(382, 515, 131, 20);
+		contentPane.add(rdbtnNodisplay);
 
 		rdbtnKingmeterJlcd = new JRadioButton("Kingmeter J-LCD *");
 		displayButtonGroup.add(rdbtnKingmeterJlcd);
@@ -999,8 +999,8 @@ public class OSEC extends JFrame {
 					iWriter.println(rdbtnBluOsecDisplay.isSelected());
 					
 					
-					iWriter.println(rdbtnNone.isSelected());
-					iWriter.println(rdbtnNone_1.isSelected());
+					iWriter.println(rdbtnNodisplay.isSelected());
+					iWriter.println(rdbtnNoRegen.isSelected());
 					
 					pWriter.println("#define EEPROM_INIT_MAGIC_BYTE " + (System.currentTimeMillis()%256) +" // makes sure (chance of fail 1/255) eeprom is invalidated after flashing new config");
 

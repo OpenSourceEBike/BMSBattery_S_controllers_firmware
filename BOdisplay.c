@@ -149,6 +149,7 @@ void addConfigStateInfos(void)
     addPayload(CODE_MAX_SPEED, ui8_speedlimit_kph);
     addPayload(CODE_THROTTLE_MIN_RANGE, ui8_throttle_min_range);
     addPayload(CODE_THROTTLE_MAX_RANGE, ui8_throttle_max_range);
+    addPayload(CODE_RIDE_MODE, ui8_ride_mode);
 
 }
 
@@ -254,6 +255,13 @@ uint8_t digestConfigRequest(uint8_t configAddress, uint8_t requestedCode, uint8_
             eeprom_write(OFFSET_THROTTLE_MAX_RANGE,requestedValue);
         }
         return ui8_throttle_max_range;
+        break;
+    case CODE_RIDE_MODE:
+        ui8_ride_mode = requestedValue;
+        if (configAddress == EEPROM_ADDRESS){
+            eeprom_write(OFFSET_RIDE_MODE,requestedValue);
+        }
+        return ui8_ride_mode;
         break;
     default:
         addPayload(CODE_ERROR, CODE_ERROR);

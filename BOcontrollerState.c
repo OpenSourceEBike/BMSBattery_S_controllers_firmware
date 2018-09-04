@@ -46,6 +46,7 @@ uint8_t ui8_control_state = 0;
 uint8_t ui8_speedlimit_kph = 0;
 uint8_t ui8_throttle_min_range=0; 
 uint8_t ui8_throttle_max_range=255; 
+uint8_t ui8_ride_mode=0; 
 
 uint8_t uint8_t_hall_case[7];
 uint8_t uint8_t_hall_order[6];
@@ -64,7 +65,20 @@ void controllerstate_init(void)
     ui8_speedlimit_kph = limit;
     ui8_throttle_min_range = ADC_THROTTLE_MIN_VALUE;
     ui8_throttle_max_range = ADC_THROTTLE_MAX_VALUE;
+#ifdef THROTTLE
+    ui8_ride_mode = RIDE_MODE_THROTTLE;
+#endif       
+#ifdef THROTTLE_AND_PAS
+    ui8_ride_mode = RIDE_MODE_THROTTLE_AND_PAS;
+#endif
+#ifdef TORQUESENSOR
+    ui8_ride_mode = RIDE_MODE_TORQUESENSOR;
+#endif
+#ifdef TORQUE_SIMULATION
+    ui8_ride_mode = RIDE_MODE_TORQUE_SIMULATION;
+#endif
 
+            
     // read in overrides from eeprom if they are > 0, assuming 0s are uninitialized
     eepromVal = eeprom_read(OFFSET_MAX_SPEED);
     if (eepromVal > 0) ui8_speedlimit_kph = eepromVal;
@@ -74,6 +88,8 @@ void controllerstate_init(void)
     if (eepromVal > 0) ui8_throttle_min_range = eepromVal;
     eepromVal = eeprom_read(OFFSET_THROTTLE_MAX_RANGE);
     if (eepromVal > 0) ui8_throttle_max_range = eepromVal;
+    eepromVal = eeprom_read(OFFSET_RIDE_MODE);
+    if (eepromVal > 0) ui8_ride_mode = eepromVal;
 
     for (di = 0; di < 6; di++)
     {
