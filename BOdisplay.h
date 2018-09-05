@@ -44,9 +44,10 @@ typedef enum
     CODE_MOTOR_STATE = ((uint8_t) 0xC0),
     CODE_BATTERY_VOLTAGE = ((uint8_t) 0xC1),
     CODE_ER_SPEED = ((uint8_t) 0xC3),
-    CODE_BATTERY_CURRENT = ((uint8_t) 0xC4),
-    CODE_CORRECTION_VALUE = ((uint8_t) 0xC5),
-    CODE_PHASE_CURRENT = ((uint8_t) 0xC6),
+    CODE_BATTERY_CURRENT_HIGH_BYTE = ((uint8_t) 0xC4),
+    CODE_BATTERY_CURRENT = ((uint8_t) 0xC5),
+    CODE_CORRECTION_VALUE = ((uint8_t) 0xC6),
+    CODE_PHASE_CURRENT = ((uint8_t) 0xC7),
 
     CODE_SUM_TORQUE = ((uint8_t) 0xD0),
     CODE_SETPOINT = ((uint8_t) 0xD1),

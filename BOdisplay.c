@@ -32,7 +32,7 @@
 //:304100305F\r\n 
 //  0 A 0 (as chars)
 uint8_t ui8_rx_buffer[13]; // modbus ascii with max 4 bytes payload (array including padding)
-uint8_t ui8_tx_buffer[41]; // (max 18*8bit key + 18*8bit data points + bounced checksum(+ key) + address + function + checksum) (array excluding padding)
+uint8_t ui8_tx_buffer[45]; // (max 20*8bit key + 20*8bit data points + bounced checksum(+ key) + address + function + checksum) (array excluding padding)
 uint8_t ui8_rx_converted_buffer[5]; // for decoded ascii values
 
 uint8_t ui8_rx_buffer_counter = 0;
@@ -180,6 +180,7 @@ void addRuntimeStateInfos(void)
     addPayload(CODE_MOTOR_STATE, ui8_motor_state);
     addPayload(CODE_BATTERY_VOLTAGE, ui8_BatteryVoltage);
     addPayload(CODE_ER_SPEED, ui16_motor_speed_erps);
+    addPayload(CODE_BATTERY_CURRENT_HIGH_BYTE, ui16_BatteryCurrent>>8);
     addPayload(CODE_BATTERY_CURRENT, ui16_BatteryCurrent);
     addPayload(CODE_CORRECTION_VALUE, ui8_position_correction_value);
     addPayload(CODE_PHASE_CURRENT, ui16_ADC_iq_current >> 2);
@@ -194,7 +195,7 @@ void addRuntimeStateInfos(void)
 
     addPayload(CODE_SETPOINT_STATE, ui8_control_state);
 
-    // no more elements left/avail (max18)
+    // 1 more elements left/avail (max20)
 }
 
 void gatherDynamicPayload(uint8_t function)
