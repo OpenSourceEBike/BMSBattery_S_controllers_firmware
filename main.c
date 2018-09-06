@@ -39,6 +39,7 @@
 uint16_t ui16_log1 = 0;
 uint8_t ui8_slowloop_flag = 0;
 uint8_t ui8_veryslowloop_counter = 0;
+uint8_t ui8_ultraslowloop_counter = 0;
 uint16_t ui16_log2 = 0;
 uint8_t ui8_log = 0;
 uint8_t ui8_i= 0; 				//counter for ... next loop
@@ -376,7 +377,16 @@ int main (void)
 	  /****************************************************************************/
 //very slow loop for communication
       if (ui8_veryslowloop_counter > 5){
+
+          ui8_ultraslowloop_counter++;
 	  ui8_veryslowloop_counter=0;
+          
+          if (ui8_ultraslowloop_counter > 10){
+              ui8_ultraslowloop_counter=0;
+              ui8_uptime ++;
+          }
+          
+          
       //getchar1 ();
 
 #ifdef DIAGNOSTICS

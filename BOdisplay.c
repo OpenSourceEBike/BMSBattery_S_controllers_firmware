@@ -194,8 +194,9 @@ void addRuntimeStateInfos(void)
     addPayload(CODE_CURRENT_TARGET, uint32_current_target);
 
     addPayload(CODE_SETPOINT_STATE, ui8_control_state);
+    addPayload(CODE_UPTIME, ui8_uptime);
 
-    // 1 more elements left/avail (max20)
+    // 0 more elements left/avail (max20)
 }
 
 void gatherDynamicPayload(uint8_t function)

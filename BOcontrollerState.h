@@ -44,6 +44,7 @@ extern uint16_t ui16_ADC_iq_current;
 extern uint16_t ui16_ADC_iq_current_filtered;
 extern uint8_t ui8_speedlimit_kph;
 extern uint8_t ui8_ride_mode;
+extern uint8_t ui8_uptime;
 
 extern uint8_t uint8_t_hall_case[7];
 extern uint8_t uint8_t_hall_order[6];

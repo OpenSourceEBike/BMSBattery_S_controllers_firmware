@@ -19,7 +19,7 @@
 #define BATTERY_CURRENT_MAX_VALUE 662L
 #define PHASE_CURRENT_MAX_VALUE 532L
 #define REGEN_CURRENT_MAX_VALUE 162L
-#define MOTOR_ROTOR_DELTA_PHASE_ANGLE_RIGHT 195
+#define MOTOR_ROTOR_DELTA_PHASE_ANGLE_RIGHT 200
 #define current_cal_a 10
 #define TEMP_CAL_A 1.6
 #define TEMP_CAL_B -110.4
@@ -42,6 +42,6 @@
 #define SPEEDSENSOR_EXTERNAL
 #define PAS_DIRECTION 0
 #define BLUOSEC
-#define EEPROM_INIT_MAGIC_BYTE 80 // makes sure (chance of fail 1/255) eeprom is invalidated after flashing new config
+#define EEPROM_INIT_MAGIC_BYTE 168 // makes sure (chance of fail 1/255) eeprom is invalidated after flashing new config
 
 #endif /* CONFIG_H_ */

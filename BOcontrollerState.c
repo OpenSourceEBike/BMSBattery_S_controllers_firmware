@@ -47,6 +47,7 @@ uint8_t ui8_speedlimit_kph = 0;
 uint8_t ui8_throttle_min_range=0; 
 uint8_t ui8_throttle_max_range=255; 
 uint8_t ui8_ride_mode=0; 
+uint8_t ui8_uptime = 0;
 
 uint8_t uint8_t_hall_case[7];
 uint8_t uint8_t_hall_order[6];
