@@ -144,8 +144,6 @@ int main (void)
   adc_init ();
   PAS_init();
   SPEED_init();
-  aca_setpoint_init();
-  setpoint_init();
   display_init();
 
 //  ITC_SetSoftwarePriority (ITC_IRQ_TIM1_OVF, ITC_PRIORITYLEVEL_2);
