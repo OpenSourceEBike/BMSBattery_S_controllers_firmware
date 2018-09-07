@@ -17,8 +17,8 @@
 #include "config.h"
 #include "display_kingmeter.h"
 #include "adc.h"
-#include "update_setpoint.h"
-#include "BOcontrollerState.h"
+//#include "update_setpoint.h" FIXME, not needed anymore?
+#include "ACAcontrollerState.h"
 
 
 uint8_t ui8_counter = 0;

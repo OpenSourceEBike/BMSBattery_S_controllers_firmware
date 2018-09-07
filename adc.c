@@ -12,9 +12,9 @@
 #include "gpio.h"
 #include "stm8s_adc1.h"
 #include "adc.h"
-#include "update_setpoint.h"
+//#include "update_setpoint.h" // FIXME, not needed any more?
 #include "timers.h"
-#include "BOcontrollerState.h"
+#include "ACAcontrollerState.h"
 
 
 
@@ -22,7 +22,7 @@
 void adc_init (void)
 {
  uint8_t ui8_i;
- uint16_t ui16_counter;
+ //uint16_t ui16_counter;
 
   //init GPIO for the used ADC pins
   GPIO_Init(GPIOB,

@@ -30,8 +30,8 @@ Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301  USA
 #include "adc.h"
 #include "brake.h"
 #include "interrupts.h"
-#include "update_setpoint.h"
-#include "BOcontrollerState.h"
+//#include "update_setpoint.h" // FIXME, not needed any more?
+#include "ACAcontrollerState.h"
 
 display_view_type display_view;
 

@@ -97,12 +97,16 @@
         <df name="openocd-v0.10.0-scripts">
         </df>
       </df>
-      <in>BOcontrollerState.c</in>
-      <in>BOcontrollerState.h</in>
+      <in>ACAcommons.c</in>
+      <in>ACAcommons.h</in>
+      <in>ACAcontrollerState.c</in>
+      <in>ACAcontrollerState.h</in>
+      <in>ACAeeprom.c</in>
+      <in>ACAeeprom.h</in>
+      <in>ACAsetPoint.c</in>
+      <in>ACAsetPoint.h</in>
       <in>BOdisplay.c</in>
       <in>BOdisplay.h</in>
-      <in>BOeeprom.c</in>
-      <in>BOeeprom.h</in>
       <in>PAS.c</in>
       <in>PAS.h</in>
       <in>SPEED.c</in>

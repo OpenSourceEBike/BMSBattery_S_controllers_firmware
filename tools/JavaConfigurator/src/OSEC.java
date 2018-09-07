@@ -121,6 +121,7 @@ public class OSEC extends JFrame {
 	private JRadioButton rdbtnKtlcd;
 	private JRadioButton rdbtnDiganostics;
 	private JRadioButton rdbtnTorquesimulation;
+	private JRadioButton rdbtnACA;
 	private JRadioButton rdbtnThrottle;
 	private JRadioButton rdbtnTorqueSensor;
 	private JRadioButton rdbtnThrottlePas;
@@ -199,6 +200,8 @@ public class OSEC extends JFrame {
 		
 		rdbtnNodisplay.setSelected(Boolean.parseBoolean(in.readLine()));
 		rdbtnNoRegen.setSelected(Boolean.parseBoolean(in.readLine()));
+		
+		rdbtnACA.setSelected(Boolean.parseBoolean(in.readLine()));
 		in.close();
 	}
 
@@ -611,6 +614,11 @@ public class OSEC extends JFrame {
 		rdbtnTorquesimulation.setBounds(136, 575, 134, 20);
 		contentPane.add(rdbtnTorquesimulation);
 
+		rdbtnACA = new JRadioButton("Adaptive !alpha!");
+		rdbtnACA.setSelected(true);
+		Ridingmode.add(rdbtnACA);
+		rdbtnACA.setBounds(136, 595, 134, 20);
+		contentPane.add(rdbtnACA);
 
 		JLabel lblMotorSpeed = new JLabel("Motor Speed");
 		lblMotorSpeed.setFont(new Font("Tahoma", Font.BOLD, 12));
@@ -1001,6 +1009,12 @@ public class OSEC extends JFrame {
 					
 					iWriter.println(rdbtnNodisplay.isSelected());
 					iWriter.println(rdbtnNoRegen.isSelected());
+					
+					if (rdbtnACA.isSelected()) {
+						text_to_save = "#define ACA";
+						pWriter.println(text_to_save);
+					}
+					iWriter.println(rdbtnACA.isSelected());
 					
 					pWriter.println("#define EEPROM_INIT_MAGIC_BYTE " + (System.currentTimeMillis()%256) +" // makes sure (chance of fail 1/255) eeprom is invalidated after flashing new config");
 

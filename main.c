@@ -26,12 +26,13 @@
 #include "PAS.h"
 #include "SPEED.h"
 #include "update_setpoint.h"
+#include "ACAsetPoint.h"
 #include "config.h"
 #include "display.h"
 #include "display_kingmeter.h"
-#include "BOcontrollerState.h"
+#include "ACAcontrollerState.h"
 #include "BOdisplay.h"
-#include "BOeeprom.h"
+#include "ACAeeprom.h"
 
 //uint16_t ui16_LPF_angle_adjust = 0;
 //uint16_t ui16_LPF_angle_adjust_temp = 0;
@@ -143,6 +144,7 @@ int main (void)
   adc_init ();
   PAS_init();
   SPEED_init();
+  aca_setpoint_init();
   setpoint_init();
   display_init();
 
@@ -270,7 +272,7 @@ int main (void)
 #endif
 
 
-#if defined(TORQUESENSOR) || defined(TORQUE_SIMULATION)
+#if defined(TORQUESENSOR) || defined(TORQUE_SIMULATION) || defined(ACA)
     //	Update cadence, torque and battery current after PAS interrupt occurrence
     if (ui8_PAS_Flag == 1)
     {
@@ -348,7 +350,7 @@ int main (void)
 	    ui8_slowloop_flag=0; //reset flag for slow loop
 	    ui8_veryslowloop_counter++; // increase counter for very slow loop
 
-#if defined(THROTTLE)  || defined(THROTTLE_AND_PAS) || defined (TORQUE_SIMULATION) // read in Throttle value an map it to margins
+#if defined(THROTTLE)  || defined(THROTTLE_AND_PAS) || defined (TORQUE_SIMULATION) || defined (ACA)// read in Throttle value an map it to margins
 	    ui16_throttle_accumulated -= ui16_throttle_accumulated>>3;
 	    ui16_throttle_accumulated += ui8_adc_read_throttle ();
 
@@ -359,8 +361,14 @@ int main (void)
             
             
             updateOffroadStatus();
-	      ui16_setpoint = (uint16_t)update_setpoint (ui16_SPEED,ui16_PAS,ui16_sum_torque,ui16_setpoint); //update setpoint
-
+            updateErpsLimits(0);
+            
+#if defined(THROTTLE)  || defined(THROTTLE_AND_PAS) || defined (TORQUE_SIMULATION) || defined (TORQUESENSOR)      
+           ui16_setpoint = (uint16_t)update_setpoint (ui16_SPEED,ui16_PAS,ui16_sum_torque,ui16_setpoint); //update setpoint
+#endif
+#ifdef ACA	   
+            ui16_setpoint = (uint16_t)aca_setpoint(ui16_SPEED,ui16_PAS,ui16_sum_torque,ui16_setpoint); //update setpoint
+#endif
 
 //#define DO_CRUISE_CONTROL 1
 #if DO_CRUISE_CONTROL == 1

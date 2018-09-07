@@ -39,8 +39,10 @@ EXTRASRCS = \
 	$(SDIR)/stm8s_adc1.c \
 	$(SDIR)/stm8s_flash.c \
 	BOdisplay.c \
-	BOcontrollerState.c \
-	BOeeprom.c \
+	ACAcontrollerState.c \
+	ACAeeprom.c \
+	ACAsetPoint.c \
+	ACAcommons.c \
 	gpio.c \
 	utils.c \
 	cruise_control.c \
@@ -56,7 +58,7 @@ EXTRASRCS = \
 	display.c \
 	display_kingmeter.c
 
-HEADERS = BOdisplay.h BOcontrollerState.h BOeeprom.h adc.h  brake.h  cruise_control.h  gpio.h  interrupts.h  main.h  motor.h  pwm.h  timers.h  uart.h  utils.h  PAS.h  SPEED.h  update_setpoint.h
+HEADERS = BOdisplay.h ACAcommons.h ACAsetPoint.h ACAcontrollerState.h ACAeeprom.h adc.h  brake.h  cruise_control.h  gpio.h  interrupts.h  main.h  motor.h  pwm.h  timers.h  uart.h  utils.h  PAS.h  SPEED.h  update_setpoint.h
 
 # The list of .rel files can be derived from the list of their source files
 RELS = $(EXTRASRCS:.c=.rel)

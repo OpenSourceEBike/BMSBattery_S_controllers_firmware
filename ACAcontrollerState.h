@@ -9,15 +9,15 @@
  */
 
 /* 
- * File:   BOcontrollerState.h
+ * File:   ACAcontrollerState.h
  * Author: Björn Schmidt
  *
  * Created on August 30, 2018, 8:03 PM
  */
 
 
-#ifndef BOCONTROLLERSTATE_H
-#define BOCONTROLLERSTATE_H
+#ifndef ACACONTROLLERSTATE_H
+#define ACACONTROLLERSTATE_H
 
 #include "config.h"
 
@@ -43,7 +43,6 @@ extern uint8_t ui8_position_correction_value;
 extern uint16_t ui16_ADC_iq_current;
 extern uint16_t ui16_ADC_iq_current_filtered;
 extern uint8_t ui8_speedlimit_kph;
-extern uint8_t ui8_ride_mode;
 extern uint8_t ui8_uptime;
 
 extern uint8_t uint8_t_hall_case[7];
@@ -51,22 +50,16 @@ extern uint8_t uint8_t_hall_order[6];
 extern int8_t int8_t_hall_counter;
 extern uint8_t ui8_hall_debug_counter;
 
+extern uint16_t ui16_erps_limit_lower;
+extern uint16_t ui16_erps_limit_higher;
+
 void setSignal(uint8_t signal);
 uint8_t readAndClearSignal(uint8_t signal);
 void controllerstate_init(void);
 void updateHallOrder(uint8_t hall_sensors);
 void updateOffroadStatus(void);
+void updateErpsLimits(void);
 
-typedef enum
-{
-    // values from 0-31 are allowed as signals are stored in a single uint32_t
-    RIDE_MODE_THROTTLE = ((uint8_t) 0x00),
-    RIDE_MODE_THROTTLE_AND_PAS = ((uint8_t) 0x01),
-    RIDE_MODE_TORQUESENSOR = ((uint8_t) 0x02),
-    RIDE_MODE_TORQUE_SIMULATION = ((uint8_t) 0x03)
-            
-
-} RIDE_MODES;
 
 typedef enum
 {
