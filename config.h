@@ -42,6 +42,6 @@
 #define PAS_DIRECTION 1
 #define BLUOSEC
 #define ACA
-#define EEPROM_INIT_MAGIC_BYTE 93 // makes sure (chance of fail 1/255) eeprom is invalidated after flashing new config
+#define EEPROM_INIT_MAGIC_BYTE 172 // makes sure (chance of fail 1/255) eeprom is invalidated after flashing new config
 
 #endif /* CONFIG_H_ */
