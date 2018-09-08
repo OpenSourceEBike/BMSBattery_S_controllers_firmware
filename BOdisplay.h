@@ -22,7 +22,8 @@
 
 typedef enum {
 	FUN_ERROR = ((uint8_t) 0x66),
-	FUN_RUNTIME_INFOS = ((uint8_t) 0x41),
+	FUN_DETAIL_INFOS = ((uint8_t) 0x40),
+	FUN_BASIC_INFOS = ((uint8_t) 0x41),
 	FUN_CONFIG_INFOS = ((uint8_t) 0x42),
 	FUN_HALL_INFOS = ((uint8_t) 0x43),
 	FUN_SET_CONFIG = ((uint8_t) 0x44)
@@ -53,6 +54,7 @@ typedef enum {
 	CODE_SUM_TORQUE = ((uint8_t) 0xD0),
 	CODE_SETPOINT = ((uint8_t) 0xD1),
 	CODE_SETPOINT_STATE = ((uint8_t) 0xD2),
+	CODE_PAS_FRACTION = ((uint8_t) 0xD3),
 
 	CODE_THROTTLE_HIGH_BYTE = ((uint8_t) 0xDA),
 	CODE_THROTTLE = ((uint8_t) 0xDB),
@@ -72,13 +74,13 @@ typedef enum {
 	CODE_THROTTLE_MIN_RANGE = ((uint8_t) 0x86),
 	CODE_THROTTLE_MAX_RANGE = ((uint8_t) 0x87),
 
-	
+
 	CODE_PAS_TRESHOLD = ((uint8_t) 0x8A),
 	CODE_PID_GAIN_P = ((uint8_t) 0x8B),
 	CODE_PID_GAIN_I = ((uint8_t) 0x8C),
 	CODE_RAMP_END = ((uint8_t) 0x8D),
 	CODE_PAS_DIRECTION = ((uint8_t) 0x8E),
-			
+
 	CODE_HALL_ORDER_BASE = ((uint8_t) 0x10),
 	CODE_CURRENT_AT_HALL_POSITION_BASE = ((uint8_t) 0x00)
 } BO_VALUE_CODES;

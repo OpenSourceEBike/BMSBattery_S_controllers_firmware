@@ -150,13 +150,13 @@ void updatePasStatus(void) {
 
         ui16_PAS = ui16_PAS_Counter; //save recent cadence
         ui16_PAS_High = ui16_PAS_High_Counter;
+        flt_current_PAS_fraction = (float) ui16_PAS / (float) ui16_PAS_High;
 
-
-        if ((ui8_s_pas_direction == 1) && ((float) ui16_PAS / (float) ui16_PAS_High > flt_s_pas_threshold)) {
+        if ((ui8_s_pas_direction == 1) && (flt_current_PAS_fraction > flt_s_pas_threshold)) {
             if (PAS_act < 7) {
                 PAS_act++;
             }
-        } else if ((ui8_s_pas_direction == 0) && ((float) ui16_PAS / (float) ui16_PAS_High < flt_s_pas_threshold)) {
+        } else if ((ui8_s_pas_direction == 0) && (flt_current_PAS_fraction < flt_s_pas_threshold)) {
             if (PAS_act < 7) {
                 PAS_act++;
             }

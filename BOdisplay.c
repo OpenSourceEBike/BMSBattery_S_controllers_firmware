@@ -122,6 +122,7 @@ void UART2_IRQHandler(void) __interrupt(UART2_IRQHANDLER) {
 
 void addConfigStateInfos(void) {
 
+    // float casts might be costly but they are only requested once every 10 seconds
     addPayload(CODE_ERPS_FACTOR, (uint16_t) (((float) wheel_circumference) / ((float) GEAR_RATIO)));
     addPayload(CODE_CURRENT_CAL_A, current_cal_a);
     addPayload(CODE_CURRENT_CAL_B_HIGH_BYTE, ui16_current_cal_b >> 8);
@@ -137,7 +138,9 @@ void addConfigStateInfos(void) {
     addPayload(CODE_PID_GAIN_P, float2int(flt_s_pid_gain_p, 1.0));
     addPayload(CODE_PID_GAIN_I, float2int(flt_s_pid_gain_i, 1.0));
     addPayload(CODE_RAMP_END, ui16_s_ramp_end >> 4);
-
+    
+    // 5 more elements left/avail (max20)
+    
 }
 
 void addHallStateInfos(void) {
@@ -153,41 +156,48 @@ void addHallStateInfos(void) {
     addPayload(CODE_HALL_ORDER_BASE + 0x03, uint8_t_hall_order[3]);
     addPayload(CODE_HALL_ORDER_BASE + 0x04, uint8_t_hall_order[4]);
     addPayload(CODE_HALL_ORDER_BASE + 0x05, uint8_t_hall_order[5]);
+    
+    // 8 more elements left/avail (max20)
 }
 
-void addRuntimeStateInfos(void) {
-    addPayload(CODE_ASSIST_LEVEL, ui8_assistlevel_global);
-    addPayload(CODE_BRAKE_STATUS, (int) brake_is_set());
+void addDetailStateInfos(void) {
+    addPayload(CODE_OFFROAD, ui8_offroad_state);
     addPayload(CODE_PAS_ACTIVE, PAS_act);
     addPayload(CODE_PAS_DIR, PAS_dir);
-    addPayload(CODE_OFFROAD, ui8_offroad_state);
+    addPayload(CODE_CORRECTION_VALUE, ui8_position_correction_value);
+    addPayload(CODE_PHASE_CURRENT, ui16_ADC_iq_current >> 2);
+    addPayload(CODE_THROTTLE_HIGH_BYTE, ui16_throttle_accumulated >> 8);
+    addPayload(CODE_THROTTLE, ui16_throttle_accumulated);
+    addPayload(CODE_CURRENT_TARGET_HIGH_BYTE, uint32_current_target >> 8);
+    addPayload(CODE_CURRENT_TARGET, uint32_current_target);
+    addPayload(CODE_PAS_FRACTION, float2int(flt_current_PAS_fraction, 4.0)); // cast might be costly, requested every second
+    
+    // 10 more elements left/avail (max20)
+}
 
+void addBasicStateInfos(void) {
+    addPayload(CODE_ASSIST_LEVEL, ui8_assistlevel_global);
+    addPayload(CODE_BRAKE_STATUS, (int) brake_is_set());
     addPayload(CODE_MOTOR_STATE, ui8_motor_state);
     addPayload(CODE_BATTERY_VOLTAGE, ui8_BatteryVoltage);
     addPayload(CODE_ER_SPEED, ui16_motor_speed_erps);
     addPayload(CODE_BATTERY_CURRENT_HIGH_BYTE, ui16_BatteryCurrent >> 8);
     addPayload(CODE_BATTERY_CURRENT, ui16_BatteryCurrent);
-    addPayload(CODE_CORRECTION_VALUE, ui8_position_correction_value);
-    addPayload(CODE_PHASE_CURRENT, ui16_ADC_iq_current >> 2);
-
     addPayload(CODE_SUM_TORQUE, ui16_sum_torque);
     addPayload(CODE_SETPOINT, ui16_setpoint);
-
-    addPayload(CODE_THROTTLE_HIGH_BYTE, ui16_throttle_accumulated >> 8);
-    addPayload(CODE_THROTTLE, ui16_throttle_accumulated);
-    addPayload(CODE_CURRENT_TARGET_HIGH_BYTE, uint32_current_target >> 8);
-    addPayload(CODE_CURRENT_TARGET, uint32_current_target);
-
     addPayload(CODE_SETPOINT_STATE, ui8_control_state);
     addPayload(CODE_UPTIME, ui8_uptime);
 
-    // 0 more elements left/avail (max20)
+    // 9 more elements left/avail (max20)
 }
 
 void gatherDynamicPayload(uint8_t function) {
     switch (function) {
-        case FUN_RUNTIME_INFOS:
-            addRuntimeStateInfos();
+        case FUN_BASIC_INFOS:
+            addBasicStateInfos();
+            break;
+        case FUN_DETAIL_INFOS:
+            addDetailStateInfos();
             break;
         case FUN_HALL_INFOS:
             addHallStateInfos();
