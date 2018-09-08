@@ -23,7 +23,20 @@
 #include "gpio.h"
 #include "ACAeeprom.h"
 #include "ACAcontrollerState.h"
+#include "ACAcommons.h"
 
+// user controllable settings
+uint8_t ui8_throttle_min_range = 32;
+uint8_t ui8_throttle_max_range = 192;
+uint8_t ui8_speedlimit_kph = 25;
+uint8_t ui8_s_pas_direction = 0;
+float flt_s_pas_threshold = 1.7;
+float flt_s_pid_gain_p = 0.5;
+float flt_s_pid_gain_i = 0.2;
+uint16_t ui16_s_ramp_end = 1500;
+uint8_t ui8_s_motor_angle = 214;
+
+// internal
 uint32_t uint32_icc_signals = 0;
 
 uint8_t ui8_assistlevel_global = 3; // for debugging of display communication
@@ -43,9 +56,6 @@ uint8_t ui8_position_correction_value = 127; // in 360/256 degrees
 uint16_t ui16_ADC_iq_current = 0;
 uint16_t ui16_ADC_iq_current_filtered = 0;
 uint8_t ui8_control_state = 0;
-uint8_t ui8_speedlimit_kph = 0;
-uint8_t ui8_throttle_min_range = 0;
-uint8_t ui8_throttle_max_range = 255;
 uint8_t ui8_uptime = 0;
 
 uint8_t uint8_t_hall_case[7];
@@ -58,9 +68,9 @@ uint16_t ui16_erps_limit_higher = 0;
 
 uint32_t ui32_SPEED_km_h; //global variable Speed
 uint32_t ui32_SPEED_km_h_accumulated;
-uint16_t ui16_SPEED = 64000; 		//speed in timetics
-uint16_t ui16_SPEED_Counter = 0; 	//time tics for speed measurement
-uint8_t ui8_SPEED_Flag = 0; 		//flag for SPEED interrupt
+uint16_t ui16_SPEED = 64000; //speed in timetics
+uint16_t ui16_SPEED_Counter = 0; //time tics for speed measurement
+uint8_t ui8_SPEED_Flag = 0; //flag for SPEED interrupt
 uint8_t ui8_offroad_counter = 0; //counter for offroad switching procedure
 
 uint8_t ui8_adc_read_throttle_busy = 0;
@@ -72,6 +82,7 @@ uint16_t ui16_PAS_High_Counter = 1; //time tics for direction detection
 uint16_t ui16_PAS = 32000; //cadence in timetics
 uint16_t ui16_PAS_High = 1; //number of High readings on PAS
 uint8_t PAS_old = 4; //last PAS direction reading
+uint8_t ui8_PAS_Flag = 0;
 
 void controllerstate_init(void) {
     uint8_t di;
@@ -81,7 +92,12 @@ void controllerstate_init(void) {
     ui8_speedlimit_kph = limit;
     ui8_throttle_min_range = ADC_THROTTLE_MIN_VALUE;
     ui8_throttle_max_range = ADC_THROTTLE_MAX_VALUE;
-
+    ui8_s_pas_direction = PAS_DIRECTION;
+    flt_s_pas_threshold = PAS_THRESHOLD;
+    flt_s_pid_gain_p = P_FACTOR;
+    flt_s_pid_gain_i = I_FACTOR;
+    ui16_s_ramp_end = RAMP_END;
+    ui8_s_motor_angle = MOTOR_ROTOR_DELTA_PHASE_ANGLE_RIGHT;
 
     // read in overrides from eeprom if they are > 0, assuming 0s are uninitialized
     eepromVal = eeprom_read(OFFSET_MAX_SPEED);
@@ -92,7 +108,18 @@ void controllerstate_init(void) {
     if (eepromVal > 0) ui8_throttle_min_range = eepromVal;
     eepromVal = eeprom_read(OFFSET_THROTTLE_MAX_RANGE);
     if (eepromVal > 0) ui8_throttle_max_range = eepromVal;
-
+    eepromVal = eeprom_read(OFFSET_PAS_DIRECTION);
+    if (eepromVal > 0) ui8_s_pas_direction = eepromVal;
+    eepromVal = eeprom_read(OFFSET_PAS_TRESHOLD);
+    if (eepromVal > 0) flt_s_pas_threshold = int2float(eepromVal, 4.0);
+    eepromVal = eeprom_read(OFFSET_PID_GAIN_P);
+    if (eepromVal > 0) flt_s_pid_gain_p = int2float(eepromVal, 1.0);
+    eepromVal = eeprom_read(OFFSET_PID_GAIN_I);
+    if (eepromVal > 0) flt_s_pid_gain_i = int2float(eepromVal, 1.0);
+    eepromVal = eeprom_read(OFFSET_RAMP_END);
+    if (eepromVal > 0) ui16_s_ramp_end = eepromVal << 4;
+    eepromVal = eeprom_read(OFFSET_MOTOR_ANGLE);
+    if (eepromVal > 0) ui8_s_motor_angle = eepromVal;
 
     for (di = 0; di < 6; di++) {
         uint8_t_hall_order[di] = 0;

@@ -28,10 +28,10 @@
 uint32_t PI_control(uint16_t pv, uint16_t setpoint) {
     float float_p;
     static float float_i;
-    float_p = ((float) setpoint - (float) pv) * P_FACTOR;
+    float_p = ((float) setpoint - (float) pv) * flt_s_pid_gain_p;
     if (float_p > 3)float_p = 3;
     if (float_p<-3)float_p = -3;
-    float_i += ((float) setpoint - (float) pv) * I_FACTOR;
+    float_i += ((float) setpoint - (float) pv) * flt_s_pid_gain_i;
     if (float_i > 255)float_i = 255;
     if (float_i < 0)float_i = 0;
 
@@ -113,6 +113,20 @@ void updateHallOrder(uint8_t hall_sensors) {
     uint8_t_hall_order[ui8_hall_order_counter] = hall_sensors;
 }
 
+uint8_t float2int(float in, float maxRange) {
+    uint16_t result;
+    if (in < 0.0)
+        return 0;
+    result = (uint16_t) (in * (float) ((float) 256 / (float) maxRange));
+    if (result > 255)
+        result = 255;
+    return (result);
+}
+
+float int2float(uint8_t in, float maxRange) {
+    return ((float) in / (float) ((float) 256 / (float) maxRange));
+}
+
 int32_t map(int32_t x, int32_t in_min, int32_t in_max, int32_t out_min, int32_t out_max) {
     // if input is smaller/bigger than expected return the min/max out ranges value
     if (x < in_min)
@@ -133,26 +147,16 @@ void updatePasStatus(void) {
     //	Update cadence, torque and battery current after PAS interrupt occurrence
     if (ui8_PAS_Flag == 1) {
         ui8_PAS_Flag = 0; //reset interrupt flag
-        
+
         ui16_PAS = ui16_PAS_Counter; //save recent cadence
         ui16_PAS_High = ui16_PAS_High_Counter;
 
-#if (PAS_DIRECTION)
-        if ((float) ui16_PAS / (float) ui16_PAS_High > PAS_THRESHOLD) {
+
+        if ((ui8_s_pas_direction == 1) && ((float) ui16_PAS / (float) ui16_PAS_High > flt_s_pas_threshold)) {
             if (PAS_act < 7) {
                 PAS_act++;
             }
-        } else {
-            if (PAS_act > 0) {
-                PAS_act--;
-            }
-
-        }
-
-#endif
-
-#if (!PAS_DIRECTION)
-        if ((float) ui16_PAS / (float) ui16_PAS_High < PAS_THRESHOLD) {
+        } else if ((ui8_s_pas_direction == 0) && ((float) ui16_PAS / (float) ui16_PAS_High < flt_s_pas_threshold)) {
             if (PAS_act < 7) {
                 PAS_act++;
             }
@@ -161,7 +165,6 @@ void updatePasStatus(void) {
                 PAS_act--;
             }
         }
-#endif
 
 #ifdef TORQUESENSOR
         if (ui16_PAS < timeout) {
@@ -172,7 +175,7 @@ void updatePasStatus(void) {
             PAS_dir = 1;
         }//set direction only if enough pulses in the right direction are detected.
 #endif
-else {
+        else {
             PAS_dir = 0;
         }
 

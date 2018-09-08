@@ -22,7 +22,10 @@
 
 uint32_t PI_control(uint16_t ist, uint16_t soll);
 uint32_t CheckSpeed(uint16_t current_target, uint16_t speed, uint16_t softLimit, uint16_t hardLimit);
-int32_t map (int32_t x, int32_t in_min, int32_t in_max, int32_t out_min, int32_t out_max);
+int32_t map(int32_t x, int32_t in_min, int32_t in_max, int32_t out_min, int32_t out_max);
+
+uint8_t float2int(float in, float maxRange);
+float int2float(uint8_t in, float maxRange);
 
 void setSignal(uint8_t signal);
 uint8_t readAndClearSignal(uint8_t signal);

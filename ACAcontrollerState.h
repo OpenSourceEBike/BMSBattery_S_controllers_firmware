@@ -74,6 +74,14 @@ extern uint16_t ui16_PAS_High_Counter; //Flag for PAS Interrupt detected
 extern uint8_t ui8_PAS_Flag; //flag for PAS interrupt
 extern uint8_t PAS_old;
 
+extern uint8_t ui8_s_pas_direction;
+extern float flt_s_pas_threshold;
+extern float flt_s_pid_gain_p;
+extern float flt_s_pid_gain_i;
+extern uint16_t ui16_s_ramp_end;
+extern uint8_t ui8_s_motor_angle;
+
+
 void controllerstate_init(void);
 
 typedef enum {

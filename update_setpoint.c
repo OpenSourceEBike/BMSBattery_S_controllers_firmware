@@ -206,10 +206,10 @@ uint16_t update_setpoint (uint16_t speed, uint16_t PAS, uint16_t sumtorque, uint
   ui16_PAS_accumulated-=ui16_PAS_accumulated>>3;
   ui16_PAS_accumulated+=PAS;
   PAS=ui16_PAS_accumulated>>3;
-  if (PAS>RAMP_END) //if you are pedaling slower than defined ramp end, current is proportional to cadence
+  if (PAS>ui16_s_ramp_end) //if you are pedaling slower than defined ramp end, current is proportional to cadence
     {
       uint32_current_target= (i16_assistlevel[ui8_assistlevel_global-1]*(BATTERY_CURRENT_MAX_VALUE-ui16_current_cal_b)/100);
-      float_temp=((float)RAMP_END)/((float)PAS);
+      float_temp=((float)ui16_s_ramp_end)/((float)PAS);
 
       uint32_current_target= ((int16_t)(uint32_current_target)*(int16_t)(float_temp*100))/100+ui16_current_cal_b;
       //printf("PAS %d, delta %d, current target %d\r\n", PAS, (int16_t)(float_temp*100), (int16_t) uint32_current_target);
