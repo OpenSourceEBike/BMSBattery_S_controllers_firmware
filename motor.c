@@ -19,7 +19,7 @@
 #include "adc.h"
 //#include "update_setpoint.h" FIXME, not needed anymore?
 #include "ACAcontrollerState.h"
-
+#include "ACAcommons.h"
 
 uint8_t ui8_counter = 0;
 uint8_t ui8_half_rotation_flag = 0;

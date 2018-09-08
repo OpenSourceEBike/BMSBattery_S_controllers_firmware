@@ -26,7 +26,6 @@ Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301  USA
 #include "config.h"
 #include "stm8s_itc.h"
 #include "uart.h"
-#include "utils.h"
 #include "adc.h"
 #include "brake.h"
 #include "interrupts.h"

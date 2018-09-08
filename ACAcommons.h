@@ -22,6 +22,15 @@
 
 uint32_t PI_control(uint16_t ist, uint16_t soll);
 uint32_t CheckSpeed(uint16_t current_target, uint16_t speed, uint16_t softLimit, uint16_t hardLimit);
+int32_t map (int32_t x, int32_t in_min, int32_t in_max, int32_t out_min, int32_t out_max);
+
+void setSignal(uint8_t signal);
+uint8_t readAndClearSignal(uint8_t signal);
+void updateHallOrder(uint8_t hall_sensors);
+void updateOffroadStatus(void);
+void updateErpsLimits(uint8_t force);
+void updateSpeeds(void);
+void updatePasStatus(void);
 
 #endif /* ACACOMMONS_H */
 

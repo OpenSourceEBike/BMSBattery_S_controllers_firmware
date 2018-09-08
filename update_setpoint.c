@@ -23,15 +23,12 @@
 #include "adc.h"
 #include "update_setpoint.h"
 #include "config.h"
-#include "utils.h"
 #include "brake.h"
 #include "ACAcontrollerState.h"
 #include "ACAcommons.h"
 
 
 static uint32_t ui32_setpoint; // local version of setpoint
-uint32_t ui32_SPEED_km_h; //global variable Speed
-static uint32_t ui32_SPEED_km_h_accumulated;
 int16_t i16_assistlevel[5]={LEVEL_1, LEVEL_2, LEVEL_3, LEVEL_4, LEVEL_5}; // difference between setpoint and actual value
 float float_temp=0; //for float calculations
 int8_t uint_PWM_Enable=0; //flag for PWM state
@@ -44,8 +41,6 @@ static uint16_t ui16_PAS_accumulated = 64000L; // for filtering of PAS value
 static uint32_t ui32_erps_accumulated; //for filtering of erps
 uint32_t ui32_erps_filtered; //filtered value of erps
 uint32_t ui32_temp;
-//uint16_t ui16_erps_limit_lower=((ui8_speedlimit_kph)*(GEAR_RATIO/wheel_circumference));
-//uint16_t ui16_erps_limit_higher=((ui8_speedlimit_kph+2)*(GEAR_RATIO/wheel_circumference));
 
 uint16_t ui16_erps_max=PWM_CYCLES_SECOND/30; //limit erps to have minimum 30 points on the sine curve for proper commutation
 
@@ -65,16 +60,6 @@ uint16_t update_setpoint (uint16_t speed, uint16_t PAS, uint16_t sumtorque, uint
   ui32_erps_accumulated-=ui32_erps_accumulated>>3;
   ui32_erps_accumulated+=ui16_motor_speed_erps;
   ui32_erps_filtered=ui32_erps_accumulated>>3;
-
-
-  if(ui8_SPEED_Tag){
-    ui32_SPEED_km_h_accumulated-=ui32_SPEED_km_h_accumulated>>2;
-    ui32_SPEED_km_h_accumulated+=(wheel_circumference*PWM_CYCLES_SECOND*36L)/(10L*(uint32_t)speed); // speed km/h*1000 from external sensor
-    ui32_SPEED_km_h=ui32_SPEED_km_h_accumulated>>2;			//calculate speed in m/h conversion fr	om sec to hour --> *3600, conversion from mm to km --> /1000000, tic frequency 15625 Hz
-    ui8_SPEED_Tag=0;
-    }
-  if(ui16_SPEED_Counter>40000){ui32_SPEED_km_h=0;}     //if wheel isn't turning, reset speed
-
 
 #ifdef REGEN
 

@@ -49,22 +49,36 @@ extern uint8_t uint8_t_hall_case[7];
 extern uint8_t uint8_t_hall_order[6];
 extern int8_t int8_t_hall_counter;
 extern uint8_t ui8_hall_debug_counter;
+extern uint8_t ui8_hall_order_counter;
 
 extern uint16_t ui16_erps_limit_lower;
 extern uint16_t ui16_erps_limit_higher;
 
-void setSignal(uint8_t signal);
-uint8_t readAndClearSignal(uint8_t signal);
+extern uint32_t ui32_SPEED_km_h; //global variable Speed
+extern uint32_t ui32_SPEED_km_h_accumulated;
+
+extern uint16_t ui16_SPEED_Counter; //Counter for bike speed
+extern uint8_t ui8_SPEED_Flag; //Flag for PAS Interrupt detected
+extern uint16_t ui16_SPEED; //Speed duration of one wheel revolution (tics * 64us)
+extern uint8_t ui8_offroad_counter;
+
+extern uint8_t ui8_adc_read_throttle_busy;
+
+extern uint16_t ui16_torque[NUMBER_OF_PAS_MAGS];
+extern uint8_t ui8_torque_index;
+
+extern uint16_t ui16_PAS;
+extern uint16_t ui16_PAS_High;
+extern uint16_t ui16_PAS_Counter; //Counter for cadence
+extern uint16_t ui16_PAS_High_Counter; //Flag for PAS Interrupt detected
+extern uint8_t ui8_PAS_Flag; //flag for PAS interrupt
+extern uint8_t PAS_old;
+
 void controllerstate_init(void);
-void updateHallOrder(uint8_t hall_sensors);
-void updateOffroadStatus(void);
-void updateErpsLimits(void);
 
-
-typedef enum
-{
-    // values from 0-31 are allowed as signals are stored in a single uint32_t
-    SIGNAL_SPEEDLIMIT_CHANGED = ((uint8_t) 0x00),
+typedef enum {
+	// values from 0-31 are allowed as signals are stored in a single uint32_t
+	SIGNAL_SPEEDLIMIT_CHANGED = ((uint8_t) 0x00),
 
 } ICC_SIGNALS;
 

@@ -25,6 +25,7 @@
 #include "ACAeeprom.h"
 #include "brake.h" // ugly crossrefernce for brake_is_set(), FIXME
 #include "ACAcontrollerState.h"
+#include "ACAcommons.h"
 
 #ifdef BLUOSEC
 
