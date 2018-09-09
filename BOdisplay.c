@@ -138,9 +138,9 @@ void addConfigStateInfos(void) {
     addPayload(CODE_PID_GAIN_P, float2int(flt_s_pid_gain_p, 1.0));
     addPayload(CODE_PID_GAIN_I, float2int(flt_s_pid_gain_i, 1.0));
     addPayload(CODE_RAMP_END, ui16_s_ramp_end >> 4);
-    
+
     // 5 more elements left/avail (max20)
-    
+
 }
 
 void addHallStateInfos(void) {
@@ -156,7 +156,7 @@ void addHallStateInfos(void) {
     addPayload(CODE_HALL_ORDER_BASE + 0x03, uint8_t_hall_order[3]);
     addPayload(CODE_HALL_ORDER_BASE + 0x04, uint8_t_hall_order[4]);
     addPayload(CODE_HALL_ORDER_BASE + 0x05, uint8_t_hall_order[5]);
-    
+
     // 8 more elements left/avail (max20)
 }
 
@@ -170,14 +170,15 @@ void addDetailStateInfos(void) {
     addPayload(CODE_THROTTLE, ui16_throttle_accumulated);
     addPayload(CODE_CURRENT_TARGET_HIGH_BYTE, uint32_current_target >> 8);
     addPayload(CODE_CURRENT_TARGET, uint32_current_target);
-    addPayload(CODE_CURRENT_RAMP,ui16_PAS_accumulated>>7);// 4 for display, 3 cause it's used via <<3 to compare with ramp end
+    addPayload(CODE_CURRENT_RAMP_HIGH_BYTE, ui16_PAS_smoothed >> 8);
+    addPayload(CODE_CURRENT_RAMP, ui16_PAS_smoothed);
     addPayload(CODE_PAS_HIGH_COUNTER_HIGH_BYTE, ui16_PAS_High >> 8);
     addPayload(CODE_PAS_HIGH_COUNTER, ui16_PAS_High);
     addPayload(CODE_PAS_COUNTER_HIGH_BYTE, ui16_PAS >> 8);
     addPayload(CODE_PAS_COUNTER, ui16_PAS);
-    
-   
-    
+
+
+
     // 6 more elements left/avail (max20)
 }
 

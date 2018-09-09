@@ -37,6 +37,7 @@ uint16_t ui16_BatteryVoltage_accumulated;
 uint8_t ui8_regen_throttle; //regen throttle read from ADC X4
 int8_t i8_motor_temperature; //temperature read from ADC X4
 uint8_t ui8_regen_flag=0; //regen flag for shifting from +90° to -90°
+static uint16_t ui16_PAS_accumulated = 64000L; // for filtering of PAS value // why start at 64000?
 static uint32_t ui32_erps_accumulated; //for filtering of erps
 uint32_t ui32_erps_filtered; //filtered value of erps
 uint32_t ui32_temp;
@@ -150,10 +151,10 @@ uint16_t update_setpoint (uint16_t speed, uint16_t PAS, uint16_t sumtorque, uint
 #ifdef TORQUESENSOR
       ui16_PAS_accumulated-=ui16_PAS_accumulated>>3;
       ui16_PAS_accumulated+=PAS;
-      PAS=ui16_PAS_accumulated>>3;
-      //uint32_current_target=((i16_assistlevel[ui8_assistlevel_global-1]*fummelfaktor*sumtorque))/(((uint32_t)PAS)<<6)+ui16_current_cal_b; 						//calculate setpoint
-      uint32_current_target=(((i16_assistlevel[ui8_assistlevel_global-1]*fummelfaktor*sumtorque))/(((uint32_t)PAS)<<6)*(1000+ui32_SPEED_km_h/ui8_speedlimit_kph))/1000+ui16_current_cal_b;
-      //printf("vor: spd %d, pas %d, sumtor %d, setpoint %lu\n", speed, PAS, sumtorque, ui32_setpoint);
+      ui16_PAS_smoothed=ui16_PAS_accumulated>>3;
+      //uint32_current_target=((i16_assistlevel[ui8_assistlevel_global-1]*fummelfaktor*sumtorque))/(((uint32_t)ui16_PAS_smoothed)<<6)+ui16_current_cal_b; 						//calculate setpoint
+      uint32_current_target=(((i16_assistlevel[ui8_assistlevel_global-1]*fummelfaktor*sumtorque))/(((uint32_t)ui16_PAS_smoothed)<<6)*(1000+ui32_SPEED_km_h/ui8_speedlimit_kph))/1000+ui16_current_cal_b;
+      //printf("vor: spd %d, pas %d, sumtor %d, setpoint %lu\n", speed, ui16_PAS_smoothed, sumtorque, ui32_setpoint);
       if (uint32_current_target>BATTERY_CURRENT_MAX_VALUE){
 	  //printf("Current target %lu\r\n", uint32_current_target);
 	  uint32_current_target=BATTERY_CURRENT_MAX_VALUE;
@@ -170,7 +171,7 @@ uint16_t update_setpoint (uint16_t speed, uint16_t PAS, uint16_t sumtorque, uint
       if (ui32_setpoint<5)ui32_setpoint=0;
       if (ui32_setpoint>255)ui32_setpoint=255;
       //printf("T, %lu, %d, %d, %d\r\n", ui32_setpoint, sumtorque, ui16_BatteryCurrent, (uint16_t) uint32_current_target);
-      //printf("%lu, %d, %d, %d\r\n", ui32_setpoint, PAS>>3, ui16_BatteryCurrent, (uint16_t) uint32_current_target);
+      //printf("%lu, %d, %d, %d\r\n", ui32_setpoint, ui16_PAS_smoothed>>3, ui16_BatteryCurrent, (uint16_t) uint32_current_target);
 
 #endif
 
@@ -204,14 +205,14 @@ uint16_t update_setpoint (uint16_t speed, uint16_t PAS, uint16_t sumtorque, uint
 #ifdef TORQUE_SIMULATION
   ui16_PAS_accumulated-=ui16_PAS_accumulated>>3;
   ui16_PAS_accumulated+=PAS;
-  PAS=ui16_PAS_accumulated>>3;
-  if (PAS>ui16_s_ramp_end) //if you are pedaling slower than defined ramp end, current is proportional to cadence
+  ui16_PAS_smoothed=ui16_PAS_accumulated>>3;
+  if (ui16_PAS_smoothed>ui16_s_ramp_end) //if you are pedaling slower than defined ramp end, current is proportional to cadence
     {
       uint32_current_target= (i16_assistlevel[ui8_assistlevel_global-1]*(BATTERY_CURRENT_MAX_VALUE-ui16_current_cal_b)/100);
-      float_temp=((float)ui16_s_ramp_end)/((float)PAS);
+      float_temp=((float)ui16_s_ramp_end)/((float)ui16_PAS_smoothed);
 
       uint32_current_target= ((int16_t)(uint32_current_target)*(int16_t)(float_temp*100))/100+ui16_current_cal_b;
-      //printf("PAS %d, delta %d, current target %d\r\n", PAS, (int16_t)(float_temp*100), (int16_t) uint32_current_target);
+      //printf("ui16_PAS_smoothed %d, delta %d, current target %d\r\n", ui16_PAS_smoothed, (int16_t)(float_temp*100), (int16_t) uint32_current_target);
     }
   else
     {

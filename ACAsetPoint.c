@@ -36,7 +36,7 @@ static int16_t i16_assistlevel[5] = {LEVEL_1, LEVEL_2, LEVEL_3, LEVEL_4, LEVEL_5
 static int8_t uint_PWM_Enable = 0; //flag for PWM state
 static uint16_t ui16_BatteryCurrent_accumulated = 2496L; //8x current offset, for filtering or Battery Current
 static uint16_t ui16_BatteryVoltage_accumulated;
-
+static uint16_t ui16_PAS_accumulated = 64000L; // for filtering of PAS value // why start at 64000?
 static uint32_t ui32_erps_accumulated; //for filtering of erps
 static uint32_t ui32_erps_filtered; //filtered value of erps
 
@@ -61,7 +61,7 @@ uint16_t aca_setpoint(uint16_t speed, uint16_t ui16_currentCadenceUnfiltered, ui
     
     ui16_PAS_accumulated -= ui16_PAS_accumulated >> 3;
     ui16_PAS_accumulated += ui16_currentCadenceUnfiltered;
-    ui16_currentCadenceUnfiltered = ui16_PAS_accumulated >> 3; // now it's filtered
+    ui16_PAS_smoothed = ui16_PAS_accumulated >> 3; // now it's filtered
 
     //check for undervoltage
     if (ui8_BatteryVoltage < BATTERY_VOLTAGE_MIN_VALUE) {
@@ -95,7 +95,8 @@ uint16_t aca_setpoint(uint16_t speed, uint16_t ui16_currentCadenceUnfiltered, ui
         }
         ui8_control_state = 4;
 
-    } else if ((ui16_PAS_Counter > timeout || !PAS_dir)&&!(ui8_offroad_state == 5 && sumtorque > 2)) {
+    } else if ((ui16_PAS_Counter > timeout || !PAS_dir)
+            &&!(ui8_offroad_state >= 0 && sumtorque > 2)) { //FIXME just for testing == 5 for ui8_offroad_state
         //check if pedals are turning with throttle active in offroad mode
         ui32_setpoint = PI_control(ui16_BatteryCurrent, ui16_current_cal_b); //Curret target = 0 A, this is to keep the integral part of the PI-control up to date
         if (ui32_setpoint < 5) {
@@ -109,10 +110,10 @@ uint16_t aca_setpoint(uint16_t speed, uint16_t ui16_currentCadenceUnfiltered, ui
 
         //if none of the overruling boundaries are concerned, calculate new setpoint
         
-        if (ui16_currentCadenceUnfiltered > ui16_s_ramp_end) //if you are pedaling slower than defined ramp end, current is proportional to cadence
+        if (ui16_PAS_smoothed > ui16_s_ramp_end) //if you are pedaling slower than defined ramp end, current is proportional to cadence
         {
             uint32_current_target = (i16_assistlevel[ui8_assistlevel_global - 1]*(BATTERY_CURRENT_MAX_VALUE - ui16_current_cal_b) / 100);
-            float_temp = ((float) ui16_s_ramp_end) / ((float) ui16_currentCadenceUnfiltered);
+            float_temp = ((float) ui16_s_ramp_end) / ((float) ui16_PAS_smoothed);
 
             uint32_current_target = ((int16_t) (uint32_current_target)*(int16_t) (float_temp * 100)) / 100 + ui16_current_cal_b;
             

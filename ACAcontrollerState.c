@@ -77,7 +77,7 @@ uint8_t ui8_adc_read_throttle_busy = 0;
 uint16_t ui16_torque[NUMBER_OF_PAS_MAGS]; //array for torque values of one crank revolution
 uint8_t ui8_torque_index = 0; //counter for torque array
 
-uint16_t ui16_PAS_accumulated = 64000L; // for filtering of PAS value // why start at 64000?
+uint16_t ui16_PAS_smoothed = 0;
 uint16_t ui16_PAS_Counter = 0; //time tics for cadence measurement
 uint16_t ui16_PAS_High_Counter = 1; //time tics for direction detection
 uint16_t ui16_PAS = 32000; //cadence in timetics

@@ -67,7 +67,7 @@ extern uint8_t ui8_adc_read_throttle_busy;
 extern uint16_t ui16_torque[NUMBER_OF_PAS_MAGS];
 extern uint8_t ui8_torque_index;
 
-extern uint16_t ui16_PAS_accumulated; // for filtering of PAS value
+extern uint16_t ui16_PAS_smoothed; // for filtering of PAS value
 extern float flt_current_PAS_fraction;
 extern uint16_t ui16_PAS;
 extern uint16_t ui16_PAS_High;
