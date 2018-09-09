@@ -170,9 +170,15 @@ void addDetailStateInfos(void) {
     addPayload(CODE_THROTTLE, ui16_throttle_accumulated);
     addPayload(CODE_CURRENT_TARGET_HIGH_BYTE, uint32_current_target >> 8);
     addPayload(CODE_CURRENT_TARGET, uint32_current_target);
-    addPayload(CODE_PAS_FRACTION, float2int(flt_current_PAS_fraction, 4.0)); // cast might be costly, requested every second
+    addPayload(CODE_CURRENT_RAMP,ui16_PAS_accumulated>>7);// 4 for display, 3 cause it's used via <<3 to compare with ramp end
+    addPayload(CODE_PAS_HIGH_COUNTER_HIGH_BYTE, ui16_PAS_High >> 8);
+    addPayload(CODE_PAS_HIGH_COUNTER, ui16_PAS_High);
+    addPayload(CODE_PAS_COUNTER_HIGH_BYTE, ui16_PAS >> 8);
+    addPayload(CODE_PAS_COUNTER, ui16_PAS);
     
-    // 10 more elements left/avail (max20)
+   
+    
+    // 6 more elements left/avail (max20)
 }
 
 void addBasicStateInfos(void) {
@@ -329,7 +335,7 @@ void processBoMessage() {
                 signPackage();
                 sendPreparedPackage();
             } else if ((ui8_rx_converted_buffer[0] == CONFIG_ADDRESS) || (ui8_rx_converted_buffer[0] == EEPROM_ADDRESS)) {
-                prepareBasePackage(CONFIG_ADDRESS, requestedFunction);
+                prepareBasePackage(ui8_rx_converted_buffer[0], requestedFunction);
                 addPayload(requestedCode, digestConfigRequest(ui8_rx_converted_buffer[0], requestedCode, requestedValue));
                 addPayload(CODE_LRC_CHECK, calculatedLrc);
                 signPackage();

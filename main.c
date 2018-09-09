@@ -195,6 +195,7 @@ int main(void) {
 
         if (ui8_slowloop_flag) {
             //printf("MainSlowLoop\n");
+
             ui8_slowloop_flag = 0; //reset flag for slow loop
             ui8_veryslowloop_counter++; // increase counter for very slow loop
 
@@ -207,7 +208,7 @@ int main(void) {
             ui16_sum_torque = (uint8_t) map(ui8_temp, ui8_throttle_min_range, ui8_throttle_max_range, 0, SETPOINT_MAX_VALUE); //map throttle to limits
 #endif
 
-
+            checkPasInActivity();
             updateOffroadStatus();
             updateErpsLimits(0);
 

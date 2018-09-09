@@ -137,8 +137,6 @@
       <in>uart.h</in>
       <in>update_setpoint.c</in>
       <in>update_setpoint.h</in>
-      <in>utils.c</in>
-      <in>utils.h</in>
     </df>
   </logicalFolder>
   <projectmakefile></projectmakefile>

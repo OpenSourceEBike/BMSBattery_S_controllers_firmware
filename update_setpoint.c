@@ -37,7 +37,6 @@ uint16_t ui16_BatteryVoltage_accumulated;
 uint8_t ui8_regen_throttle; //regen throttle read from ADC X4
 int8_t i8_motor_temperature; //temperature read from ADC X4
 uint8_t ui8_regen_flag=0; //regen flag for shifting from +90° to -90°
-static uint16_t ui16_PAS_accumulated = 64000L; // for filtering of PAS value
 static uint32_t ui32_erps_accumulated; //for filtering of erps
 uint32_t ui32_erps_filtered; //filtered value of erps
 uint32_t ui32_temp;

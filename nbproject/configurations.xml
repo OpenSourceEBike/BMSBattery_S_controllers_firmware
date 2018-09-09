@@ -99,8 +99,6 @@
       <in>uart.h</in>
       <in>update_setpoint.c</in>
       <in>update_setpoint.h</in>
-      <in>utils.c</in>
-      <in>utils.h</in>
     </df>
     <logicalFolder name="StdPeriphLib"
                    displayName="StdPeriphLib"
@@ -323,10 +321,6 @@
       <item path="update_setpoint.c" ex="false" tool="0" flavor2="0">
       </item>
       <item path="update_setpoint.h" ex="false" tool="3" flavor2="0">
-      </item>
-      <item path="utils.c" ex="false" tool="0" flavor2="0">
-      </item>
-      <item path="utils.h" ex="false" tool="3" flavor2="0">
       </item>
     </conf>
   </confs>

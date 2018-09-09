@@ -67,13 +67,14 @@ extern uint8_t ui8_adc_read_throttle_busy;
 extern uint16_t ui16_torque[NUMBER_OF_PAS_MAGS];
 extern uint8_t ui8_torque_index;
 
+extern uint16_t ui16_PAS_accumulated; // for filtering of PAS value
 extern float flt_current_PAS_fraction;
 extern uint16_t ui16_PAS;
 extern uint16_t ui16_PAS_High;
 extern uint16_t ui16_PAS_Counter; //Counter for cadence
 extern uint16_t ui16_PAS_High_Counter; //Flag for PAS Interrupt detected
 extern uint8_t ui8_PAS_Flag; //flag for PAS interrupt
-extern uint8_t PAS_old;
+extern uint8_t ui8_PAS_update_call_when_inactive_counter;
 
 extern uint8_t ui8_s_pas_direction;
 extern float flt_s_pas_threshold;

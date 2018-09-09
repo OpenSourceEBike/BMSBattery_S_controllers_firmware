@@ -34,6 +34,6 @@ void updateOffroadStatus(void);
 void updateErpsLimits(uint8_t force);
 void updateSpeeds(void);
 void updatePasStatus(void);
-
+void checkPasInActivity(void);
 #endif /* ACACOMMONS_H */
 

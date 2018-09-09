@@ -143,20 +143,51 @@ int32_t map(int32_t x, int32_t in_min, int32_t in_max, int32_t out_min, int32_t 
         return (x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
 }
 
+void updatePasDir(void) {
+#ifdef TORQUESENSOR
+    if (ui16_PAS < timeout) {
+        PAS_dir = 1;
+    } //only PAS timeout for Torquesensor Mode.
+#else
+    if (PAS_act > 3) {
+        PAS_dir = 1;
+    }//set direction only if enough pulses in the right direction are detected.
+#endif
+    else {
+        PAS_dir = 0;
+    }
+}
+
+void checkPasInActivity(void){
+    ui8_PAS_update_call_when_inactive_counter++;
+    //	Update cadence, after PAS interrupt occurrence
+    // we are called at 50 Hz, if there has been no interrupt for more than ~1s, ramp down PAS automatically
+    if (ui8_PAS_Flag == 0 && ui8_PAS_update_call_when_inactive_counter > (uint8_t)(timeout>>6)) {
+
+        ui8_PAS_update_call_when_inactive_counter = 0;
+        
+        if (PAS_act > 0) {
+            PAS_act--;
+        }
+    
+        updatePasDir();
+    
+    }
+}
+
 void updatePasStatus(void) {
-    //	Update cadence, torque and battery current after PAS interrupt occurrence
+
     if (ui8_PAS_Flag == 1) {
         ui8_PAS_Flag = 0; //reset interrupt flag
 
         ui16_PAS = ui16_PAS_Counter; //save recent cadence
         ui16_PAS_High = ui16_PAS_High_Counter;
-        flt_current_PAS_fraction = (float) ui16_PAS / (float) ui16_PAS_High;
-
-        if ((ui8_s_pas_direction == 1) && (flt_current_PAS_fraction > flt_s_pas_threshold)) {
+      
+        if ((ui8_s_pas_direction == 1) && ((float) ui16_PAS / (float) ui16_PAS_High > flt_s_pas_threshold)) {
             if (PAS_act < 7) {
                 PAS_act++;
             }
-        } else if ((ui8_s_pas_direction == 0) && (flt_current_PAS_fraction < flt_s_pas_threshold)) {
+        } else if ((ui8_s_pas_direction == 0) && ((float) ui16_PAS / (float) ui16_PAS_High < flt_s_pas_threshold)) {
             if (PAS_act < 7) {
                 PAS_act++;
             }
@@ -166,21 +197,7 @@ void updatePasStatus(void) {
             }
         }
 
-#ifdef TORQUESENSOR
-        if (ui16_PAS < timeout) {
-            PAS_dir = 1;
-        } //only PAS timeout for Torquesensor Mode.
-#else
-        if (PAS_act > 3) {
-            PAS_dir = 1;
-        }//set direction only if enough pulses in the right direction are detected.
-#endif
-        else {
-            PAS_dir = 0;
-        }
 
-        ui16_PAS_Counter = 1;
-        ui16_PAS_High_Counter = 1; //reset PAS Counter
 
 #ifdef TORQUESENSOR
         ui8_temp = ui8_adc_read_throttle(); //read in recent torque value
@@ -196,6 +213,11 @@ void updatePasStatus(void) {
         } //reset index counter
 
 #endif
+
+        updatePasDir();
+        ui16_PAS_Counter = 1;
+        ui16_PAS_High_Counter = 1; //reset PAS Counter
+        ui8_PAS_update_call_when_inactive_counter = 0;
     }
 }
 
