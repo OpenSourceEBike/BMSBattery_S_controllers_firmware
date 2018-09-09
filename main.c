@@ -172,7 +172,7 @@ int main(void) {
         // Update display after message received occurrence
         if (ui8_msg_received) {
             ui8_msg_received = 0;
-            //printf("%d\n", ui16_SPEED);
+            //printf("%d\n", ui16_time_ticks_between_speed_interrupt);
             display_update(); //Display aktualisieren aus Code vom Forumscontroller
         }
 #endif
@@ -181,7 +181,7 @@ int main(void) {
         // Update display after message received occurrence
         if (ui8_msg_received) {
             ui8_msg_received = 0;
-            //printf("%d\n", ui16_SPEED);
+            //printf("%d\n", ui16_time_ticks_between_speed_interrupt);
             check_message(); //Display aktualisieren aus Code vom Forumscontroller
         }
 #endif
@@ -213,10 +213,10 @@ int main(void) {
             updateErpsLimits(0);
 
 #if defined(THROTTLE)  || defined(THROTTLE_AND_PAS) || defined (TORQUE_SIMULATION) || defined (TORQUESENSOR)      
-            ui16_setpoint = (uint16_t) update_setpoint(ui16_SPEED, ui16_PAS, ui16_sum_torque, ui16_setpoint); //update setpoint
+            ui16_setpoint = (uint16_t) update_setpoint(ui16_time_ticks_between_speed_interrupt, ui16_time_ticks_between_pas_interrupt, ui16_sum_torque, ui16_setpoint); //update setpoint
 #endif
 #ifdef ACA    
-            ui16_setpoint = (uint16_t) aca_setpoint(ui16_SPEED, ui16_PAS, ui16_sum_torque, ui16_setpoint); //update setpoint
+            ui16_setpoint = (uint16_t) aca_setpoint(ui16_time_ticks_between_speed_interrupt, ui16_time_ticks_between_pas_interrupt, ui16_sum_torque, ui16_setpoint); //update setpoint
 #endif
 
             //#define DO_CRUISE_CONTROL 1
@@ -247,7 +247,7 @@ int main(void) {
                 //getchar1 ();
 
 #ifdef DIAGNOSTICS
-                printf("%u,%u, %u, %u, %u, %u\r\n", ui8_control_state, ui16_setpoint, ui16_motor_speed_erps, ui16_BatteryCurrent, ui16_PAS, ui16_sum_torque);
+                printf("%u,%u, %u, %u, %u, %u\r\n", ui8_control_state, ui16_setpoint, ui16_motor_speed_erps, ui16_BatteryCurrent, ui16_time_ticks_between_pas_interrupt, ui16_sum_torque);
 
                 //printf("erps %d, motorstate %d, cyclecountertotal %d\r\n", ui16_motor_speed_erps, ui8_motor_state, ui16_PWM_cycles_counter_total);
 

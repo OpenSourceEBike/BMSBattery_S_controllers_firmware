@@ -86,10 +86,10 @@ void kingmeter_update(void)
         KM.Tx.Battery = KM_BATTERY_LOW;
     }
 
-    if((ui16_SPEED>>4) < KM_MAX_WHEELTIME && ui16_SPEED!=0)
+    if((ui16_time_ticks_between_speed_interrupt>>4) < KM_MAX_WHEELTIME && ui16_time_ticks_between_speed_interrupt!=0)
     {
         // Adapt wheeltime to match displayed speedo value according config.h setting      
-        KM.Tx.Wheeltime_ms = ui16_SPEED>>4;	// is not exactly correct, factor should be 15.625, not 16
+        KM.Tx.Wheeltime_ms = ui16_time_ticks_between_speed_interrupt>>4;	// is not exactly correct, factor should be 15.625, not 16
 
 
     }
@@ -180,9 +180,9 @@ void display_update()
 
 
 #ifdef SPEEDSENSOR_EXTERNAL
-  if(ui16_SPEED>65000){ui16_wheel_period_ms=4500;}
+  if(ui16_time_ticks_between_speed_interrupt>65000){ui16_wheel_period_ms=4500;}
   else{
-  ui16_wheel_period_ms = (uint16_t) ((float)ui16_SPEED/((float)PWM_CYCLES_SECOND/1000.0)); //must be /1000 devided in /125/8 for better resolution
+  ui16_wheel_period_ms = (uint16_t) ((float)ui16_time_ticks_between_speed_interrupt/((float)PWM_CYCLES_SECOND/1000.0)); //must be /1000 devided in /125/8 for better resolution
   }
 #endif
 

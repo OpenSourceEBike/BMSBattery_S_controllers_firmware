@@ -41,13 +41,13 @@ uint32_t PI_control(uint16_t pv, uint16_t setpoint) {
 void updateSpeeds(void) {
     // Update speed after speed interrupt occurrence
     if (ui8_SPEED_Flag) {
-        if (ui16_SPEED_Counter > 1500) {
+        if (ui16_time_ticks_for_speed_calculation > 1500) {
             //ignore spikes speed information, Do nothing if derived speed would be greater ca. 82km/h with 28" wheel
-            ui16_SPEED = ui16_SPEED_Counter; //save recent speed
-            ui16_SPEED_Counter = 0; //reset speed counter
+            ui16_time_ticks_between_speed_interrupt = ui16_time_ticks_for_speed_calculation; //save recent speed
+            ui16_time_ticks_for_speed_calculation = 0; //reset speed counter
 
             ui32_SPEED_km_h_accumulated -= ui32_SPEED_km_h_accumulated >> 2;
-            ui32_SPEED_km_h_accumulated += (wheel_circumference * PWM_CYCLES_SECOND * 36L) / (10L * (uint32_t) ui16_SPEED); // speed km/h*1000 from external sensor
+            ui32_SPEED_km_h_accumulated += (wheel_circumference * PWM_CYCLES_SECOND * 36L) / (10L * (uint32_t) ui16_time_ticks_between_speed_interrupt); // speed km/h*1000 from external sensor
             ui32_SPEED_km_h = ui32_SPEED_km_h_accumulated >> 2; //calculate speed in m/h conversion from sec to hour --> *3600, conversion from mm to km --> /1000000, tic frequency 15625 Hz
         }
 
@@ -57,11 +57,11 @@ void updateSpeeds(void) {
     //if wheel isn't turning, reset speed
     // FIXME, the following is gathered from two places that were executed just in that order
     // distinction 40000/65529 doesn't really make much sense
-    if (ui16_SPEED_Counter > 40000) {
+    if (ui16_time_ticks_for_speed_calculation > 40000) {
         ui32_SPEED_km_h = 0;
     }
-    if (ui16_SPEED_Counter > 65529 && ui16_SPEED != 65530) {
-        ui16_SPEED = 65530; //Set Display to 0 km/h
+    if (ui16_time_ticks_for_speed_calculation > 65529 && ui16_time_ticks_between_speed_interrupt != 65530) {
+        ui16_time_ticks_between_speed_interrupt = 65530; //Set Display to 0 km/h
         PAS_act = 0; //Set PAS indicator to 0 to avoid motor startig, if pushing backwards from standstill
     }
 }
@@ -72,12 +72,15 @@ uint32_t CheckSpeed(uint16_t current_target, uint16_t speed, uint16_t softLimit,
 
         if (speed > hardLimit) { //if you are riding much too fast, stop motor immediately
             current_target = ui16_current_cal_b;
-            ui8_control_state = 11;
+
         } else {
-            uint32_t ui32_temp = ((current_target - ui16_current_cal_b));
-            ui32_temp *= (hardLimit - speed);
-            current_target = (uint16_t) ((ui32_temp) / (hardLimit - softLimit) + ui16_current_cal_b);
-            ui8_control_state = 12;
+            uint32_t ui32_ct_normalized = ((current_target - ui16_current_cal_b));
+
+            current_target = (uint16_t)
+                    ((ui32_ct_normalized * (hardLimit - speed)) /
+                    (hardLimit - softLimit)
+                    + ui16_current_cal_b);
+
 
         }
     }
@@ -145,7 +148,7 @@ int32_t map(int32_t x, int32_t in_min, int32_t in_max, int32_t out_min, int32_t 
 
 void updatePasDir(void) {
 #ifdef TORQUESENSOR
-    if (ui16_PAS < timeout) {
+    if (ui16_time_ticks_between_pas_interrupt < timeout) {
         PAS_dir = 1;
     } //only PAS timeout for Torquesensor Mode.
 #else
@@ -158,20 +161,20 @@ void updatePasDir(void) {
     }
 }
 
-void checkPasInActivity(void){
+void checkPasInActivity(void) {
     ui8_PAS_update_call_when_inactive_counter++;
     //	Update cadence, after PAS interrupt occurrence
     // we are called at 50 Hz, if there has been no interrupt for more than ~1s, ramp down PAS automatically
-    if (ui8_PAS_Flag == 0 && ui8_PAS_update_call_when_inactive_counter > (uint8_t)(timeout>>6)) {
+    if (ui8_PAS_Flag == 0 && ui8_PAS_update_call_when_inactive_counter > (uint8_t) (timeout >> 6)) {
 
         ui8_PAS_update_call_when_inactive_counter = 0;
-        
+
         if (PAS_act > 0) {
             PAS_act--;
         }
-    
+
         updatePasDir();
-    
+
     }
 }
 
@@ -180,14 +183,14 @@ void updatePasStatus(void) {
     if (ui8_PAS_Flag == 1) {
         ui8_PAS_Flag = 0; //reset interrupt flag
 
-        ui16_PAS = ui16_PAS_Counter; //save recent cadence
+        ui16_time_ticks_between_pas_interrupt = ui16_time_ticks_for_pas_calculation; //save recent cadence
         ui16_PAS_High = ui16_PAS_High_Counter;
-      
-        if ((ui8_s_pas_direction == 1) && ((float) ui16_PAS / (float) ui16_PAS_High > flt_s_pas_threshold)) {
+
+        if ((ui8_s_pas_direction == 1) && ((float) ui16_time_ticks_between_pas_interrupt / (float) ui16_PAS_High > flt_s_pas_threshold)) {
             if (PAS_act < 7) {
                 PAS_act++;
             }
-        } else if ((ui8_s_pas_direction == 0) && ((float) ui16_PAS / (float) ui16_PAS_High < flt_s_pas_threshold)) {
+        } else if ((ui8_s_pas_direction == 0) && ((float) ui16_time_ticks_between_pas_interrupt / (float) ui16_PAS_High < flt_s_pas_threshold)) {
             if (PAS_act < 7) {
                 PAS_act++;
             }
@@ -215,7 +218,7 @@ void updatePasStatus(void) {
 #endif
 
         updatePasDir();
-        ui16_PAS_Counter = 1;
+        ui16_time_ticks_for_pas_calculation = 1;
         ui16_PAS_High_Counter = 1; //reset PAS Counter
         ui8_PAS_update_call_when_inactive_counter = 0;
     }

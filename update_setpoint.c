@@ -120,7 +120,7 @@ uint16_t update_setpoint (uint16_t speed, uint16_t PAS, uint16_t sumtorque, uint
 
   //check if pedals are turning with throttle active in offroad mode
 #if defined(THROTTLE_AND_PAS) || defined (TORQUE_SIMULATION)
-  else if ((ui16_PAS_Counter>timeout || !PAS_dir)&&!(ui8_offroad_state==5 && sumtorque>2)){
+  else if ((ui16_time_ticks_for_pas_calculation>timeout || !PAS_dir)&&!(ui8_offroad_state==5 && sumtorque>2)){
             ui32_setpoint= PI_control(ui16_BatteryCurrent, ui16_current_cal_b);//Curret target = 0 A, this is to keep the integral part of the PI-control up to date
                   if (ui32_setpoint<5){ui32_setpoint=0;}
                   if (ui32_setpoint>255){ui32_setpoint=255;}
@@ -133,7 +133,7 @@ uint16_t update_setpoint (uint16_t speed, uint16_t PAS, uint16_t sumtorque, uint
 #endif
  // check if pedals are turning in torquesensor mode, throttle active in offroad mode doesn't work here
 #if defined(TORQUESENSOR)
-  else if (ui16_PAS_Counter>timeout || !PAS_dir){
+  else if (ui16_time_ticks_for_pas_calculation>timeout || !PAS_dir){
             ui32_setpoint= PI_control(ui16_BatteryCurrent, ui16_current_cal_b);//Curret target = 0 A, this is to keep the integral part of the PI-control up to date
                   if (ui32_setpoint<5){ui32_setpoint=0;}
                   if (ui32_setpoint>255){ui32_setpoint=255;}
@@ -151,10 +151,10 @@ uint16_t update_setpoint (uint16_t speed, uint16_t PAS, uint16_t sumtorque, uint
 #ifdef TORQUESENSOR
       ui16_PAS_accumulated-=ui16_PAS_accumulated>>3;
       ui16_PAS_accumulated+=PAS;
-      ui16_PAS_smoothed=ui16_PAS_accumulated>>3;
-      //uint32_current_target=((i16_assistlevel[ui8_assistlevel_global-1]*fummelfaktor*sumtorque))/(((uint32_t)ui16_PAS_smoothed)<<6)+ui16_current_cal_b; 						//calculate setpoint
-      uint32_current_target=(((i16_assistlevel[ui8_assistlevel_global-1]*fummelfaktor*sumtorque))/(((uint32_t)ui16_PAS_smoothed)<<6)*(1000+ui32_SPEED_km_h/ui8_speedlimit_kph))/1000+ui16_current_cal_b;
-      //printf("vor: spd %d, pas %d, sumtor %d, setpoint %lu\n", speed, ui16_PAS_smoothed, sumtorque, ui32_setpoint);
+      ui16_time_ticks_between_pas_interrupt_smoothed=ui16_PAS_accumulated>>3;
+      //uint32_current_target=((i16_assistlevel[ui8_assistlevel_global-1]*fummelfaktor*sumtorque))/(((uint32_t)ui16_time_ticks_between_pas_interrupt_smoothed)<<6)+ui16_current_cal_b; 						//calculate setpoint
+      uint32_current_target=(((i16_assistlevel[ui8_assistlevel_global-1]*fummelfaktor*sumtorque))/(((uint32_t)ui16_time_ticks_between_pas_interrupt_smoothed)<<6)*(1000+ui32_SPEED_km_h/ui8_speedlimit_kph))/1000+ui16_current_cal_b;
+      //printf("vor: spd %d, pas %d, sumtor %d, setpoint %lu\n", speed, ui16_time_ticks_between_pas_interrupt_smoothed, sumtorque, ui32_setpoint);
       if (uint32_current_target>BATTERY_CURRENT_MAX_VALUE){
 	  //printf("Current target %lu\r\n", uint32_current_target);
 	  uint32_current_target=BATTERY_CURRENT_MAX_VALUE;
@@ -171,7 +171,7 @@ uint16_t update_setpoint (uint16_t speed, uint16_t PAS, uint16_t sumtorque, uint
       if (ui32_setpoint<5)ui32_setpoint=0;
       if (ui32_setpoint>255)ui32_setpoint=255;
       //printf("T, %lu, %d, %d, %d\r\n", ui32_setpoint, sumtorque, ui16_BatteryCurrent, (uint16_t) uint32_current_target);
-      //printf("%lu, %d, %d, %d\r\n", ui32_setpoint, ui16_PAS_smoothed>>3, ui16_BatteryCurrent, (uint16_t) uint32_current_target);
+      //printf("%lu, %d, %d, %d\r\n", ui32_setpoint, ui16_time_ticks_between_pas_interrupt_smoothed>>3, ui16_BatteryCurrent, (uint16_t) uint32_current_target);
 
 #endif
 
@@ -205,14 +205,14 @@ uint16_t update_setpoint (uint16_t speed, uint16_t PAS, uint16_t sumtorque, uint
 #ifdef TORQUE_SIMULATION
   ui16_PAS_accumulated-=ui16_PAS_accumulated>>3;
   ui16_PAS_accumulated+=PAS;
-  ui16_PAS_smoothed=ui16_PAS_accumulated>>3;
-  if (ui16_PAS_smoothed>ui16_s_ramp_end) //if you are pedaling slower than defined ramp end, current is proportional to cadence
+  ui16_time_ticks_between_pas_interrupt_smoothed=ui16_PAS_accumulated>>3;
+  if (ui16_time_ticks_between_pas_interrupt_smoothed>ui16_s_ramp_end) //if you are pedaling slower than defined ramp end, current is proportional to cadence
     {
       uint32_current_target= (i16_assistlevel[ui8_assistlevel_global-1]*(BATTERY_CURRENT_MAX_VALUE-ui16_current_cal_b)/100);
-      float_temp=((float)ui16_s_ramp_end)/((float)ui16_PAS_smoothed);
+      float_temp=((float)ui16_s_ramp_end)/((float)ui16_time_ticks_between_pas_interrupt_smoothed);
 
       uint32_current_target= ((int16_t)(uint32_current_target)*(int16_t)(float_temp*100))/100+ui16_current_cal_b;
-      //printf("ui16_PAS_smoothed %d, delta %d, current target %d\r\n", ui16_PAS_smoothed, (int16_t)(float_temp*100), (int16_t) uint32_current_target);
+      //printf("ui16_time_ticks_between_pas_interrupt_smoothed %d, delta %d, current target %d\r\n", ui16_time_ticks_between_pas_interrupt_smoothed, (int16_t)(float_temp*100), (int16_t) uint32_current_target);
     }
   else
     {

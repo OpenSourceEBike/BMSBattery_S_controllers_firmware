@@ -68,8 +68,8 @@ uint16_t ui16_erps_limit_higher = 0;
 
 uint32_t ui32_SPEED_km_h; //global variable Speed
 uint32_t ui32_SPEED_km_h_accumulated;
-uint16_t ui16_SPEED = 64000; //speed in timetics
-uint16_t ui16_SPEED_Counter = 0; //time tics for speed measurement
+uint16_t ui16_time_ticks_between_speed_interrupt = 64000; //speed in timetics
+uint16_t ui16_time_ticks_for_speed_calculation = 0; //time tics for speed measurement
 uint8_t ui8_SPEED_Flag = 0; //flag for SPEED interrupt
 uint8_t ui8_offroad_counter = 0; //counter for offroad switching procedure
 
@@ -77,10 +77,10 @@ uint8_t ui8_adc_read_throttle_busy = 0;
 uint16_t ui16_torque[NUMBER_OF_PAS_MAGS]; //array for torque values of one crank revolution
 uint8_t ui8_torque_index = 0; //counter for torque array
 
-uint16_t ui16_PAS_smoothed = 0;
-uint16_t ui16_PAS_Counter = 0; //time tics for cadence measurement
+uint16_t ui16_time_ticks_between_pas_interrupt_smoothed = 0;
+uint16_t ui16_time_ticks_for_pas_calculation = 0; //time tics for cadence measurement
 uint16_t ui16_PAS_High_Counter = 1; //time tics for direction detection
-uint16_t ui16_PAS = 32000; //cadence in timetics
+uint16_t ui16_time_ticks_between_pas_interrupt = 32000; //cadence in timetics
 uint16_t ui16_PAS_High = 1; //number of High readings on PAS
 uint8_t ui8_PAS_update_call_when_inactive_counter = 50; //increased when no pas change is detected (50Hz)
 uint8_t ui8_PAS_Flag = 0;

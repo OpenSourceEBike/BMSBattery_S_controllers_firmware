@@ -170,12 +170,12 @@ void addDetailStateInfos(void) {
     addPayload(CODE_THROTTLE, ui16_throttle_accumulated);
     addPayload(CODE_CURRENT_TARGET_HIGH_BYTE, uint32_current_target >> 8);
     addPayload(CODE_CURRENT_TARGET, uint32_current_target);
-    addPayload(CODE_CURRENT_RAMP_HIGH_BYTE, ui16_PAS_smoothed >> 8);
-    addPayload(CODE_CURRENT_RAMP, ui16_PAS_smoothed);
+    addPayload(CODE_CURRENT_RAMP_HIGH_BYTE, ui16_time_ticks_between_pas_interrupt_smoothed >> 8);
+    addPayload(CODE_CURRENT_RAMP, ui16_time_ticks_between_pas_interrupt_smoothed);
     addPayload(CODE_PAS_HIGH_COUNTER_HIGH_BYTE, ui16_PAS_High >> 8);
     addPayload(CODE_PAS_HIGH_COUNTER, ui16_PAS_High);
-    addPayload(CODE_PAS_COUNTER_HIGH_BYTE, ui16_PAS >> 8);
-    addPayload(CODE_PAS_COUNTER, ui16_PAS);
+    addPayload(CODE_PAS_COUNTER_HIGH_BYTE, ui16_time_ticks_between_pas_interrupt >> 8);
+    addPayload(CODE_PAS_COUNTER, ui16_time_ticks_between_pas_interrupt);
 
 
 
@@ -188,6 +188,8 @@ void addBasicStateInfos(void) {
     addPayload(CODE_MOTOR_STATE, ui8_motor_state);
     addPayload(CODE_BATTERY_VOLTAGE, ui8_BatteryVoltage);
     addPayload(CODE_ER_SPEED, ui16_motor_speed_erps);
+    addPayload(CODE_SPEED_HIGH_BYTE, ui32_SPEED_km_h >> 8);
+    addPayload(CODE_SPEED, ui32_SPEED_km_h);
     addPayload(CODE_BATTERY_CURRENT_HIGH_BYTE, ui16_BatteryCurrent >> 8);
     addPayload(CODE_BATTERY_CURRENT, ui16_BatteryCurrent);
     addPayload(CODE_SUM_TORQUE, ui16_sum_torque);
@@ -195,7 +197,7 @@ void addBasicStateInfos(void) {
     addPayload(CODE_SETPOINT_STATE, ui8_control_state);
     addPayload(CODE_UPTIME, ui8_uptime);
 
-    // 9 more elements left/avail (max20)
+    // 7 more elements left/avail (max20)
 }
 
 void gatherDynamicPayload(uint8_t function) {

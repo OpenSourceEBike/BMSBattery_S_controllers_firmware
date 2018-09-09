@@ -51,6 +51,9 @@ typedef enum {
 	CODE_CORRECTION_VALUE = ((uint8_t) 0xC6),
 	CODE_PHASE_CURRENT = ((uint8_t) 0xC7),
 
+	CODE_SPEED_HIGH_BYTE = ((uint8_t) 0xC8),
+	CODE_SPEED = ((uint8_t) 0xC9),
+
 	CODE_SUM_TORQUE = ((uint8_t) 0xD0),
 	CODE_SETPOINT = ((uint8_t) 0xD1),
 	CODE_SETPOINT_STATE = ((uint8_t) 0xD2),

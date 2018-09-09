@@ -241,8 +241,8 @@ void hall_sensors_read_and_action (void)
 // runs every 64us (PWM frequency)
 void motor_fast_loop (void)
 {
-  if(ui16_SPEED_Counter < 65530) {ui16_SPEED_Counter++;} 	//increase SPEED Counter but avoid overflow
-  if(ui16_PAS_Counter < 65530) {ui16_PAS_Counter++;}		//increase PAS Counter but avoid overflow
+  if(ui16_time_ticks_for_speed_calculation < 65530) {ui16_time_ticks_for_speed_calculation++;} 	//increase SPEED Counter but avoid overflow
+  if(ui16_time_ticks_for_pas_calculation < 65530) {ui16_time_ticks_for_pas_calculation++;}		//increase PAS Counter but avoid overflow
   if (GPIO_ReadInputPin(PAS__PORT, PAS__PIN) && ui16_PAS_High_Counter<65530){ui16_PAS_High_Counter++;}
 
 

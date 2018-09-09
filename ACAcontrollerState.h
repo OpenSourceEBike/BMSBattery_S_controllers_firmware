@@ -57,9 +57,10 @@ extern uint16_t ui16_erps_limit_higher;
 extern uint32_t ui32_SPEED_km_h; //global variable Speed
 extern uint32_t ui32_SPEED_km_h_accumulated;
 
-extern uint16_t ui16_SPEED_Counter; //Counter for bike speed
+extern uint16_t ui16_time_ticks_for_speed_calculation;
+extern uint16_t ui16_time_ticks_between_speed_interrupt; //Counter for bike speed
 extern uint8_t ui8_SPEED_Flag; //Flag for PAS Interrupt detected
-extern uint16_t ui16_SPEED; //Speed duration of one wheel revolution (tics * 64us)
+extern uint16_t ui16_time_ticks_between_speed_interrupt; //Speed duration of one wheel revolution (tics * 64us)
 extern uint8_t ui8_offroad_counter;
 
 extern uint8_t ui8_adc_read_throttle_busy;
@@ -67,12 +68,12 @@ extern uint8_t ui8_adc_read_throttle_busy;
 extern uint16_t ui16_torque[NUMBER_OF_PAS_MAGS];
 extern uint8_t ui8_torque_index;
 
-extern uint16_t ui16_PAS_smoothed; // for filtering of PAS value
+extern uint16_t ui16_time_ticks_between_pas_interrupt_smoothed; // for filtering of PAS value
 extern float flt_current_PAS_fraction;
-extern uint16_t ui16_PAS;
+extern uint16_t ui16_time_ticks_between_pas_interrupt;
 extern uint16_t ui16_PAS_High;
-extern uint16_t ui16_PAS_Counter; //Counter for cadence
-extern uint16_t ui16_PAS_High_Counter; //Flag for PAS Interrupt detected
+extern uint16_t ui16_time_ticks_for_pas_calculation; //Counter for cadence
+extern uint16_t ui16_PAS_High_Counter; 
 extern uint8_t ui8_PAS_Flag; //flag for PAS interrupt
 extern uint8_t ui8_PAS_update_call_when_inactive_counter;
 
