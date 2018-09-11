@@ -28,7 +28,10 @@
 // user controllable settings
 uint8_t ui8_throttle_min_range = 32;
 uint8_t ui8_throttle_max_range = 192;
-uint8_t ui8_speedlimit_kph = 25;
+uint8_t ui8_speedlimit_kph = 25; // normal limit
+uint8_t ui8_speedlimit_without_pas_kph = 6; // limit without pas activity
+uint8_t ui8_speedlimit_with_throttle_override_kph = 35; // limit with pas and throttle both active
+uint8_t ui8_speedlimit_actual_kph; // dynamic speedlimit based on current state
 uint8_t ui8_s_pas_direction = 0;
 float flt_s_pas_threshold = 1.7;
 float flt_s_pid_gain_p = 0.5;
@@ -63,8 +66,7 @@ uint8_t uint8_t_hall_order[6];
 int8_t int8_t_hall_counter = 0;
 uint8_t ui8_hall_order_counter = 5;
 
-uint16_t ui16_erps_limit_lower = 0;
-uint16_t ui16_erps_limit_higher = 0;
+uint16_t ui16_speed_kph_to_erps_ratio = 0;
 
 uint32_t ui32_SPEED_km_h; //global variable Speed
 uint32_t ui32_SPEED_km_h_accumulated;
@@ -91,6 +93,7 @@ void controllerstate_init(void) {
 
     // convert static defines to volatile vars
     ui8_speedlimit_kph = limit;
+    ui8_speedlimit_actual_kph = limit;
     ui8_throttle_min_range = ADC_THROTTLE_MIN_VALUE;
     ui8_throttle_max_range = ADC_THROTTLE_MAX_VALUE;
     ui8_s_pas_direction = PAS_DIRECTION;

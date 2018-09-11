@@ -128,7 +128,7 @@ void addConfigStateInfos(void) {
     addPayload(CODE_CURRENT_CAL_B_HIGH_BYTE, ui16_current_cal_b >> 8);
     addPayload(CODE_CURRENT_CAL_B, ui16_current_cal_b);
     addPayload(CODE_EEPROM_MAGIC_BYTE, eeprom_magic_byte);
-    addPayload(CODE_MAX_SPEED, ui8_speedlimit_kph);
+    addPayload(CODE_MAX_SPEED, ui8_speedlimit_actual_kph);
     addPayload(CODE_ASSIST_LEVEL, ui8_assistlevel_global);
     addPayload(CODE_THROTTLE_MIN_RANGE, ui8_throttle_min_range);
     addPayload(CODE_THROTTLE_MAX_RANGE, ui8_throttle_max_range);

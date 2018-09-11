@@ -22,8 +22,41 @@
 #include "stm8s_gpio.h"
 #include "config.h"
 #include "gpio.h"
+#include "adc.h"
 #include "ACAcommons.h"
 #include "ACAcontrollerState.h"
+
+static uint8_t ui8_temp;
+
+uint8_t float2int(float in, float maxRange) {
+    uint16_t result;
+    if (in < 0.0)
+        return 0;
+    result = (uint16_t) (in * (float) ((float) 256 / (float) maxRange));
+    if (result > 255)
+        result = 255;
+    return (result);
+}
+
+float int2float(uint8_t in, float maxRange) {
+    return ((float) in / (float) ((float) 256 / (float) maxRange));
+}
+
+int32_t map(int32_t x, int32_t in_min, int32_t in_max, int32_t out_min, int32_t out_max) {
+    // if input is smaller/bigger than expected return the min/max out ranges value
+    if (x < in_min)
+        return out_min;
+    else if (x > in_max)
+        return out_max;
+
+        // map the input to the output range.
+        // round up if mapping bigger ranges to smaller ranges
+    else if ((in_max - in_min) > (out_max - out_min))
+        return (x - in_min) * (out_max - out_min + 1) / (in_max - in_min + 1) + out_min;
+        // round down if mapping smaller ranges to bigger ranges
+    else
+        return (x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
+}
 
 uint32_t PI_control(uint16_t pv, uint16_t setpoint) {
     float float_p;
@@ -68,7 +101,7 @@ void updateSpeeds(void) {
 
 uint32_t CheckSpeed(uint16_t current_target, uint16_t speed, uint16_t softLimit, uint16_t hardLimit) {
     //ramp down motor power if you are riding too fast and speed liming is active
-    if (speed > softLimit && ui8_offroad_state != 5) {
+    if (speed > softLimit && ui8_offroad_state != 5) { // FIXME the && part is only in here for old setpoint, aca already defines a higher limit
 
         if (speed > hardLimit) { //if you are riding much too fast, stop motor immediately
             current_target = ui16_current_cal_b;
@@ -101,11 +134,9 @@ uint8_t readAndClearSignal(uint8_t signal) {
     return 0;
 }
 
-void updateErpsLimits(uint8_t force) {
-    if ((force != 0) || (readAndClearSignal(SIGNAL_SPEEDLIMIT_CHANGED) == 1)) {
-        ui16_erps_limit_lower = (uint16_t) ((float) GEAR_RATIO * (float) ui8_speedlimit_kph * 10000.0 / ((float) wheel_circumference * 36.0));
-        ui16_erps_limit_higher = (uint16_t) ((float) GEAR_RATIO * (float) (ui8_speedlimit_kph + 2)*10000.0 / ((float) wheel_circumference * 36.0));
-    }
+void initErpsRatio(void) {
+    //if (readAndClearSignal(SIGNAL_SPEEDLIMIT_CHANGED) == 1) 
+    ui16_speed_kph_to_erps_ratio = (uint16_t) ((float) GEAR_RATIO * 1000000.0 / ((float) wheel_circumference * 36.0));
 }
 
 void updateHallOrder(uint8_t hall_sensors) {
@@ -114,36 +145,6 @@ void updateHallOrder(uint8_t hall_sensors) {
         ui8_hall_order_counter = 0;
     }
     uint8_t_hall_order[ui8_hall_order_counter] = hall_sensors;
-}
-
-uint8_t float2int(float in, float maxRange) {
-    uint16_t result;
-    if (in < 0.0)
-        return 0;
-    result = (uint16_t) (in * (float) ((float) 256 / (float) maxRange));
-    if (result > 255)
-        result = 255;
-    return (result);
-}
-
-float int2float(uint8_t in, float maxRange) {
-    return ((float) in / (float) ((float) 256 / (float) maxRange));
-}
-
-int32_t map(int32_t x, int32_t in_min, int32_t in_max, int32_t out_min, int32_t out_max) {
-    // if input is smaller/bigger than expected return the min/max out ranges value
-    if (x < in_min)
-        return out_min;
-    else if (x > in_max)
-        return out_max;
-
-        // map the input to the output range.
-        // round up if mapping bigger ranges to smaller ranges
-    else if ((in_max - in_min) > (out_max - out_min))
-        return (x - in_min) * (out_max - out_min + 1) / (in_max - in_min + 1) + out_min;
-        // round down if mapping smaller ranges to bigger ranges
-    else
-        return (x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
 }
 
 void updatePasDir(void) {
@@ -159,6 +160,23 @@ void updatePasDir(void) {
     else {
         PAS_dir = 0;
     }
+}
+
+void updateRequestedTorque(void) {
+
+#ifndef TORQUESENSOR
+    ui16_throttle_accumulated -= ui16_throttle_accumulated >> 3;
+    ui16_throttle_accumulated += ui8_adc_read_throttle();
+    ui8_temp = ui16_throttle_accumulated >> 3; //read in value from adc
+    ui16_sum_torque = (uint8_t) map(ui8_temp, ui8_throttle_min_range, ui8_throttle_max_range, 0, SETPOINT_MAX_VALUE); //map throttle to limits
+#else
+    ui16_sum_torque = 0;
+    for (ui8_temp = 0; ui8_temp < NUMBER_OF_PAS_MAGS; ui8_temp++) { // sum up array content
+        ui16_sum_torque += ui16_torque[ui8_temp];
+    }
+
+    ui16_sum_torque /= NUMBER_OF_PAS_MAGS;
+#endif
 }
 
 void checkPasInActivity(void) {
@@ -201,14 +219,9 @@ void updatePasStatus(void) {
         }
 
 
-
 #ifdef TORQUESENSOR
         ui8_temp = ui8_adc_read_throttle(); //read in recent torque value
         ui16_torque[ui8_torque_index] = (uint8_t) map(ui8_temp, ui8_throttle_min_range, ui8_throttle_max_range, 0, SETPOINT_MAX_VALUE); //map throttle to limits
-        ui16_sum_torque = 0;
-        for (a = 0; a < NUMBER_OF_PAS_MAGS; a++) { // sum up array content
-            ui16_sum_torque += ui16_torque[a];
-        }
 
         ui8_torque_index++;
         if (ui8_torque_index > NUMBER_OF_PAS_MAGS - 1) {
@@ -226,62 +239,64 @@ void updatePasStatus(void) {
 
 void updateOffroadStatus(void) {
 
-    if (ui8_offroad_state != 5) {
-        if (ui8_offroad_state == 0 && !GPIO_ReadInputPin(BRAKE__PORT, BRAKE__PIN)) {//first step, brake on.
-            ui8_offroad_state = 1;
-
-        }
-        if (ui8_offroad_state == 1) {//second step, make sure the brake is hold according to definded time
+    if (ui8_offroad_state == 5) {
+        if (!GPIO_ReadInputPin(BRAKE__PORT, BRAKE__PIN)) {
             ui8_offroad_counter++;
-            if (GPIO_ReadInputPin(BRAKE__PORT, BRAKE__PIN) && ui8_offroad_counter < MORSE_TIME_1) {//brake is released too early
-                ui8_offroad_state = 0;
-                ui8_offroad_counter = 0;
-            } else if (GPIO_ReadInputPin(BRAKE__PORT, BRAKE__PIN) && ui8_offroad_counter > MORSE_TIME_1 + MORSE_TOLERANCE) {//brake is released according to cheatcode
-                ui8_offroad_state = 2;
-                ui8_offroad_counter = 0;
-            } else if (!GPIO_ReadInputPin(BRAKE__PORT, BRAKE__PIN) && ui8_offroad_counter > MORSE_TIME_1 + MORSE_TOLERANCE) {//brake is released too late
+            if (ui8_offroad_counter == 255) {//disable on pressing brake for 5 seconds
                 ui8_offroad_state = 0;
                 ui8_offroad_counter = 0;
             }
+        } else {
+            ui8_offroad_counter = 0;
         }
-
-        if (ui8_offroad_state == 2) {//third step, make sure the brake is released according to definded time
-            ui8_offroad_counter++;
-            if (!GPIO_ReadInputPin(BRAKE__PORT, BRAKE__PIN) && ui8_offroad_counter < MORSE_TIME_2) { //brake is hold too early
-                ui8_offroad_state = 0;
-                ui8_offroad_counter = 0;
-            } else if (!GPIO_ReadInputPin(BRAKE__PORT, BRAKE__PIN) && ui8_offroad_counter > MORSE_TIME_2 + MORSE_TOLERANCE) {//brake is hold according to cheatcode
-                ui8_offroad_state = 3;
-                ui8_offroad_counter = 0;
-
-            } else if (GPIO_ReadInputPin(BRAKE__PORT, BRAKE__PIN) && ui8_offroad_counter > MORSE_TIME_2 + MORSE_TOLERANCE) {//brake is hold too late
-                ui8_offroad_state = 0;
-                ui8_offroad_counter = 0;
-            }
+    } else if (ui8_offroad_state == 0 && !GPIO_ReadInputPin(BRAKE__PORT, BRAKE__PIN)) {//first step, brake on.
+        ui8_offroad_state = 1;
+    } else if (ui8_offroad_state == 1) {//second step, make sure the brake is hold according to definded time
+        ui8_offroad_counter++;
+        if (GPIO_ReadInputPin(BRAKE__PORT, BRAKE__PIN) && ui8_offroad_counter < MORSE_TIME_1) {//brake is released too early
+            ui8_offroad_state = 0;
+            ui8_offroad_counter = 0;
+        } else if (GPIO_ReadInputPin(BRAKE__PORT, BRAKE__PIN) && ui8_offroad_counter > MORSE_TIME_1 + MORSE_TOLERANCE) {//brake is released according to cheatcode
+            ui8_offroad_state = 2;
+            ui8_offroad_counter = 0;
+        } else if (!GPIO_ReadInputPin(BRAKE__PORT, BRAKE__PIN) && ui8_offroad_counter > MORSE_TIME_1 + MORSE_TOLERANCE) {//brake is released too late
+            ui8_offroad_state = 0;
+            ui8_offroad_counter = 0;
         }
+    } else if (ui8_offroad_state == 2) {//third step, make sure the brake is released according to definded time
+        ui8_offroad_counter++;
+        if (!GPIO_ReadInputPin(BRAKE__PORT, BRAKE__PIN) && ui8_offroad_counter < MORSE_TIME_2) { //brake is hold too early
+            ui8_offroad_state = 0;
+            ui8_offroad_counter = 0;
+        } else if (!GPIO_ReadInputPin(BRAKE__PORT, BRAKE__PIN) && ui8_offroad_counter > MORSE_TIME_2 + MORSE_TOLERANCE) {//brake is hold according to cheatcode
+            ui8_offroad_state = 3;
+            ui8_offroad_counter = 0;
 
-        if (ui8_offroad_state == 3) {//second step, make sure the brake is hold according to definded time
-            ui8_offroad_counter++;
-            if (GPIO_ReadInputPin(BRAKE__PORT, BRAKE__PIN) && ui8_offroad_counter < MORSE_TIME_3) {//brake is released too early
-                ui8_offroad_state = 0;
-                ui8_offroad_counter = 0;
-            } else if (GPIO_ReadInputPin(BRAKE__PORT, BRAKE__PIN) && ui8_offroad_counter > MORSE_TIME_3 + MORSE_TOLERANCE) {//brake is released according to cheatcode
-                ui8_offroad_state = 4;
-                ui8_offroad_counter = 0;
-
-            } else if (!GPIO_ReadInputPin(BRAKE__PORT, BRAKE__PIN) && ui8_offroad_counter > MORSE_TIME_3 + MORSE_TOLERANCE) {//brake is released too late
-                ui8_offroad_state = 0;
-                ui8_offroad_counter = 0;
-            }
+        } else if (GPIO_ReadInputPin(BRAKE__PORT, BRAKE__PIN) && ui8_offroad_counter > MORSE_TIME_2 + MORSE_TOLERANCE) {//brake is hold too late
+            ui8_offroad_state = 0;
+            ui8_offroad_counter = 0;
         }
+    } else if (ui8_offroad_state == 3) {//second step, make sure the brake is hold according to definded time
+        ui8_offroad_counter++;
+        if (GPIO_ReadInputPin(BRAKE__PORT, BRAKE__PIN) && ui8_offroad_counter < MORSE_TIME_3) {//brake is released too early
+            ui8_offroad_state = 0;
+            ui8_offroad_counter = 0;
+        } else if (GPIO_ReadInputPin(BRAKE__PORT, BRAKE__PIN) && ui8_offroad_counter > MORSE_TIME_3 + MORSE_TOLERANCE) {//brake is released according to cheatcode
+            ui8_offroad_state = 4;
+            ui8_offroad_counter = 0;
+
+        } else if (!GPIO_ReadInputPin(BRAKE__PORT, BRAKE__PIN) && ui8_offroad_counter > MORSE_TIME_3 + MORSE_TOLERANCE) {//brake is released too late
+            ui8_offroad_state = 0;
+            ui8_offroad_counter = 0;
+        }
+    } else if (ui8_offroad_state == 4) {
         // wait 3 seconds in state 4 for display feedback
-        if (ui8_offroad_state == 4) {
-            ui8_offroad_counter++;
-            if (ui8_offroad_counter > 150) {
-                ui8_offroad_state = 5;
-                ui8_offroad_counter = 0;
-            }
+        ui8_offroad_counter++;
+        if (ui8_offroad_counter > 150) {
+            ui8_offroad_state = 5;
+            ui8_offroad_counter = 0;
         }
-
     }
+
+
 }

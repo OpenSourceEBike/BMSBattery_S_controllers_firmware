@@ -43,6 +43,9 @@ extern uint8_t ui8_position_correction_value;
 extern uint16_t ui16_ADC_iq_current;
 extern uint16_t ui16_ADC_iq_current_filtered;
 extern uint8_t ui8_speedlimit_kph;
+extern uint8_t ui8_speedlimit_without_pas_kph;
+extern uint8_t ui8_speedlimit_actual_kph;
+extern uint8_t ui8_speedlimit_with_throttle_override_kph;
 extern uint8_t ui8_uptime;
 
 extern uint8_t uint8_t_hall_case[7];
@@ -51,8 +54,7 @@ extern int8_t int8_t_hall_counter;
 extern uint8_t ui8_hall_debug_counter;
 extern uint8_t ui8_hall_order_counter;
 
-extern uint16_t ui16_erps_limit_lower;
-extern uint16_t ui16_erps_limit_higher;
+extern uint16_t ui16_speed_kph_to_erps_ratio;
 
 extern uint32_t ui32_SPEED_km_h; //global variable Speed
 extern uint32_t ui32_SPEED_km_h_accumulated;

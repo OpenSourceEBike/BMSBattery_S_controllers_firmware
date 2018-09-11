@@ -38,10 +38,11 @@
 #define BATTERY_LI_ION_CELLS_NUMBER 13
 #define PAS_THRESHOLD 1.9
 #define PWM_CYCLES_SECOND 15625L
-#define SPEEDSENSOR_EXTERNAL
+#define SPEEDSENSOR_INTERNAL
+#define REGEN_DIGITAL
 #define PAS_DIRECTION 1
 #define BLUOSEC
 #define ACA
-#define EEPROM_INIT_MAGIC_BYTE 53 // makes sure (chance of fail 1/255) eeprom is invalidated after flashing new config
+#define EEPROM_INIT_MAGIC_BYTE 173 // makes sure (chance of fail 1/255) eeprom is invalidated after flashing new config
 
 #endif /* CONFIG_H_ */

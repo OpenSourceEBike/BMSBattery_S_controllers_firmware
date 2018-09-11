@@ -31,9 +31,11 @@ void setSignal(uint8_t signal);
 uint8_t readAndClearSignal(uint8_t signal);
 void updateHallOrder(uint8_t hall_sensors);
 void updateOffroadStatus(void);
-void updateErpsLimits(uint8_t force);
+void initErpsRatio(void);
 void updateSpeeds(void);
 void updatePasStatus(void);
 void checkPasInActivity(void);
+void updateRequestedTorque(void);
+
 #endif /* ACACOMMONS_H */
 

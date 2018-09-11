@@ -49,19 +49,7 @@ float float_kv = 0;
 float float_R = 0;
 uint8_t a = 0; //loop counter
 
-//static uint16_t ui16_throttle_counter = 0;
-//uint16_t ui16_temp_delay = 0;
 static int16_t i16_deziAmps;
-
-//uint8_t uint8_t_rotorposition [7] = {
-//    0,
-//    42,
-//    85,
-//    127,
-//    170,
-//    212,
-//    255
-//};
 
 
 /////////////////////////////////////////////////////////////////////////////////////////////
@@ -96,8 +84,6 @@ void TIM1_UPD_OVF_TRG_BRK_IRQHandler(void) __interrupt(TIM1_UPD_OVF_TRG_BRK_IRQH
 // Timer2/slow control loop
 void TIM2_UPD_OVF_TRG_BRK_IRQHandler(void) __interrupt(TIM2_UPD_OVF_TRG_BRK_IRQHANDLER);
 
-
-
 // UART2 receivce handler
 void UART2_IRQHandler(void) __interrupt(UART2_IRQHANDLER);
 
@@ -106,13 +92,6 @@ void UART2_IRQHandler(void) __interrupt(UART2_IRQHANDLER);
 /////////////////////////////////////////////////////////////////////////////////////////////
 
 int main(void) {
-    //  static uint32_t ui32_cruise_counter = 0;
-    //  static uint8_t ui8_cruise_duty_cycle = 0;
-
-    static uint8_t ui8_temp = 0;
-    static int16_t i16_temp = 0;
-
-
     //set clock at the max 16MHz
     CLK_HSIPrescalerConfig(CLK_PRESCALER_HSIDIV1);
 
@@ -124,7 +103,7 @@ int main(void) {
     uart_init();
     eeprom_init();
     controllerstate_init();
-    updateErpsLimits(1);
+    initErpsRatio();
     pwm_init();
     hall_sensor_init();
     adc_init();
@@ -158,12 +137,6 @@ int main(void) {
     printf("System initialized\r\n");
 #endif
     while (1) {
-        static uint32_t ui32_counter = 0;
-        uint16_t ui16_temp = 0;
-
-        uint16_t ui32_temp = 0;
-        uint8_t j = 0;
-        static float f_temp = 0;
 
         updateSpeeds();
         updatePasStatus();
@@ -190,27 +163,16 @@ int main(void) {
         processBoMessage();
 #endif
 
-
         // scheduled update of setpoint and duty cycle (slow loop, 50 Hz)
-
         if (ui8_slowloop_flag) {
             //printf("MainSlowLoop\n");
 
             ui8_slowloop_flag = 0; //reset flag for slow loop
             ui8_veryslowloop_counter++; // increase counter for very slow loop
-
-#if defined(THROTTLE)  || defined(THROTTLE_AND_PAS) || defined (TORQUE_SIMULATION) || defined (ACA)// read in Throttle value an map it to margins
-            ui16_throttle_accumulated -= ui16_throttle_accumulated >> 3;
-            ui16_throttle_accumulated += ui8_adc_read_throttle();
-
-            ui8_temp = ui16_throttle_accumulated >> 3; //read in value from adc
-
-            ui16_sum_torque = (uint8_t) map(ui8_temp, ui8_throttle_min_range, ui8_throttle_max_range, 0, SETPOINT_MAX_VALUE); //map throttle to limits
-#endif
-
+            
             checkPasInActivity();
+            updateRequestedTorque(); //now calculates tq for sensor as well
             updateOffroadStatus();
-            updateErpsLimits(0);
 
 #if defined(THROTTLE)  || defined(THROTTLE_AND_PAS) || defined (TORQUE_SIMULATION) || defined (TORQUESENSOR)      
             ui16_setpoint = (uint16_t) update_setpoint(ui16_time_ticks_between_speed_interrupt, ui16_time_ticks_between_pas_interrupt, ui16_sum_torque, ui16_setpoint); //update setpoint
@@ -228,9 +190,6 @@ int main(void) {
 
             //pwm_set_duty_cycle ((uint8_t)ui16_sum_torque);
 
-
-
-
             /****************************************************************************/
             //very slow loop for communication
             if (ui8_veryslowloop_counter > 5) {
@@ -242,9 +201,6 @@ int main(void) {
                     ui8_ultraslowloop_counter = 0;
                     ui8_uptime++;
                 }
-
-
-                //getchar1 ();
 
 #ifdef DIAGNOSTICS
                 printf("%u,%u, %u, %u, %u, %u\r\n", ui8_control_state, ui16_setpoint, ui16_motor_speed_erps, ui16_BatteryCurrent, ui16_time_ticks_between_pas_interrupt, ui16_sum_torque);
