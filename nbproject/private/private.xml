@@ -7,9 +7,9 @@
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
+            <file>file:/G:/osebikefw/ACAcommons.c</file>
             <file>file:/G:/osebikefw/config.h</file>
             <file>file:/G:/osebikefw/BOdisplay.c</file>
-            <file>file:/G:/osebikefw/main.c</file>
             <file>file:/G:/osebikefw/PAS.c</file>
             <file>file:/G:/osebikefw/interrupts.h</file>
             <file>file:/G:/osebikefw/BOdisplay.h</file>
@@ -23,8 +23,8 @@
             <file>file:/G:/osebikefw/motor.c</file>
             <file>file:/G:/osebikefw/ACAsetPoint.h</file>
             <file>file:/G:/osebikefw/brake.c</file>
-            <file>file:/G:/osebikefw/adc.c</file>
             <file>file:/G:/osebikefw/update_setpoint.c</file>
+            <file>file:/G:/osebikefw/display.c</file>
         </group>
     </open-files>
 </project-private>

@@ -36,7 +36,7 @@ static int16_t i16_assistlevel[6] = {0, LEVEL_1, LEVEL_2, LEVEL_3, LEVEL_4, LEVE
 static int8_t uint_PWM_Enable = 0; //flag for PWM state
 static uint16_t ui16_BatteryCurrent_accumulated = 2496L; //8x current offset, for filtering or Battery Current
 static uint16_t ui16_BatteryVoltage_accumulated;
-static uint16_t ui16_time_ticks_between_pas_interrupt_accumulated = 64000L; // for filtering of PAS value // why start at 64000?
+static uint32_t ui32_time_ticks_between_pas_interrupt_accumulated = 32000L; // for filtering of PAS value // why start at 64000?
 static uint32_t ui32_erps_accumulated; //for filtering of erps
 static uint32_t ui32_erps_filtered; //filtered value of erps
 
@@ -82,9 +82,9 @@ uint16_t aca_setpoint(uint16_t ui16_time_ticks_between_speed_interrupt, uint16_t
     ui32_erps_accumulated += ui16_motor_speed_erps;
     ui32_erps_filtered = ui32_erps_accumulated >> 3;
 
-    ui16_time_ticks_between_pas_interrupt_accumulated -= ui16_time_ticks_between_pas_interrupt_accumulated >> 3;
-    ui16_time_ticks_between_pas_interrupt_accumulated += ui16_time_ticks_between_pas_interrupt;
-    ui16_time_ticks_between_pas_interrupt_smoothed = ui16_time_ticks_between_pas_interrupt_accumulated >> 3; // now it's filtered
+    ui32_time_ticks_between_pas_interrupt_accumulated -= ui32_time_ticks_between_pas_interrupt_accumulated >> 3;
+    ui32_time_ticks_between_pas_interrupt_accumulated += ui16_time_ticks_between_pas_interrupt;
+    ui16_time_ticks_between_pas_interrupt_smoothed = ui32_time_ticks_between_pas_interrupt_accumulated >> 3; // now it's filtered
 
     //check for undervoltage
     if (ui8_BatteryVoltage < BATTERY_VOLTAGE_MIN_VALUE) {

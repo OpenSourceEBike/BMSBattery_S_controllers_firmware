@@ -66,6 +66,10 @@ uint8_t eeprom_write(uint8_t address_offset, uint8_t value) {
         return 1;
     }
 
+    if (eeeprom_read(address_offset) == value) {
+        return 0;
+    }
+
     FLASH_SetProgrammingTime(FLASH_PROGRAMTIME_STANDARD);
     FLASH_Unlock(FLASH_MEMTYPE_DATA);
     while (!FLASH_GetFlagStatus(FLASH_FLAG_DUL));
