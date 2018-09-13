@@ -66,7 +66,7 @@ uint8_t eeprom_write(uint8_t address_offset, uint8_t value) {
         return 1;
     }
 
-    if (eeeprom_read(address_offset) == value) {
+    if (eeprom_read(address_offset) == value) {
         return 0;
     }
 

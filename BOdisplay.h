@@ -80,7 +80,7 @@ typedef enum {
 	CODE_CURRENT_CAL_B = ((uint8_t) 0x89),
 
 	CODE_EEPROM_MAGIC_BYTE = ((uint8_t) 0x84),
-	CODE_MAX_SPEED = ((uint8_t) 0x85),
+	CODE_MAX_SPEED_DEFAULT = ((uint8_t) 0x85),
 
 	CODE_THROTTLE_MIN_RANGE = ((uint8_t) 0x86),
 	CODE_THROTTLE_MAX_RANGE = ((uint8_t) 0x87),
@@ -91,6 +91,11 @@ typedef enum {
 	CODE_PID_GAIN_I = ((uint8_t) 0x8C),
 	CODE_RAMP_END = ((uint8_t) 0x8D),
 	CODE_PAS_DIRECTION = ((uint8_t) 0x8E),
+
+	CODE_ACTUAL_MAX_SPEED = ((uint8_t) 0x90),
+	CODE_MAX_SPEED_WITHOUT_PAS = ((uint8_t) 0x91),
+	CODE_MAX_SPEED_WITH_THROTTLE_OVERRIDE = ((uint8_t) 0x92),
+	CODE_THROTTLE_REACTS_TO_ASSIST_LEVEL = ((uint8_t) 0x93),
 
 	CODE_HALL_ORDER_BASE = ((uint8_t) 0x10),
 	CODE_CURRENT_AT_HALL_POSITION_BASE = ((uint8_t) 0x00)

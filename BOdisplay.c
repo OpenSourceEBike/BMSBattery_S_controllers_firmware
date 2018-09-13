@@ -128,7 +128,10 @@ void addConfigStateInfos(void) {
     addPayload(CODE_CURRENT_CAL_B_HIGH_BYTE, ui16_current_cal_b >> 8);
     addPayload(CODE_CURRENT_CAL_B, ui16_current_cal_b);
     addPayload(CODE_EEPROM_MAGIC_BYTE, eeprom_magic_byte);
-    addPayload(CODE_MAX_SPEED, ui8_speedlimit_actual_kph);
+    addPayload(CODE_MAX_SPEED_DEFAULT, ui8_speedlimit_kph);
+    addPayload(CODE_MAX_SPEED_WITHOUT_PAS, ui8_speedlimit_without_pas_kph);
+    addPayload(CODE_MAX_SPEED_WITH_THROTTLE_OVERRIDE, ui8_speedlimit_with_throttle_override_kph);
+    addPayload(CODE_THROTTLE_REACTS_TO_ASSIST_LEVEL, ui8_throttle_reacts_to_assist_level);
     addPayload(CODE_ASSIST_LEVEL, ui8_assistlevel_global);
     addPayload(CODE_THROTTLE_MIN_RANGE, ui8_throttle_min_range);
     addPayload(CODE_THROTTLE_MAX_RANGE, ui8_throttle_max_range);
@@ -139,7 +142,7 @@ void addConfigStateInfos(void) {
     addPayload(CODE_PID_GAIN_I, float2int(flt_s_pid_gain_i, 1.0));
     addPayload(CODE_RAMP_END, ui16_s_ramp_end >> 4);
 
-    // 5 more elements left/avail (max20)
+    // 2 more elements left/avail (max20)
 
 }
 
@@ -176,13 +179,13 @@ void addDetailStateInfos(void) {
     addPayload(CODE_PAS_HIGH_COUNTER, ui16_PAS_High);
     addPayload(CODE_PAS_COUNTER_HIGH_BYTE, ui16_time_ticks_between_pas_interrupt >> 8);
     addPayload(CODE_PAS_COUNTER, ui16_time_ticks_between_pas_interrupt);
+   
 
-
-
-    // 6 more elements left/avail (max20)
+    // 5 more elements left/avail (max20)
 }
 
 void addBasicStateInfos(void) {
+    addPayload(CODE_ACTUAL_MAX_SPEED, ui8_speedlimit_actual_kph);
     addPayload(CODE_ASSIST_LEVEL, ui8_assistlevel_global);
     addPayload(CODE_BRAKE_STATUS, (int) brake_is_set());
     addPayload(CODE_MOTOR_STATE, ui8_motor_state);
@@ -197,7 +200,7 @@ void addBasicStateInfos(void) {
     addPayload(CODE_SETPOINT_STATE, ui8_control_state);
     addPayload(CODE_UPTIME, ui8_uptime);
 
-    // 7 more elements left/avail (max20)
+    // 6 more elements left/avail (max20)
 }
 
 void gatherDynamicPayload(uint8_t function) {
@@ -227,13 +230,9 @@ void gatherStaticPayload(uint8_t function) {
 
 uint8_t digestConfigRequest(uint8_t configAddress, uint8_t requestedCode, uint8_t requestedValue) {
     switch (requestedCode) {
-        case CODE_MAX_SPEED:
-            ui8_speedlimit_kph = requestedValue;
-            if (configAddress == EEPROM_ADDRESS) {
-                eeprom_write(OFFSET_MAX_SPEED, requestedValue);
-            }
-            setSignal(SIGNAL_SPEEDLIMIT_CHANGED);
-            return ui8_speedlimit_kph;
+        case CODE_OFFROAD:
+            ui8_offroad_state = requestedValue;
+            return ui8_offroad_state;
             break;
         case CODE_ASSIST_LEVEL:
             ui8_assistlevel_global = requestedValue;
@@ -241,6 +240,13 @@ uint8_t digestConfigRequest(uint8_t configAddress, uint8_t requestedCode, uint8_
                 eeprom_write(OFFSET_ASSIST_LEVEL, requestedValue);
             }
             return ui8_assistlevel_global;
+            break;
+        case CODE_THROTTLE_REACTS_TO_ASSIST_LEVEL:
+            ui8_throttle_reacts_to_assist_level = requestedValue;
+            if (configAddress == EEPROM_ADDRESS) {
+                eeprom_write(OFFSET_THROTTLE_REACTS_TO_ASSIST_LEVEL, requestedValue);
+            }
+            return ui8_throttle_reacts_to_assist_level;
             break;
         case CODE_THROTTLE_MIN_RANGE:
             ui8_throttle_min_range = requestedValue;
@@ -299,6 +305,31 @@ uint8_t digestConfigRequest(uint8_t configAddress, uint8_t requestedCode, uint8_
             }
             return ui16_s_ramp_end >> 4;
             break;
+        case CODE_MAX_SPEED_DEFAULT:
+            ui8_speedlimit_kph = requestedValue;
+            if (configAddress == EEPROM_ADDRESS) {
+                eeprom_write(OFFSET_MAX_SPEED_DEFAULT, requestedValue);
+            }
+            setSignal(SIGNAL_SPEEDLIMIT_CHANGED);
+            return ui8_speedlimit_kph;
+            break;
+        case CODE_MAX_SPEED_WITHOUT_PAS:
+            ui8_speedlimit_without_pas_kph = requestedValue;
+            if (configAddress == EEPROM_ADDRESS) {
+                eeprom_write(OFFSET_MAX_SPEED_WITHOUT_PAS, requestedValue);
+            }
+            setSignal(SIGNAL_SPEEDLIMIT_CHANGED);
+            return ui8_speedlimit_without_pas_kph;
+            break;
+        case CODE_MAX_SPEED_WITH_THROTTLE_OVERRIDE:
+            ui8_speedlimit_with_throttle_override_kph = requestedValue;
+            if (configAddress == EEPROM_ADDRESS) {
+                eeprom_write(OFFSET_MAX_SPEED_WITH_THROTTLE_OVERRIDE, requestedValue);
+            }
+            setSignal(SIGNAL_SPEEDLIMIT_CHANGED);
+            return ui8_speedlimit_with_throttle_override_kph;
+            break;
+        
 
         default:
             addPayload(CODE_ERROR, CODE_ERROR);

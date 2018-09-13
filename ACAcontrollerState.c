@@ -75,6 +75,8 @@ uint16_t ui16_time_ticks_for_speed_calculation = 0; //time tics for speed measur
 uint8_t ui8_SPEED_Flag = 0; //flag for SPEED interrupt
 uint8_t ui8_offroad_counter = 0; //counter for offroad switching procedure
 
+uint8_t ui8_throttle_reacts_to_assist_level = 0; //if throttle input should be bases on assist level
+
 uint8_t ui8_adc_read_throttle_busy = 0;
 uint16_t ui16_torque[NUMBER_OF_PAS_MAGS]; //array for torque values of one crank revolution
 uint8_t ui8_torque_index = 0; //counter for torque array
@@ -104,8 +106,15 @@ void controllerstate_init(void) {
     ui8_s_motor_angle = MOTOR_ROTOR_DELTA_PHASE_ANGLE_RIGHT;
 
     // read in overrides from eeprom if they are > 0, assuming 0s are uninitialized
-    eepromVal = eeprom_read(OFFSET_MAX_SPEED);
+    eepromVal = eeprom_read(OFFSET_MAX_SPEED_DEFAULT);
     if (eepromVal > 0) ui8_speedlimit_kph = eepromVal;
+    eepromVal = eeprom_read(OFFSET_MAX_SPEED_WITHOUT_PAS);
+    if (eepromVal > 0) ui8_speedlimit_without_pas_kph = eepromVal;
+    eepromVal = eeprom_read(OFFSET_MAX_SPEED_WITH_THROTTLE_OVERRIDE);
+    if (eepromVal > 0) ui8_speedlimit_with_throttle_override_kph = eepromVal;
+    eepromVal = eeprom_read(OFFSET_THROTTLE_REACTS_TO_ASSIST_LEVEL);
+    if (eepromVal > 0) ui8_throttle_reacts_to_assist_level = eepromVal;
+    
     eepromVal = eeprom_read(OFFSET_ASSIST_LEVEL);
     if (eepromVal > 0) ui8_assistlevel_global = eepromVal;
     eepromVal = eeprom_read(OFFSET_THROTTLE_MIN_RANGE);

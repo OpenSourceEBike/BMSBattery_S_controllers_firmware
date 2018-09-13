@@ -56,17 +56,18 @@ uint16_t cutoffSetpoint(uint32_t ui32_setpoint) {
 
 // note: sumtorque is considered to be throttle input, not torquesensor input
 // to make torquesensor work with ACA probably a few tweaks are needed, as high torquesensor input would override pas input
+
 uint16_t aca_setpoint(uint16_t ui16_time_ticks_between_speed_interrupt, uint16_t ui16_time_ticks_between_pas_interrupt, uint16_t sumtorque, uint16_t setpoint_old) {
 #if defined(ACA)  
 
     // first select current speed limit
     if (ui8_offroad_state == 5) {
         ui8_speedlimit_actual_kph = 80;
+    } else if (ui8_offroad_state == 6 && sumtorque > 2) {
+        ui8_speedlimit_actual_kph = ui8_speedlimit_with_throttle_override_kph;
     } else if (ui16_time_ticks_for_pas_calculation > timeout || !PAS_dir) {
         ui8_speedlimit_actual_kph = ui8_speedlimit_without_pas_kph;
-    } else if (sumtorque >2) {
-        ui8_speedlimit_actual_kph = ui8_speedlimit_with_throttle_override_kph;
-    }else{
+    } else {
         ui8_speedlimit_actual_kph = ui8_speedlimit_kph;
     }
 
@@ -112,16 +113,21 @@ uint16_t aca_setpoint(uint16_t ui16_time_ticks_between_speed_interrupt, uint16_t
             uint32_current_target = (i16_assistlevel[ui8_assistlevel_global]*(BATTERY_CURRENT_MAX_VALUE - ui16_current_cal_b) / 100);
             float_temp = ((float) ui16_s_ramp_end) / ((float) ui16_time_ticks_between_pas_interrupt_smoothed);
 
-            uint32_current_target = ((int16_t) (uint32_current_target)*(int16_t) (float_temp * 100)) / 100 + ui16_current_cal_b;
+            uint32_current_target = ((uint16_t) (uint32_current_target)*(uint16_t) (float_temp * 100)) / 100 + ui16_current_cal_b;
 
         } else {
             uint32_current_target = (i16_assistlevel[ui8_assistlevel_global]*(BATTERY_CURRENT_MAX_VALUE - ui16_current_cal_b) / 100 + ui16_current_cal_b);
 
         }
         ui8_control_state = 9;
-        float_temp = (float) sumtorque * (float) (BATTERY_CURRENT_MAX_VALUE - ui16_current_cal_b) / 255.0 + (float) ui16_current_cal_b; //calculate current target
-        if ((int32_t) float_temp > uint32_current_target) {
-            uint32_current_target = (int32_t) float_temp; //override torque simulation with throttle
+
+        if (ui8_throttle_reacts_to_assist_level == 1) {
+            float_temp = (float) i16_assistlevel[ui8_assistlevel_global] * (float) sumtorque * (float) (BATTERY_CURRENT_MAX_VALUE - ui16_current_cal_b) / 255.0 + (float) ui16_current_cal_b; //calculate current target
+        } else {
+            float_temp = (float) sumtorque * (float) (BATTERY_CURRENT_MAX_VALUE - ui16_current_cal_b) / 255.0 + (float) ui16_current_cal_b; //calculate current target
+        }
+        if ((uint32_t) float_temp > uint32_current_target) {
+            uint32_current_target = (uint32_t) float_temp; //override torque simulation with throttle
             ui8_control_state = 10;
         }
 

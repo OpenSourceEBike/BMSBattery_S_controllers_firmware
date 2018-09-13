@@ -65,6 +65,8 @@ extern uint8_t ui8_SPEED_Flag; //Flag for PAS Interrupt detected
 extern uint16_t ui16_time_ticks_between_speed_interrupt; //Speed duration of one wheel revolution (tics * 64us)
 extern uint8_t ui8_offroad_counter;
 
+extern uint8_t ui8_throttle_reacts_to_assist_level;
+
 extern uint8_t ui8_adc_read_throttle_busy;
 
 extern uint16_t ui16_torque[NUMBER_OF_PAS_MAGS];
