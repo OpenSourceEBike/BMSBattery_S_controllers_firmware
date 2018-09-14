@@ -82,6 +82,7 @@ extern uint8_t ui8_PAS_Flag; //flag for PAS interrupt
 extern uint8_t ui8_PAS_update_call_when_inactive_counter;
 
 extern uint8_t ui8_s_pas_direction;
+extern float flt_torquesensorCalibration;
 extern float flt_s_pas_threshold;
 extern float flt_s_pid_gain_p;
 extern float flt_s_pid_gain_i;

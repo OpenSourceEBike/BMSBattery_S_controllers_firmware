@@ -36,6 +36,7 @@ uint8_t ui8_s_pas_direction = 0;
 float flt_s_pas_threshold = 1.7;
 float flt_s_pid_gain_p = 0.5;
 float flt_s_pid_gain_i = 0.2;
+float flt_torquesensorCalibration = 0.0;
 uint16_t ui16_s_ramp_end = 1500;
 uint8_t ui8_s_motor_angle = 214;
 

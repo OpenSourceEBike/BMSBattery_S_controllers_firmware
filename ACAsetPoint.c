@@ -121,13 +121,21 @@ uint16_t aca_setpoint(uint16_t ui16_time_ticks_between_speed_interrupt, uint16_t
         }
         ui8_control_state = 9;
 
+		float_temp = (float) sumtorque;
         if (ui8_throttle_reacts_to_assist_level == 1) {
-            float_temp = (float) i16_assistlevel[ui8_assistlevel_global] * (float) sumtorque * (float) (BATTERY_CURRENT_MAX_VALUE - ui16_current_cal_b) / 255.0 + (float) ui16_current_cal_b; //calculate current target
-        } else {
-            float_temp = (float) sumtorque * (float) (BATTERY_CURRENT_MAX_VALUE - ui16_current_cal_b) / 255.0 + (float) ui16_current_cal_b; //calculate current target
-        }
+			float_temp *= ((float) i16_assistlevel[ui8_assistlevel_global]/100.0);
+		}
+		if (flt_torquesensorCalibration != 0.0){
+			// TODO adjust flt_torquesensorCalibration in case of torquesensor;
+			// flt_torquesensorCalibration is >fummelfactor * NUMBER_OF_PAS_MAGS * 64< (64 cause of <<6)
+			float_temp *= flt_torquesensorCalibration /((uint32_t)ui16_time_ticks_between_pas_interrupt_smoothed); // influence of cadence
+			float_temp *= (1000+ui32_SPEED_km_h/ui8_speedlimit_actual_kph)/1000; // influence of current speed, don't get this part, more tq the faster you are?
+		}
+				
+        float_temp = float_temp * (float) (BATTERY_CURRENT_MAX_VALUE - ui16_current_cal_b) / 255.0 + (float) ui16_current_cal_b; //calculate current target
+        
         if ((uint32_t) float_temp > uint32_current_target) {
-            uint32_current_target = (uint32_t) float_temp; //override torque simulation with throttle
+            uint32_current_target = (uint32_t) float_temp; //override torque simulation with throttle / torquesensor
             ui8_control_state = 10;
         }
 
