@@ -101,7 +101,7 @@ void updateSpeeds(void) {
 
 uint32_t CheckSpeed(uint16_t current_target, uint16_t speed, uint16_t softLimit, uint16_t hardLimit) {
     //ramp down motor power if you are riding too fast and speed liming is active
-    if (speed > softLimit && ui8_offroad_state != 5) { // FIXME the && part is only in here for old setpoint, aca already defines a higher limit
+    if (speed > softLimit && ui8_offroad_state != 255) { // FIXME the && part is only in here for old setpoint, aca already defines a higher limit
 
         if (speed > hardLimit) { //if you are riding much too fast, stop motor immediately
             current_target = ui16_current_cal_b;
@@ -239,7 +239,13 @@ void updatePasStatus(void) {
 
 void updateOffroadStatus(void) {
 
-    if (ui8_offroad_state == 5) {
+    // check if offroad mode is enabled
+    if (0 == (ui8_aca_flags & OFFROAD_ENABLED)) {
+        return;
+    }
+
+    if (((ui8_aca_flags & BRAKE_DISABLES_OFFROAD) == BRAKE_DISABLES_OFFROAD) && (ui8_offroad_state > 4)) {
+        // if disabling is enabled :)
         if (!GPIO_ReadInputPin(BRAKE__PORT, BRAKE__PIN)) {
             ui8_offroad_counter++;
             if (ui8_offroad_counter == 255) {//disable on pressing brake for 5 seconds
@@ -293,7 +299,7 @@ void updateOffroadStatus(void) {
         // wait 3 seconds in state 4 for display feedback
         ui8_offroad_counter++;
         if (ui8_offroad_counter > 150) {
-            ui8_offroad_state = 5;
+            ui8_offroad_state = 255;
             ui8_offroad_counter = 0;
         }
     }

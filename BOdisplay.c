@@ -131,15 +131,15 @@ void addConfigStateInfos(void) {
     addPayload(CODE_MAX_SPEED_DEFAULT, ui8_speedlimit_kph);
     addPayload(CODE_MAX_SPEED_WITHOUT_PAS, ui8_speedlimit_without_pas_kph);
     addPayload(CODE_MAX_SPEED_WITH_THROTTLE_OVERRIDE, ui8_speedlimit_with_throttle_override_kph);
-    addPayload(CODE_THROTTLE_REACTS_TO_ASSIST_LEVEL, ui8_throttle_reacts_to_assist_level);
+    addPayload(CODE_ACA_FLAGS, ui8_aca_flags);
     addPayload(CODE_ASSIST_LEVEL, ui8_assistlevel_global);
     addPayload(CODE_THROTTLE_MIN_RANGE, ui8_throttle_min_range);
     addPayload(CODE_THROTTLE_MAX_RANGE, ui8_throttle_max_range);
     addPayload(CODE_MOTOR_SPECIFIC_ANGLE, ui8_s_motor_angle);
     addPayload(CODE_PAS_DIRECTION, ui8_s_pas_direction);
     addPayload(CODE_PAS_TRESHOLD, float2int(flt_s_pas_threshold, 4.0));
-    addPayload(CODE_PID_GAIN_P, float2int(flt_s_pid_gain_p, 1.0));
-    addPayload(CODE_PID_GAIN_I, float2int(flt_s_pid_gain_i, 1.0));
+    addPayload(CODE_PID_GAIN_P, float2int(flt_s_pid_gain_p, 2.0));
+    addPayload(CODE_PID_GAIN_I, float2int(flt_s_pid_gain_i, 2.0));
     addPayload(CODE_RAMP_END, ui16_s_ramp_end >> 4);
 
     // 2 more elements left/avail (max20)
@@ -242,12 +242,12 @@ uint8_t digestConfigRequest(uint8_t configAddress, uint8_t requestedCode, uint8_
             }
             return ui8_assistlevel_global;
             break;
-        case CODE_THROTTLE_REACTS_TO_ASSIST_LEVEL:
-            ui8_throttle_reacts_to_assist_level = requestedValue;
+        case CODE_ACA_FLAGS:
+            ui8_aca_flags = requestedValue;
             if (configAddress == EEPROM_ADDRESS) {
-                eeprom_write(OFFSET_THROTTLE_REACTS_TO_ASSIST_LEVEL, requestedValue);
+                eeprom_write(OFFSET_ACA_FLAGS, requestedValue);
             }
-            return ui8_throttle_reacts_to_assist_level;
+            return ui8_aca_flags;
             break;
         case CODE_THROTTLE_MIN_RANGE:
             ui8_throttle_min_range = requestedValue;
@@ -286,18 +286,18 @@ uint8_t digestConfigRequest(uint8_t configAddress, uint8_t requestedCode, uint8_
             return float2int(flt_s_pas_threshold, 4.0);
             break;
         case CODE_PID_GAIN_P:
-            flt_s_pid_gain_p = int2float(requestedValue, 1.0);
+            flt_s_pid_gain_p = int2float(requestedValue, 2.0);
             if (configAddress == EEPROM_ADDRESS) {
                 eeprom_write(OFFSET_PID_GAIN_P, requestedValue);
             }
-            return float2int(flt_s_pid_gain_p, 1.0);
+            return float2int(flt_s_pid_gain_p, 2.0);
             break;
         case CODE_PID_GAIN_I:
-            flt_s_pid_gain_i = int2float(requestedValue, 1.0);
+            flt_s_pid_gain_i = int2float(requestedValue, 2.0);
             if (configAddress == EEPROM_ADDRESS) {
                 eeprom_write(OFFSET_PID_GAIN_I, requestedValue);
             }
-            return float2int(flt_s_pid_gain_i, 1.0);
+            return float2int(flt_s_pid_gain_i, 2.0);
             break;
         case CODE_RAMP_END:
             ui16_s_ramp_end = requestedValue << 4;

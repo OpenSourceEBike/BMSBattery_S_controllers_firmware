@@ -76,7 +76,7 @@ uint16_t ui16_time_ticks_for_speed_calculation = 0; //time tics for speed measur
 uint8_t ui8_SPEED_Flag = 0; //flag for SPEED interrupt
 uint8_t ui8_offroad_counter = 0; //counter for offroad switching procedure
 
-uint8_t ui8_throttle_reacts_to_assist_level = 0; //if throttle input should be bases on assist level
+uint8_t ui8_aca_flags = 0; //if throttle input should be bases on assist level and other flags
 
 uint8_t ui8_adc_read_throttle_busy = 0;
 uint16_t ui16_torque[NUMBER_OF_PAS_MAGS]; //array for torque values of one crank revolution
@@ -95,6 +95,7 @@ void controllerstate_init(void) {
     uint8_t eepromVal;
 
     // convert static defines to volatile vars
+    ui8_aca_flags = ACA;
     ui8_speedlimit_kph = limit;
     ui8_speedlimit_actual_kph = limit;
     ui8_throttle_min_range = ADC_THROTTLE_MIN_VALUE;
@@ -113,8 +114,8 @@ void controllerstate_init(void) {
     if (eepromVal > 0) ui8_speedlimit_without_pas_kph = eepromVal;
     eepromVal = eeprom_read(OFFSET_MAX_SPEED_WITH_THROTTLE_OVERRIDE);
     if (eepromVal > 0) ui8_speedlimit_with_throttle_override_kph = eepromVal;
-    eepromVal = eeprom_read(OFFSET_THROTTLE_REACTS_TO_ASSIST_LEVEL);
-    if (eepromVal > 0) ui8_throttle_reacts_to_assist_level = eepromVal;
+    eepromVal = eeprom_read(OFFSET_ACA_FLAGS);
+    if (eepromVal > 0) ui8_aca_flags = eepromVal;
     
     eepromVal = eeprom_read(OFFSET_ASSIST_LEVEL);
     if (eepromVal > 0) ui8_assistlevel_global = eepromVal;
@@ -127,9 +128,9 @@ void controllerstate_init(void) {
     eepromVal = eeprom_read(OFFSET_PAS_TRESHOLD);
     if (eepromVal > 0) flt_s_pas_threshold = int2float(eepromVal, 4.0);
     eepromVal = eeprom_read(OFFSET_PID_GAIN_P);
-    if (eepromVal > 0) flt_s_pid_gain_p = int2float(eepromVal, 1.0);
+    if (eepromVal > 0) flt_s_pid_gain_p = int2float(eepromVal, 2.0);
     eepromVal = eeprom_read(OFFSET_PID_GAIN_I);
-    if (eepromVal > 0) flt_s_pid_gain_i = int2float(eepromVal, 1.0);
+    if (eepromVal > 0) flt_s_pid_gain_i = int2float(eepromVal, 2.0);
     eepromVal = eeprom_read(OFFSET_RAMP_END);
     if (eepromVal > 0) ui16_s_ramp_end = eepromVal << 4;
     eepromVal = eeprom_read(OFFSET_MOTOR_ANGLE);

@@ -61,10 +61,12 @@ uint16_t aca_setpoint(uint16_t ui16_time_ticks_between_speed_interrupt, uint16_t
 #if defined(ACA)  
 
     // first select current speed limit
-    if (ui8_offroad_state == 5) {
+    if (ui8_offroad_state == 255) {
         ui8_speedlimit_actual_kph = 80;
-    } else if (ui8_offroad_state == 6 && sumtorque > 2) {
-        ui8_speedlimit_actual_kph = ui8_speedlimit_with_throttle_override_kph;
+    } else if (ui8_offroad_state > 15 && sumtorque <= 2) { // allow a slight increase based on ui8_offroad_state
+        ui8_speedlimit_actual_kph = ui8_speedlimit_kph + (ui8_offroad_state-16);
+    } else if (ui8_offroad_state > 15 && sumtorque > 2) {
+        ui8_speedlimit_actual_kph = ui8_speedlimit_with_throttle_override_kph + (ui8_offroad_state-16);
     } else if (ui16_time_ticks_for_pas_calculation > timeout || !PAS_dir) {
         ui8_speedlimit_actual_kph = ui8_speedlimit_without_pas_kph;
     } else {
@@ -122,7 +124,7 @@ uint16_t aca_setpoint(uint16_t ui16_time_ticks_between_speed_interrupt, uint16_t
         }
 
         float_temp = (float) sumtorque;
-        if (ui8_throttle_reacts_to_assist_level == 1) {
+        if ((ui8_aca_flags & ASSIST_LVL_AFFECTS_THROTTLE) == 1) {
             float_temp *= ((float) i16_assistlevel[ui8_assistlevel_global] / 100.0);
             ui8_control_state += 2;
         }

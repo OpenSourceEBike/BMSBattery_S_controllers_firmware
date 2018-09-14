@@ -12,13 +12,12 @@
 #define limit 28
 #define timeout 3125
 #define wheel_circumference 2230L
-#define fummelfaktor 32L
 #define ADC_THROTTLE_MIN_VALUE 43
 #define ADC_THROTTLE_MAX_VALUE 182
 #define BATTERY_VOLTAGE_MIN_VALUE 148
 #define BATTERY_CURRENT_MAX_VALUE 550L
 #define PHASE_CURRENT_MAX_VALUE 666L
-#define REGEN_CURRENT_MAX_VALUE 162L
+#define REGEN_CURRENT_MAX_VALUE 80L
 #define MOTOR_ROTOR_DELTA_PHASE_ANGLE_RIGHT 200
 #define current_cal_a 10
 #define TEMP_CAL_A 1.6
@@ -31,7 +30,7 @@
 #define MORSE_TIME_1 50
 #define MORSE_TIME_2 50
 #define MORSE_TIME_3 50
-#define RAMP_END 777
+#define RAMP_END 1000
 #define P_FACTOR 0.5
 #define I_FACTOR 0.2
 #define GEAR_RATIO 24L
@@ -42,7 +41,8 @@
 #define REGEN_DIGITAL
 #define PAS_DIRECTION 1
 #define BLUOSEC
-#define ACA
-#define EEPROM_INIT_MAGIC_BYTE 83 // makes sure (chance of fail 1/255) eeprom is invalidated after flashing new config
+#define TQS_CALIB 0.0
+#define ACA 134
+#define EEPROM_INIT_MAGIC_BYTE 85 // makes sure (chance of fail 1/255) eeprom is invalidated after flashing new config
 
 #endif /* CONFIG_H_ */

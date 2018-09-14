@@ -33,6 +33,8 @@ import javax.swing.ButtonGroup;
 import javax.swing.JList;
 import javax.swing.JScrollPane;
 import java.awt.Dimension;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 import java.util.List;
 import java.util.ArrayList;
 import java.io.File;
@@ -46,17 +48,19 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.nio.file.Paths;
 import java.util.Arrays;
+import javax.swing.JCheckBox;
 
 public class OSEC extends JFrame {
-	
+
 	public class FileContainer {
 
 		public FileContainer(File file) {
 			this.file = file;
 		}
 		public File file;
+
 		@Override
-		public String toString(){
+		public String toString() {
 			return file.getName();
 		}
 	}
@@ -68,7 +72,6 @@ public class OSEC extends JFrame {
 	private JLabel lblSpeedLimit;
 	private JTextField txtSpeedlimit;
 	private JLabel lblSupportFactor;
-	private JTextField txtSupportfactor;
 	private JLabel lblThrottleMin;
 	private JTextField txtThrottlemin;
 	private JLabel lblThrottleMax;
@@ -78,7 +81,7 @@ public class OSEC extends JFrame {
 	private JButton btnWriteConfiguration;
 	private JTextField txtMaxbatterycurrent;
 	private JTextField txtUndervoltage;
-	private final ButtonGroup Ridingmode = new ButtonGroup();
+	//private final ButtonGroup Ridingmode = new ButtonGroup();
 	private JTextField txtMotor_specific_angle;
 	private JTextField txtBatteryCurcala;
 	private JLabel lblDiplayType;
@@ -98,6 +101,7 @@ public class OSEC extends JFrame {
 	private JTextField Morse_Time_2;
 	private JTextField Morse_Time_3;
 	private JTextField ramp_end;
+	private JTextField flt_tqCalibrationFactor;
 	private JTextField p_factor;
 	private JTextField i_factor;
 	private JTextField GearRatio;
@@ -120,16 +124,19 @@ public class OSEC extends JFrame {
 	private JRadioButton rdbtnKingmeterJlcd;
 	private JRadioButton rdbtnKtlcd;
 	private JRadioButton rdbtnDiganostics;
-	private JRadioButton rdbtnTorquesimulation;
-	private JRadioButton rdbtnACA;
-	private JRadioButton rdbtnThrottle;
-	private JRadioButton rdbtnTorqueSensor;
-	private JRadioButton rdbtnThrottlePas;
+
+	private JCheckBox cbTorqueSensor;
+	private JCheckBox cbAssistLevelInfluencesThrottle;
+	private JCheckBox cbOffroadEnabled;
+	private JCheckBox cbBrakeDisablesOffroad;
+	private JTextField speedWithoutPas;
+	private JTextField speedWithoutThrottleOverride;
+
 	private JRadioButton rdbtnNoRegen;
 	private JRadioButton rdbtnNodisplay;
-	
+
 	private File settingsDir;
-	private File lastSettingsFile=null;
+	private File lastSettingsFile = null;
 
 	/**
 	 * Launch the application.
@@ -155,7 +162,7 @@ public class OSEC extends JFrame {
 		txtSpeedlimit.setText(in.readLine());
 		txtPasTimeout.setText(in.readLine());
 		txtWheelCircumference.setText(in.readLine());
-		txtSupportfactor.setText(in.readLine());
+		in.readLine();//old options, no longer used
 		txtThrottlemin.setText(in.readLine());
 		txtThrottlemax.setText(in.readLine());
 		txtUndervoltage.setText(in.readLine());
@@ -181,10 +188,11 @@ public class OSEC extends JFrame {
 		CellsNumber.setText(in.readLine());
 		PAS_threshold.setText(in.readLine());
 
-		rdbtnTorqueSensor.setSelected(Boolean.parseBoolean(in.readLine()));
-		rdbtnThrottlePas.setSelected(Boolean.parseBoolean(in.readLine()));
-		rdbtnThrottle.setSelected(Boolean.parseBoolean(in.readLine()));
-		rdbtnTorquesimulation.setSelected(Boolean.parseBoolean(in.readLine()));
+		cbTorqueSensor.setSelected(Boolean.parseBoolean(in.readLine()));
+		in.readLine();//old options, no longer used
+		in.readLine();//old options, no longer used
+		in.readLine();//old options, no longer used
+
 		rdbtnHigh.setSelected(Boolean.parseBoolean(in.readLine()));
 		rdbtnNormal.setSelected(Boolean.parseBoolean(in.readLine()));
 		rdbtnKtlcd.setSelected(Boolean.parseBoolean(in.readLine()));
@@ -197,12 +205,34 @@ public class OSEC extends JFrame {
 		rdbtnLeft.setSelected(Boolean.parseBoolean(in.readLine()));
 		rdbtnRight.setSelected(Boolean.parseBoolean(in.readLine()));
 		rdbtnBluOsecDisplay.setSelected(Boolean.parseBoolean(in.readLine()));
-		
+
 		rdbtnNodisplay.setSelected(Boolean.parseBoolean(in.readLine()));
 		rdbtnNoRegen.setSelected(Boolean.parseBoolean(in.readLine()));
+
+		in.readLine();//old options, no longer used
+		flt_tqCalibrationFactor.setText(in.readLine());
 		
-		rdbtnACA.setSelected(Boolean.parseBoolean(in.readLine()));
+		int acaFlags=Integer.parseInt(in.readLine());
+		cbAssistLevelInfluencesThrottle.setSelected((acaFlags&1)>0);
+		cbOffroadEnabled.setSelected((acaFlags&2)>0);
+		cbBrakeDisablesOffroad.setSelected((acaFlags&4)>0);
+				
 		in.close();
+	}
+
+	private void updateDependiencies() {
+		if (cbTorqueSensor.isSelected()) {
+			ramp_end.setText("0");
+			ramp_end.setEditable(false);
+			flt_tqCalibrationFactor.setEditable(true);
+			flt_tqCalibrationFactor.setText("1.0");
+		} else {
+			flt_tqCalibrationFactor.setText("0.0");
+			ramp_end.setText("1000");
+			flt_tqCalibrationFactor.setEditable(false);
+			ramp_end.setEditable(true);
+
+		}
 	}
 
 	/**
@@ -218,7 +248,7 @@ public class OSEC extends JFrame {
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
 		setContentPane(contentPane);
 		contentPane.setLayout(null);
-		
+
 		JLabel footnote = new JLabel("*) manual adjustments needed in config.h");
 		footnote.setBounds(600, 650, 320, 25);
 		contentPane.add(footnote);
@@ -239,15 +269,15 @@ public class OSEC extends JFrame {
 		DefaultListModel settingsFilesModel = new DefaultListModel();
 		for (File file : settingsDir.listFiles()) {
 			settingsFilesModel.addElement(new FileContainer(file));
-			
-			if (lastSettingsFile == null){
-				lastSettingsFile=file;
-			}else{
-				if (file.getName().compareTo(lastSettingsFile.getName())>0){
-					lastSettingsFile=file;
+
+			if (lastSettingsFile == null) {
+				lastSettingsFile = file;
+			} else {
+				if (file.getName().compareTo(lastSettingsFile.getName()) > 0) {
+					lastSettingsFile = file;
 				}
 			}
-			
+
 		}
 
 		JList settingsList = new JList(settingsFilesModel);
@@ -270,167 +300,243 @@ public class OSEC extends JFrame {
 				} catch (IOException ex) {
 					Logger.getLogger(OSEC.class.getName()).log(Level.SEVERE, null, ex);
 				}
+				settingsList.clearSelection();
+				updateDependiencies();
 			}
 		});
-
-		JLabel lblPasTimeout = new JLabel("PAS Timeout");
-		lblPasTimeout.setBounds(15, 146, 101, 14);
-		contentPane.add(lblPasTimeout);
-
-		txtPasTimeout = new JTextField();
-		txtPasTimeout.setText("3125");
-		txtPasTimeout.setBounds(150, 144, 86, 20);
-		contentPane.add(txtPasTimeout);
-		txtPasTimeout.setColumns(10);
-
-		JLabel lblWheelCircumference = new JLabel("Wheel circumference");
-		lblWheelCircumference.setBounds(15, 119, 131, 14);
-		contentPane.add(lblWheelCircumference);
-
-		txtWheelCircumference = new JTextField();
-		txtWheelCircumference.setText("2000");
-		txtWheelCircumference.setBounds(150, 117, 86, 20);
-		contentPane.add(txtWheelCircumference);
-		txtWheelCircumference.setColumns(10);
-
+		
 		JLabel lblNumberOfPas = new JLabel("No. of PAS Magnets");
-		lblNumberOfPas.setBounds(15, 92, 141, 14);
+		lblNumberOfPas.setBounds(15, 90, 141, 14);
 		contentPane.add(lblNumberOfPas);
 
 		txtNumberOfPas = new JTextField();
 		txtNumberOfPas.setText("16");
-		txtNumberOfPas.setBounds(150, 87, 86, 20);
+		txtNumberOfPas.setBounds(150, 90, 86, 20);
 		contentPane.add(txtNumberOfPas);
 		txtNumberOfPas.setColumns(10);
 
-		lblSpeedLimit = new JLabel("Speed Limit (km/h)");
-		lblSpeedLimit.setBounds(15, 173, 135, 14);
-		contentPane.add(lblSpeedLimit);
+		JLabel lblWheelCircumference = new JLabel("Wheel circumference");
+		lblWheelCircumference.setBounds(15, 110, 131, 14);
+		contentPane.add(lblWheelCircumference);
 
-		txtSpeedlimit = new JTextField();
-		txtSpeedlimit.setText("25");
-		txtSpeedlimit.setBounds(150, 171, 86, 20);
-		contentPane.add(txtSpeedlimit);
-		txtSpeedlimit.setColumns(10);
+		txtWheelCircumference = new JTextField();
+		txtWheelCircumference.setText("2000");
+		txtWheelCircumference.setBounds(150, 110, 86, 20);
+		contentPane.add(txtWheelCircumference);
+		txtWheelCircumference.setColumns(10);
 
-		lblSupportFactor = new JLabel("Assist factor");
-		lblSupportFactor.setBounds(383, 227, 88, 14);
-		contentPane.add(lblSupportFactor);
+		JLabel lblPasTimeout = new JLabel("PAS Timeout");
+		lblPasTimeout.setBounds(15, 130, 130, 14);
+		contentPane.add(lblPasTimeout);
 
-		txtSupportfactor = new JTextField();
-		txtSupportfactor.setText("64");
-		txtSupportfactor.setBounds(476, 224, 86, 20);
-		contentPane.add(txtSupportfactor);
-		txtSupportfactor.setColumns(10);
+		txtPasTimeout = new JTextField();
+		txtPasTimeout.setText("3125");
+		txtPasTimeout.setBounds(150, 130, 86, 20);
+		contentPane.add(txtPasTimeout);
+		txtPasTimeout.setColumns(10);
+
 
 		lblThrottleMin = new JLabel("Throttle min");
-		lblThrottleMin.setBounds(15, 201, 78, 14);
+		lblThrottleMin.setBounds(15, 150, 78, 14);
 		contentPane.add(lblThrottleMin);
 
 		txtThrottlemin = new JTextField();
 		txtThrottlemin.setText("43");
-		txtThrottlemin.setBounds(150, 198, 86, 20);
+		txtThrottlemin.setBounds(150, 150, 86, 20);
 		contentPane.add(txtThrottlemin);
 		txtThrottlemin.setColumns(10);
 
 		lblThrottleMax = new JLabel("Throttle max");
-		lblThrottleMax.setBounds(15, 224, 78, 14);
+		lblThrottleMax.setBounds(15, 170, 78, 14);
 		contentPane.add(lblThrottleMax);
 
 		txtThrottlemax = new JTextField();
 		txtThrottlemax.setText("182");
-		txtThrottlemax.setBounds(150, 221, 86, 20);
+		txtThrottlemax.setBounds(150, 170, 86, 20);
 		contentPane.add(txtThrottlemax);
 		txtThrottlemax.setColumns(10);
 
+		JLabel lblBatteryCurrentMax = new JLabel("Battery Current max");
+		lblBatteryCurrentMax.setBounds(15, 190, 131, 14);
+		contentPane.add(lblBatteryCurrentMax);
+
+		txtMaxbatterycurrent = new JTextField();
+		txtMaxbatterycurrent.setText("372");
+		txtMaxbatterycurrent.setBounds(150, 190, 86, 20);
+		contentPane.add(txtMaxbatterycurrent);
+		txtMaxbatterycurrent.setColumns(10);
+
+
+		JLabel lblPhaseCurrentMax = new JLabel("Phase Current max");
+		lblPhaseCurrentMax.setBounds(15, 210, 131, 14);
+		contentPane.add(lblPhaseCurrentMax);
+
+		txtMaxphasecurrent = new JTextField();
+		txtMaxphasecurrent.setText("372");
+		txtMaxphasecurrent.setColumns(10);
+		txtMaxphasecurrent.setBounds(150, 210, 86, 20);
+		contentPane.add(txtMaxphasecurrent);
+		
+		JLabel lblRegenCurrentMax = new JLabel("Regen Current max");
+		lblRegenCurrentMax.setBounds(15, 230, 131, 14);
+		contentPane.add(lblRegenCurrentMax);
+		
+		txtMaxregencurrent = new JTextField();
+		txtMaxregencurrent.setText("282");
+		txtMaxregencurrent.setColumns(10);
+		txtMaxregencurrent.setBounds(150, 230, 86, 20);
+		contentPane.add(txtMaxregencurrent);
+
+		JLabel lblUndervoltageLimit = new JLabel("Undervoltage limit");
+		lblUndervoltageLimit.setBounds(15, 250, 121, 14);
+		contentPane.add(lblUndervoltageLimit);
+		
+		txtUndervoltage = new JTextField();
+		txtUndervoltage.setText("127");
+		txtUndervoltage.setBounds(150, 250, 86, 20);
+		contentPane.add(txtUndervoltage);
+		txtUndervoltage.setColumns(10);
+		
+
+		JLabel lblMotorSpecificAngle = new JLabel("Motor specific angle");
+		lblMotorSpecificAngle.setBounds(15, 270, 121, 14);
+		contentPane.add(lblMotorSpecificAngle);
+		
 		txtMotor_specific_angle = new JTextField();
 		txtMotor_specific_angle.setText("214");
-		txtMotor_specific_angle.setBounds(150, 336, 86, 20);
+		txtMotor_specific_angle.setBounds(150, 270, 86, 20);
 		contentPane.add(txtMotor_specific_angle);
 		txtMotor_specific_angle.setColumns(10);
 
-		JLabel lblMotorSpecificAngle = new JLabel("Motor specific angle");
-		lblMotorSpecificAngle.setBounds(15, 339, 121, 14);
-		contentPane.add(lblMotorSpecificAngle);
-
+		JLabel lblBatteryCurrentCal = new JLabel("Battery Current cal a");
+		lblBatteryCurrentCal.setBounds(15, 290, 121, 14);
+		contentPane.add(lblBatteryCurrentCal);
+		
 		txtBatteryCurcala = new JTextField();
 		txtBatteryCurcala.setText("10");
-		txtBatteryCurcala.setBounds(150, 359, 86, 20);
+		txtBatteryCurcala.setBounds(150, 290, 86, 20);
 		contentPane.add(txtBatteryCurcala);
 		txtBatteryCurcala.setColumns(10);
 
-		JLabel lblBatteryCurrentCal = new JLabel("Battery Current cal a");
-		lblBatteryCurrentCal.setBounds(15, 362, 121, 14);
-		contentPane.add(lblBatteryCurrentCal);
 
 		JLabel lblTemperatureCalA = new JLabel("Temperature cal a");
-		lblTemperatureCalA.setBounds(15, 384, 121, 14);
+		lblTemperatureCalA.setBounds(15, 310, 121, 14);
 		contentPane.add(lblTemperatureCalA);
 
 		TempCalA = new JTextField();
 		TempCalA.setText("1.6");
 		TempCalA.setColumns(10);
-		TempCalA.setBounds(150, 381, 86, 20);
+		TempCalA.setBounds(150, 310, 86, 20);
 		contentPane.add(TempCalA);
+		
+		JLabel lblTemperatureCalB = new JLabel("Temperature cal b");
+		lblTemperatureCalB.setBounds(15, 330, 121, 14);
+		contentPane.add(lblTemperatureCalB);
 
 		TempCalB = new JTextField();
 		TempCalB.setText("110.4");
 		TempCalB.setColumns(10);
-		TempCalB.setBounds(150, 403, 86, 20);
+		TempCalB.setBounds(150, 330, 86, 20);
 		contentPane.add(TempCalB);
+		
+		JLabel lblPfactor = new JLabel("Gain P");
+		lblPfactor.setBounds(15, 350, 67, 14);
+		contentPane.add(lblPfactor);
 
-		JLabel lblTemperatureCalB = new JLabel("Temperature cal b");
-		lblTemperatureCalB.setBounds(15, 406, 121, 14);
-		contentPane.add(lblTemperatureCalB);
+		p_factor = new JTextField();
+		p_factor.setText("0.5");
+		p_factor.setColumns(10);
+		p_factor.setBounds(150, 350, 86, 20);
+		contentPane.add(p_factor);
+
+		JLabel lblIfactor = new JLabel("Gain I");
+		lblIfactor.setBounds(15, 370, 67, 14);
+		contentPane.add(lblIfactor);
+
+		i_factor = new JTextField();
+		i_factor.setText("0.2");
+		i_factor.setColumns(10);
+		i_factor.setBounds(150, 370, 86, 20);
+		contentPane.add(i_factor);
+
+		JLabel lblGearRatio = new JLabel("Gear Ratio");
+		lblGearRatio.setBounds(15, 390, 131, 14);
+		contentPane.add(lblGearRatio);
+
+		GearRatio = new JTextField();
+		GearRatio.setText("64");
+		GearRatio.setColumns(10);
+		GearRatio.setBounds(150, 390, 86, 20);
+		contentPane.add(GearRatio);
+
+		JLabel lblNumberSerialCells = new JLabel("Serial cells");
+		lblNumberSerialCells.setBounds(15, 410, 86, 14);
+		contentPane.add(lblNumberSerialCells);
+
+		CellsNumber = new JTextField();
+		CellsNumber.setText("10");
+		CellsNumber.setColumns(10);
+		CellsNumber.setBounds(150, 410, 86, 20);
+		contentPane.add(CellsNumber);
+		
+		JLabel lblPasThreshold = new JLabel("PAS threshold");
+		lblPasThreshold.setBounds(15, 430, 86, 20);
+		contentPane.add(lblPasThreshold);
+
+		PAS_threshold = new JTextField();
+		PAS_threshold.setText("1.7");
+		PAS_threshold.setColumns(10);
+		PAS_threshold.setBounds(150, 430, 86, 20);
+		contentPane.add(PAS_threshold);
 
 		JLabel lblAssistLevel = new JLabel("Assist Level 1");
-		lblAssistLevel.setBounds(383, 92, 88, 14);
+		lblAssistLevel.setBounds(332, 90, 88, 14);
 		contentPane.add(lblAssistLevel);
 
 		Assist_Level_1 = new JTextField();
 		Assist_Level_1.setText("20");
 		Assist_Level_1.setColumns(10);
-		Assist_Level_1.setBounds(476, 89, 86, 20);
+		Assist_Level_1.setBounds(476, 90, 86, 20);
 		contentPane.add(Assist_Level_1);
 
 		JLabel lblAssistLevel_1 = new JLabel("Assist Level 2");
-		lblAssistLevel_1.setBounds(383, 119, 86, 14);
+		lblAssistLevel_1.setBounds(332, 110, 86, 14);
 		contentPane.add(lblAssistLevel_1);
 
 		Assist_Level_2 = new JTextField();
 		Assist_Level_2.setText("40");
 		Assist_Level_2.setColumns(10);
-		Assist_Level_2.setBounds(476, 116, 86, 20);
+		Assist_Level_2.setBounds(476, 110, 86, 20);
 		contentPane.add(Assist_Level_2);
 
 		JLabel lblAssistLevel_2 = new JLabel("Assist Level 3");
-		lblAssistLevel_2.setBounds(383, 146, 86, 14);
+		lblAssistLevel_2.setBounds(332, 130, 86, 14);
 		contentPane.add(lblAssistLevel_2);
 
 		Assist_Level_3 = new JTextField();
 		Assist_Level_3.setText("60");
 		Assist_Level_3.setColumns(10);
-		Assist_Level_3.setBounds(476, 143, 86, 20);
+		Assist_Level_3.setBounds(476, 130, 86, 20);
 		contentPane.add(Assist_Level_3);
 
+		lblAssistLevel_3 = new JLabel("Assist Level 4");
+		lblAssistLevel_3.setBounds(332, 150, 86, 14);
+		contentPane.add(lblAssistLevel_3);
+		
 		Assist_Level_4 = new JTextField();
 		Assist_Level_4.setText("80");
 		Assist_Level_4.setColumns(10);
-		Assist_Level_4.setBounds(476, 174, 86, 20);
+		Assist_Level_4.setBounds(476, 150, 86, 20);
 		contentPane.add(Assist_Level_4);
 
-		lblAssistLevel_3 = new JLabel("Assist Level 4");
-		lblAssistLevel_3.setBounds(383, 177, 86, 14);
-		contentPane.add(lblAssistLevel_3);
-
 		lblAssistLevel_4 = new JLabel("Assist Level 5");
-		lblAssistLevel_4.setBounds(383, 201, 86, 14);
+		lblAssistLevel_4.setBounds(332, 170, 86, 14);
 		contentPane.add(lblAssistLevel_4);
 
 		Assist_Level_5 = new JTextField();
 		Assist_Level_5.setText("100");
 		Assist_Level_5.setColumns(10);
-		Assist_Level_5.setBounds(476, 198, 86, 20);
+		Assist_Level_5.setBounds(476, 170, 86, 20);
 		contentPane.add(Assist_Level_5);
 
 		JList list = new JList();
@@ -438,33 +544,33 @@ public class OSEC extends JFrame {
 		contentPane.add(list);
 
 		JLabel lblMorsetime = new JLabel("Morse-time 1");
-		lblMorsetime.setBounds(383, 254, 86, 14);
+		lblMorsetime.setBounds(332, 200, 86, 14);
 		contentPane.add(lblMorsetime);
 
 		Morse_Time_1 = new JTextField();
 		Morse_Time_1.setText("50");
 		Morse_Time_1.setColumns(10);
-		Morse_Time_1.setBounds(476, 251, 86, 20);
+		Morse_Time_1.setBounds(476, 200, 86, 20);
 		contentPane.add(Morse_Time_1);
 
 		JLabel lblMorsetime_1 = new JLabel("Morse-time 2");
-		lblMorsetime_1.setBounds(383, 282, 86, 14);
+		lblMorsetime_1.setBounds(332, 220, 86, 14);
 		contentPane.add(lblMorsetime_1);
 
 		Morse_Time_2 = new JTextField();
 		Morse_Time_2.setText("50");
 		Morse_Time_2.setColumns(10);
-		Morse_Time_2.setBounds(476, 279, 86, 20);
+		Morse_Time_2.setBounds(476, 220, 86, 20);
 		contentPane.add(Morse_Time_2);
 
 		JLabel lblMorsetime_2 = new JLabel("Morse-time 3");
-		lblMorsetime_2.setBounds(383, 310, 88, 14);
+		lblMorsetime_2.setBounds(332, 240, 88, 14);
 		contentPane.add(lblMorsetime_2);
 
 		Morse_Time_3 = new JTextField();
 		Morse_Time_3.setText("50");
 		Morse_Time_3.setColumns(10);
-		Morse_Time_3.setBounds(476, 307, 86, 20);
+		Morse_Time_3.setBounds(476, 240, 86, 20);
 		contentPane.add(Morse_Time_3);
 
 		lblHttpsopensourceebikefirmwarebitbucketio = new JButton("https://opensourceebikefirmware.bitbucket.io/");
@@ -496,130 +602,76 @@ public class OSEC extends JFrame {
 		lblOpenSourceFirmware.setBounds(154, 42, 255, 14);
 		contentPane.add(lblOpenSourceFirmware);
 
-		txtMaxbatterycurrent = new JTextField();
-		txtMaxbatterycurrent.setText("372");
-		txtMaxbatterycurrent.setBounds(150, 270, 86, 20);
-		contentPane.add(txtMaxbatterycurrent);
-		txtMaxbatterycurrent.setColumns(10);
-
-		JLabel lblBatteryCurrentMax = new JLabel("Battery Current max");
-		lblBatteryCurrentMax.setBounds(15, 273, 131, 14);
-		contentPane.add(lblBatteryCurrentMax);
-
-		JLabel lblRegenCurrentMax = new JLabel("Regen Current max");
-		lblRegenCurrentMax.setBounds(15, 250, 131, 14);
-		contentPane.add(lblRegenCurrentMax);
-
-		JLabel lblPhaseCurrentMax = new JLabel("Phase Current max");
-		lblPhaseCurrentMax.setBounds(15, 295, 131, 14);
-		contentPane.add(lblPhaseCurrentMax);
-
-		txtMaxphasecurrent = new JTextField();
-		txtMaxphasecurrent.setText("372");
-		txtMaxphasecurrent.setColumns(10);
-		txtMaxphasecurrent.setBounds(150, 292, 86, 20);
-		contentPane.add(txtMaxphasecurrent);
-
-		txtMaxregencurrent = new JTextField();
-		txtMaxregencurrent.setText("282");
-		txtMaxregencurrent.setColumns(10);
-		txtMaxregencurrent.setBounds(150, 247, 86, 20);
-		contentPane.add(txtMaxregencurrent);
-
-		txtUndervoltage = new JTextField();
-		txtUndervoltage.setText("127");
-		txtUndervoltage.setBounds(150, 313, 86, 20);
-		contentPane.add(txtUndervoltage);
-		txtUndervoltage.setColumns(10);
+		
 
 		JLabel lblRampEnd = new JLabel("Ramp end");
-		lblRampEnd.setBounds(383, 338, 67, 14);
+		lblRampEnd.setBounds(332, 280, 67, 14);
 		contentPane.add(lblRampEnd);
 
 		ramp_end = new JTextField();
 		ramp_end.setText("977");
 		ramp_end.setColumns(10);
-		ramp_end.setBounds(476, 335, 86, 20);
+		ramp_end.setBounds(476, 280, 86, 20);
 		contentPane.add(ramp_end);
-
-		JLabel lblUndervoltageLimit = new JLabel("Undervoltage limit");
-		lblUndervoltageLimit.setBounds(15, 316, 121, 14);
-		contentPane.add(lblUndervoltageLimit);
-
-		JLabel lblPfactor = new JLabel("Gain P");
-		lblPfactor.setBounds(383, 366, 67, 14);
-		contentPane.add(lblPfactor);
-
-		p_factor = new JTextField();
-		p_factor.setText("0.5");
-		p_factor.setColumns(10);
-		p_factor.setBounds(476, 363, 86, 20);
-		contentPane.add(p_factor);
-
-		JLabel lblIfactor = new JLabel("Gain I");
-		lblIfactor.setBounds(383, 393, 67, 14);
-		contentPane.add(lblIfactor);
-
-		i_factor = new JTextField();
-		i_factor.setText("0.2");
-		i_factor.setColumns(10);
-		i_factor.setBounds(476, 390, 86, 20);
-		contentPane.add(i_factor);
-
-		JLabel lblGearRatio = new JLabel("Gear Ratio");
-		lblGearRatio.setBounds(15, 427, 131, 14);
-		contentPane.add(lblGearRatio);
-
-		GearRatio = new JTextField();
-		GearRatio.setText("64");
-		GearRatio.setColumns(10);
-		GearRatio.setBounds(150, 424, 86, 20);
-		contentPane.add(GearRatio);
-
-		JLabel lblNumberSerialCells = new JLabel("Serial cells");
-		lblNumberSerialCells.setBounds(384, 421, 86, 14);
-		contentPane.add(lblNumberSerialCells);
-
-		CellsNumber = new JTextField();
-		CellsNumber.setText("10");
-		CellsNumber.setColumns(10);
-		CellsNumber.setBounds(477, 418, 86, 20);
-		contentPane.add(CellsNumber);
 		
 		
-		JLabel lblRideMode = new JLabel("Ride Mode");
+		JLabel lblTqCalibrationFactor = new JLabel("TQ Calib");
+		lblTqCalibrationFactor.setBounds(332, 300, 67, 14);
+		contentPane.add(lblTqCalibrationFactor);
+		
+		flt_tqCalibrationFactor = new JTextField();
+		flt_tqCalibrationFactor.setText("1.0");
+		flt_tqCalibrationFactor.setColumns(10);
+		flt_tqCalibrationFactor.setBounds(476, 300, 86, 20);
+		contentPane.add(flt_tqCalibrationFactor);
+		
+
+		lblSpeedLimit = new JLabel("Speed Limit (km/h)");
+		lblSpeedLimit.setBounds(332, 340, 135, 14);
+		contentPane.add(lblSpeedLimit);
+
+		txtSpeedlimit = new JTextField();
+		txtSpeedlimit.setText("25");
+		txtSpeedlimit.setBounds(476, 340, 86, 20);
+		contentPane.add(txtSpeedlimit);
+		txtSpeedlimit.setColumns(10);
+		
+		
+		
+
+		JLabel lblRideMode = new JLabel("Ride Options");
 		lblRideMode.setFont(new Font("Tahoma", Font.BOLD, 12));
 		lblRideMode.setBounds(136, 490, 86, 20);
 		contentPane.add(lblRideMode);
 
-		rdbtnThrottle = new JRadioButton("Throttle");
-		Ridingmode.add(rdbtnThrottle);
-		rdbtnThrottle.setBounds(136, 515, 109, 20);
-		contentPane.add(rdbtnThrottle);
-
-		rdbtnThrottlePas = new JRadioButton("Throttle and PAS");
-		Ridingmode.add(rdbtnThrottlePas);
-		rdbtnThrottlePas.setBounds(136, 535, 131, 20);
-		contentPane.add(rdbtnThrottlePas);
-
-		rdbtnTorqueSensor = new JRadioButton("Torquesensor");
-		rdbtnTorqueSensor.setSelected(true);
-		Ridingmode.add(rdbtnTorqueSensor);
-		rdbtnTorqueSensor.setBounds(136, 555, 131, 20);
-		contentPane.add(rdbtnTorqueSensor);
-
-		rdbtnTorquesimulation = new JRadioButton("Torque-Simulation");
-		rdbtnTorquesimulation.setSelected(true);
-		Ridingmode.add(rdbtnTorquesimulation);
-		rdbtnTorquesimulation.setBounds(136, 575, 134, 20);
-		contentPane.add(rdbtnTorquesimulation);
-
-		rdbtnACA = new JRadioButton("Adaptive !alpha!");
-		rdbtnACA.setSelected(true);
-		Ridingmode.add(rdbtnACA);
-		rdbtnACA.setBounds(136, 595, 134, 20);
-		contentPane.add(rdbtnACA);
-
+		cbTorqueSensor = new JCheckBox("Torquesensor");
+		cbTorqueSensor.setSelected(false);
+		cbTorqueSensor.setBounds(136, 515, 131, 20);
+		contentPane.add(cbTorqueSensor);
+		
+		cbTorqueSensor.addItemListener(new ItemListener() {
+			@Override
+			public void itemStateChanged(ItemEvent e) {
+				updateDependiencies();
+			}
+		});
+		
+		
+		cbAssistLevelInfluencesThrottle = new JCheckBox("A.Lvl affects Throttle");
+		cbAssistLevelInfluencesThrottle.setSelected(false);
+		cbAssistLevelInfluencesThrottle.setBounds(136, 535, 131, 20);
+		contentPane.add(cbAssistLevelInfluencesThrottle);
+		
+		cbOffroadEnabled = new JCheckBox("Offroad Enabled");
+		cbOffroadEnabled.setSelected(false);
+		cbOffroadEnabled.setBounds(136, 555, 131, 20);
+		contentPane.add(cbOffroadEnabled);
+		
+		cbBrakeDisablesOffroad = new JCheckBox("Brake Disables Offroad");
+		cbBrakeDisablesOffroad.setSelected(false);
+		cbBrakeDisablesOffroad.setBounds(136, 575, 131, 20);
+		contentPane.add(cbBrakeDisablesOffroad);
+	
 		JLabel lblMotorSpeed = new JLabel("Motor Speed");
 		lblMotorSpeed.setFont(new Font("Tahoma", Font.BOLD, 12));
 		lblMotorSpeed.setBounds(276, 490, 86, 20);
@@ -652,15 +704,6 @@ public class OSEC extends JFrame {
 		rdbtnExternal.setBounds(276, 645, 101, 20);
 		contentPane.add(rdbtnExternal);
 
-		JLabel lblPasThreshold = new JLabel("PAS threshold");
-		lblPasThreshold.setBounds(383, 449, 86, 20);
-		contentPane.add(lblPasThreshold);
-
-		PAS_threshold = new JTextField();
-		PAS_threshold.setText("1.7");
-		PAS_threshold.setColumns(10);
-		PAS_threshold.setBounds(476, 446, 86, 20);
-		contentPane.add(PAS_threshold);
 
 		JLabel lblPasDirection = new JLabel("PAS direction");
 		lblPasDirection.setFont(new Font("Tahoma", Font.BOLD, 12));
@@ -677,7 +720,7 @@ public class OSEC extends JFrame {
 		PASdirection.add(rdbtnLeft);
 		rdbtnLeft.setBounds(15, 645, 67, 20);
 		contentPane.add(rdbtnLeft);
-		
+
 		JLabel lblRegeneration = new JLabel("Regeneration");
 		lblRegeneration.setFont(new Font("Tahoma", Font.BOLD, 12));
 		lblRegeneration.setBounds(15, 490, 86, 20);
@@ -693,16 +736,12 @@ public class OSEC extends JFrame {
 		Regen.add(rdbtnNoRegen);
 		rdbtnNoRegen.setBounds(15, 515, 97, 20);
 		contentPane.add(rdbtnNoRegen);
-		
+
 		rdbtnRegen = new JRadioButton("linear");
 		rdbtnRegen.setBounds(15, 535, 97, 23);
 		Regen.add(rdbtnRegen);
 		contentPane.add(rdbtnRegen);
 
-
-		
-		
-		
 		lblDiplayType = new JLabel("Display Type");
 		lblDiplayType.setFont(new Font("Tahoma", Font.BOLD, 12));
 		lblDiplayType.setBounds(382, 490, 86, 20);
@@ -728,7 +767,7 @@ public class OSEC extends JFrame {
 		displayButtonGroup.add(rdbtnBluOsecDisplay);
 		rdbtnBluOsecDisplay.setBounds(382, 590, 131, 20);
 		contentPane.add(rdbtnBluOsecDisplay);
-		
+
 		rdbtnDiganostics = new JRadioButton("Diagnostics");
 		displayButtonGroup.add(rdbtnDiganostics);
 		rdbtnDiganostics.setBounds(382, 615, 131, 20);
@@ -806,9 +845,9 @@ public class OSEC extends JFrame {
 					iWriter.println(txtWheelCircumference.getText());
 					pWriter.println(text_to_save);
 
-					text_to_save = "#define fummelfaktor " + txtSupportfactor.getText() + "L";
-					iWriter.println(txtSupportfactor.getText());
-					pWriter.println(text_to_save);
+					
+					iWriter.println("");// old options, unused
+
 
 					text_to_save = "#define ADC_THROTTLE_MIN_VALUE " + txtThrottlemin.getText();
 					iWriter.println(txtThrottlemin.getText());
@@ -906,29 +945,10 @@ public class OSEC extends JFrame {
 					iWriter.println(PAS_threshold.getText());
 					pWriter.println(text_to_save);
 
-					if (rdbtnTorqueSensor.isSelected()) {
-						text_to_save = "#define TORQUESENSOR";
-						pWriter.println(text_to_save);
-					}
-					iWriter.println(rdbtnTorqueSensor.isSelected());
-
-					if (rdbtnThrottlePas.isSelected()) {
-						text_to_save = "#define THROTTLE_AND_PAS";
-						pWriter.println(text_to_save);
-					}
-					iWriter.println(rdbtnThrottlePas.isSelected());
-
-					if (rdbtnThrottle.isSelected()) {
-						text_to_save = "#define THROTTLE";
-						pWriter.println(text_to_save);
-					}
-					iWriter.println(rdbtnThrottle.isSelected());
-
-					if (rdbtnTorquesimulation.isSelected()) {
-						text_to_save = "#define TORQUE_SIMULATION";
-						pWriter.println(text_to_save);
-					}
-					iWriter.println(rdbtnTorquesimulation.isSelected());
+					iWriter.println(cbTorqueSensor.isSelected());
+					iWriter.println("");// old options, unused
+					iWriter.println("");// old options, unused
+					iWriter.println("");// old options, unused
 
 					if (rdbtnHigh.isSelected()) {
 						text_to_save = "#define PWM_CYCLES_SECOND 20833L";
@@ -1005,19 +1025,23 @@ public class OSEC extends JFrame {
 						pWriter.println(text_to_save);
 					}
 					iWriter.println(rdbtnBluOsecDisplay.isSelected());
-					
-					
+
 					iWriter.println(rdbtnNodisplay.isSelected());
 					iWriter.println(rdbtnNoRegen.isSelected());
+					iWriter.println("");// old options, unused
 					
-					if (rdbtnACA.isSelected()) {
-						text_to_save = "#define ACA";
-						pWriter.println(text_to_save);
-					}
-					iWriter.println(rdbtnACA.isSelected());
+					text_to_save = "#define TQS_CALIB " + flt_tqCalibrationFactor.getText();
+					iWriter.println(flt_tqCalibrationFactor.getText());
+					pWriter.println(text_to_save);
 					
-					pWriter.println("#define EEPROM_INIT_MAGIC_BYTE " + (System.currentTimeMillis()%256) +" // makes sure (chance of fail 1/255) eeprom is invalidated after flashing new config");
-
+					int acaFlags=128;
+					acaFlags |= (cbAssistLevelInfluencesThrottle.isSelected()?1:0);
+					acaFlags |= (cbOffroadEnabled.isSelected()?2:0);
+					acaFlags |= (cbBrakeDisablesOffroad.isSelected()?4:0);
+					iWriter.println(acaFlags);
+					
+					pWriter.println("#define ACA "+acaFlags);
+					pWriter.println("#define EEPROM_INIT_MAGIC_BYTE " + (System.currentTimeMillis() % 256) + " // makes sure (chance of fail 1/255) eeprom is invalidated after flashing new config");
 					pWriter.println("\r\n#endif /* CONFIG_H_ */");
 
 					iWriter.close();
@@ -1044,9 +1068,14 @@ public class OSEC extends JFrame {
 		btnWriteConfiguration.setBounds(600, 495, 320, 58);
 		contentPane.add(btnWriteConfiguration);
 
-		
-		if (lastSettingsFile != null){
-			loadSettings(lastSettingsFile);
+		if (lastSettingsFile != null) {
+			try {
+				loadSettings(lastSettingsFile);
+			} catch (Exception ex) {
+
+			}
+			settingsList.clearSelection();
+			updateDependiencies();
 		}
 	}
 }

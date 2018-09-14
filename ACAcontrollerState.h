@@ -65,7 +65,7 @@ extern uint8_t ui8_SPEED_Flag; //Flag for PAS Interrupt detected
 extern uint16_t ui16_time_ticks_between_speed_interrupt; //Speed duration of one wheel revolution (tics * 64us)
 extern uint8_t ui8_offroad_counter;
 
-extern uint8_t ui8_throttle_reacts_to_assist_level;
+extern uint8_t ui8_aca_flags;
 
 extern uint8_t ui8_adc_read_throttle_busy;
 
@@ -77,7 +77,7 @@ extern float flt_current_PAS_fraction;
 extern uint16_t ui16_time_ticks_between_pas_interrupt;
 extern uint16_t ui16_PAS_High;
 extern uint16_t ui16_time_ticks_for_pas_calculation; //Counter for cadence
-extern uint16_t ui16_PAS_High_Counter; 
+extern uint16_t ui16_PAS_High_Counter;
 extern uint8_t ui8_PAS_Flag; //flag for PAS interrupt
 extern uint8_t ui8_PAS_update_call_when_inactive_counter;
 
@@ -97,6 +97,14 @@ typedef enum {
 	SIGNAL_SPEEDLIMIT_CHANGED = ((uint8_t) 0x00),
 
 } ICC_SIGNALS;
+
+typedef enum {
+	// values from 0-31 are allowed as signals are stored in a single uint32_t
+	ASSIST_LVL_AFFECTS_THROTTLE = ((uint8_t) 1),
+	OFFROAD_ENABLED = ((uint8_t) 2),
+	BRAKE_DISABLES_OFFROAD = ((uint8_t) 4),
+	DUMMY_ALWAYS_ON = ((uint8_t) 128)
+} ACA_FLAGS;
 
 #endif /* BOCONTROLLERSTATE_H */
 
