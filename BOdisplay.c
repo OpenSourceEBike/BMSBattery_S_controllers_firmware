@@ -190,6 +190,7 @@ void addBasicStateInfos(void) {
     addPayload(CODE_BRAKE_STATUS, (int) brake_is_set());
     addPayload(CODE_MOTOR_STATE, ui8_motor_state);
     addPayload(CODE_BATTERY_VOLTAGE, ui8_BatteryVoltage);
+    addPayload(CODE_ER_SPEED_HIGH_BYTE, ui16_motor_speed_erps>>8);
     addPayload(CODE_ER_SPEED, ui16_motor_speed_erps);
     addPayload(CODE_SPEED_HIGH_BYTE, ui32_SPEED_km_h >> 8);
     addPayload(CODE_SPEED, ui32_SPEED_km_h);
@@ -200,7 +201,7 @@ void addBasicStateInfos(void) {
     addPayload(CODE_SETPOINT_STATE, ui8_control_state);
     addPayload(CODE_UPTIME, ui8_uptime);
 
-    // 6 more elements left/avail (max20)
+    // 5 more elements left/avail (max20)
 }
 
 void gatherDynamicPayload(uint8_t function) {

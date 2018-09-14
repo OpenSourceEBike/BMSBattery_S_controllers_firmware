@@ -219,16 +219,16 @@ void updatePasStatus(void) {
         }
 
 
-#ifdef TORQUESENSOR
-        ui8_temp = ui8_adc_read_throttle(); //read in recent torque value
-        ui16_torque[ui8_torque_index] = (uint8_t) map(ui8_temp, ui8_throttle_min_range, ui8_throttle_max_range, 0, SETPOINT_MAX_VALUE); //map throttle to limits
+        if (flt_torquesensorCalibration != 0.0) {
+            ui8_temp = ui8_adc_read_throttle(); //read in recent torque value
+            ui16_torque[ui8_torque_index] = (uint8_t) map(ui8_temp, ui8_throttle_min_range, ui8_throttle_max_range, 0, SETPOINT_MAX_VALUE); //map throttle to limits
 
-        ui8_torque_index++;
-        if (ui8_torque_index > NUMBER_OF_PAS_MAGS - 1) {
-            ui8_torque_index = 0;
-        } //reset index counter
+            ui8_torque_index++;
+            if (ui8_torque_index > NUMBER_OF_PAS_MAGS - 1) {
+                ui8_torque_index = 0;
+            } //reset index counter
 
-#endif
+        }
 
         updatePasDir();
         ui16_time_ticks_for_pas_calculation = 1;
