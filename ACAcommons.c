@@ -181,7 +181,10 @@ void updateRequestedTorque(void) {
 
 void checkPasInActivity(void) {
     ui8_PAS_update_call_when_inactive_counter++;
-    //	Update cadence, after PAS interrupt occurrence
+    if (ui16_time_ticks_for_pas_calculation > timeout){
+        // updatePasStatus does not fire if pas inactive, so set interval to reasonably high value here
+        ui16_time_ticks_between_pas_interrupt = 64000;
+    }
     // we are called at 50 Hz, if there has been no interrupt for more than ~1s, ramp down PAS automatically
     if (ui8_PAS_Flag == 0 && ui8_PAS_update_call_when_inactive_counter > (uint8_t) (timeout >> 6)) {
 
