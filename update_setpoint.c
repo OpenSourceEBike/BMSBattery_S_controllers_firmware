@@ -8,6 +8,8 @@
  * Released under the GPL License, Version 3
  */
 
+#if defined(JUSTFORREFERENCE) 
+
 #include <stdint.h>
 #include <stdio.h>
 #include <float.h>
@@ -46,7 +48,7 @@ uint16_t ui16_erps_max=PWM_CYCLES_SECOND/30; //limit erps to have minimum 30 poi
 
 uint16_t update_setpoint (uint16_t speed, uint16_t PAS, uint16_t sumtorque, uint16_t setpoint_old)
 {
-#if defined(THROTTLE)  || defined(THROTTLE_AND_PAS) || defined (TORQUE_SIMULATION) || defined (TORQUESENSOR)  
+ 
 
   ui16_BatteryCurrent_accumulated -= ui16_BatteryCurrent_accumulated>>3;
   ui16_BatteryCurrent_accumulated += ui16_adc_read_motor_total_current();
@@ -257,9 +259,9 @@ uint16_t update_setpoint (uint16_t speed, uint16_t PAS, uint16_t sumtorque, uint
 #endif
      }
  } //end of else
-#endif
+
   return ui32_setpoint;
 
 } //end of update setpoint function
-
+#endif
 

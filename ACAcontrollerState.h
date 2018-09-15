@@ -26,7 +26,7 @@ extern uint32_t uint32_icc_signals; // inter component communication, very simpl
 extern uint8_t ui8_throttle_min_range;
 extern uint8_t ui8_throttle_max_range;
 extern uint8_t ui8_control_state;
-extern uint8_t ui8_assistlevel_global;
+extern uint8_t ui8_assistlevel_global; //assist level for regen (high 4 bits) and torque (low 4 bits)
 extern uint8_t PAS_act;
 extern uint8_t PAS_dir; //flag for pasdirection
 extern uint16_t ui16_sum_torque;
@@ -39,6 +39,7 @@ extern uint8_t ui8_motor_state;
 extern uint8_t ui8_BatteryVoltage;
 extern uint16_t ui16_motor_speed_erps;
 extern uint16_t ui16_virtual_erps_speed;
+extern uint32_t ui32_erps_filtered; //filtered value of erps
 extern uint16_t ui16_BatteryCurrent;
 extern uint8_t ui8_position_correction_value;
 extern uint16_t ui16_ADC_iq_current;
@@ -48,6 +49,8 @@ extern uint8_t ui8_speedlimit_without_pas_kph;
 extern uint8_t ui8_speedlimit_actual_kph;
 extern uint8_t ui8_speedlimit_with_throttle_override_kph;
 extern uint8_t ui8_uptime;
+
+extern int8_t i8_motor_temperature;
 
 extern uint8_t uint8_t_hall_case[7];
 extern uint8_t uint8_t_hall_order[6];

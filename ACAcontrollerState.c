@@ -42,7 +42,7 @@ uint8_t ui8_s_motor_angle = 214;
 // internal
 uint32_t uint32_icc_signals = 0;
 
-uint8_t ui8_assistlevel_global = 3; // for debugging of display communication
+uint8_t ui8_assistlevel_global = 243; // 3 + max regen
 uint8_t PAS_act = 3; //recent PAS direction reading
 uint8_t PAS_dir = 0; //PAS direction flag
 uint16_t ui16_sum_torque = 0; //sum of array elements
@@ -54,6 +54,7 @@ uint16_t ui16_current_cal_b = 0;
 uint8_t ui8_motor_state = 0;
 uint8_t ui8_BatteryVoltage = 0; //Battery Voltage read from ADC
 uint16_t ui16_motor_speed_erps = 0;
+uint32_t ui32_erps_filtered=0; //filtered value of erps
 uint16_t ui16_virtual_erps_speed = 0;
 uint16_t ui16_BatteryCurrent = 0; //Battery Current read from ADC8
 uint8_t ui8_position_correction_value = 127; // in 360/256 degrees
@@ -61,6 +62,8 @@ uint16_t ui16_ADC_iq_current = 0;
 uint16_t ui16_ADC_iq_current_filtered = 0;
 uint8_t ui8_control_state = 0;
 uint8_t ui8_uptime = 0;
+
+int8_t i8_motor_temperature=0;
 
 uint8_t uint8_t_hall_case[7];
 uint8_t uint8_t_hall_order[6];

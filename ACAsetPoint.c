@@ -38,7 +38,6 @@ static uint16_t ui16_BatteryCurrent_accumulated = 2496L; //8x current offset, fo
 static uint16_t ui16_BatteryVoltage_accumulated;
 static uint32_t ui32_time_ticks_between_pas_interrupt_accumulated = 32000L; // for filtering of PAS value // why start at 64000?
 static uint32_t ui32_erps_accumulated; //for filtering of erps
-static uint32_t ui32_erps_filtered; //filtered value of erps
 
 static uint16_t ui16_erps_max = PWM_CYCLES_SECOND / 30; //limit erps to have minimum 30 points on the sine curve for proper commutation
 static float float_temp = 0; //for float calculations
@@ -59,7 +58,6 @@ uint16_t cutoffSetpoint(uint32_t ui32_setpoint) {
 // to make torquesensor work with ACA probably a few tweaks are needed, as high torquesensor input would override pas input
 
 uint16_t aca_setpoint(uint16_t ui16_time_ticks_between_speed_interrupt, uint16_t ui16_time_ticks_between_pas_interrupt, uint16_t sumtorque, uint16_t setpoint_old) {
-#if defined(ACA)  
 
     // first select current speed limit
     if (ui8_offroad_state == 255) {
@@ -110,11 +108,11 @@ uint16_t aca_setpoint(uint16_t ui16_time_ticks_between_speed_interrupt, uint16_t
     } else if (brake_is_set()) {
 
         if ((ui8_aca_flags & DIGITAL_REGEN) == DIGITAL_REGEN) {
-            ui8_temp = 255; //Curret target = max regen, needs to be replaced with on screen regen throttle
+            ui8_temp = i16_assistlevel[ui8_assistlevel_global>>4]; //Curret target based on regen assist level
         } else {
-            ui8_temp = map(ui8_adc_read_regen_throttle(), ui8_throttle_min_range, ui8_throttle_max_range, 0, SETPOINT_MAX_VALUE); //map regen throttle to limits
+            ui8_temp = map(ui8_adc_read_regen_throttle(), ui8_throttle_min_range, ui8_throttle_max_range, 0, 100); //map regen throttle to limits
         }
-        float_temp = (float) ui8_temp * (float) (REGEN_CURRENT_MAX_VALUE - ui16_current_cal_b) / 255.0;
+        float_temp = (float) ui8_temp * (float) (REGEN_CURRENT_MAX_VALUE - ui16_current_cal_b) / 100.0;
 
         if (((ui8_aca_flags & SPEED_INFLUENCES_REGEN) == SPEED_INFLUENCES_REGEN) && (ui32_SPEED_km_h < ui8_speedlimit_kph)) {
             float_temp *= ((float) ui16_virtual_erps_speed / ((float) (ui16_speed_kph_to_erps_ratio * ((float) ui8_speedlimit_kph)) / 100.0)); // influence of current speed based on base speed limit
@@ -138,13 +136,13 @@ uint16_t aca_setpoint(uint16_t ui16_time_ticks_between_speed_interrupt, uint16_t
         if (ui16_s_ramp_end != 0) {
             if (ui16_time_ticks_between_pas_interrupt_smoothed > ui16_s_ramp_end) //if you are pedaling slower than defined ramp end, current is proportional to cadence
             {
-                uint32_current_target = (i16_assistlevel[ui8_assistlevel_global]*(BATTERY_CURRENT_MAX_VALUE - ui16_current_cal_b) / 100);
+                uint32_current_target = (i16_assistlevel[ui8_assistlevel_global&15]*(BATTERY_CURRENT_MAX_VALUE - ui16_current_cal_b) / 100);
                 float_temp = ((float) ui16_s_ramp_end) / ((float) ui16_time_ticks_between_pas_interrupt_smoothed);
 
                 uint32_current_target = ((uint16_t) (uint32_current_target)*(uint16_t) (float_temp * 100)) / 100 + ui16_current_cal_b;
                 ui8_control_state += 1;
             } else {
-                uint32_current_target = (i16_assistlevel[ui8_assistlevel_global]*(BATTERY_CURRENT_MAX_VALUE - ui16_current_cal_b) / 100 + ui16_current_cal_b);
+                uint32_current_target = (i16_assistlevel[ui8_assistlevel_global&15]*(BATTERY_CURRENT_MAX_VALUE - ui16_current_cal_b) / 100 + ui16_current_cal_b);
 
             }
         }
@@ -152,7 +150,7 @@ uint16_t aca_setpoint(uint16_t ui16_time_ticks_between_speed_interrupt, uint16_t
         // throttle / torquesensor override following
         float_temp = (float) sumtorque;
         if ((ui8_aca_flags & ASSIST_LVL_AFFECTS_THROTTLE) == 1) {
-            float_temp *= ((float) i16_assistlevel[ui8_assistlevel_global] / 100.0);
+            float_temp *= ((float) i16_assistlevel[ui8_assistlevel_global&15] / 100.0);
             ui8_control_state += 2;
         }
         // if torque sensor is requested
@@ -197,7 +195,6 @@ uint16_t aca_setpoint(uint16_t ui16_time_ticks_between_speed_interrupt, uint16_t
 
         }
     }
-#endif
     return cutoffSetpoint(ui32_setpoint);
 
 }

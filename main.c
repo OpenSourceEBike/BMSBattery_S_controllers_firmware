@@ -24,7 +24,7 @@
 #include "pwm.h"
 #include "PAS.h"
 #include "SPEED.h"
-#include "update_setpoint.h"
+//#include "update_setpoint.h"
 #include "ACAsetPoint.h"
 #include "config.h"
 #include "display.h"
@@ -174,12 +174,7 @@ int main(void) {
             updateRequestedTorque(); //now calculates tq for sensor as well
             updateOffroadStatus();
 
-#if defined(THROTTLE)  || defined(THROTTLE_AND_PAS) || defined (TORQUE_SIMULATION) || defined (TORQUESENSOR)      
-            ui16_setpoint = (uint16_t) update_setpoint(ui16_time_ticks_between_speed_interrupt, ui16_time_ticks_between_pas_interrupt, ui16_sum_torque, ui16_setpoint); //update setpoint
-#endif
-#ifdef ACA    
             ui16_setpoint = (uint16_t) aca_setpoint(ui16_time_ticks_between_speed_interrupt, ui16_time_ticks_between_pas_interrupt, ui16_sum_torque, ui16_setpoint); //update setpoint
-#endif
 
             //#define DO_CRUISE_CONTROL 1
 #if DO_CRUISE_CONTROL == 1

@@ -53,11 +53,10 @@ EXTRASRCS = \
 	motor.c \
 	PAS.c \
 	SPEED.c \
-	update_setpoint.c \
 	display.c \
 	display_kingmeter.c
 
-HEADERS = BOdisplay.h ACAcommons.h ACAsetPoint.h ACAcontrollerState.h ACAeeprom.h  adc.h  brake.h  cruise_control.h  gpio.h  interrupts.h  main.h  motor.h  pwm.h  timers.h  uart.h  PAS.h  SPEED.h  update_setpoint.h
+HEADERS = BOdisplay.h ACAcommons.h ACAsetPoint.h ACAcontrollerState.h ACAeeprom.h  adc.h  brake.h  cruise_control.h  gpio.h  interrupts.h  main.h  motor.h  pwm.h  timers.h  uart.h  PAS.h  SPEED.h  
 
 # The list of .rel files can be derived from the list of their source files
 RELS = $(EXTRASRCS:.c=.rel)
