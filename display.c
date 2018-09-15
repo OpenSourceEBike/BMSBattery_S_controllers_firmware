@@ -132,7 +132,7 @@ void kingmeter_update(void)
     }
     else
     {
-	ui8_assistlevel_global=KM.Rx.AssistLevel+240; // always add max regen 
+	ui8_assistlevel_global=KM.Rx.AssistLevel+80; // always add max regen 
      }
 
 
@@ -285,7 +285,7 @@ void check_message()
      lcd_configuration_variables.ui8_max_speed = 10 + ((ui8_rx_buffer [4] & 248) >> 3) | (ui8_rx_buffer [6] & 32);
      lcd_configuration_variables.ui8_power_assist_control_mode = ui8_rx_buffer [6] & 8;
      lcd_configuration_variables.ui8_controller_max_current = (ui8_rx_buffer [9] & 15);
-     ui8_assistlevel_global=lcd_configuration_variables.ui8_assist_level+240; // always add max regen 
+     ui8_assistlevel_global=lcd_configuration_variables.ui8_assist_level+80; // always add max regen 
      display_update();
    }
  }

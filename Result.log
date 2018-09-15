@@ -1,7 +1,7 @@
 ----------------------------------------------------------
 new log session
 date:				09/15/18
-time:				16:38:27
+time:				17:24:49
 ----------------------------------------------------------
 STVP_CmdLine version 1.6
 
@@ -24,6 +24,7 @@ BoardName=ST-LINK ST-LINK_ID=0 Device=STM8S105x6 Port=USB ProgMode=SWIM
 <<< Loading file succeeds
 
 >>> Programming PROGRAM MEMORY
-Cannot communicate with the tool.
-Wrong tool selection or check tool power supply or check that a previous session is closed.
-<<< Programming PROGRAM MEMORY fails
+<<< Programming PROGRAM MEMORY succeeds
+
+>>> Verifying PROGRAM MEMORY
+<<< Verifying PROGRAM MEMORY succeeds

@@ -42,7 +42,7 @@ uint8_t ui8_s_motor_angle = 214;
 // internal
 uint32_t uint32_icc_signals = 0;
 
-uint8_t ui8_assistlevel_global = 243; // 3 + max regen
+uint8_t ui8_assistlevel_global = 83; // 3 + max regen
 uint8_t PAS_act = 3; //recent PAS direction reading
 uint8_t PAS_dir = 0; //PAS direction flag
 uint16_t ui16_sum_torque = 0; //sum of array elements
