@@ -32,7 +32,6 @@ uint8_t ui8_speedlimit_kph = 25; // normal limit
 uint8_t ui8_speedlimit_without_pas_kph = 6; // limit without pas activity
 uint8_t ui8_speedlimit_with_throttle_override_kph = 35; // limit with pas and throttle both active
 uint8_t ui8_speedlimit_actual_kph; // dynamic speedlimit based on current state
-uint8_t ui8_s_pas_direction = 0;
 float flt_s_pas_threshold = 1.7;
 float flt_s_pid_gain_p = 0.5;
 float flt_s_pid_gain_i = 0.2;
@@ -55,6 +54,7 @@ uint16_t ui16_current_cal_b = 0;
 uint8_t ui8_motor_state = 0;
 uint8_t ui8_BatteryVoltage = 0; //Battery Voltage read from ADC
 uint16_t ui16_motor_speed_erps = 0;
+uint16_t ui16_virtual_erps_speed = 0;
 uint16_t ui16_BatteryCurrent = 0; //Battery Current read from ADC8
 uint8_t ui8_position_correction_value = 127; // in 360/256 degrees
 uint16_t ui16_ADC_iq_current = 0;
@@ -100,7 +100,6 @@ void controllerstate_init(void) {
     ui8_speedlimit_actual_kph = limit;
     ui8_throttle_min_range = ADC_THROTTLE_MIN_VALUE;
     ui8_throttle_max_range = ADC_THROTTLE_MAX_VALUE;
-    ui8_s_pas_direction = PAS_DIRECTION;
     flt_s_pas_threshold = PAS_THRESHOLD;
     flt_s_pid_gain_p = P_FACTOR;
     flt_s_pid_gain_i = I_FACTOR;
@@ -123,8 +122,6 @@ void controllerstate_init(void) {
     if (eepromVal > 0) ui8_throttle_min_range = eepromVal;
     eepromVal = eeprom_read(OFFSET_THROTTLE_MAX_RANGE);
     if (eepromVal > 0) ui8_throttle_max_range = eepromVal;
-    eepromVal = eeprom_read(OFFSET_PAS_DIRECTION);
-    if (eepromVal > 0) ui8_s_pas_direction = eepromVal;
     eepromVal = eeprom_read(OFFSET_PAS_TRESHOLD);
     if (eepromVal > 0) flt_s_pas_threshold = int2float(eepromVal, 4.0);
     eepromVal = eeprom_read(OFFSET_PID_GAIN_P);

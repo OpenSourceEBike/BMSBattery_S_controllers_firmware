@@ -136,13 +136,12 @@ void addConfigStateInfos(void) {
     addPayload(CODE_THROTTLE_MIN_RANGE, ui8_throttle_min_range);
     addPayload(CODE_THROTTLE_MAX_RANGE, ui8_throttle_max_range);
     addPayload(CODE_MOTOR_SPECIFIC_ANGLE, ui8_s_motor_angle);
-    addPayload(CODE_PAS_DIRECTION, ui8_s_pas_direction);
     addPayload(CODE_PAS_TRESHOLD, float2int(flt_s_pas_threshold, 4.0));
     addPayload(CODE_PID_GAIN_P, float2int(flt_s_pid_gain_p, 2.0));
     addPayload(CODE_PID_GAIN_I, float2int(flt_s_pid_gain_i, 2.0));
     addPayload(CODE_RAMP_END, ui16_s_ramp_end >> 4);
 
-    // 2 more elements left/avail (max20)
+    // 3 more elements left/avail (max20)
 
 }
 
@@ -179,9 +178,10 @@ void addDetailStateInfos(void) {
     addPayload(CODE_PAS_HIGH_COUNTER, ui16_PAS_High);
     addPayload(CODE_PAS_COUNTER_HIGH_BYTE, ui16_time_ticks_between_pas_interrupt >> 8);
     addPayload(CODE_PAS_COUNTER, ui16_time_ticks_between_pas_interrupt);
-   
+    addPayload(CODE_VER_SPEED_HIGH_BYTE, ui16_virtual_erps_speed>>8);
+    addPayload(CODE_VER_SPEED, ui16_virtual_erps_speed);
 
-    // 5 more elements left/avail (max20)
+    // 3 more elements left/avail (max20)
 }
 
 void addBasicStateInfos(void) {
@@ -271,13 +271,7 @@ uint8_t digestConfigRequest(uint8_t configAddress, uint8_t requestedCode, uint8_
             }
             return ui8_s_motor_angle;
             break;
-        case CODE_PAS_DIRECTION:
-            ui8_s_pas_direction = requestedValue;
-            if (configAddress == EEPROM_ADDRESS) {
-                eeprom_write(OFFSET_PAS_DIRECTION, requestedValue);
-            }
-            return ui8_s_pas_direction;
-            break;
+        
         case CODE_PAS_TRESHOLD:
             flt_s_pas_threshold = int2float(requestedValue, 4.0);
             if (configAddress == EEPROM_ADDRESS) {

@@ -38,6 +38,7 @@ extern uint16_t ui16_current_cal_b;
 extern uint8_t ui8_motor_state;
 extern uint8_t ui8_BatteryVoltage;
 extern uint16_t ui16_motor_speed_erps;
+extern uint16_t ui16_virtual_erps_speed;
 extern uint16_t ui16_BatteryCurrent;
 extern uint8_t ui8_position_correction_value;
 extern uint16_t ui16_ADC_iq_current;
@@ -81,7 +82,7 @@ extern uint16_t ui16_PAS_High_Counter;
 extern uint8_t ui8_PAS_Flag; //flag for PAS interrupt
 extern uint8_t ui8_PAS_update_call_when_inactive_counter;
 
-extern uint8_t ui8_s_pas_direction;
+
 extern float flt_torquesensorCalibration;
 extern float flt_s_pas_threshold;
 extern float flt_s_pid_gain_p;
@@ -103,6 +104,12 @@ typedef enum {
 	ASSIST_LVL_AFFECTS_THROTTLE = ((uint8_t) 1),
 	OFFROAD_ENABLED = ((uint8_t) 2),
 	BRAKE_DISABLES_OFFROAD = ((uint8_t) 4),
+
+	DIGITAL_REGEN = ((uint8_t) 8),
+	SPEED_INFLUENCES_REGEN = ((uint8_t) 16),
+	SPEED_INFLUENCES_TORQUESENSOR = ((uint8_t) 32),
+	PAS_INVERTED = ((uint8_t) 64),
+
 	DUMMY_ALWAYS_ON = ((uint8_t) 128)
 } ACA_FLAGS;
 

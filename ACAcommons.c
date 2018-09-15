@@ -204,11 +204,11 @@ void updatePasStatus(void) {
         ui16_time_ticks_between_pas_interrupt = ui16_time_ticks_for_pas_calculation; //save recent cadence
         ui16_PAS_High = ui16_PAS_High_Counter;
 
-        if ((ui8_s_pas_direction == 1) && ((float) ui16_time_ticks_between_pas_interrupt / (float) ui16_PAS_High > flt_s_pas_threshold)) {
+        if ((0 == (ui8_aca_flags & PAS_INVERTED)) && ((float) ui16_time_ticks_between_pas_interrupt / (float) ui16_PAS_High > flt_s_pas_threshold)) {
             if (PAS_act < 7) {
                 PAS_act++;
             }
-        } else if ((ui8_s_pas_direction == 0) && ((float) ui16_time_ticks_between_pas_interrupt / (float) ui16_PAS_High < flt_s_pas_threshold)) {
+        } else if ((PAS_INVERTED == (ui8_aca_flags & PAS_INVERTED)) && ((float) ui16_time_ticks_between_pas_interrupt / (float) ui16_PAS_High < flt_s_pas_threshold)) {
             if (PAS_act < 7) {
                 PAS_act++;
             }

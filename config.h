@@ -38,11 +38,9 @@
 #define PAS_THRESHOLD 3.0
 #define PWM_CYCLES_SECOND 15625L
 #define SPEEDSENSOR_INTERNAL
-#define REGEN_DIGITAL
-#define PAS_DIRECTION 1
 #define BLUOSEC
 #define TQS_CALIB 0.0
-#define ACA 134
-#define EEPROM_INIT_MAGIC_BYTE 129 // makes sure (chance of fail 1/255) eeprom is invalidated after flashing new config
+#define ACA 158
+#define EEPROM_INIT_MAGIC_BYTE 197 // makes sure (chance of fail 1/255) eeprom is invalidated after flashing new config
 
 #endif /* CONFIG_H_ */

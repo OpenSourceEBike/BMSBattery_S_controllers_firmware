@@ -32,7 +32,6 @@ typedef enum
     OFFSET_ASSIST_LEVEL = ((uint8_t) 0x03),
     OFFSET_THROTTLE_MIN_RANGE = ((uint8_t) 0x04),
     OFFSET_THROTTLE_MAX_RANGE = ((uint8_t) 0x05),
-    OFFSET_PAS_DIRECTION = ((uint8_t) 0x06),
     OFFSET_PAS_TRESHOLD = ((uint8_t) 0x07),
     OFFSET_PID_GAIN_P = ((uint8_t) 0x08),
     OFFSET_PID_GAIN_I = ((uint8_t) 0x09),

@@ -88,8 +88,7 @@ public class OSEC extends JFrame {
 	private final ButtonGroup displayButtonGroup = new ButtonGroup();
 	private final ButtonGroup MotorSpeed = new ButtonGroup();
 	private final ButtonGroup Speedsensor = new ButtonGroup();
-	private final ButtonGroup PASdirection = new ButtonGroup();
-	private final ButtonGroup Regen = new ButtonGroup();
+
 	private JTextField Assist_Level_1;
 	private JTextField Assist_Level_2;
 	private JTextField Assist_Level_3;
@@ -117,10 +116,7 @@ public class OSEC extends JFrame {
 	private JTextField TempCalA;
 	private JTextField TempCalB;
 	private JRadioButton rdbtnBluOsecDisplay;
-	private JRadioButton rdbtnRight;
-	private JRadioButton rdbtnLeft;
-	private JRadioButton rdbtnRegen;
-	private JRadioButton rdbtnRegenDigital;
+
 	private JRadioButton rdbtnKingmeterJlcd;
 	private JRadioButton rdbtnKtlcd;
 	private JRadioButton rdbtnDiganostics;
@@ -129,6 +125,13 @@ public class OSEC extends JFrame {
 	private JCheckBox cbAssistLevelInfluencesThrottle;
 	private JCheckBox cbOffroadEnabled;
 	private JCheckBox cbBrakeDisablesOffroad;
+	
+	private JCheckBox cbDigitalRegen;
+	private JCheckBox cbSpeedInfluencesRegen;
+	private JCheckBox cbSpeedInfluencesTqSensor;
+	private JCheckBox cbPasInverted;
+	
+	
 	private JTextField speedWithoutPas;
 	private JTextField speedWithoutThrottleOverride;
 
@@ -200,10 +203,10 @@ public class OSEC extends JFrame {
 		rdbtnInternal.setSelected(Boolean.parseBoolean(in.readLine()));
 		rdbtnExternal.setSelected(Boolean.parseBoolean(in.readLine()));
 		rdbtnDiganostics.setSelected(Boolean.parseBoolean(in.readLine()));
-		rdbtnRegenDigital.setSelected(Boolean.parseBoolean(in.readLine()));
-		rdbtnRegen.setSelected(Boolean.parseBoolean(in.readLine()));
-		rdbtnLeft.setSelected(Boolean.parseBoolean(in.readLine()));
-		rdbtnRight.setSelected(Boolean.parseBoolean(in.readLine()));
+		in.readLine();
+		in.readLine();
+		in.readLine();
+		in.readLine();
 		rdbtnBluOsecDisplay.setSelected(Boolean.parseBoolean(in.readLine()));
 
 		rdbtnNodisplay.setSelected(Boolean.parseBoolean(in.readLine()));
@@ -216,6 +219,11 @@ public class OSEC extends JFrame {
 		cbAssistLevelInfluencesThrottle.setSelected((acaFlags&1)>0);
 		cbOffroadEnabled.setSelected((acaFlags&2)>0);
 		cbBrakeDisablesOffroad.setSelected((acaFlags&4)>0);
+		
+		cbDigitalRegen.setSelected((acaFlags&8)>0);
+		cbSpeedInfluencesRegen.setSelected((acaFlags&16)>0);
+		cbSpeedInfluencesTqSensor.setSelected((acaFlags&32)>0);
+		cbPasInverted.setSelected((acaFlags&64)>0);
 				
 		in.close();
 	}
@@ -650,14 +658,14 @@ public class OSEC extends JFrame {
 
 		JLabel lblRideMode = new JLabel("Ride Options");
 		lblRideMode.setFont(new Font("Tahoma", Font.BOLD, 12));
-		lblRideMode.setBounds(136, 490, 86, 20);
+		lblRideMode.setBounds(15, 490, 86, 20);
 		lblRideMode.setForeground(Color.GRAY);
 		contentPane.add(lblRideMode);
 
 		cbTorqueSensor = new JCheckBox("Torquesensor");
 		cbTorqueSensor.setSelected(false);
 		cbTorqueSensor.setForeground(Color.GRAY);
-		cbTorqueSensor.setBounds(136, 515, 131, 20);
+		cbTorqueSensor.setBounds(15, 515, 250, 20);
 		contentPane.add(cbTorqueSensor);
 		
 		cbTorqueSensor.addItemListener(new ItemListener() {
@@ -668,23 +676,49 @@ public class OSEC extends JFrame {
 		});
 		
 		
-		cbAssistLevelInfluencesThrottle = new JCheckBox("A.Lvl affects Throttle");
+		cbAssistLevelInfluencesThrottle = new JCheckBox("Assist Lvl affects Throttle");
 		cbAssistLevelInfluencesThrottle.setSelected(false);
-		cbAssistLevelInfluencesThrottle.setBounds(136, 535, 131, 20);
+		cbAssistLevelInfluencesThrottle.setBounds(15, 535, 250, 20);
 		cbAssistLevelInfluencesThrottle.setForeground(Color.GRAY);
 		contentPane.add(cbAssistLevelInfluencesThrottle);
 		
 		cbOffroadEnabled = new JCheckBox("Offroad Enabled");
 		cbOffroadEnabled.setSelected(false);
-		cbOffroadEnabled.setBounds(136, 555, 131, 20);
+		cbOffroadEnabled.setBounds(15, 555, 250, 20);
 		cbOffroadEnabled.setForeground(Color.GRAY);
 		contentPane.add(cbOffroadEnabled);
 		
 		cbBrakeDisablesOffroad = new JCheckBox("Brake Disables Offroad");
 		cbBrakeDisablesOffroad.setSelected(false);
-		cbBrakeDisablesOffroad.setBounds(136, 575, 131, 20);
+		cbBrakeDisablesOffroad.setBounds(15, 575, 250, 20);
 		cbBrakeDisablesOffroad.setForeground(Color.GRAY);
 		contentPane.add(cbBrakeDisablesOffroad);
+		
+		
+		cbDigitalRegen = new JCheckBox("Regen Digital (no X4 throttle)");
+		cbDigitalRegen.setSelected(false);
+		cbDigitalRegen.setBounds(15, 595, 250, 20);
+		cbDigitalRegen.setForeground(Color.GRAY);
+		contentPane.add(cbDigitalRegen);
+		
+		cbSpeedInfluencesRegen = new JCheckBox("Speed Influences Regen Rate");
+		cbSpeedInfluencesRegen.setSelected(false);
+		cbSpeedInfluencesRegen.setBounds(15, 615, 250, 20);
+		cbSpeedInfluencesRegen.setForeground(Color.GRAY);
+		contentPane.add(cbSpeedInfluencesRegen);
+		
+		cbSpeedInfluencesTqSensor = new JCheckBox("Speed influences Tq Sensor");
+		cbSpeedInfluencesTqSensor.setSelected(false);
+		cbSpeedInfluencesTqSensor.setBounds(15, 635, 250, 20);
+		cbSpeedInfluencesTqSensor.setForeground(Color.GRAY);
+		contentPane.add(cbSpeedInfluencesTqSensor);
+		
+		cbPasInverted = new JCheckBox("Pas inverted (right side)");
+		cbPasInverted.setSelected(false);
+		cbPasInverted.setBounds(15, 655, 250, 20);
+		cbPasInverted.setForeground(Color.GRAY);
+		contentPane.add(cbPasInverted);
+		
 	
 		JLabel lblMotorSpeed = new JLabel("Motor Speed");
 		lblMotorSpeed.setFont(new Font("Tahoma", Font.BOLD, 12));
@@ -718,40 +752,6 @@ public class OSEC extends JFrame {
 		rdbtnExternal.setBounds(276, 645, 101, 20);
 		contentPane.add(rdbtnExternal);
 
-
-		JLabel lblPasDirection = new JLabel("PAS direction");
-		lblPasDirection.setFont(new Font("Tahoma", Font.BOLD, 12));
-		lblPasDirection.setForeground(Color.GRAY);
-		lblPasDirection.setBounds(15, 600, 98, 20);
-		contentPane.add(lblPasDirection);
-
-		rdbtnRight = new JRadioButton("Right");
-		PASdirection.add(rdbtnRight);
-		rdbtnRight.setForeground(Color.GRAY);
-		rdbtnRight.setSelected(true);
-		rdbtnRight.setBounds(15, 625, 67, 20);
-		contentPane.add(rdbtnRight);
-
-		rdbtnLeft = new JRadioButton("Left");
-		rdbtnLeft.setForeground(Color.GRAY);
-		PASdirection.add(rdbtnLeft);
-		rdbtnLeft.setBounds(15, 645, 67, 20);
-		contentPane.add(rdbtnLeft);
-
-		JLabel lblRegeneration = new JLabel("Regeneration");
-		lblRegeneration.setFont(new Font("Tahoma", Font.BOLD, 12));
-		lblRegeneration.setBounds(15, 490, 86, 20);
-		contentPane.add(lblRegeneration);
-
-		rdbtnRegenDigital = new JRadioButton("digital");
-		rdbtnRegenDigital.setBounds(15, 515, 97, 20);
-		Regen.add(rdbtnRegenDigital);
-		contentPane.add(rdbtnRegenDigital);
-
-		rdbtnRegen = new JRadioButton("linear");
-		rdbtnRegen.setBounds(15, 535, 97, 23);
-		Regen.add(rdbtnRegen);
-		contentPane.add(rdbtnRegen);
 
 		lblDiplayType = new JLabel("Display Type");
 		lblDiplayType.setFont(new Font("Tahoma", Font.BOLD, 12));
@@ -1007,29 +1007,10 @@ public class OSEC extends JFrame {
 					}
 					iWriter.println(rdbtnDiganostics.isSelected());
 
-					if (rdbtnRegenDigital.isSelected()) {
-						text_to_save = "#define REGEN_DIGITAL";
-						pWriter.println(text_to_save);
-					}
-					iWriter.println(rdbtnRegenDigital.isSelected());
-
-					if (rdbtnRegen.isSelected()) {
-						text_to_save = "#define REGEN";
-						pWriter.println(text_to_save);
-					}
-					iWriter.println(rdbtnRegen.isSelected());
-
-					if (rdbtnLeft.isSelected()) {
-						text_to_save = "#define PAS_DIRECTION 0";
-						pWriter.println(text_to_save);
-					}
-					iWriter.println(rdbtnLeft.isSelected());
-
-					if (rdbtnRight.isSelected()) {
-						text_to_save = "#define PAS_DIRECTION 1";
-						pWriter.println(text_to_save);
-					}
-					iWriter.println(rdbtnRight.isSelected());
+					iWriter.println("");// old options, unused
+					iWriter.println("");// old options, unused
+					iWriter.println("");// old options, unused
+					iWriter.println("");// old options, unused
 
 					if (rdbtnBluOsecDisplay.isSelected()) {
 						text_to_save = "#define BLUOSEC";
@@ -1049,6 +1030,11 @@ public class OSEC extends JFrame {
 					acaFlags |= (cbAssistLevelInfluencesThrottle.isSelected()?1:0);
 					acaFlags |= (cbOffroadEnabled.isSelected()?2:0);
 					acaFlags |= (cbBrakeDisablesOffroad.isSelected()?4:0);
+					acaFlags |= (cbDigitalRegen.isSelected()?8:0);
+					acaFlags |= (cbSpeedInfluencesRegen.isSelected()?16:0);
+					acaFlags |= (cbSpeedInfluencesTqSensor.isSelected()?32:0);
+					acaFlags |= (cbPasInverted.isSelected()?64:0);
+					
 					iWriter.println(acaFlags);
 					
 					pWriter.println("#define ACA "+acaFlags);

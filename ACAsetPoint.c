@@ -74,7 +74,16 @@ uint16_t aca_setpoint(uint16_t ui16_time_ticks_between_speed_interrupt, uint16_t
         ui8_speedlimit_actual_kph = ui8_speedlimit_kph;
     }
 
-    ui16_BatteryCurrent_accumulated -= ui16_BatteryCurrent_accumulated >> 3;
+    // select virtual erps speed based on speedsensor type
+#ifdef SPEEDSENSOR_INTERNAL
+    ui16_virtual_erps_speed = (uint16_t) ui32_erps_filtered;
+#endif
+
+#ifdef SPEEDSENSOR_EXTERNAL
+    ui16_virtual_erps_speed = ui16_speed_kph_to_erps_ratio * ((uint16_t) (ui32_SPEED_km_h / 100)) / 1000 // /100/1000 instead of more plausible /1000/100 cause of 16bit overflow
+#endif
+
+            ui16_BatteryCurrent_accumulated -= ui16_BatteryCurrent_accumulated >> 3;
     ui16_BatteryCurrent_accumulated += ui16_adc_read_motor_total_current();
     ui16_BatteryCurrent = ui16_BatteryCurrent_accumulated >> 3;
 
@@ -100,14 +109,18 @@ uint16_t aca_setpoint(uint16_t ui16_time_ticks_between_speed_interrupt, uint16_t
 
     } else if (brake_is_set()) {
 
-#ifdef REGEN_DIGITAL
-        ui8_temp = 255; //Curret target = max regen, needs to be replaced with on screen regen throttle
-#else        
-        ui8_temp = map (ui8_adc_read_regen_throttle () , ui8_throttle_min_range, ui8_throttle_max_range, 0, SETPOINT_MAX_VALUE); //map regen throttle to limits
-#endif
-        float_temp = (float) ui8_temp * (float) (REGEN_CURRENT_MAX_VALUE - ui16_current_cal_b) / 255.0 + (float) ui16_current_cal_b;
+        if ((ui8_aca_flags & DIGITAL_REGEN) == DIGITAL_REGEN) {
+            ui8_temp = 255; //Curret target = max regen, needs to be replaced with on screen regen throttle
+        } else {
+            ui8_temp = map(ui8_adc_read_regen_throttle(), ui8_throttle_min_range, ui8_throttle_max_range, 0, SETPOINT_MAX_VALUE); //map regen throttle to limits
+        }
+        float_temp = (float) ui8_temp * (float) (REGEN_CURRENT_MAX_VALUE - ui16_current_cal_b) / 255.0;
 
-        uint32_current_target = (uint32_t) float_temp;
+        if (((ui8_aca_flags & SPEED_INFLUENCES_REGEN) == SPEED_INFLUENCES_REGEN) && (ui32_SPEED_km_h < ui8_speedlimit_kph)) {
+            float_temp *= ((float) ui16_virtual_erps_speed / ((float) (ui16_speed_kph_to_erps_ratio * ((float) ui8_speedlimit_kph)) / 100.0)); // influence of current speed based on base speed limit
+        }
+
+        uint32_current_target = (uint32_t) float_temp + ui16_current_cal_b;
         ui32_setpoint = PI_control(ui16_BatteryCurrent, uint32_current_target);
         ui8_control_state = 2;
 
@@ -117,31 +130,38 @@ uint16_t aca_setpoint(uint16_t ui16_time_ticks_between_speed_interrupt, uint16_t
 
     } else {
 
+        uint32_current_target = ui16_current_cal_b; // reset target to zero
         ui8_control_state = 8;
         //if none of the overruling boundaries are concerned, calculate new setpoint
 
-        if (ui16_time_ticks_between_pas_interrupt_smoothed > ui16_s_ramp_end) //if you are pedaling slower than defined ramp end, current is proportional to cadence
-        {
-            uint32_current_target = (i16_assistlevel[ui8_assistlevel_global]*(BATTERY_CURRENT_MAX_VALUE - ui16_current_cal_b) / 100);
-            float_temp = ((float) ui16_s_ramp_end) / ((float) ui16_time_ticks_between_pas_interrupt_smoothed);
+        // if torque sim is requested
+        if (ui16_s_ramp_end != 0) {
+            if (ui16_time_ticks_between_pas_interrupt_smoothed > ui16_s_ramp_end) //if you are pedaling slower than defined ramp end, current is proportional to cadence
+            {
+                uint32_current_target = (i16_assistlevel[ui8_assistlevel_global]*(BATTERY_CURRENT_MAX_VALUE - ui16_current_cal_b) / 100);
+                float_temp = ((float) ui16_s_ramp_end) / ((float) ui16_time_ticks_between_pas_interrupt_smoothed);
 
-            uint32_current_target = ((uint16_t) (uint32_current_target)*(uint16_t) (float_temp * 100)) / 100 + ui16_current_cal_b;
-            ui8_control_state += 1;
-        } else {
-            uint32_current_target = (i16_assistlevel[ui8_assistlevel_global]*(BATTERY_CURRENT_MAX_VALUE - ui16_current_cal_b) / 100 + ui16_current_cal_b);
+                uint32_current_target = ((uint16_t) (uint32_current_target)*(uint16_t) (float_temp * 100)) / 100 + ui16_current_cal_b;
+                ui8_control_state += 1;
+            } else {
+                uint32_current_target = (i16_assistlevel[ui8_assistlevel_global]*(BATTERY_CURRENT_MAX_VALUE - ui16_current_cal_b) / 100 + ui16_current_cal_b);
 
+            }
         }
 
+        // throttle / torquesensor override following
         float_temp = (float) sumtorque;
         if ((ui8_aca_flags & ASSIST_LVL_AFFECTS_THROTTLE) == 1) {
             float_temp *= ((float) i16_assistlevel[ui8_assistlevel_global] / 100.0);
             ui8_control_state += 2;
         }
+        // if torque sensor is requested
         if (flt_torquesensorCalibration != 0.0) {
-            // TODO adjust flt_torquesensorCalibration in case of torquesensor;
             // flt_torquesensorCalibration is >fummelfactor * NUMBER_OF_PAS_MAGS * 64< (64 cause of <<6)
             float_temp *= flt_torquesensorCalibration / ((uint32_t) ui16_time_ticks_between_pas_interrupt_smoothed); // influence of cadence
-            float_temp *= (1000 + ui32_SPEED_km_h / ui8_speedlimit_actual_kph) / 1000; // influence of current speed, don't get this part, more tq the faster you are?
+            if ((ui8_aca_flags & SPEED_INFLUENCES_TORQUESENSOR) == SPEED_INFLUENCES_TORQUESENSOR) {
+                float_temp *= ((float) ui16_virtual_erps_speed / ((float) (ui16_speed_kph_to_erps_ratio * ((float) ui8_speedlimit_kph)) / 100.0)); // influence of current speed based on base speed limit
+            }
             ui8_control_state += 4;
         }
 
@@ -152,16 +172,9 @@ uint16_t aca_setpoint(uint16_t ui16_time_ticks_between_speed_interrupt, uint16_t
             ui8_control_state += 8;
         }
 
+        // check for overspeed
         uint32_temp = uint32_current_target;
-
-#ifdef SPEEDSENSOR_INTERNAL
-        uint32_current_target = CheckSpeed((uint16_t) uint32_current_target, (uint16_t) ui32_erps_filtered, (ui16_speed_kph_to_erps_ratio * ((uint16_t) ui8_speedlimit_actual_kph)) / 100, (ui16_speed_kph_to_erps_ratio * ((uint16_t) (ui8_speedlimit_actual_kph + 2))) / 100); //limit speed
-#endif
-
-#ifdef SPEEDSENSOR_EXTERNAL
-        uint32_current_target = CheckSpeed((uint16_t) uint32_current_target, (uint16_t) ui32_SPEED_km_h, ui8_speedlimit_actual_kph * 1000, (ui8_speedlimit_actual_kph + 2)*1000); //limit speed
-#endif
-
+        uint32_current_target = CheckSpeed((uint16_t) uint32_current_target, (uint16_t) ui16_virtual_erps_speed, (ui16_speed_kph_to_erps_ratio * ((uint16_t) ui8_speedlimit_actual_kph)) / 100, (ui16_speed_kph_to_erps_ratio * ((uint16_t) (ui8_speedlimit_actual_kph + 2))) / 100); //limit speed
         if (uint32_temp != uint32_current_target) {
             ui8_control_state += 16;
         }
