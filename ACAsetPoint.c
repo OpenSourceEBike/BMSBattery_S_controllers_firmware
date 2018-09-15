@@ -43,6 +43,7 @@ static uint32_t ui32_erps_filtered; //filtered value of erps
 static uint16_t ui16_erps_max = PWM_CYCLES_SECOND / 30; //limit erps to have minimum 30 points on the sine curve for proper commutation
 static float float_temp = 0; //for float calculations
 static uint32_t uint32_temp = 0;
+static uint8_t ui8_temp = 0;
 
 uint16_t cutoffSetpoint(uint32_t ui32_setpoint) {
     if (ui32_setpoint < 5) {
@@ -64,9 +65,9 @@ uint16_t aca_setpoint(uint16_t ui16_time_ticks_between_speed_interrupt, uint16_t
     if (ui8_offroad_state == 255) {
         ui8_speedlimit_actual_kph = 80;
     } else if (ui8_offroad_state > 15 && sumtorque <= 2) { // allow a slight increase based on ui8_offroad_state
-        ui8_speedlimit_actual_kph = ui8_speedlimit_kph + (ui8_offroad_state-16);
+        ui8_speedlimit_actual_kph = ui8_speedlimit_kph + (ui8_offroad_state - 16);
     } else if (ui8_offroad_state > 15 && sumtorque > 2) {
-        ui8_speedlimit_actual_kph = ui8_speedlimit_with_throttle_override_kph + (ui8_offroad_state-16);
+        ui8_speedlimit_actual_kph = ui8_speedlimit_with_throttle_override_kph + (ui8_offroad_state - 16);
     } else if (ui16_time_ticks_for_pas_calculation > timeout || !PAS_dir) {
         ui8_speedlimit_actual_kph = ui8_speedlimit_without_pas_kph;
     } else {
@@ -99,7 +100,15 @@ uint16_t aca_setpoint(uint16_t ui16_time_ticks_between_speed_interrupt, uint16_t
 
     } else if (brake_is_set()) {
 
-        ui32_setpoint = PI_control(ui16_BatteryCurrent, REGEN_CURRENT_MAX_VALUE); //Curret target = max regen,
+#ifdef REGEN_DIGITAL
+        ui8_temp = 255; //Curret target = max regen, needs to be replaced with on screen regen throttle
+#else        
+        ui8_temp = map (ui8_adc_read_regen_throttle () , ui8_throttle_min_range, ui8_throttle_max_range, 0, SETPOINT_MAX_VALUE); //map regen throttle to limits
+#endif
+        float_temp = (float) ui8_temp * (float) (REGEN_CURRENT_MAX_VALUE - ui16_current_cal_b) / 255.0 + (float) ui16_current_cal_b;
+
+        uint32_current_target = (uint32_t) float_temp;
+        ui32_setpoint = PI_control(ui16_BatteryCurrent, uint32_current_target);
         ui8_control_state = 2;
 
     } else if (ui32_erps_filtered > ui16_erps_max) {//limit max erps

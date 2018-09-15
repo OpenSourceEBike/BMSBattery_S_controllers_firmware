@@ -132,7 +132,7 @@ public class OSEC extends JFrame {
 	private JTextField speedWithoutPas;
 	private JTextField speedWithoutThrottleOverride;
 
-	private JRadioButton rdbtnNoRegen;
+
 	private JRadioButton rdbtnNodisplay;
 
 	private File settingsDir;
@@ -207,7 +207,7 @@ public class OSEC extends JFrame {
 		rdbtnBluOsecDisplay.setSelected(Boolean.parseBoolean(in.readLine()));
 
 		rdbtnNodisplay.setSelected(Boolean.parseBoolean(in.readLine()));
-		rdbtnNoRegen.setSelected(Boolean.parseBoolean(in.readLine()));
+		in.readLine();//old options, no longer used
 
 		in.readLine();//old options, no longer used
 		flt_tqCalibrationFactor.setText(in.readLine());
@@ -255,7 +255,7 @@ public class OSEC extends JFrame {
 
 		JLabel lblTollesProgramm = new JLabel("C#ROME-B Parameter Configurator");
 		lblTollesProgramm.setHorizontalAlignment(SwingConstants.CENTER);
-		lblTollesProgramm.setForeground(Color.BLUE);
+		lblTollesProgramm.setForeground(Color.GRAY);
 		lblTollesProgramm.setFont(new Font("Tahoma", Font.PLAIN, 18));
 		lblTollesProgramm.setBounds(114, 11, 326, 34);
 		contentPane.add(lblTollesProgramm);
@@ -338,6 +338,7 @@ public class OSEC extends JFrame {
 
 		lblThrottleMin = new JLabel("Throttle min");
 		lblThrottleMin.setBounds(15, 150, 78, 14);
+		lblThrottleMin.setForeground(Color.GRAY);
 		contentPane.add(lblThrottleMin);
 
 		txtThrottlemin = new JTextField();
@@ -348,6 +349,7 @@ public class OSEC extends JFrame {
 
 		lblThrottleMax = new JLabel("Throttle max");
 		lblThrottleMax.setBounds(15, 170, 78, 14);
+		lblThrottleMax.setForeground(Color.GRAY);
 		contentPane.add(lblThrottleMax);
 
 		txtThrottlemax = new JTextField();
@@ -400,6 +402,7 @@ public class OSEC extends JFrame {
 
 		JLabel lblMotorSpecificAngle = new JLabel("Motor specific angle");
 		lblMotorSpecificAngle.setBounds(15, 270, 121, 14);
+		lblMotorSpecificAngle.setForeground(Color.GRAY);
 		contentPane.add(lblMotorSpecificAngle);
 		
 		txtMotor_specific_angle = new JTextField();
@@ -441,6 +444,7 @@ public class OSEC extends JFrame {
 		
 		JLabel lblPfactor = new JLabel("Gain P");
 		lblPfactor.setBounds(15, 350, 67, 14);
+		lblPfactor.setForeground(Color.GRAY);
 		contentPane.add(lblPfactor);
 
 		p_factor = new JTextField();
@@ -450,6 +454,7 @@ public class OSEC extends JFrame {
 		contentPane.add(p_factor);
 
 		JLabel lblIfactor = new JLabel("Gain I");
+		lblIfactor.setForeground(Color.GRAY);
 		lblIfactor.setBounds(15, 370, 67, 14);
 		contentPane.add(lblIfactor);
 
@@ -481,6 +486,7 @@ public class OSEC extends JFrame {
 		
 		JLabel lblPasThreshold = new JLabel("PAS threshold");
 		lblPasThreshold.setBounds(15, 430, 86, 20);
+		lblPasThreshold.setForeground(Color.GRAY);
 		contentPane.add(lblPasThreshold);
 
 		PAS_threshold = new JTextField();
@@ -606,6 +612,7 @@ public class OSEC extends JFrame {
 
 		JLabel lblRampEnd = new JLabel("Ramp end");
 		lblRampEnd.setBounds(332, 280, 67, 14);
+		lblRampEnd.setForeground(Color.GRAY);
 		contentPane.add(lblRampEnd);
 
 		ramp_end = new JTextField();
@@ -617,6 +624,7 @@ public class OSEC extends JFrame {
 		
 		JLabel lblTqCalibrationFactor = new JLabel("TQ Calib");
 		lblTqCalibrationFactor.setBounds(332, 300, 67, 14);
+		lblTqCalibrationFactor.setForeground(Color.GRAY);
 		contentPane.add(lblTqCalibrationFactor);
 		
 		flt_tqCalibrationFactor = new JTextField();
@@ -628,6 +636,7 @@ public class OSEC extends JFrame {
 
 		lblSpeedLimit = new JLabel("Speed Limit (km/h)");
 		lblSpeedLimit.setBounds(332, 340, 135, 14);
+		lblSpeedLimit.setForeground(Color.GRAY);
 		contentPane.add(lblSpeedLimit);
 
 		txtSpeedlimit = new JTextField();
@@ -642,10 +651,12 @@ public class OSEC extends JFrame {
 		JLabel lblRideMode = new JLabel("Ride Options");
 		lblRideMode.setFont(new Font("Tahoma", Font.BOLD, 12));
 		lblRideMode.setBounds(136, 490, 86, 20);
+		lblRideMode.setForeground(Color.GRAY);
 		contentPane.add(lblRideMode);
 
 		cbTorqueSensor = new JCheckBox("Torquesensor");
 		cbTorqueSensor.setSelected(false);
+		cbTorqueSensor.setForeground(Color.GRAY);
 		cbTorqueSensor.setBounds(136, 515, 131, 20);
 		contentPane.add(cbTorqueSensor);
 		
@@ -660,16 +671,19 @@ public class OSEC extends JFrame {
 		cbAssistLevelInfluencesThrottle = new JCheckBox("A.Lvl affects Throttle");
 		cbAssistLevelInfluencesThrottle.setSelected(false);
 		cbAssistLevelInfluencesThrottle.setBounds(136, 535, 131, 20);
+		cbAssistLevelInfluencesThrottle.setForeground(Color.GRAY);
 		contentPane.add(cbAssistLevelInfluencesThrottle);
 		
 		cbOffroadEnabled = new JCheckBox("Offroad Enabled");
 		cbOffroadEnabled.setSelected(false);
 		cbOffroadEnabled.setBounds(136, 555, 131, 20);
+		cbOffroadEnabled.setForeground(Color.GRAY);
 		contentPane.add(cbOffroadEnabled);
 		
 		cbBrakeDisablesOffroad = new JCheckBox("Brake Disables Offroad");
 		cbBrakeDisablesOffroad.setSelected(false);
 		cbBrakeDisablesOffroad.setBounds(136, 575, 131, 20);
+		cbBrakeDisablesOffroad.setForeground(Color.GRAY);
 		contentPane.add(cbBrakeDisablesOffroad);
 	
 		JLabel lblMotorSpeed = new JLabel("Motor Speed");
@@ -707,16 +721,19 @@ public class OSEC extends JFrame {
 
 		JLabel lblPasDirection = new JLabel("PAS direction");
 		lblPasDirection.setFont(new Font("Tahoma", Font.BOLD, 12));
+		lblPasDirection.setForeground(Color.GRAY);
 		lblPasDirection.setBounds(15, 600, 98, 20);
 		contentPane.add(lblPasDirection);
 
 		rdbtnRight = new JRadioButton("Right");
 		PASdirection.add(rdbtnRight);
+		rdbtnRight.setForeground(Color.GRAY);
 		rdbtnRight.setSelected(true);
 		rdbtnRight.setBounds(15, 625, 67, 20);
 		contentPane.add(rdbtnRight);
 
 		rdbtnLeft = new JRadioButton("Left");
+		rdbtnLeft.setForeground(Color.GRAY);
 		PASdirection.add(rdbtnLeft);
 		rdbtnLeft.setBounds(15, 645, 67, 20);
 		contentPane.add(rdbtnLeft);
@@ -727,15 +744,9 @@ public class OSEC extends JFrame {
 		contentPane.add(lblRegeneration);
 
 		rdbtnRegenDigital = new JRadioButton("digital");
-		rdbtnRegenDigital.setBounds(15, 555, 97, 20);
+		rdbtnRegenDigital.setBounds(15, 515, 97, 20);
 		Regen.add(rdbtnRegenDigital);
 		contentPane.add(rdbtnRegenDigital);
-
-		rdbtnNoRegen = new JRadioButton("None");
-		rdbtnNoRegen.setSelected(true);
-		Regen.add(rdbtnNoRegen);
-		rdbtnNoRegen.setBounds(15, 515, 97, 20);
-		contentPane.add(rdbtnNoRegen);
 
 		rdbtnRegen = new JRadioButton("linear");
 		rdbtnRegen.setBounds(15, 535, 97, 23);
@@ -1027,7 +1038,7 @@ public class OSEC extends JFrame {
 					iWriter.println(rdbtnBluOsecDisplay.isSelected());
 
 					iWriter.println(rdbtnNodisplay.isSelected());
-					iWriter.println(rdbtnNoRegen.isSelected());
+					iWriter.println("");// old options, unused
 					iWriter.println("");// old options, unused
 					
 					text_to_save = "#define TQS_CALIB " + flt_tqCalibrationFactor.getText();
