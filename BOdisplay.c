@@ -34,7 +34,7 @@
 //  0 A 0 (as chars)
 uint8_t ui8_rx_buffer[17]; // modbus ascii with max 8 bytes payload (array including padding)
 uint8_t ui8_tx_buffer[45]; // (max 20*8bit key + 20*8bit data points + bounced checksum(+ key) + address + function + checksum) (array excluding padding)
-uint8_t ui8_rx_converted_buffer[6]; // for decoded ascii values
+uint8_t ui8_rx_converted_buffer[7]; // for decoded ascii values
 
 uint8_t ui8_rx_buffer_counter = 0;
 uint8_t ui8_tx_buffer_counter = 0;
