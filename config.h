@@ -15,9 +15,9 @@
 #define ADC_THROTTLE_MIN_VALUE 43
 #define ADC_THROTTLE_MAX_VALUE 182
 #define BATTERY_VOLTAGE_MIN_VALUE 148
-#define BATTERY_CURRENT_MAX_VALUE 550L
-#define PHASE_CURRENT_MAX_VALUE 666L
-#define REGEN_CURRENT_MAX_VALUE 275L
+#define BATTERY_CURRENT_MAX_VALUE 250L
+#define PHASE_CURRENT_MAX_VALUE 300L
+#define REGEN_CURRENT_MAX_VALUE 50L
 #define MOTOR_ROTOR_DELTA_PHASE_ANGLE_RIGHT 200
 #define current_cal_a 10
 #define TEMP_CAL_A 1.6
@@ -41,6 +41,6 @@
 #define BLUOSEC
 #define TQS_CALIB 0.0
 #define ACA 158
-#define EEPROM_INIT_MAGIC_BYTE 197 // makes sure (chance of fail 1/255) eeprom is invalidated after flashing new config
+#define EEPROM_INIT_MAGIC_BYTE 110 // makes sure (chance of fail 1/255) eeprom is invalidated after flashing new config
 
 #endif /* CONFIG_H_ */

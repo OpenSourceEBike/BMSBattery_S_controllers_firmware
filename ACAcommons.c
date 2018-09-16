@@ -148,42 +148,39 @@ void updateHallOrder(uint8_t hall_sensors) {
 }
 
 void updatePasDir(void) {
-#ifdef TORQUESENSOR
-    if (ui16_time_ticks_between_pas_interrupt < timeout) {
+    if ((flt_torquesensorCalibration != 0.0)&&(ui16_time_ticks_between_pas_interrupt < timeout)) {
+        //only PAS timeout for Torquesensor Mode.
         PAS_dir = 1;
-    } //only PAS timeout for Torquesensor Mode.
-#else
-    if (PAS_act > 3) {
+    }else if ((flt_torquesensorCalibration == 0.0) && (PAS_act > 3)) {
+        //set direction only if enough pulses in the right direction are detected.
         PAS_dir = 1;
-    }//set direction only if enough pulses in the right direction are detected.
-#endif
-    else {
+    } else {
         PAS_dir = 0;
     }
 }
 
 void updateRequestedTorque(void) {
 
-#ifndef TORQUESENSOR
-    ui16_throttle_accumulated -= ui16_throttle_accumulated >> 3;
-    ui16_throttle_accumulated += ui8_adc_read_throttle();
-    ui8_temp = ui16_throttle_accumulated >> 3; //read in value from adc
-    ui16_sum_torque = (uint8_t) map(ui8_temp, ui8_throttle_min_range, ui8_throttle_max_range, 0, SETPOINT_MAX_VALUE); //map throttle to limits
-#else
-    ui16_sum_torque = 0;
-    for (ui8_temp = 0; ui8_temp < NUMBER_OF_PAS_MAGS; ui8_temp++) { // sum up array content
-        ui16_sum_torque += ui16_torque[ui8_temp];
-    }
+    if (flt_torquesensorCalibration == 0.0) {
+        ui16_throttle_accumulated -= ui16_throttle_accumulated >> 3;
+        ui16_throttle_accumulated += ui8_adc_read_throttle();
+        ui8_temp = ui16_throttle_accumulated >> 3; //read in value from adc
+        ui16_sum_torque = (uint8_t) map(ui8_temp, ui8_throttle_min_range, ui8_throttle_max_range, 0, SETPOINT_MAX_VALUE); //map throttle to limits
+    } else {
+        ui16_sum_torque = 0;
+        for (ui8_temp = 0; ui8_temp < NUMBER_OF_PAS_MAGS; ui8_temp++) { // sum up array content
+            ui16_sum_torque += ui16_torque[ui8_temp];
+        }
 
-    ui16_sum_torque /= NUMBER_OF_PAS_MAGS;
-#endif
+        ui16_sum_torque /= NUMBER_OF_PAS_MAGS;
+    }
 }
 
 void checkPasInActivity(void) {
     ui8_PAS_update_call_when_inactive_counter++;
-    if (ui16_time_ticks_for_pas_calculation > timeout){
+    if (ui16_time_ticks_for_pas_calculation > timeout) {
         // updatePasStatus does not fire if pas inactive, so set interval to reasonably high value here
-        ui16_time_ticks_between_pas_interrupt = 64000;
+        ui16_time_ticks_between_pas_interrupt = 32000L;
     }
     // we are called at 50 Hz, if there has been no interrupt for more than ~1s, ramp down PAS automatically
     if (ui8_PAS_Flag == 0 && ui8_PAS_update_call_when_inactive_counter > (uint8_t) (timeout >> 6)) {

@@ -32,9 +32,9 @@
 // example
 //:304100305F\r\n 
 //  0 A 0 (as chars)
-uint8_t ui8_rx_buffer[13]; // modbus ascii with max 4 bytes payload (array including padding)
+uint8_t ui8_rx_buffer[17]; // modbus ascii with max 8 bytes payload (array including padding)
 uint8_t ui8_tx_buffer[45]; // (max 20*8bit key + 20*8bit data points + bounced checksum(+ key) + address + function + checksum) (array excluding padding)
-uint8_t ui8_rx_converted_buffer[5]; // for decoded ascii values
+uint8_t ui8_rx_converted_buffer[6]; // for decoded ascii values
 
 uint8_t ui8_rx_buffer_counter = 0;
 uint8_t ui8_tx_buffer_counter = 0;
@@ -97,7 +97,7 @@ void signPackage(void) {
 void UART2_IRQHandler(void) __interrupt(UART2_IRQHANDLER) {
 
     if (UART2_GetFlagStatus(UART2_FLAG_RXNE) == SET) {
-        if (ui8_rx_buffer_counter < 13) {
+        if (ui8_rx_buffer_counter < 17) {
             ui8_rx_buffer[ui8_rx_buffer_counter++] = UART2_ReceiveData8();
         } else {
             UART2_ReceiveData8();
@@ -141,7 +141,10 @@ void addConfigStateInfos(void) {
     addPayload(CODE_PID_GAIN_I, float2int(flt_s_pid_gain_i, 2.0));
     addPayload(CODE_RAMP_END, ui16_s_ramp_end >> 4);
 
-    // 3 more elements left/avail (max20)
+    addPayload(CODE_MAX_BAT_CURRENT_HIGH_BYTE, ui16_battery_current_max_value >> 8);
+    addPayload(CODE_MAX_BAT_CURRENT, ui16_battery_current_max_value);
+    addPayload(CODE_MAX_REGEN_CURRENT, ui16_regen_current_max_value);
+    // 0 more elements left/avail (max20)
 
 }
 
@@ -229,39 +232,57 @@ void gatherStaticPayload(uint8_t function) {
     }
 }
 
-uint8_t digestConfigRequest(uint8_t configAddress, uint8_t requestedCode, uint8_t requestedValue) {
-    switch (requestedCode) {
+void digestConfigRequest(uint8_t configAddress, uint8_t requestedCodeLowByte, uint8_t requestedValueHighByte, uint8_t requestedValue) {
+    
+    
+    switch (requestedCodeLowByte) {
         case CODE_OFFROAD:
             ui8_offroad_state = requestedValue;
-            return ui8_offroad_state;
+            addPayload(requestedCodeLowByte,  ui8_offroad_state);
+            break;
+        case CODE_MAX_BAT_CURRENT:
+            ui16_battery_current_max_value = ((uint16_t)requestedValueHighByte<<8)+(uint16_t)requestedValue;
+            if (configAddress == EEPROM_ADDRESS) {
+                eeprom_write(OFFSET_BATTERY_CURRENT_MAX_VALUE_HIGH_BYTE, requestedValueHighByte);
+                eeprom_write(OFFSET_BATTERY_CURRENT_MAX_VALUE, requestedValue);
+            }
+            addPayload(CODE_MAX_BAT_CURRENT_HIGH_BYTE, ui16_battery_current_max_value>>8);
+            addPayload(requestedCodeLowByte, ui16_battery_current_max_value);
+            break;
+        case CODE_MAX_REGEN_CURRENT:
+            ui16_regen_current_max_value = requestedValue;
+            if (configAddress == EEPROM_ADDRESS) {
+                eeprom_write(OFFSET_REGEN_CURRENT_MAX_VALUE, requestedValue);
+            }
+            addPayload(requestedCodeLowByte, ui16_regen_current_max_value);
             break;
         case CODE_ASSIST_LEVEL:
             ui8_assistlevel_global = requestedValue;
             if (configAddress == EEPROM_ADDRESS) {
                 eeprom_write(OFFSET_ASSIST_LEVEL, requestedValue);
             }
-            return ui8_assistlevel_global;
+            addPayload(requestedCodeLowByte, ui8_assistlevel_global);
             break;
         case CODE_ACA_FLAGS:
             ui8_aca_flags = requestedValue;
             if (configAddress == EEPROM_ADDRESS) {
                 eeprom_write(OFFSET_ACA_FLAGS, requestedValue);
             }
-            return ui8_aca_flags;
+            addPayload(requestedCodeLowByte, ui8_aca_flags);
             break;
         case CODE_THROTTLE_MIN_RANGE:
             ui8_throttle_min_range = requestedValue;
             if (configAddress == EEPROM_ADDRESS) {
                 eeprom_write(OFFSET_THROTTLE_MIN_RANGE, requestedValue);
             }
-            return ui8_throttle_min_range;
+            addPayload(requestedCodeLowByte, ui8_throttle_min_range);
             break;
         case CODE_THROTTLE_MAX_RANGE:
             ui8_throttle_max_range = requestedValue;
             if (configAddress == EEPROM_ADDRESS) {
                 eeprom_write(OFFSET_THROTTLE_MAX_RANGE, requestedValue);
             }
-            return ui8_throttle_max_range;
+            addPayload(requestedCodeLowByte, ui8_throttle_max_range);
             break;
 
         case CODE_MOTOR_SPECIFIC_ANGLE:
@@ -269,7 +290,7 @@ uint8_t digestConfigRequest(uint8_t configAddress, uint8_t requestedCode, uint8_
             if (configAddress == EEPROM_ADDRESS) {
                 eeprom_write(OFFSET_MOTOR_ANGLE, requestedValue);
             }
-            return ui8_s_motor_angle;
+            addPayload(requestedCodeLowByte, ui8_s_motor_angle);
             break;
         
         case CODE_PAS_TRESHOLD:
@@ -277,28 +298,28 @@ uint8_t digestConfigRequest(uint8_t configAddress, uint8_t requestedCode, uint8_
             if (configAddress == EEPROM_ADDRESS) {
                 eeprom_write(OFFSET_PAS_TRESHOLD, requestedValue);
             }
-            return float2int(flt_s_pas_threshold, 4.0);
+            addPayload(requestedCodeLowByte, float2int(flt_s_pas_threshold, 4.0));
             break;
         case CODE_PID_GAIN_P:
             flt_s_pid_gain_p = int2float(requestedValue, 2.0);
             if (configAddress == EEPROM_ADDRESS) {
                 eeprom_write(OFFSET_PID_GAIN_P, requestedValue);
             }
-            return float2int(flt_s_pid_gain_p, 2.0);
+            addPayload(requestedCodeLowByte, float2int(flt_s_pid_gain_p, 2.0));
             break;
         case CODE_PID_GAIN_I:
             flt_s_pid_gain_i = int2float(requestedValue, 2.0);
             if (configAddress == EEPROM_ADDRESS) {
                 eeprom_write(OFFSET_PID_GAIN_I, requestedValue);
             }
-            return float2int(flt_s_pid_gain_i, 2.0);
+            addPayload(requestedCodeLowByte, float2int(flt_s_pid_gain_i, 2.0));
             break;
         case CODE_RAMP_END:
             ui16_s_ramp_end = requestedValue << 4;
             if (configAddress == EEPROM_ADDRESS) {
                 eeprom_write(OFFSET_RAMP_END, requestedValue);
             }
-            return ui16_s_ramp_end >> 4;
+            addPayload(requestedCodeLowByte, ui16_s_ramp_end >> 4);
             break;
         case CODE_MAX_SPEED_DEFAULT:
             ui8_speedlimit_kph = requestedValue;
@@ -306,7 +327,7 @@ uint8_t digestConfigRequest(uint8_t configAddress, uint8_t requestedCode, uint8_
                 eeprom_write(OFFSET_MAX_SPEED_DEFAULT, requestedValue);
             }
             setSignal(SIGNAL_SPEEDLIMIT_CHANGED);
-            return ui8_speedlimit_kph;
+            addPayload(requestedCodeLowByte, ui8_speedlimit_kph);
             break;
         case CODE_MAX_SPEED_WITHOUT_PAS:
             ui8_speedlimit_without_pas_kph = requestedValue;
@@ -314,7 +335,7 @@ uint8_t digestConfigRequest(uint8_t configAddress, uint8_t requestedCode, uint8_
                 eeprom_write(OFFSET_MAX_SPEED_WITHOUT_PAS, requestedValue);
             }
             setSignal(SIGNAL_SPEEDLIMIT_CHANGED);
-            return ui8_speedlimit_without_pas_kph;
+            addPayload(requestedCodeLowByte, ui8_speedlimit_without_pas_kph);
             break;
         case CODE_MAX_SPEED_WITH_THROTTLE_OVERRIDE:
             ui8_speedlimit_with_throttle_override_kph = requestedValue;
@@ -322,19 +343,19 @@ uint8_t digestConfigRequest(uint8_t configAddress, uint8_t requestedCode, uint8_
                 eeprom_write(OFFSET_MAX_SPEED_WITH_THROTTLE_OVERRIDE, requestedValue);
             }
             setSignal(SIGNAL_SPEEDLIMIT_CHANGED);
-            return ui8_speedlimit_with_throttle_override_kph;
+            addPayload(requestedCodeLowByte, ui8_speedlimit_with_throttle_override_kph);
             break;
         
 
         default:
             addPayload(CODE_ERROR, CODE_ERROR);
-            return 0;
+
     }
 
 }
 
 void processBoMessage() {
-    if (ui8_rx_buffer_counter == 13) {
+    if (ui8_rx_buffer_counter == 17) {
 
         uint8_t calculatedLrc;
 
@@ -343,13 +364,16 @@ void processBoMessage() {
         ui8_rx_converted_buffer[2] = (hex2int(ui8_rx_buffer[5]) << 4) + hex2int(ui8_rx_buffer[6]);
         ui8_rx_converted_buffer[3] = (hex2int(ui8_rx_buffer[7]) << 4) + hex2int(ui8_rx_buffer[8]);
         ui8_rx_converted_buffer[4] = (hex2int(ui8_rx_buffer[9]) << 4) + hex2int(ui8_rx_buffer[10]);
-        calculatedLrc = calcLRC(ui8_rx_converted_buffer, 0, 4);
+        ui8_rx_converted_buffer[5] = (hex2int(ui8_rx_buffer[11]) << 4) + hex2int(ui8_rx_buffer[12]);
+        ui8_rx_converted_buffer[6] = (hex2int(ui8_rx_buffer[13]) << 4) + hex2int(ui8_rx_buffer[14]);
+        calculatedLrc = calcLRC(ui8_rx_converted_buffer, 0, 6);
 
 
-        if (calculatedLrc == ui8_rx_converted_buffer[4]) {
+        if (calculatedLrc == ui8_rx_converted_buffer[6]) {
             uint8_t requestedFunction = ui8_rx_converted_buffer[1];
-            uint8_t requestedCode = ui8_rx_converted_buffer[2];
-            uint8_t requestedValue = ui8_rx_converted_buffer[3];
+            uint8_t requestedCodeLowByte = ui8_rx_converted_buffer[4];
+            uint8_t requestedValueHighByte = ui8_rx_converted_buffer[3];
+            uint8_t requestedValue = ui8_rx_converted_buffer[5];
 
             if (ui8_rx_converted_buffer[0] == DYNAMIC_DATA_ADDRESS) {
                 prepareBasePackage(DYNAMIC_DATA_ADDRESS, requestedFunction);
@@ -365,7 +389,7 @@ void processBoMessage() {
                 sendPreparedPackage();
             } else if ((ui8_rx_converted_buffer[0] == CONFIG_ADDRESS) || (ui8_rx_converted_buffer[0] == EEPROM_ADDRESS)) {
                 prepareBasePackage(ui8_rx_converted_buffer[0], requestedFunction);
-                addPayload(requestedCode, digestConfigRequest(ui8_rx_converted_buffer[0], requestedCode, requestedValue));
+                digestConfigRequest(ui8_rx_converted_buffer[0], requestedCodeLowByte, requestedValueHighByte, requestedValue);
                 addPayload(CODE_LRC_CHECK, calculatedLrc);
                 signPackage();
                 sendPreparedPackage();
@@ -378,6 +402,8 @@ void processBoMessage() {
             addPayload(CODE_ERROR + 2, ui8_rx_converted_buffer[2]);
             addPayload(CODE_ERROR + 3, ui8_rx_converted_buffer[3]);
             addPayload(CODE_ERROR + 4, ui8_rx_converted_buffer[4]);
+            addPayload(CODE_ERROR + 5, ui8_rx_converted_buffer[5]);
+            addPayload(CODE_ERROR + 6, ui8_rx_converted_buffer[6]);
             addPayload(CODE_LRC_CHECK, calculatedLrc);
             signPackage();
             sendPreparedPackage();

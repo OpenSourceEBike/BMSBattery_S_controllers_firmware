@@ -66,7 +66,7 @@ uint16_t update_setpoint (uint16_t speed, uint16_t PAS, uint16_t sumtorque, uint
 #ifdef REGEN
 
   //check if regen is wanted
-  ui8_regen_throttle = map (ui8_adc_read_regen_throttle () , ui8_throttle_min_range, ui8_throttle_max_range, 0, SETPOINT_MAX_VALUE); //map throttle to limits
+  ui8_regen_throttle = map (ui16_adc_read_x4_value ()>>2 , ui8_throttle_min_range, ui8_throttle_max_range, 0, SETPOINT_MAX_VALUE); //map throttle to limits
     if(ui8_regen_throttle>2){
     float_temp=(float)ui8_regen_throttle*(float)(REGEN_CURRENT_MAX_VALUE-ui16_current_cal_b)/255.0+(float)ui16_current_cal_b;
     ui32_setpoint= PI_control(ui16_BatteryCurrent, (uint16_t) float_temp);
@@ -80,7 +80,7 @@ uint16_t update_setpoint (uint16_t speed, uint16_t PAS, uint16_t sumtorque, uint
       //check for undervoltage
 #ifndef REGEN
 
-      i8_motor_temperature=(int8_t)((float)ui16_adc_read_regen_throttle ()*TEMP_CAL_A+TEMP_CAL_B); //calibration for tpm36 temperature sensor
+      i8_motor_temperature=(int8_t)((float)ui16_adc_read_x4_value ()*TEMP_CAL_A+TEMP_CAL_B); //calibration for tpm36 temperature sensor
       if(ui8_BatteryVoltage<BATTERY_VOLTAGE_MIN_VALUE){
 #endif
       TIM1_CtrlPWMOutputs(DISABLE);

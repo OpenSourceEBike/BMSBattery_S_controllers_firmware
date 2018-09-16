@@ -32,6 +32,7 @@ typedef enum {
 typedef enum {
 	// do not use values below 0x60 (reserved for array types)
 
+	CODE_DUMMY_HIGH_BYTE= ((uint8_t) 0xFE),
 	CODE_DUMMY = ((uint8_t) 0xFF),
 	CODE_LRC_CHECK = ((uint8_t) 0x60),
 	CODE_ERROR = ((uint8_t) 0x66),
@@ -102,6 +103,10 @@ typedef enum {
 	CODE_MAX_SPEED_WITHOUT_PAS = ((uint8_t) 0x91),
 	CODE_MAX_SPEED_WITH_THROTTLE_OVERRIDE = ((uint8_t) 0x92),
 	CODE_ACA_FLAGS = ((uint8_t) 0x93),
+			
+	CODE_MAX_BAT_CURRENT_HIGH_BYTE= ((uint8_t) 0x94),
+    CODE_MAX_BAT_CURRENT= ((uint8_t) 0x95),
+    CODE_MAX_REGEN_CURRENT= ((uint8_t) 0x96),
 
 	CODE_HALL_ORDER_BASE = ((uint8_t) 0x10),
 	CODE_CURRENT_AT_HALL_POSITION_BASE = ((uint8_t) 0x00)

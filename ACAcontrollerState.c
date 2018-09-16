@@ -51,10 +51,14 @@ uint32_t uint32_current_target = 0; //target for PI-Control
 uint16_t ui16_setpoint = 0;
 uint16_t ui16_throttle_accumulated = 0;
 uint16_t ui16_current_cal_b = 0;
+uint16_t ui16_x4_cal_b = 0;
+uint16_t ui16_throttle_cal_b = 0;
+uint16_t ui16_battery_current_max_value = 0;
+uint16_t ui16_regen_current_max_value = 0;
 uint8_t ui8_motor_state = 0;
 uint8_t ui8_BatteryVoltage = 0; //Battery Voltage read from ADC
 uint16_t ui16_motor_speed_erps = 0;
-uint32_t ui32_erps_filtered=0; //filtered value of erps
+uint32_t ui32_erps_filtered = 0; //filtered value of erps
 uint16_t ui16_virtual_erps_speed = 0;
 uint16_t ui16_BatteryCurrent = 0; //Battery Current read from ADC8
 uint8_t ui8_position_correction_value = 127; // in 360/256 degrees
@@ -63,7 +67,7 @@ uint16_t ui16_ADC_iq_current_filtered = 0;
 uint8_t ui8_control_state = 0;
 uint8_t ui8_uptime = 0;
 
-int8_t i8_motor_temperature=0;
+int8_t i8_motor_temperature = 0;
 
 uint8_t uint8_t_hall_case[7];
 uint8_t uint8_t_hall_order[6];
@@ -96,6 +100,7 @@ uint8_t ui8_PAS_Flag = 0;
 void controllerstate_init(void) {
     uint8_t di;
     uint8_t eepromVal;
+    uint8_t eepromHighVal;
 
     // convert static defines to volatile vars
     ui8_aca_flags = ACA;
@@ -108,8 +113,17 @@ void controllerstate_init(void) {
     flt_s_pid_gain_i = I_FACTOR;
     ui16_s_ramp_end = RAMP_END;
     ui8_s_motor_angle = MOTOR_ROTOR_DELTA_PHASE_ANGLE_RIGHT;
+    ui16_battery_current_max_value = BATTERY_CURRENT_MAX_VALUE;
+    ui16_regen_current_max_value = REGEN_CURRENT_MAX_VALUE;
 
     // read in overrides from eeprom if they are > 0, assuming 0s are uninitialized
+    eepromHighVal = eeprom_read(OFFSET_BATTERY_CURRENT_MAX_VALUE_HIGH_BYTE);
+    eepromVal = eeprom_read(OFFSET_BATTERY_CURRENT_MAX_VALUE);
+    if (eepromVal > 0 || eepromHighVal > 0) ui16_battery_current_max_value = ((uint16_t)eepromHighVal << 8) + (uint16_t)eepromVal;
+
+    eepromVal = eeprom_read(OFFSET_REGEN_CURRENT_MAX_VALUE);
+    if (eepromVal > 0) ui16_regen_current_max_value = eepromVal;
+    
     eepromVal = eeprom_read(OFFSET_MAX_SPEED_DEFAULT);
     if (eepromVal > 0) ui8_speedlimit_kph = eepromVal;
     eepromVal = eeprom_read(OFFSET_MAX_SPEED_WITHOUT_PAS);
@@ -118,7 +132,7 @@ void controllerstate_init(void) {
     if (eepromVal > 0) ui8_speedlimit_with_throttle_override_kph = eepromVal;
     eepromVal = eeprom_read(OFFSET_ACA_FLAGS);
     if (eepromVal > 0) ui8_aca_flags = eepromVal;
-    
+
     eepromVal = eeprom_read(OFFSET_ASSIST_LEVEL);
     if (eepromVal > 0) ui8_assistlevel_global = eepromVal;
     eepromVal = eeprom_read(OFFSET_THROTTLE_MIN_RANGE);
