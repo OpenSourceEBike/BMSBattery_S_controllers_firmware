@@ -32,7 +32,7 @@ typedef enum {
 typedef enum {
 	// do not use values below 0x60 (reserved for array types)
 
-	CODE_DUMMY_HIGH_BYTE= ((uint8_t) 0xFE),
+	CODE_DUMMY_HIGH_BYTE= ((uint8_t) 0x64),
 	CODE_DUMMY = ((uint8_t) 0xFF),
 	CODE_LRC_CHECK = ((uint8_t) 0x60),
 	CODE_ERROR = ((uint8_t) 0x66),

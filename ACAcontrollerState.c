@@ -44,7 +44,7 @@ uint32_t uint32_icc_signals = 0;
 
 uint8_t ui8_assistlevel_global = 83; // 3 + max regen
 uint8_t PAS_act = 3; //recent PAS direction reading
-uint8_t PAS_dir = 0; //PAS direction flag
+uint8_t PAS_is_active = 0; 
 uint16_t ui16_sum_torque = 0; //sum of array elements
 uint8_t ui8_offroad_state = 0; //state of offroad switching procedure
 uint32_t uint32_current_target = 0; //target for PI-Control
@@ -78,7 +78,7 @@ uint16_t ui16_speed_kph_to_erps_ratio = 0;
 
 uint32_t ui32_SPEED_km_h; //global variable Speed
 uint32_t ui32_SPEED_km_h_accumulated;
-uint16_t ui16_time_ticks_between_speed_interrupt = 64000; //speed in timetics
+uint16_t ui16_time_ticks_between_speed_interrupt = 32000L; //speed in timetics
 uint16_t ui16_time_ticks_for_speed_calculation = 0; //time tics for speed measurement
 uint8_t ui8_SPEED_Flag = 0; //flag for SPEED interrupt
 uint8_t ui8_offroad_counter = 0; //counter for offroad switching procedure
@@ -92,7 +92,7 @@ uint8_t ui8_torque_index = 0; //counter for torque array
 uint16_t ui16_time_ticks_between_pas_interrupt_smoothed = 0;
 uint16_t ui16_time_ticks_for_pas_calculation = 0; //time tics for cadence measurement
 uint16_t ui16_PAS_High_Counter = 1; //time tics for direction detection
-uint16_t ui16_time_ticks_between_pas_interrupt = 32000; //cadence in timetics
+uint16_t ui16_time_ticks_between_pas_interrupt = timeout; //cadence in timetics
 uint16_t ui16_PAS_High = 1; //number of High readings on PAS
 uint8_t ui8_PAS_update_call_when_inactive_counter = 50; //increased when no pas change is detected (50Hz)
 uint8_t ui8_PAS_Flag = 0;

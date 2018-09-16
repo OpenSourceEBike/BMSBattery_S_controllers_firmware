@@ -168,7 +168,7 @@ void addHallStateInfos(void) {
 void addDetailStateInfos(void) {
     addPayload(CODE_OFFROAD, ui8_offroad_state);
     addPayload(CODE_PAS_ACTIVE, PAS_act);
-    addPayload(CODE_PAS_DIR, PAS_dir);
+    addPayload(CODE_PAS_DIR, PAS_is_active);
     addPayload(CODE_CORRECTION_VALUE, ui8_position_correction_value);
     addPayload(CODE_PHASE_CURRENT, ui16_ADC_iq_current >> 2);
     addPayload(CODE_THROTTLE_HIGH_BYTE, ui16_throttle_accumulated >> 8);

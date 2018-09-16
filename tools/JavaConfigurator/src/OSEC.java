@@ -367,6 +367,7 @@ public class OSEC extends JFrame {
 		txtThrottlemax.setColumns(10);
 
 		JLabel lblBatteryCurrentMax = new JLabel("Battery Current max");
+		lblBatteryCurrentMax.setForeground(Color.GRAY);
 		lblBatteryCurrentMax.setBounds(15, 190, 131, 14);
 		contentPane.add(lblBatteryCurrentMax);
 
@@ -388,6 +389,7 @@ public class OSEC extends JFrame {
 		contentPane.add(txtMaxphasecurrent);
 		
 		JLabel lblRegenCurrentMax = new JLabel("Regen Current max");
+		lblRegenCurrentMax.setForeground(Color.GRAY);
 		lblRegenCurrentMax.setBounds(15, 230, 131, 14);
 		contentPane.add(lblRegenCurrentMax);
 		
