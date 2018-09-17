@@ -95,6 +95,7 @@ extern float flt_s_pas_threshold;
 extern float flt_s_pid_gain_p;
 extern float flt_s_pid_gain_i;
 extern uint16_t ui16_s_ramp_end;
+extern uint16_t ui16_s_ramp_start;
 extern uint8_t ui8_s_motor_angle;
 
 

@@ -178,9 +178,9 @@ void updateRequestedTorque(void) {
 
 void checkPasInActivity(void) {
     ui8_PAS_update_call_when_inactive_counter++;
-    if (ui16_time_ticks_for_pas_calculation > timeout) {
+    if (ui16_time_ticks_for_pas_calculation > ui16_s_ramp_start) {
         // updatePasStatus does not fire if pas inactive, so set interval to reasonably high value here
-        ui16_time_ticks_between_pas_interrupt = timeout;
+        ui16_time_ticks_between_pas_interrupt = ui16_s_ramp_start;
     }
     // we are called at 50 Hz, if there has been no interrupt for more than ~1s, ramp down PAS automatically
     if (ui8_PAS_Flag == 0 && ui8_PAS_update_call_when_inactive_counter > (uint8_t) (timeout >> 6)) {
@@ -239,11 +239,6 @@ void updatePasStatus(void) {
 
 void updateOffroadStatus(void) {
 
-    // check if offroad mode is enabled
-    if (0 == (ui8_aca_flags & OFFROAD_ENABLED)) {
-        return;
-    }
-
     if (((ui8_aca_flags & BRAKE_DISABLES_OFFROAD) == BRAKE_DISABLES_OFFROAD) && (ui8_offroad_state > 4)) {
         // if disabling is enabled :)
         if (!GPIO_ReadInputPin(BRAKE__PORT, BRAKE__PIN)) {
@@ -255,7 +250,14 @@ void updateOffroadStatus(void) {
         } else {
             ui8_offroad_counter = 0;
         }
-    } else if (ui8_offroad_state == 0 && !GPIO_ReadInputPin(BRAKE__PORT, BRAKE__PIN)) {//first step, brake on.
+    }
+    
+    // check if offroad mode is enabled
+    if (0 == (ui8_aca_flags & OFFROAD_ENABLED)) {
+        return;
+    }
+
+    if (ui8_offroad_state == 0 && !GPIO_ReadInputPin(BRAKE__PORT, BRAKE__PIN)) {//first step, brake on.
         ui8_offroad_state = 1;
     } else if (ui8_offroad_state == 1) {//second step, make sure the brake is hold according to definded time
         ui8_offroad_counter++;

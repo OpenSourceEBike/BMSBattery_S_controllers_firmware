@@ -92,7 +92,6 @@
           </df>
           <df name="test">
           </df>
-          <in>config.h</in>
         </df>
         <df name="openocd-v0.10.0-scripts">
         </df>

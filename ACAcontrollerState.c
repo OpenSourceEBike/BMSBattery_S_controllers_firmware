@@ -37,6 +37,7 @@ float flt_s_pid_gain_p = 0.5;
 float flt_s_pid_gain_i = 0.2;
 float flt_torquesensorCalibration = 0.0;
 uint16_t ui16_s_ramp_end = 1500;
+uint16_t ui16_s_ramp_start = 7000;
 uint8_t ui8_s_motor_angle = 214;
 
 // internal
@@ -111,6 +112,7 @@ void controllerstate_init(void) {
     flt_s_pas_threshold = PAS_THRESHOLD;
     flt_s_pid_gain_p = P_FACTOR;
     flt_s_pid_gain_i = I_FACTOR;
+    ui16_s_ramp_start = RAMP_START;
     ui16_s_ramp_end = RAMP_END;
     ui8_s_motor_angle = MOTOR_ROTOR_DELTA_PHASE_ANGLE_RIGHT;
     ui16_battery_current_max_value = BATTERY_CURRENT_MAX_VALUE;
@@ -147,6 +149,8 @@ void controllerstate_init(void) {
     if (eepromVal > 0) flt_s_pid_gain_i = int2float(eepromVal, 2.0);
     eepromVal = eeprom_read(OFFSET_RAMP_END);
     if (eepromVal > 0) ui16_s_ramp_end = eepromVal << 4;
+    eepromVal = eeprom_read(OFFSET_RAMP_START);
+    if (eepromVal > 0) ui16_s_ramp_start = eepromVal << 4;
     eepromVal = eeprom_read(OFFSET_MOTOR_ANGLE);
     if (eepromVal > 0) ui8_s_motor_angle = eepromVal;
 

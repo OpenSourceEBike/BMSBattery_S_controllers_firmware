@@ -100,6 +100,7 @@ public class OSEC extends JFrame {
 	private JTextField Morse_Time_2;
 	private JTextField Morse_Time_3;
 	private JTextField ramp_end;
+	private JTextField ramp_start;
 	private JTextField flt_tqCalibrationFactor;
 	private JTextField p_factor;
 	private JTextField i_factor;
@@ -192,7 +193,7 @@ public class OSEC extends JFrame {
 		PAS_threshold.setText(in.readLine());
 
 		cbTorqueSensor.setSelected(Boolean.parseBoolean(in.readLine()));
-		in.readLine();//old options, no longer used
+		ramp_start.setText(in.readLine());
 		in.readLine();//old options, no longer used
 		in.readLine();//old options, no longer used
 
@@ -232,13 +233,18 @@ public class OSEC extends JFrame {
 		if (cbTorqueSensor.isSelected()) {
 			ramp_end.setText("0");
 			ramp_end.setEditable(false);
+			ramp_start.setText("0");
+			ramp_start.setEditable(false);
 			flt_tqCalibrationFactor.setEditable(true);
 			flt_tqCalibrationFactor.setText("1.0");
 		} else {
 			flt_tqCalibrationFactor.setText("0.0");
 			ramp_end.setText("1000");
-			flt_tqCalibrationFactor.setEditable(false);
 			ramp_end.setEditable(true);
+			ramp_start.setText("7000");
+			ramp_start.setEditable(true);
+			flt_tqCalibrationFactor.setEditable(false);
+			
 
 		}
 	}
@@ -626,21 +632,32 @@ public class OSEC extends JFrame {
 		contentPane.add(lblRampEnd);
 
 		ramp_end = new JTextField();
-		ramp_end.setText("977");
+		ramp_end.setText("2000");
 		ramp_end.setColumns(10);
 		ramp_end.setBounds(476, 280, 86, 20);
 		contentPane.add(ramp_end);
 		
+		JLabel lblRampStart = new JLabel("Ramp start");
+		lblRampStart.setBounds(332, 300, 67, 14);
+		lblRampStart.setForeground(Color.GRAY);
+		contentPane.add(lblRampStart);
+
+		ramp_start = new JTextField();
+		ramp_start.setText("7000");
+		ramp_start.setColumns(10);
+		ramp_start.setBounds(476, 300, 86, 20);
+		contentPane.add(ramp_start);
+		
 		
 		JLabel lblTqCalibrationFactor = new JLabel("TQ Calib");
-		lblTqCalibrationFactor.setBounds(332, 300, 67, 14);
+		lblTqCalibrationFactor.setBounds(332, 320, 67, 14);
 		lblTqCalibrationFactor.setForeground(Color.GRAY);
 		contentPane.add(lblTqCalibrationFactor);
 		
 		flt_tqCalibrationFactor = new JTextField();
 		flt_tqCalibrationFactor.setText("1.0");
 		flt_tqCalibrationFactor.setColumns(10);
-		flt_tqCalibrationFactor.setBounds(476, 300, 86, 20);
+		flt_tqCalibrationFactor.setBounds(476, 320, 86, 20);
 		contentPane.add(flt_tqCalibrationFactor);
 		
 
@@ -959,7 +976,11 @@ public class OSEC extends JFrame {
 					pWriter.println(text_to_save);
 
 					iWriter.println(cbTorqueSensor.isSelected());
-					iWriter.println("");// old options, unused
+					
+					text_to_save = "#define RAMP_START " + ramp_start.getText();
+					iWriter.println(ramp_start.getText());
+					pWriter.println(text_to_save);
+					
 					iWriter.println("");// old options, unused
 					iWriter.println("");// old options, unused
 

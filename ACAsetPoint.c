@@ -99,36 +99,37 @@ uint16_t aca_setpoint(uint16_t ui16_time_ticks_between_speed_interrupt, uint16_t
     ui32_time_ticks_between_pas_interrupt_accumulated += ui16_time_ticks_between_pas_interrupt;
     ui16_time_ticks_between_pas_interrupt_smoothed = ui32_time_ticks_between_pas_interrupt_accumulated >> 3; // now it's filtered
 
-     // set virtual PAS activity that doesn't exceed timeout
-    if (ui16_time_ticks_between_pas_interrupt_smoothed > timeout) {
-        ui16_virtual_capped_pas_activity = timeout;
+    // set virtual PAS activity that doesn't exceed ui16_s_ramp_start
+    if (ui16_time_ticks_between_pas_interrupt_smoothed > ui16_s_ramp_start) {
+        ui16_virtual_capped_pas_activity = ui16_s_ramp_start;
     } else {
         ui16_virtual_capped_pas_activity = ui16_time_ticks_between_pas_interrupt_smoothed;
     }
-    
+
     //check for undervoltage
     if (ui8_BatteryVoltage < BATTERY_VOLTAGE_MIN_VALUE) {
 
         TIM1_CtrlPWMOutputs(DISABLE);
         uint_PWM_Enable = 0; // highest priority: Stop motor for undervoltage protection
         ui32_setpoint = 0;
-        ui8_control_state = 0;
+        ui8_control_state = 255;
 
     } else if (brake_is_set()) {
 
-        ui8_control_state = 1;
+        ui8_control_state = 255;
 
         if ((ui8_aca_flags & DIGITAL_REGEN) == DIGITAL_REGEN) {
             ui8_temp = i16_assistlevel[ui8_assistlevel_global >> 4]; //Curret target based on regen assist level
-            ui8_control_state += 2;
+            ui8_control_state -= 1;
         } else {
             ui8_temp = map(ui16_adc_read_x4_value() >> 2, ui8_throttle_min_range, ui8_throttle_max_range, 0, 100); //map regen throttle to limits
+            ui8_control_state -= 2;
         }
         float_temp = (float) ui8_temp * (float) (ui16_regen_current_max_value) / 100.0;
 
         if (((ui8_aca_flags & SPEED_INFLUENCES_REGEN) == SPEED_INFLUENCES_REGEN) && (ui16_virtual_erps_speed < ((ui16_speed_kph_to_erps_ratio * ((uint16_t) ui8_speedlimit_kph)) / 100))) {
             float_temp *= ((float) ui16_virtual_erps_speed / ((float) (ui16_speed_kph_to_erps_ratio * ((float) ui8_speedlimit_kph)) / 100.0)); // influence of current speed based on base speed limit
-            ui8_control_state += 4;
+            ui8_control_state -= 4;
         }
 
         uint32_current_target = (uint32_t) ui16_current_cal_b - float_temp;
@@ -141,7 +142,7 @@ uint16_t aca_setpoint(uint16_t ui16_time_ticks_between_speed_interrupt, uint16_t
     } else {
 
         uint32_current_target = ui16_current_cal_b; // reset target to zero
-        ui8_control_state = 4;
+        ui8_control_state = 0;
         //if none of the overruling boundaries are concerned, calculate new setpoint
 
         // if torque sim is requested
@@ -151,9 +152,9 @@ uint16_t aca_setpoint(uint16_t ui16_time_ticks_between_speed_interrupt, uint16_t
                 //or not pedalling at all
                 //current is proportional to cadence
                 uint32_current_target = (i16_assistlevel[ui8_assistlevel_global & 15]*(ui16_battery_current_max_value) / 100);
-                float_temp = 1.0-(((float) (ui16_virtual_capped_pas_activity-ui16_s_ramp_end)) / ((float) (timeout-ui16_s_ramp_end)));
+                float_temp = 1.0 - (((float) (ui16_virtual_capped_pas_activity - ui16_s_ramp_end)) / ((float) (ui16_s_ramp_start - ui16_s_ramp_end)));
                 uint32_current_target = ((uint16_t) (uint32_current_target)*(uint16_t) (float_temp * 100.0)) / 100 + ui16_current_cal_b;
-
+                ui8_control_state += 1;
             } else {
                 uint32_current_target = (i16_assistlevel[ui8_assistlevel_global & 15]*(ui16_battery_current_max_value) / 100 + ui16_current_cal_b);
                 ui8_control_state += 2;
