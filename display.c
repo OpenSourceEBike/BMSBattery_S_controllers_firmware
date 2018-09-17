@@ -277,6 +277,7 @@ void check_message()
    if (((ui8_crc ^ 10) == ui8_rx_buffer [7]) 	|| // some versions of CRC LCD5 (??)
 	((ui8_crc ^ 5) == ui8_rx_buffer [7]) 	|| // CRC LCD3 (tested with KT36/48SVPR, from PSWpower)
 	((ui8_crc ^ 9) == ui8_rx_buffer [7]) 	|| // CRC LCD5
+       	((ui8_crc ^ 9) == ui8_rx_buffer [7])    || // CRC LCD5 Added display 5 Romanta
 	((ui8_crc ^ 2) == ui8_rx_buffer [7])) 	   // CRC LCD3
    { //printf("message valid \r\n");
      lcd_configuration_variables.ui8_assist_level = ui8_rx_buffer [3] & 7;
