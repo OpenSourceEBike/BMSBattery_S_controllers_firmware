@@ -25,27 +25,26 @@ extern uint8_t eeprom_magic_byte;
 #define EEPROM_BASE_ADDRESS    0x4000
 #define EEPROM_MAX_INIT_RANGE 0x1F // we should at least have 640 avail / 32 in use for now
 
-typedef enum
-{
-    OFFSET_MOTOR_ANGLE = ((uint8_t) 0x01),
+typedef enum {
+	OFFSET_MOTOR_ANGLE = ((uint8_t) 0x01),
 	OFFSET_ACA_FLAGS = ((uint8_t) 0x02),
-    OFFSET_ASSIST_LEVEL = ((uint8_t) 0x03),
-    OFFSET_THROTTLE_MIN_RANGE = ((uint8_t) 0x04),
-    OFFSET_THROTTLE_MAX_RANGE = ((uint8_t) 0x05),
+	OFFSET_ASSIST_LEVEL = ((uint8_t) 0x03),
+	OFFSET_THROTTLE_MIN_RANGE = ((uint8_t) 0x04),
+	OFFSET_THROTTLE_MAX_RANGE = ((uint8_t) 0x05),
 	OFFSET_RAMP_START = ((uint8_t) 0x06),
-    OFFSET_PAS_TRESHOLD = ((uint8_t) 0x07),
-    OFFSET_PID_GAIN_P = ((uint8_t) 0x08),
-    OFFSET_PID_GAIN_I = ((uint8_t) 0x09),
-    OFFSET_RAMP_END = ((uint8_t) 0x0A),
-			
+	OFFSET_PAS_TRESHOLD = ((uint8_t) 0x07),
+	OFFSET_PID_GAIN_P = ((uint8_t) 0x08),
+	OFFSET_PID_GAIN_I = ((uint8_t) 0x09),
+	OFFSET_RAMP_END = ((uint8_t) 0x0A),
+
 	OFFSET_MAX_SPEED_DEFAULT = ((uint8_t) 0x0B),
 	OFFSET_MAX_SPEED_WITHOUT_PAS = ((uint8_t) 0x0C),
 	OFFSET_MAX_SPEED_WITH_THROTTLE_OVERRIDE = ((uint8_t) 0x0D),
-	
+
 	OFFSET_BATTERY_CURRENT_MAX_VALUE_HIGH_BYTE = ((uint8_t) 0x0E),
 	OFFSET_BATTERY_CURRENT_MAX_VALUE = ((uint8_t) 0x0F),
-	OFFSET_REGEN_CURRENT_MAX_VALUE = ((uint8_t) 0x10)
-			
+	OFFSET_REGEN_CURRENT_MAX_VALUE = ((uint8_t) 0x10),
+	OFFSET_CURRENT_CAL_A = ((uint8_t) 0x11)
 
 } BO_EEPROM_OFFSETS;
 

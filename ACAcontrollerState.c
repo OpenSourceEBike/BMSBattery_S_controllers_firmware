@@ -45,12 +45,13 @@ uint32_t uint32_icc_signals = 0;
 
 uint8_t ui8_assistlevel_global = 83; // 3 + max regen
 uint8_t PAS_act = 3; //recent PAS direction reading
-uint8_t PAS_is_active = 0; 
+uint8_t PAS_is_active = 0;
 uint16_t ui16_sum_torque = 0; //sum of array elements
 uint8_t ui8_offroad_state = 0; //state of offroad switching procedure
 uint32_t uint32_current_target = 0; //target for PI-Control
 uint16_t ui16_setpoint = 0;
 uint16_t ui16_throttle_accumulated = 0;
+uint8_t ui8_current_cal_a = 0;
 uint16_t ui16_current_cal_b = 0;
 uint16_t ui16_x4_cal_b = 0;
 uint16_t ui16_throttle_cal_b = 0;
@@ -79,7 +80,7 @@ uint16_t ui16_speed_kph_to_erps_ratio = 0;
 
 uint32_t ui32_SPEED_km_h; //global variable Speed
 uint32_t ui32_SPEED_km_h_accumulated;
-uint16_t ui16_time_ticks_between_speed_interrupt = 32000L; //speed in timetics
+uint16_t ui16_time_ticks_between_speed_interrupt = 64000L; //speed in timetics
 uint16_t ui16_time_ticks_for_speed_calculation = 0; //time tics for speed measurement
 uint8_t ui8_SPEED_Flag = 0; //flag for SPEED interrupt
 uint8_t ui8_offroad_counter = 0; //counter for offroad switching procedure
@@ -93,7 +94,7 @@ uint8_t ui8_torque_index = 0; //counter for torque array
 uint16_t ui16_time_ticks_between_pas_interrupt_smoothed = 0;
 uint16_t ui16_time_ticks_for_pas_calculation = 0; //time tics for cadence measurement
 uint16_t ui16_PAS_High_Counter = 1; //time tics for direction detection
-uint16_t ui16_time_ticks_between_pas_interrupt = timeout; //cadence in timetics
+uint16_t ui16_time_ticks_between_pas_interrupt = 64000L; //cadence in timetics
 uint16_t ui16_PAS_High = 1; //number of High readings on PAS
 uint8_t ui8_PAS_update_call_when_inactive_counter = 50; //increased when no pas change is detected (50Hz)
 uint8_t ui8_PAS_Flag = 0;
@@ -117,15 +118,16 @@ void controllerstate_init(void) {
     ui8_s_motor_angle = MOTOR_ROTOR_DELTA_PHASE_ANGLE_RIGHT;
     ui16_battery_current_max_value = BATTERY_CURRENT_MAX_VALUE;
     ui16_regen_current_max_value = REGEN_CURRENT_MAX_VALUE;
+    ui8_current_cal_a = current_cal_a;
 
     // read in overrides from eeprom if they are > 0, assuming 0s are uninitialized
     eepromHighVal = eeprom_read(OFFSET_BATTERY_CURRENT_MAX_VALUE_HIGH_BYTE);
     eepromVal = eeprom_read(OFFSET_BATTERY_CURRENT_MAX_VALUE);
-    if (eepromVal > 0 || eepromHighVal > 0) ui16_battery_current_max_value = ((uint16_t)eepromHighVal << 8) + (uint16_t)eepromVal;
+    if (eepromVal > 0 || eepromHighVal > 0) ui16_battery_current_max_value = ((uint16_t) eepromHighVal << 8) + (uint16_t) eepromVal;
 
     eepromVal = eeprom_read(OFFSET_REGEN_CURRENT_MAX_VALUE);
     if (eepromVal > 0) ui16_regen_current_max_value = eepromVal;
-    
+
     eepromVal = eeprom_read(OFFSET_MAX_SPEED_DEFAULT);
     if (eepromVal > 0) ui8_speedlimit_kph = eepromVal;
     eepromVal = eeprom_read(OFFSET_MAX_SPEED_WITHOUT_PAS);
@@ -134,7 +136,8 @@ void controllerstate_init(void) {
     if (eepromVal > 0) ui8_speedlimit_with_throttle_override_kph = eepromVal;
     eepromVal = eeprom_read(OFFSET_ACA_FLAGS);
     if (eepromVal > 0) ui8_aca_flags = eepromVal;
-
+    eepromVal = eeprom_read(OFFSET_CURRENT_CAL_A);
+    if (eepromVal > 0) ui8_current_cal_a = eepromVal;
     eepromVal = eeprom_read(OFFSET_ASSIST_LEVEL);
     if (eepromVal > 0) ui8_assistlevel_global = eepromVal;
     eepromVal = eeprom_read(OFFSET_THROTTLE_MIN_RANGE);
@@ -157,6 +160,6 @@ void controllerstate_init(void) {
     for (di = 0; di < 6; di++) {
         uint8_t_hall_order[di] = 0;
     }
-
+    
 }
 

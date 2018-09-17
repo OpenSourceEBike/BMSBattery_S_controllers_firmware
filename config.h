@@ -15,7 +15,7 @@
 #define ADC_THROTTLE_MIN_VALUE 43
 #define ADC_THROTTLE_MAX_VALUE 182
 #define BATTERY_VOLTAGE_MIN_VALUE 148
-#define BATTERY_CURRENT_MAX_VALUE 175L
+#define BATTERY_CURRENT_MAX_VALUE 150L
 #define PHASE_CURRENT_MAX_VALUE 300L
 #define REGEN_CURRENT_MAX_VALUE 50L
 #define MOTOR_ROTOR_DELTA_PHASE_ANGLE_RIGHT 200
@@ -30,18 +30,18 @@
 #define MORSE_TIME_1 50
 #define MORSE_TIME_2 50
 #define MORSE_TIME_3 50
-#define RAMP_END 1000
+#define RAMP_END 2000
 #define P_FACTOR 0.5
 #define I_FACTOR 0.2
 #define GEAR_RATIO 24L
 #define BATTERY_LI_ION_CELLS_NUMBER 13
 #define PAS_THRESHOLD 3.0
-#define RAMP_START 7000
+#define RAMP_START 6000
 #define PWM_CYCLES_SECOND 15625L
 #define SPEEDSENSOR_INTERNAL
 #define BLUOSEC
 #define TQS_CALIB 0.0
 #define ACA 156
-#define EEPROM_INIT_MAGIC_BYTE 229 // makes sure (chance of fail 1/255) eeprom is invalidated after flashing new config
+#define EEPROM_INIT_MAGIC_BYTE 161 // makes sure (chance of fail 1/255) eeprom is invalidated after flashing new config
 
 #endif /* CONFIG_H_ */

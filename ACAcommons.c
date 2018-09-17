@@ -149,7 +149,7 @@ void updateHallOrder(uint8_t hall_sensors) {
 
 void updatePasDir(void) {
     if ((flt_torquesensorCalibration != 0.0)&&(ui16_time_ticks_between_pas_interrupt < timeout)) {
-        //only PAS timeout for Torquesensor Mode.
+        //only for Torquesensor Mode.
         PAS_is_active = 1;
     }else if ((flt_torquesensorCalibration == 0.0) && (PAS_act > 3)) {
         //set direction only if enough pulses in the right direction are detected.
@@ -178,9 +178,9 @@ void updateRequestedTorque(void) {
 
 void checkPasInActivity(void) {
     ui8_PAS_update_call_when_inactive_counter++;
-    if (ui16_time_ticks_for_pas_calculation > ui16_s_ramp_start) {
+    if (ui16_time_ticks_for_pas_calculation > timeout) {
         // updatePasStatus does not fire if pas inactive, so set interval to reasonably high value here
-        ui16_time_ticks_between_pas_interrupt = ui16_s_ramp_start;
+        ui16_time_ticks_between_pas_interrupt = 64000L;
     }
     // we are called at 50 Hz, if there has been no interrupt for more than ~1s, ramp down PAS automatically
     if (ui8_PAS_Flag == 0 && ui8_PAS_update_call_when_inactive_counter > (uint8_t) (timeout >> 6)) {

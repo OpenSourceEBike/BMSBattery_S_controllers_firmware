@@ -124,7 +124,7 @@ void addConfigStateInfos(void) {
 
     // float casts might be costly but they are only requested once every 10 seconds
     addPayload(CODE_ERPS_FACTOR, (uint16_t) (((float) wheel_circumference) / ((float) GEAR_RATIO)));
-    addPayload(CODE_CURRENT_CAL_A, current_cal_a);
+    addPayload(CODE_CURRENT_CAL_A, ui8_current_cal_a);
     addPayload(CODE_CURRENT_CAL_B_HIGH_BYTE, ui16_current_cal_b >> 8);
     addPayload(CODE_CURRENT_CAL_B, ui16_current_cal_b);
     addPayload(CODE_EEPROM_MAGIC_BYTE, eeprom_magic_byte);
@@ -139,8 +139,8 @@ void addConfigStateInfos(void) {
     addPayload(CODE_PAS_TRESHOLD, float2int(flt_s_pas_threshold, 4.0));
     addPayload(CODE_PID_GAIN_P, float2int(flt_s_pid_gain_p, 2.0));
     addPayload(CODE_PID_GAIN_I, float2int(flt_s_pid_gain_i, 2.0));
-    addPayload(CODE_RAMP_END, ui16_s_ramp_end >> 4);
-    addPayload(CODE_RAMP_START, ui16_s_ramp_start >> 4);
+    addPayload(CODE_RAMP_END, ui16_s_ramp_end >> 5);
+    addPayload(CODE_RAMP_START, ui16_s_ramp_start >> 5);
     addPayload(CODE_MAX_BAT_CURRENT_HIGH_BYTE, ui16_battery_current_max_value >> 8);
     addPayload(CODE_MAX_BAT_CURRENT, ui16_battery_current_max_value);
     addPayload(CODE_MAX_REGEN_CURRENT, ui16_regen_current_max_value);
@@ -181,7 +181,7 @@ void addDetailStateInfos(void) {
     addPayload(CODE_PAS_HIGH_COUNTER, ui16_PAS_High);
     addPayload(CODE_PAS_COUNTER_HIGH_BYTE, ui16_time_ticks_between_pas_interrupt >> 8);
     addPayload(CODE_PAS_COUNTER, ui16_time_ticks_between_pas_interrupt);
-    addPayload(CODE_VER_SPEED_HIGH_BYTE, ui16_virtual_erps_speed>>8);
+    addPayload(CODE_VER_SPEED_HIGH_BYTE, ui16_virtual_erps_speed >> 8);
     addPayload(CODE_VER_SPEED, ui16_virtual_erps_speed);
 
     // 5 more elements left/avail (max22)
@@ -193,7 +193,7 @@ void addBasicStateInfos(void) {
     addPayload(CODE_BRAKE_STATUS, (int) brake_is_set());
     addPayload(CODE_MOTOR_STATE, ui8_motor_state);
     addPayload(CODE_BATTERY_VOLTAGE, ui8_BatteryVoltage);
-    addPayload(CODE_ER_SPEED_HIGH_BYTE, ui16_motor_speed_erps>>8);
+    addPayload(CODE_ER_SPEED_HIGH_BYTE, ui16_motor_speed_erps >> 8);
     addPayload(CODE_ER_SPEED, ui16_motor_speed_erps);
     addPayload(CODE_SPEED_HIGH_BYTE, ui32_SPEED_km_h >> 8);
     addPayload(CODE_SPEED, ui32_SPEED_km_h);
@@ -233,20 +233,20 @@ void gatherStaticPayload(uint8_t function) {
 }
 
 void digestConfigRequest(uint8_t configAddress, uint8_t requestedCodeLowByte, uint8_t requestedValueHighByte, uint8_t requestedValue) {
-    
-    
+
+
     switch (requestedCodeLowByte) {
         case CODE_OFFROAD:
             ui8_offroad_state = requestedValue;
-            addPayload(requestedCodeLowByte,  ui8_offroad_state);
+            addPayload(requestedCodeLowByte, ui8_offroad_state);
             break;
         case CODE_MAX_BAT_CURRENT:
-            ui16_battery_current_max_value = ((uint16_t)requestedValueHighByte<<8)+(uint16_t)requestedValue;
+            ui16_battery_current_max_value = ((uint16_t) requestedValueHighByte << 8)+(uint16_t) requestedValue;
             if (configAddress == EEPROM_ADDRESS) {
                 eeprom_write(OFFSET_BATTERY_CURRENT_MAX_VALUE_HIGH_BYTE, requestedValueHighByte);
                 eeprom_write(OFFSET_BATTERY_CURRENT_MAX_VALUE, requestedValue);
             }
-            addPayload(CODE_MAX_BAT_CURRENT_HIGH_BYTE, ui16_battery_current_max_value>>8);
+            addPayload(CODE_MAX_BAT_CURRENT_HIGH_BYTE, ui16_battery_current_max_value >> 8);
             addPayload(requestedCodeLowByte, ui16_battery_current_max_value);
             break;
         case CODE_MAX_REGEN_CURRENT:
@@ -255,6 +255,13 @@ void digestConfigRequest(uint8_t configAddress, uint8_t requestedCodeLowByte, ui
                 eeprom_write(OFFSET_REGEN_CURRENT_MAX_VALUE, requestedValue);
             }
             addPayload(requestedCodeLowByte, ui16_regen_current_max_value);
+            break;
+        case CODE_CURRENT_CAL_A:
+            ui8_current_cal_a = requestedValue;
+            if (configAddress == EEPROM_ADDRESS) {
+                eeprom_write(OFFSET_CURRENT_CAL_A, requestedValue);
+            }
+            addPayload(requestedCodeLowByte, ui8_current_cal_a);
             break;
         case CODE_ASSIST_LEVEL:
             ui8_assistlevel_global = requestedValue;
@@ -292,7 +299,7 @@ void digestConfigRequest(uint8_t configAddress, uint8_t requestedCodeLowByte, ui
             }
             addPayload(requestedCodeLowByte, ui8_s_motor_angle);
             break;
-        
+
         case CODE_PAS_TRESHOLD:
             flt_s_pas_threshold = int2float(requestedValue, 4.0);
             if (configAddress == EEPROM_ADDRESS) {
@@ -315,18 +322,18 @@ void digestConfigRequest(uint8_t configAddress, uint8_t requestedCodeLowByte, ui
             addPayload(requestedCodeLowByte, float2int(flt_s_pid_gain_i, 2.0));
             break;
         case CODE_RAMP_END:
-            ui16_s_ramp_end = requestedValue << 4;
+            ui16_s_ramp_end = requestedValue << 5;
             if (configAddress == EEPROM_ADDRESS) {
                 eeprom_write(OFFSET_RAMP_END, requestedValue);
             }
-            addPayload(requestedCodeLowByte, ui16_s_ramp_end >> 4);
+            addPayload(requestedCodeLowByte, ui16_s_ramp_end >> 5);
             break;
         case CODE_RAMP_START:
-            ui16_s_ramp_start = requestedValue << 4;
+            ui16_s_ramp_start = requestedValue << 5;
             if (configAddress == EEPROM_ADDRESS) {
                 eeprom_write(OFFSET_RAMP_START, requestedValue);
             }
-            addPayload(requestedCodeLowByte, ui16_s_ramp_start >> 4);
+            addPayload(requestedCodeLowByte, ui16_s_ramp_start >> 5);
             break;
         case CODE_MAX_SPEED_DEFAULT:
             ui8_speedlimit_kph = requestedValue;
@@ -352,7 +359,7 @@ void digestConfigRequest(uint8_t configAddress, uint8_t requestedCodeLowByte, ui
             setSignal(SIGNAL_SPEEDLIMIT_CHANGED);
             addPayload(requestedCodeLowByte, ui8_speedlimit_with_throttle_override_kph);
             break;
-        
+
 
         default:
             addPayload(CODE_ERROR, CODE_ERROR);
