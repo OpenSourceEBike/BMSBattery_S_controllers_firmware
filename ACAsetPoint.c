@@ -30,7 +30,7 @@
 #include "brake.h"
 #include "adc.h" // FIXME ugly cross reference
 
-static uint32_t ui32_setpoint; // local version of setpoint
+static uint32_t ui32_dutycycle; // local version of setpoint
 static int16_t i16_assistlevel[6] = {0, LEVEL_1, LEVEL_2, LEVEL_3, LEVEL_4, LEVEL_5}; // difference between setpoint and actual value
 
 static int8_t uint_PWM_Enable = 0; //flag for PWM state
@@ -46,14 +46,14 @@ static uint16_t ui16_virtual_capped_pas_activity = 0;
 static uint32_t uint32_temp = 0;
 static uint8_t ui8_temp = 0;
 
-uint16_t cutoffSetpoint(uint32_t ui32_setpoint) {
-    if (ui32_setpoint < 5) {
-        ui32_setpoint = 0;
+uint16_t cutoffSetpoint(uint32_t ui32_dutycycle) {
+    if (ui32_dutycycle < 5) {
+        ui32_dutycycle = 0;
     }
-    if (ui32_setpoint > 255) {
-        ui32_setpoint = 255;
+    if (ui32_dutycycle > 255) {
+        ui32_dutycycle = 255;
     }
-    return ui32_setpoint;
+    return ui32_dutycycle;
 }
 
 // note: sumtorque is considered to be throttle input, not torquesensor input
@@ -111,7 +111,7 @@ uint16_t aca_setpoint(uint16_t ui16_time_ticks_between_speed_interrupt, uint16_t
 
         TIM1_CtrlPWMOutputs(DISABLE);
         uint_PWM_Enable = 0; // highest priority: Stop motor for undervoltage protection
-        ui32_setpoint = 0;
+        ui32_dutycycle = 0;
         ui8_control_state = 255;
 
     } else if (brake_is_set()) {
@@ -133,10 +133,10 @@ uint16_t aca_setpoint(uint16_t ui16_time_ticks_between_speed_interrupt, uint16_t
         }
 
         uint32_current_target = (uint32_t) ui16_current_cal_b - float_temp;
-        ui32_setpoint = PI_control(ui16_BatteryCurrent, uint32_current_target);
+        ui32_dutycycle = PI_control(ui16_BatteryCurrent, uint32_current_target);
 
     } else if (ui32_erps_filtered > ui16_erps_max) {//limit max erps
-        ui32_setpoint = PI_control(ui32_erps_filtered, ui16_erps_max); //limit the erps to maximum value to have minimum 30 points of sine table for proper commutation
+        ui32_dutycycle = PI_control(ui32_erps_filtered, ui16_erps_max); //limit the erps to maximum value to have minimum 30 points of sine table for proper commutation
         ui8_control_state = 2;
 
     } else {
@@ -199,7 +199,7 @@ uint16_t aca_setpoint(uint16_t ui16_time_ticks_between_speed_interrupt, uint16_t
             uint32_current_target = (PHASE_CURRENT_MAX_VALUE) * setpoint_old / 255 + ui16_current_cal_b;
             ui8_control_state += 128;
         }
-        ui32_setpoint = PI_control(ui16_BatteryCurrent, uint32_current_target);
+        ui32_dutycycle = PI_control(ui16_BatteryCurrent, uint32_current_target);
 
 
         //enable PWM if disabled and voltage is 2V higher than min, some hysteresis
@@ -209,6 +209,6 @@ uint16_t aca_setpoint(uint16_t ui16_time_ticks_between_speed_interrupt, uint16_t
 
         }
     }
-    return cutoffSetpoint(ui32_setpoint);
+    return cutoffSetpoint(ui32_dutycycle);
 
 }
