@@ -79,6 +79,18 @@
           </df>
         </df>
         <df name="JavaConfigurator">
+          <df name="build">
+            <df name="classes">
+            </df>
+            <df name="empty">
+            </df>
+            <df name="generated-sources">
+              <df name="ap-source-output">
+              </df>
+            </df>
+          </df>
+          <df name="dist">
+          </df>
           <df name="src">
           </df>
           <df name="test">
@@ -121,7 +133,6 @@
       <in>motor.h</in>
       <in>pwm.c</in>
       <in>pwm.h</in>
-      <in>test.c</in>
       <in>timers.c</in>
       <in>timers.h</in>
       <in>uart.c</in>

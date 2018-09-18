@@ -152,9 +152,9 @@ void controllerstate_init(void) {
     eepromVal = eeprom_read(OFFSET_PID_GAIN_I);
     if (eepromVal > 0) flt_s_pid_gain_i = int2float(eepromVal, 2.0);
     eepromVal = eeprom_read(OFFSET_RAMP_END);
-    if (eepromVal > 0) ui16_s_ramp_end = eepromVal << 4;
+    if (eepromVal > 0) ui16_s_ramp_end = eepromVal << 5;
     eepromVal = eeprom_read(OFFSET_RAMP_START);
-    if (eepromVal > 0) ui16_s_ramp_start = eepromVal << 4;
+    if (eepromVal > 0) ui16_s_ramp_start = eepromVal << 6;
     eepromVal = eeprom_read(OFFSET_MOTOR_ANGLE);
     if (eepromVal > 0) ui8_s_motor_angle = eepromVal;
 

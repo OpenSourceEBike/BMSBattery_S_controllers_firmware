@@ -93,7 +93,6 @@
       <in>motor.h</in>
       <in>pwm.c</in>
       <in>pwm.h</in>
-      <in>test.c</in>
       <in>timers.c</in>
       <in>timers.h</in>
       <in>uart.c</in>
@@ -310,8 +309,6 @@
       <item path="pwm.c" ex="false" tool="0" flavor2="0">
       </item>
       <item path="pwm.h" ex="false" tool="3" flavor2="0">
-      </item>
-      <item path="test.c" ex="false" tool="0" flavor2="0">
       </item>
       <item path="timers.c" ex="false" tool="0" flavor2="0">
       </item>

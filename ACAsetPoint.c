@@ -44,6 +44,7 @@ static float float_temp = 0; //for float calculations
 
 static uint16_t ui16_virtual_capped_pas_activity = 0;
 static uint32_t uint32_temp = 0;
+static uint16_t uint16_temp = 0;
 static uint8_t ui8_temp = 0;
 
 uint16_t cutoffSetpoint(uint32_t ui32_dutycycle) {
@@ -133,7 +134,8 @@ uint16_t aca_setpoint(uint16_t ui16_time_ticks_between_speed_interrupt, uint16_t
 
         //Current target gets ramped down with speed
         if (((ui16_aca_flags & SPEED_INFLUENCES_REGEN) == SPEED_INFLUENCES_REGEN) && (ui16_virtual_erps_speed < ((ui16_speed_kph_to_erps_ratio * ((uint16_t) ui8_speedlimit_kph)) / 100))) {
-            if (ui16_virtual_erps_speed < 30) {
+            
+            if (ui16_virtual_erps_speed < 15) {
                 // turn of regen at low speeds
                 // based on erps in order to avoid an additional calculation
                 float_temp = 0.0;
