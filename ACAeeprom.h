@@ -27,7 +27,6 @@ extern uint8_t eeprom_magic_byte;
 
 typedef enum {
 	OFFSET_MOTOR_ANGLE = ((uint8_t) 0x01),
-	OFFSET_ACA_FLAGS = ((uint8_t) 0x02),
 	OFFSET_ASSIST_LEVEL = ((uint8_t) 0x03),
 	OFFSET_THROTTLE_MIN_RANGE = ((uint8_t) 0x04),
 	OFFSET_THROTTLE_MAX_RANGE = ((uint8_t) 0x05),
@@ -44,7 +43,10 @@ typedef enum {
 	OFFSET_BATTERY_CURRENT_MAX_VALUE_HIGH_BYTE = ((uint8_t) 0x0E),
 	OFFSET_BATTERY_CURRENT_MAX_VALUE = ((uint8_t) 0x0F),
 	OFFSET_REGEN_CURRENT_MAX_VALUE = ((uint8_t) 0x10),
-	OFFSET_CURRENT_CAL_A = ((uint8_t) 0x11)
+	OFFSET_CURRENT_CAL_A = ((uint8_t) 0x11),
+
+	OFFSET_ACA_FLAGS_HIGH_BYTE = ((uint8_t) 0x12),
+	OFFSET_ACA_FLAGS = ((uint8_t) 0x13)
 
 } BO_EEPROM_OFFSETS;
 

@@ -122,20 +122,21 @@ public class OSEC extends JFrame {
 	private JRadioButton rdbtnKtlcd;
 	private JRadioButton rdbtnDiganostics;
 
+	private JCheckBox cbResetEeprom;
+
 	private JCheckBox cbTorqueSensor;
+	private JCheckBox cbBypassLowSpeedRegenPiControl;
 	private JCheckBox cbAssistLevelInfluencesThrottle;
 	private JCheckBox cbOffroadEnabled;
 	private JCheckBox cbBrakeDisablesOffroad;
-	
+
 	private JCheckBox cbDigitalRegen;
 	private JCheckBox cbSpeedInfluencesRegen;
 	private JCheckBox cbSpeedInfluencesTqSensor;
 	private JCheckBox cbPasInverted;
-	
-	
+
 	private JTextField speedWithoutPas;
 	private JTextField speedWithoutThrottleOverride;
-
 
 	private JRadioButton rdbtnNodisplay;
 
@@ -215,17 +216,17 @@ public class OSEC extends JFrame {
 
 		in.readLine();//old options, no longer used
 		flt_tqCalibrationFactor.setText(in.readLine());
-		
-		int acaFlags=Integer.parseInt(in.readLine());
-		cbAssistLevelInfluencesThrottle.setSelected((acaFlags&1)>0);
-		cbOffroadEnabled.setSelected((acaFlags&2)>0);
-		cbBrakeDisablesOffroad.setSelected((acaFlags&4)>0);
-		
-		cbDigitalRegen.setSelected((acaFlags&8)>0);
-		cbSpeedInfluencesRegen.setSelected((acaFlags&16)>0);
-		cbSpeedInfluencesTqSensor.setSelected((acaFlags&32)>0);
-		cbPasInverted.setSelected((acaFlags&64)>0);
-				
+
+		int acaFlags = Integer.parseInt(in.readLine());
+		cbAssistLevelInfluencesThrottle.setSelected((acaFlags & 1) > 0);
+		cbOffroadEnabled.setSelected((acaFlags & 2) > 0);
+		cbBrakeDisablesOffroad.setSelected((acaFlags & 4) > 0);
+
+		cbDigitalRegen.setSelected((acaFlags & 8) > 0);
+		cbSpeedInfluencesRegen.setSelected((acaFlags & 16) > 0);
+		cbSpeedInfluencesTqSensor.setSelected((acaFlags & 32) > 0);
+		cbPasInverted.setSelected((acaFlags & 64) > 0);
+		cbBypassLowSpeedRegenPiControl.setSelected((acaFlags & 256) > 0);
 		in.close();
 	}
 
@@ -244,7 +245,6 @@ public class OSEC extends JFrame {
 			ramp_start.setText("7000");
 			ramp_start.setEditable(true);
 			flt_tqCalibrationFactor.setEditable(false);
-			
 
 		}
 	}
@@ -318,7 +318,7 @@ public class OSEC extends JFrame {
 				updateDependiencies();
 			}
 		});
-		
+
 		JLabel lblNumberOfPas = new JLabel("No. of PAS Magnets");
 		lblNumberOfPas.setBounds(15, 90, 141, 14);
 		contentPane.add(lblNumberOfPas);
@@ -348,7 +348,6 @@ public class OSEC extends JFrame {
 		txtPasTimeout.setBounds(150, 130, 86, 20);
 		contentPane.add(txtPasTimeout);
 		txtPasTimeout.setColumns(10);
-
 
 		lblThrottleMin = new JLabel("Throttle min");
 		lblThrottleMin.setBounds(15, 150, 78, 14);
@@ -383,7 +382,6 @@ public class OSEC extends JFrame {
 		contentPane.add(txtMaxbatterycurrent);
 		txtMaxbatterycurrent.setColumns(10);
 
-
 		JLabel lblPhaseCurrentMax = new JLabel("Phase Current max");
 		lblPhaseCurrentMax.setBounds(15, 210, 131, 14);
 		contentPane.add(lblPhaseCurrentMax);
@@ -393,12 +391,12 @@ public class OSEC extends JFrame {
 		txtMaxphasecurrent.setColumns(10);
 		txtMaxphasecurrent.setBounds(150, 210, 86, 20);
 		contentPane.add(txtMaxphasecurrent);
-		
+
 		JLabel lblRegenCurrentMax = new JLabel("Regen Current max");
 		lblRegenCurrentMax.setForeground(Color.GRAY);
 		lblRegenCurrentMax.setBounds(15, 230, 131, 14);
 		contentPane.add(lblRegenCurrentMax);
-		
+
 		txtMaxregencurrent = new JTextField();
 		txtMaxregencurrent.setText("282");
 		txtMaxregencurrent.setColumns(10);
@@ -408,19 +406,18 @@ public class OSEC extends JFrame {
 		JLabel lblUndervoltageLimit = new JLabel("Undervoltage limit");
 		lblUndervoltageLimit.setBounds(15, 250, 121, 14);
 		contentPane.add(lblUndervoltageLimit);
-		
+
 		txtUndervoltage = new JTextField();
 		txtUndervoltage.setText("127");
 		txtUndervoltage.setBounds(150, 250, 86, 20);
 		contentPane.add(txtUndervoltage);
 		txtUndervoltage.setColumns(10);
-		
 
 		JLabel lblMotorSpecificAngle = new JLabel("Motor specific angle");
 		lblMotorSpecificAngle.setBounds(15, 270, 121, 14);
 		lblMotorSpecificAngle.setForeground(Color.GRAY);
 		contentPane.add(lblMotorSpecificAngle);
-		
+
 		txtMotor_specific_angle = new JTextField();
 		txtMotor_specific_angle.setText("214");
 		txtMotor_specific_angle.setBounds(150, 270, 86, 20);
@@ -430,13 +427,12 @@ public class OSEC extends JFrame {
 		JLabel lblBatteryCurrentCal = new JLabel("Battery Current cal a");
 		lblBatteryCurrentCal.setBounds(15, 290, 121, 14);
 		contentPane.add(lblBatteryCurrentCal);
-		
+
 		txtBatteryCurcala = new JTextField();
 		txtBatteryCurcala.setText("10");
 		txtBatteryCurcala.setBounds(150, 290, 86, 20);
 		contentPane.add(txtBatteryCurcala);
 		txtBatteryCurcala.setColumns(10);
-
 
 		JLabel lblTemperatureCalA = new JLabel("Temperature cal a");
 		lblTemperatureCalA.setBounds(15, 310, 121, 14);
@@ -447,7 +443,7 @@ public class OSEC extends JFrame {
 		TempCalA.setColumns(10);
 		TempCalA.setBounds(150, 310, 86, 20);
 		contentPane.add(TempCalA);
-		
+
 		JLabel lblTemperatureCalB = new JLabel("Temperature cal b");
 		lblTemperatureCalB.setBounds(15, 330, 121, 14);
 		contentPane.add(lblTemperatureCalB);
@@ -457,7 +453,7 @@ public class OSEC extends JFrame {
 		TempCalB.setColumns(10);
 		TempCalB.setBounds(150, 330, 86, 20);
 		contentPane.add(TempCalB);
-		
+
 		JLabel lblPfactor = new JLabel("Gain P");
 		lblPfactor.setBounds(15, 350, 67, 14);
 		lblPfactor.setForeground(Color.GRAY);
@@ -499,7 +495,7 @@ public class OSEC extends JFrame {
 		CellsNumber.setColumns(10);
 		CellsNumber.setBounds(150, 410, 86, 20);
 		contentPane.add(CellsNumber);
-		
+
 		JLabel lblPasThreshold = new JLabel("PAS threshold");
 		lblPasThreshold.setBounds(15, 430, 86, 20);
 		lblPasThreshold.setForeground(Color.GRAY);
@@ -544,7 +540,7 @@ public class OSEC extends JFrame {
 		lblAssistLevel_3 = new JLabel("Assist Level 4");
 		lblAssistLevel_3.setBounds(332, 150, 86, 14);
 		contentPane.add(lblAssistLevel_3);
-		
+
 		Assist_Level_4 = new JTextField();
 		Assist_Level_4.setText("80");
 		Assist_Level_4.setColumns(10);
@@ -624,8 +620,6 @@ public class OSEC extends JFrame {
 		lblOpenSourceFirmware.setBounds(154, 42, 255, 14);
 		contentPane.add(lblOpenSourceFirmware);
 
-		
-
 		JLabel lblRampEnd = new JLabel("Ramp end");
 		lblRampEnd.setBounds(332, 280, 67, 14);
 		lblRampEnd.setForeground(Color.GRAY);
@@ -636,7 +630,7 @@ public class OSEC extends JFrame {
 		ramp_end.setColumns(10);
 		ramp_end.setBounds(476, 280, 86, 20);
 		contentPane.add(ramp_end);
-		
+
 		JLabel lblRampStart = new JLabel("Ramp start");
 		lblRampStart.setBounds(332, 300, 67, 14);
 		lblRampStart.setForeground(Color.GRAY);
@@ -647,19 +641,17 @@ public class OSEC extends JFrame {
 		ramp_start.setColumns(10);
 		ramp_start.setBounds(476, 300, 86, 20);
 		contentPane.add(ramp_start);
-		
-		
+
 		JLabel lblTqCalibrationFactor = new JLabel("TQ Calib");
 		lblTqCalibrationFactor.setBounds(332, 320, 67, 14);
 		lblTqCalibrationFactor.setForeground(Color.GRAY);
 		contentPane.add(lblTqCalibrationFactor);
-		
+
 		flt_tqCalibrationFactor = new JTextField();
 		flt_tqCalibrationFactor.setText("1.0");
 		flt_tqCalibrationFactor.setColumns(10);
 		flt_tqCalibrationFactor.setBounds(476, 320, 86, 20);
 		contentPane.add(flt_tqCalibrationFactor);
-		
 
 		lblSpeedLimit = new JLabel("Speed Limit (km/h)");
 		lblSpeedLimit.setBounds(332, 340, 135, 14);
@@ -671,74 +663,74 @@ public class OSEC extends JFrame {
 		txtSpeedlimit.setBounds(476, 340, 86, 20);
 		contentPane.add(txtSpeedlimit);
 		txtSpeedlimit.setColumns(10);
-		
-		
-		
 
 		JLabel lblRideMode = new JLabel("Ride Options");
 		lblRideMode.setFont(new Font("Tahoma", Font.BOLD, 12));
-		lblRideMode.setBounds(15, 490, 86, 20);
+		lblRideMode.setBounds(15, 470, 86, 20);
 		lblRideMode.setForeground(Color.GRAY);
 		contentPane.add(lblRideMode);
+
+		cbBypassLowSpeedRegenPiControl = new JCheckBox("Bypass PI control regen @low speed");
+		cbBypassLowSpeedRegenPiControl.setSelected(false);
+		cbBypassLowSpeedRegenPiControl.setBounds(15, 495, 250, 20);
+		cbBypassLowSpeedRegenPiControl.setForeground(Color.GRAY);
+		contentPane.add(cbBypassLowSpeedRegenPiControl);
 
 		cbTorqueSensor = new JCheckBox("Torquesensor");
 		cbTorqueSensor.setSelected(false);
 		cbTorqueSensor.setForeground(Color.GRAY);
 		cbTorqueSensor.setBounds(15, 515, 250, 20);
 		contentPane.add(cbTorqueSensor);
-		
+
 		cbTorqueSensor.addItemListener(new ItemListener() {
 			@Override
 			public void itemStateChanged(ItemEvent e) {
 				updateDependiencies();
 			}
 		});
-		
-		
+
 		cbAssistLevelInfluencesThrottle = new JCheckBox("Assist Lvl affects Throttle");
 		cbAssistLevelInfluencesThrottle.setSelected(false);
 		cbAssistLevelInfluencesThrottle.setBounds(15, 535, 250, 20);
 		cbAssistLevelInfluencesThrottle.setForeground(Color.GRAY);
 		contentPane.add(cbAssistLevelInfluencesThrottle);
-		
+
 		cbOffroadEnabled = new JCheckBox("Offroad Enabled");
 		cbOffroadEnabled.setSelected(false);
 		cbOffroadEnabled.setBounds(15, 555, 250, 20);
 		cbOffroadEnabled.setForeground(Color.GRAY);
 		contentPane.add(cbOffroadEnabled);
-		
+
 		cbBrakeDisablesOffroad = new JCheckBox("Brake Disables Offroad");
 		cbBrakeDisablesOffroad.setSelected(false);
 		cbBrakeDisablesOffroad.setBounds(15, 575, 250, 20);
 		cbBrakeDisablesOffroad.setForeground(Color.GRAY);
 		contentPane.add(cbBrakeDisablesOffroad);
-		
-		
+
 		cbDigitalRegen = new JCheckBox("Regen Digital (no X4 throttle)");
 		cbDigitalRegen.setSelected(false);
 		cbDigitalRegen.setBounds(15, 595, 250, 20);
 		cbDigitalRegen.setForeground(Color.GRAY);
 		contentPane.add(cbDigitalRegen);
-		
+
 		cbSpeedInfluencesRegen = new JCheckBox("Speed Influences Regen Rate");
 		cbSpeedInfluencesRegen.setSelected(false);
 		cbSpeedInfluencesRegen.setBounds(15, 615, 250, 20);
 		cbSpeedInfluencesRegen.setForeground(Color.GRAY);
 		contentPane.add(cbSpeedInfluencesRegen);
-		
+
 		cbSpeedInfluencesTqSensor = new JCheckBox("Speed influences Tq Sensor");
 		cbSpeedInfluencesTqSensor.setSelected(false);
 		cbSpeedInfluencesTqSensor.setBounds(15, 635, 250, 20);
 		cbSpeedInfluencesTqSensor.setForeground(Color.GRAY);
 		contentPane.add(cbSpeedInfluencesTqSensor);
-		
+
 		cbPasInverted = new JCheckBox("Pas inverted (right side)");
 		cbPasInverted.setSelected(false);
 		cbPasInverted.setBounds(15, 655, 250, 20);
 		cbPasInverted.setForeground(Color.GRAY);
 		contentPane.add(cbPasInverted);
-		
-	
+
 		JLabel lblMotorSpeed = new JLabel("Motor Speed");
 		lblMotorSpeed.setFont(new Font("Tahoma", Font.BOLD, 12));
 		lblMotorSpeed.setBounds(276, 490, 86, 20);
@@ -771,7 +763,6 @@ public class OSEC extends JFrame {
 		rdbtnExternal.setBounds(276, 645, 101, 20);
 		contentPane.add(rdbtnExternal);
 
-
 		lblDiplayType = new JLabel("Display Type");
 		lblDiplayType.setFont(new Font("Tahoma", Font.BOLD, 12));
 		lblDiplayType.setBounds(382, 490, 86, 20);
@@ -802,6 +793,11 @@ public class OSEC extends JFrame {
 		displayButtonGroup.add(rdbtnDiganostics);
 		rdbtnDiganostics.setBounds(382, 615, 131, 20);
 		contentPane.add(rdbtnDiganostics);
+
+		cbResetEeprom = new JCheckBox("Write eeprom magic byte (will reset eeprom)");
+		cbResetEeprom.setSelected(false);
+		cbResetEeprom.setBounds(600, 470, 300, 20);
+		contentPane.add(cbResetEeprom);
 
 		JButton btnWriteoptionsbyte = new JButton("Write Option Bytes");
 		btnWriteoptionsbyte.setFont(new Font("Tahoma", Font.BOLD, 12));
@@ -875,9 +871,7 @@ public class OSEC extends JFrame {
 					iWriter.println(txtWheelCircumference.getText());
 					pWriter.println(text_to_save);
 
-					
 					iWriter.println("");// old options, unused
-
 
 					text_to_save = "#define ADC_THROTTLE_MIN_VALUE " + txtThrottlemin.getText();
 					iWriter.println(txtThrottlemin.getText());
@@ -976,11 +970,11 @@ public class OSEC extends JFrame {
 					pWriter.println(text_to_save);
 
 					iWriter.println(cbTorqueSensor.isSelected());
-					
+
 					text_to_save = "#define RAMP_START " + ramp_start.getText();
 					iWriter.println(ramp_start.getText());
 					pWriter.println(text_to_save);
-					
+
 					iWriter.println("");// old options, unused
 					iWriter.println("");// old options, unused
 
@@ -1044,24 +1038,31 @@ public class OSEC extends JFrame {
 					iWriter.println(rdbtnNodisplay.isSelected());
 					iWriter.println("");// old options, unused
 					iWriter.println("");// old options, unused
-					
+
 					text_to_save = "#define TQS_CALIB " + flt_tqCalibrationFactor.getText();
 					iWriter.println(flt_tqCalibrationFactor.getText());
 					pWriter.println(text_to_save);
-					
-					int acaFlags=128;
-					acaFlags |= (cbAssistLevelInfluencesThrottle.isSelected()?1:0);
-					acaFlags |= (cbOffroadEnabled.isSelected()?2:0);
-					acaFlags |= (cbBrakeDisablesOffroad.isSelected()?4:0);
-					acaFlags |= (cbDigitalRegen.isSelected()?8:0);
-					acaFlags |= (cbSpeedInfluencesRegen.isSelected()?16:0);
-					acaFlags |= (cbSpeedInfluencesTqSensor.isSelected()?32:0);
-					acaFlags |= (cbPasInverted.isSelected()?64:0);
-					
+
+					int acaFlags = 128;
+					acaFlags |= (cbAssistLevelInfluencesThrottle.isSelected() ? 1 : 0);
+					acaFlags |= (cbOffroadEnabled.isSelected() ? 2 : 0);
+					acaFlags |= (cbBrakeDisablesOffroad.isSelected() ? 4 : 0);
+					acaFlags |= (cbDigitalRegen.isSelected() ? 8 : 0);
+					acaFlags |= (cbSpeedInfluencesRegen.isSelected() ? 16 : 0);
+					acaFlags |= (cbSpeedInfluencesTqSensor.isSelected() ? 32 : 0);
+					acaFlags |= (cbPasInverted.isSelected() ? 64 : 0);
+
+					acaFlags |= (cbBypassLowSpeedRegenPiControl.isSelected() ? 256 : 0);
+
 					iWriter.println(acaFlags);
-					
-					pWriter.println("#define ACA "+acaFlags);
+
+					pWriter.println("#define ACA " + acaFlags);
+
+					if (!cbResetEeprom.isSelected()) {
+						pWriter.println("#define EEPROM_NOINIT // eeprom will not be cleared");
+					}
 					pWriter.println("#define EEPROM_INIT_MAGIC_BYTE " + (System.currentTimeMillis() % 256) + " // makes sure (chance of fail 1/255) eeprom is invalidated after flashing new config");
+
 					pWriter.println("\r\n#endif /* CONFIG_H_ */");
 
 					iWriter.close();

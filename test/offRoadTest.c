@@ -29,7 +29,7 @@
 
 uint8_t ui8_offroad_counter;
 uint8_t ui8_offroad_state = 18;
-uint8_t ui8_aca_flags = 158;
+uint8_t ui16_aca_flags = 158;
 uint8_t fake_brake_set = 127;
 
 typedef enum {
@@ -38,16 +38,16 @@ typedef enum {
 
 typedef enum {
 	// values from 0-31 are allowed as signals are stored in a single uint32_t
-	ASSIST_LVL_AFFECTS_THROTTLE = ((uint8_t) 1),
-	OFFROAD_ENABLED = ((uint8_t) 2),
-	BRAKE_DISABLES_OFFROAD = ((uint8_t) 4),
+	ASSIST_LVL_AFFECTS_THROTTLE = ((uint16_t) 1),
+	OFFROAD_ENABLED = ((uint16_t) 2),
+	BRAKE_DISABLES_OFFROAD = ((uint16_t) 4),
 
-	DIGITAL_REGEN = ((uint8_t) 8),
-	SPEED_INFLUENCES_REGEN = ((uint8_t) 16),
-	SPEED_INFLUENCES_TORQUESENSOR = ((uint8_t) 32),
-	PAS_INVERTED = ((uint8_t) 64),
+	DIGITAL_REGEN = ((uint16_t) 8),
+	SPEED_INFLUENCES_REGEN = ((uint16_t) 16),
+	SPEED_INFLUENCES_TORQUESENSOR = ((uint16_t) 32),
+	PAS_INVERTED = ((uint16_t) 64),
 
-	DUMMY_ALWAYS_ON = ((uint8_t) 128)
+	DUMMY_ALWAYS_ON = ((uint16_t) 128)
 } ACA_FLAGS;
 
 BitStatus GPIO_ReadInputPin() {
@@ -81,7 +81,7 @@ int kbhit(void) {
 
 void updateOffroadStatus(void) {
 
-	if (((ui8_aca_flags & BRAKE_DISABLES_OFFROAD) == BRAKE_DISABLES_OFFROAD) && (ui8_offroad_state > 4)) {
+	if (((ui16_aca_flags & BRAKE_DISABLES_OFFROAD) == BRAKE_DISABLES_OFFROAD) && (ui8_offroad_state > 4)) {
 		// if disabling is enabled :)
 		if (!GPIO_ReadInputPin()) {
 			ui8_offroad_counter++;
@@ -95,7 +95,7 @@ void updateOffroadStatus(void) {
 	}
 
 	// check if offroad mode is enabled
-	if (0 == (ui8_aca_flags & OFFROAD_ENABLED)) {
+	if (0 == (ui16_aca_flags & OFFROAD_ENABLED)) {
 		return;
 	}
 
@@ -179,13 +179,13 @@ void main() {
 		}, NULL);
 		updateOffroadStatus();
 
-		if (((ui8_aca_flags & BRAKE_DISABLES_OFFROAD) == BRAKE_DISABLES_OFFROAD) && 1 == 1) {
+		if (((ui16_aca_flags & BRAKE_DISABLES_OFFROAD) == BRAKE_DISABLES_OFFROAD) && 1 == 1) {
 			printf(" disabler on  ");
 		} else {
 			printf(" disabler off ");
 		}
 
-		if (0 == (ui8_aca_flags & OFFROAD_ENABLED)) {
+		if (0 == (ui16_aca_flags & OFFROAD_ENABLED)) {
 			printf(" enabler off ");
 
 		} else {

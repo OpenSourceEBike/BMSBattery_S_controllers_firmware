@@ -74,7 +74,7 @@ extern uint8_t ui8_SPEED_Flag; //Flag for PAS Interrupt detected
 extern uint16_t ui16_time_ticks_between_speed_interrupt; //Speed duration of one wheel revolution (tics * 64us)
 extern uint8_t ui8_offroad_counter;
 
-extern uint8_t ui8_aca_flags;
+extern uint16_t ui16_aca_flags;
 
 extern uint8_t ui8_adc_read_throttle_busy;
 
@@ -110,16 +110,18 @@ typedef enum {
 
 typedef enum {
 	// values from 0-31 are allowed as signals are stored in a single uint32_t
-	ASSIST_LVL_AFFECTS_THROTTLE = ((uint8_t) 1),
-	OFFROAD_ENABLED = ((uint8_t) 2),
-	BRAKE_DISABLES_OFFROAD = ((uint8_t) 4),
+	ASSIST_LVL_AFFECTS_THROTTLE = ((uint16_t) 1),
+	OFFROAD_ENABLED = ((uint16_t) 2),
+	BRAKE_DISABLES_OFFROAD = ((uint16_t) 4),
 
-	DIGITAL_REGEN = ((uint8_t) 8),
-	SPEED_INFLUENCES_REGEN = ((uint8_t) 16),
-	SPEED_INFLUENCES_TORQUESENSOR = ((uint8_t) 32),
-	PAS_INVERTED = ((uint8_t) 64),
+	DIGITAL_REGEN = ((uint16_t) 8),
+	SPEED_INFLUENCES_REGEN = ((uint16_t) 16),
+	SPEED_INFLUENCES_TORQUESENSOR = ((uint16_t) 32),
+	PAS_INVERTED = ((uint16_t) 64),
 
-	DUMMY_ALWAYS_ON = ((uint8_t) 128)
+	DUMMY_ALWAYS_ON = ((uint16_t) 128),
+			
+	BYPASS_LOW_SPEED_REGEN_PI_CONTROL = ((uint16_t) 256)
 } ACA_FLAGS;
 
 #endif /* BOCONTROLLERSTATE_H */

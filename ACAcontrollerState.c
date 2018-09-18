@@ -85,7 +85,7 @@ uint16_t ui16_time_ticks_for_speed_calculation = 0; //time tics for speed measur
 uint8_t ui8_SPEED_Flag = 0; //flag for SPEED interrupt
 uint8_t ui8_offroad_counter = 0; //counter for offroad switching procedure
 
-uint8_t ui8_aca_flags = 0; //if throttle input should be bases on assist level and other flags
+uint16_t ui16_aca_flags = 0; //if throttle input should be bases on assist level and other flags
 
 uint8_t ui8_adc_read_throttle_busy = 0;
 uint16_t ui16_torque[NUMBER_OF_PAS_MAGS]; //array for torque values of one crank revolution
@@ -105,7 +105,7 @@ void controllerstate_init(void) {
     uint8_t eepromHighVal;
 
     // convert static defines to volatile vars
-    ui8_aca_flags = ACA;
+    ui16_aca_flags = ACA;
     ui8_speedlimit_kph = limit;
     ui8_speedlimit_actual_kph = limit;
     ui8_throttle_min_range = ADC_THROTTLE_MIN_VALUE;
@@ -125,17 +125,18 @@ void controllerstate_init(void) {
     eepromVal = eeprom_read(OFFSET_BATTERY_CURRENT_MAX_VALUE);
     if (eepromVal > 0 || eepromHighVal > 0) ui16_battery_current_max_value = ((uint16_t) eepromHighVal << 8) + (uint16_t) eepromVal;
 
+    eepromHighVal = eeprom_read(OFFSET_ACA_FLAGS_HIGH_BYTE);
+    eepromVal = eeprom_read(OFFSET_ACA_FLAGS);
+    if (eepromVal > 0 || eepromHighVal > 0)  ui16_aca_flags = ((uint16_t) eepromHighVal << 8) + (uint16_t) eepromVal;
+    
     eepromVal = eeprom_read(OFFSET_REGEN_CURRENT_MAX_VALUE);
     if (eepromVal > 0) ui16_regen_current_max_value = eepromVal;
-
     eepromVal = eeprom_read(OFFSET_MAX_SPEED_DEFAULT);
     if (eepromVal > 0) ui8_speedlimit_kph = eepromVal;
     eepromVal = eeprom_read(OFFSET_MAX_SPEED_WITHOUT_PAS);
     if (eepromVal > 0) ui8_speedlimit_without_pas_kph = eepromVal;
     eepromVal = eeprom_read(OFFSET_MAX_SPEED_WITH_THROTTLE_OVERRIDE);
     if (eepromVal > 0) ui8_speedlimit_with_throttle_override_kph = eepromVal;
-    eepromVal = eeprom_read(OFFSET_ACA_FLAGS);
-    if (eepromVal > 0) ui8_aca_flags = eepromVal;
     eepromVal = eeprom_read(OFFSET_CURRENT_CAL_A);
     if (eepromVal > 0) ui8_current_cal_a = eepromVal;
     eepromVal = eeprom_read(OFFSET_ASSIST_LEVEL);

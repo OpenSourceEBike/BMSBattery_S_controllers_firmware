@@ -19,7 +19,7 @@
 #define PHASE_CURRENT_MAX_VALUE 300L
 #define REGEN_CURRENT_MAX_VALUE 50L
 #define MOTOR_ROTOR_DELTA_PHASE_ANGLE_RIGHT 200
-#define current_cal_a 10
+#define current_cal_a 5
 #define TEMP_CAL_A 1.6
 #define TEMP_CAL_B -110.4
 #define LEVEL_1 12
@@ -36,12 +36,13 @@
 #define GEAR_RATIO 24L
 #define BATTERY_LI_ION_CELLS_NUMBER 13
 #define PAS_THRESHOLD 3.0
-#define RAMP_START 6000
+#define RAMP_START 12000
 #define PWM_CYCLES_SECOND 15625L
 #define SPEEDSENSOR_INTERNAL
 #define BLUOSEC
 #define TQS_CALIB 0.0
 #define ACA 156
-#define EEPROM_INIT_MAGIC_BYTE 161 // makes sure (chance of fail 1/255) eeprom is invalidated after flashing new config
+#define EEPROM_NOINIT // eeprom will not be cleared
+#define EEPROM_INIT_MAGIC_BYTE 146 // makes sure (chance of fail 1/255) eeprom is invalidated after flashing new config
 
 #endif /* CONFIG_H_ */

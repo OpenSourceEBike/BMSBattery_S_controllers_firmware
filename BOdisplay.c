@@ -131,7 +131,8 @@ void addConfigStateInfos(void) {
     addPayload(CODE_MAX_SPEED_DEFAULT, ui8_speedlimit_kph);
     addPayload(CODE_MAX_SPEED_WITHOUT_PAS, ui8_speedlimit_without_pas_kph);
     addPayload(CODE_MAX_SPEED_WITH_THROTTLE_OVERRIDE, ui8_speedlimit_with_throttle_override_kph);
-    addPayload(CODE_ACA_FLAGS, ui8_aca_flags);
+    addPayload(CODE_ACA_FLAGS_HIGH_BYTE, ui16_aca_flags >> 8);
+    addPayload(CODE_ACA_FLAGS, ui16_aca_flags);
     addPayload(CODE_ASSIST_LEVEL, ui8_assistlevel_global);
     addPayload(CODE_THROTTLE_MIN_RANGE, ui8_throttle_min_range);
     addPayload(CODE_THROTTLE_MAX_RANGE, ui8_throttle_max_range);
@@ -140,11 +141,11 @@ void addConfigStateInfos(void) {
     addPayload(CODE_PID_GAIN_P, float2int(flt_s_pid_gain_p, 2.0));
     addPayload(CODE_PID_GAIN_I, float2int(flt_s_pid_gain_i, 2.0));
     addPayload(CODE_RAMP_END, ui16_s_ramp_end >> 5);
-    addPayload(CODE_RAMP_START, ui16_s_ramp_start >> 5);
+    addPayload(CODE_RAMP_START, ui16_s_ramp_start >> 6);
     addPayload(CODE_MAX_BAT_CURRENT_HIGH_BYTE, ui16_battery_current_max_value >> 8);
     addPayload(CODE_MAX_BAT_CURRENT, ui16_battery_current_max_value);
     addPayload(CODE_MAX_REGEN_CURRENT, ui16_regen_current_max_value);
-    // 1 more elements left/avail (max22)
+    // 0 more elements left/avail (max22)
 
 }
 
@@ -240,6 +241,15 @@ void digestConfigRequest(uint8_t configAddress, uint8_t requestedCodeLowByte, ui
             ui8_offroad_state = requestedValue;
             addPayload(requestedCodeLowByte, ui8_offroad_state);
             break;
+        case CODE_ACA_FLAGS:
+            ui16_aca_flags = ((uint16_t) requestedValueHighByte << 8)+(uint16_t) requestedValue;
+            if (configAddress == EEPROM_ADDRESS) {
+                eeprom_write(OFFSET_ACA_FLAGS_HIGH_BYTE, requestedValueHighByte);
+                eeprom_write(OFFSET_ACA_FLAGS, requestedValue);
+            }
+            addPayload(CODE_ACA_FLAGS_HIGH_BYTE, ui16_aca_flags >> 8);
+            addPayload(requestedCodeLowByte, ui16_aca_flags);
+            break;
         case CODE_MAX_BAT_CURRENT:
             ui16_battery_current_max_value = ((uint16_t) requestedValueHighByte << 8)+(uint16_t) requestedValue;
             if (configAddress == EEPROM_ADDRESS) {
@@ -269,13 +279,6 @@ void digestConfigRequest(uint8_t configAddress, uint8_t requestedCodeLowByte, ui
                 eeprom_write(OFFSET_ASSIST_LEVEL, requestedValue);
             }
             addPayload(requestedCodeLowByte, ui8_assistlevel_global);
-            break;
-        case CODE_ACA_FLAGS:
-            ui8_aca_flags = requestedValue;
-            if (configAddress == EEPROM_ADDRESS) {
-                eeprom_write(OFFSET_ACA_FLAGS, requestedValue);
-            }
-            addPayload(requestedCodeLowByte, ui8_aca_flags);
             break;
         case CODE_THROTTLE_MIN_RANGE:
             ui8_throttle_min_range = requestedValue;
@@ -329,11 +332,11 @@ void digestConfigRequest(uint8_t configAddress, uint8_t requestedCodeLowByte, ui
             addPayload(requestedCodeLowByte, ui16_s_ramp_end >> 5);
             break;
         case CODE_RAMP_START:
-            ui16_s_ramp_start = requestedValue << 5;
+            ui16_s_ramp_start = requestedValue << 6;
             if (configAddress == EEPROM_ADDRESS) {
                 eeprom_write(OFFSET_RAMP_START, requestedValue);
             }
-            addPayload(requestedCodeLowByte, ui16_s_ramp_start >> 5);
+            addPayload(requestedCodeLowByte, ui16_s_ramp_start >> 6);
             break;
         case CODE_MAX_SPEED_DEFAULT:
             ui8_speedlimit_kph = requestedValue;

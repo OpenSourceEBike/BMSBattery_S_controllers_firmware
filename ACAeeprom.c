@@ -26,6 +26,7 @@
 uint8_t eeprom_magic_byte = 0;
 
 void eeprom_init(void) {
+#ifndef EEPROM_NOINIT
     eeprom_magic_byte = (FLASH_ReadByte(EEPROM_BASE_ADDRESS + EEPROM_MAX_INIT_RANGE));
     if (eeprom_magic_byte != EEPROM_INIT_MAGIC_BYTE) {
         // eeprom needs to be reset after flashing
@@ -48,7 +49,7 @@ void eeprom_init(void) {
         // reread to check everything went well
         eeprom_magic_byte = (FLASH_ReadByte(EEPROM_BASE_ADDRESS + EEPROM_MAX_INIT_RANGE));
     }
-
+#endif
 }
 
 uint8_t eeprom_read(uint8_t address_offset) {

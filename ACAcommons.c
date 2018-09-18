@@ -204,11 +204,11 @@ void updatePasStatus(void) {
         ui16_time_ticks_between_pas_interrupt = ui16_time_ticks_for_pas_calculation; //save recent cadence
         ui16_PAS_High = ui16_PAS_High_Counter;
 
-        if ((0 == (ui8_aca_flags & PAS_INVERTED)) && ((float) ui16_time_ticks_between_pas_interrupt / (float) ui16_PAS_High > flt_s_pas_threshold)) {
+        if ((0 == (ui16_aca_flags & PAS_INVERTED)) && ((float) ui16_time_ticks_between_pas_interrupt / (float) ui16_PAS_High > flt_s_pas_threshold)) {
             if (PAS_act < 7) {
                 PAS_act++;
             }
-        } else if ((PAS_INVERTED == (ui8_aca_flags & PAS_INVERTED)) && ((float) ui16_time_ticks_between_pas_interrupt / (float) ui16_PAS_High < flt_s_pas_threshold)) {
+        } else if ((PAS_INVERTED == (ui16_aca_flags & PAS_INVERTED)) && ((float) ui16_time_ticks_between_pas_interrupt / (float) ui16_PAS_High < flt_s_pas_threshold)) {
             if (PAS_act < 7) {
                 PAS_act++;
             }
@@ -239,7 +239,7 @@ void updatePasStatus(void) {
 
 void updateOffroadStatus(void) {
 
-    if (((ui8_aca_flags & BRAKE_DISABLES_OFFROAD) == BRAKE_DISABLES_OFFROAD) && (ui8_offroad_state > 4)) {
+    if (((ui16_aca_flags & BRAKE_DISABLES_OFFROAD) == BRAKE_DISABLES_OFFROAD) && (ui8_offroad_state > 4)) {
         // if disabling is enabled :)
         if (!GPIO_ReadInputPin(BRAKE__PORT, BRAKE__PIN)) {
             ui8_offroad_counter++;
@@ -253,7 +253,7 @@ void updateOffroadStatus(void) {
     }
     
     // check if offroad mode is enabled
-    if (0 == (ui8_aca_flags & OFFROAD_ENABLED)) {
+    if (0 == (ui16_aca_flags & OFFROAD_ENABLED)) {
         return;
     }
 
