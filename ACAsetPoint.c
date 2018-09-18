@@ -106,7 +106,7 @@ uint16_t aca_setpoint(uint16_t ui16_time_ticks_between_speed_interrupt, uint16_t
         ui16_virtual_capped_pas_activity = ui16_time_ticks_between_pas_interrupt_smoothed;
     }
 
-    //check for undervoltage
+    //check for undervoltage --> disable PWM
     if (ui8_BatteryVoltage < BATTERY_VOLTAGE_MIN_VALUE) {
 
         TIM1_CtrlPWMOutputs(DISABLE);
@@ -114,19 +114,24 @@ uint16_t aca_setpoint(uint16_t ui16_time_ticks_between_speed_interrupt, uint16_t
         ui32_dutycycle = 0;
         ui8_control_state = 255;
 
+    // check for brake --> set regen current
     } else if (brake_is_set()) {
 
         ui8_control_state = 255;
-
+        //Current target based on regen assist level
         if ((ui8_aca_flags & DIGITAL_REGEN) == DIGITAL_REGEN) {
-            ui8_temp = i16_assistlevel[ui8_assistlevel_global >> 4]; //Curret target based on regen assist level
+
+            ui8_temp = i16_assistlevel[ui8_assistlevel_global >> 4];
             ui8_control_state -= 1;
+
+        //Current target based on linear input on pad X4
         } else {
             ui8_temp = map(ui16_adc_read_x4_value() >> 2, ui8_throttle_min_range, ui8_throttle_max_range, 0, 100); //map regen throttle to limits
             ui8_control_state -= 2;
         }
         float_temp = (float) ui8_temp * (float) (ui16_regen_current_max_value) / 100.0;
 
+        //Current target gets ramped down with speed
         if (((ui8_aca_flags & SPEED_INFLUENCES_REGEN) == SPEED_INFLUENCES_REGEN) && (ui16_virtual_erps_speed < ((ui16_speed_kph_to_erps_ratio * ((uint16_t) ui8_speedlimit_kph)) / 100))) {
             float_temp *= ((float) ui16_virtual_erps_speed / ((float) (ui16_speed_kph_to_erps_ratio * ((float) ui8_speedlimit_kph)) / 100.0)); // influence of current speed based on base speed limit
             ui8_control_state -= 4;
@@ -135,7 +140,8 @@ uint16_t aca_setpoint(uint16_t ui16_time_ticks_between_speed_interrupt, uint16_t
         uint32_current_target = (uint32_t) ui16_current_cal_b - float_temp;
         ui32_dutycycle = PI_control(ui16_BatteryCurrent, uint32_current_target);
 
-    } else if (ui32_erps_filtered > ui16_erps_max) {//limit max erps
+    //limit max erps
+    } else if (ui32_erps_filtered > ui16_erps_max) {
         ui32_dutycycle = PI_control(ui32_erps_filtered, ui16_erps_max); //limit the erps to maximum value to have minimum 30 points of sine table for proper commutation
         ui8_control_state = 2;
 
@@ -145,7 +151,7 @@ uint16_t aca_setpoint(uint16_t ui16_time_ticks_between_speed_interrupt, uint16_t
         ui8_control_state = 0;
         //if none of the overruling boundaries are concerned, calculate new setpoint
 
-        // if torque sim is requested
+        // if torque sim is requested. We could check if we could solve this function with just one line with map function...
         if (ui16_s_ramp_end != 0) {
             if (ui16_virtual_capped_pas_activity > ui16_s_ramp_end) {
                 //if you are pedaling slower than defined ramp end
@@ -155,6 +161,8 @@ uint16_t aca_setpoint(uint16_t ui16_time_ticks_between_speed_interrupt, uint16_t
                 float_temp = 1.0 - (((float) (ui16_virtual_capped_pas_activity - ui16_s_ramp_end)) / ((float) (ui16_s_ramp_start - ui16_s_ramp_end)));
                 uint32_current_target = ((uint16_t) (uint32_current_target)*(uint16_t) (float_temp * 100.0)) / 100 + ui16_current_cal_b;
                 ui8_control_state += 1;
+
+            //in you are pedaling faster than in ramp end defined, desired battery current level is set,
             } else {
                 uint32_current_target = (i16_assistlevel[ui8_assistlevel_global & 15]*(ui16_battery_current_max_value) / 100 + ui16_current_cal_b);
                 ui8_control_state += 2;
@@ -163,6 +171,8 @@ uint16_t aca_setpoint(uint16_t ui16_time_ticks_between_speed_interrupt, uint16_t
 
         // throttle / torquesensor override following
         float_temp = (float) sumtorque;
+
+        // map curret target to assist level, not to maximum value
         if ((ui8_aca_flags & ASSIST_LVL_AFFECTS_THROTTLE) == 1) {
             float_temp *= ((float) i16_assistlevel[ui8_assistlevel_global & 15] / 100.0);
             ui8_control_state += 4;
@@ -171,6 +181,7 @@ uint16_t aca_setpoint(uint16_t ui16_time_ticks_between_speed_interrupt, uint16_t
         if (flt_torquesensorCalibration != 0.0) {
             // flt_torquesensorCalibration is >fummelfactor * NUMBER_OF_PAS_MAGS * 64< (64 cause of <<6)
             float_temp *= flt_torquesensorCalibration / ((uint32_t) ui16_virtual_capped_pas_activity); // influence of cadence
+           //increase power linear with speed for convenient commuting :-)
             if ((ui8_aca_flags & SPEED_INFLUENCES_TORQUESENSOR) == SPEED_INFLUENCES_TORQUESENSOR) {
                 float_temp *= ((float) ui16_virtual_erps_speed / ((float) (ui16_speed_kph_to_erps_ratio * ((float) ui8_speedlimit_kph)) / 100.0)); // influence of current speed based on base speed limit
             }
@@ -195,15 +206,22 @@ uint16_t aca_setpoint(uint16_t ui16_time_ticks_between_speed_interrupt, uint16_t
             uint32_current_target = ui16_battery_current_max_value + ui16_current_cal_b;
             ui8_control_state += 64;
         }
+        //phase current limiting
         if (setpoint_old > 0 && (uint32_current_target - ui16_current_cal_b)*255 / setpoint_old > PHASE_CURRENT_MAX_VALUE) { // limit phase current according to Phase Current = battery current/duty cycle
             uint32_current_target = (PHASE_CURRENT_MAX_VALUE) * setpoint_old / 255 + ui16_current_cal_b;
             ui8_control_state += 128;
         }
+        //send current target to PI-controller
         ui32_dutycycle = PI_control(ui16_BatteryCurrent, uint32_current_target);
 
+        //disable PWM if enabled and motor is at standstill and no power is wanted
+        if (uint_PWM_Enable && ui32_erps_filtered==0 && uint32_current_target=ui16_current_cal_b) {
+            TIM1_CtrlPWMOutputs(DISABLE);
+            uint_PWM_Enable = 0;
+        }
 
-        //enable PWM if disabled and voltage is 2V higher than min, some hysteresis
-        if (!uint_PWM_Enable && ui8_BatteryVoltage > BATTERY_VOLTAGE_MIN_VALUE + 8) {
+        //enable PWM if disabled and voltage is 2V higher than min, some hysteresis and power is wanted
+        if (!uint_PWM_Enable && ui8_BatteryVoltage > BATTERY_VOLTAGE_MIN_VALUE + 8 && uint32_current_target!=ui16_current_cal_b) {
             TIM1_CtrlPWMOutputs(ENABLE);
             uint_PWM_Enable = 1;
 
