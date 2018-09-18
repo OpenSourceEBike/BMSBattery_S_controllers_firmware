@@ -134,7 +134,7 @@ uint16_t aca_setpoint(uint16_t ui16_time_ticks_between_speed_interrupt, uint16_t
 
         //Current target gets ramped down with speed
         if (((ui16_aca_flags & SPEED_INFLUENCES_REGEN) == SPEED_INFLUENCES_REGEN) && (ui16_virtual_erps_speed < ((ui16_speed_kph_to_erps_ratio * ((uint16_t) ui8_speedlimit_kph)) / 100))) {
-            
+
             if (ui16_virtual_erps_speed < 15) {
                 // turn of regen at low speeds
                 // based on erps in order to avoid an additional calculation
@@ -234,7 +234,7 @@ uint16_t aca_setpoint(uint16_t ui16_time_ticks_between_speed_interrupt, uint16_t
         }
 
         //enable PWM if disabled and voltage is 2V higher than min, some hysteresis and power is wanted
-        if (!uint_PWM_Enable && ui8_BatteryVoltage > BATTERY_VOLTAGE_MIN_VALUE + 8 && uint32_current_target != ui16_current_cal_b) {
+        if (!uint_PWM_Enable && ui8_BatteryVoltage > BATTERY_VOLTAGE_MIN_VALUE + 8 && ((ui32_erps_filtered != 0) || (uint32_current_target != ui16_current_cal_b))) {
             TIM1_CtrlPWMOutputs(ENABLE);
             uint_PWM_Enable = 1;
 
