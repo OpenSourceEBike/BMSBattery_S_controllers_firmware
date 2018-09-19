@@ -71,6 +71,8 @@ public class OSEC extends JFrame {
 	private JTextField txtNumberOfPas;
 	private JLabel lblSpeedLimit;
 	private JTextField txtSpeedlimit;
+	private JTextField txtSpeedlimitWithoutPas;
+	private JTextField txtSpeedlimitWithThrottleOverride;
 	private JLabel lblSupportFactor;
 	private JLabel lblThrottleMin;
 	private JTextField txtThrottlemin;
@@ -167,7 +169,7 @@ public class OSEC extends JFrame {
 		txtSpeedlimit.setText(in.readLine());
 		txtPasTimeout.setText(in.readLine());
 		txtWheelCircumference.setText(in.readLine());
-		in.readLine();//old options, no longer used
+		txtSpeedlimitWithoutPas.setText(in.readLine());if (txtSpeedlimitWithoutPas.getText().trim().isEmpty())txtSpeedlimitWithoutPas.setText("6");
 		txtThrottlemin.setText(in.readLine());
 		txtThrottlemax.setText(in.readLine());
 		txtUndervoltage.setText(in.readLine());
@@ -195,7 +197,7 @@ public class OSEC extends JFrame {
 
 		cbTorqueSensor.setSelected(Boolean.parseBoolean(in.readLine()));
 		ramp_start.setText(in.readLine());
-		in.readLine();//old options, no longer used
+		txtSpeedlimitWithThrottleOverride.setText(in.readLine());if (txtSpeedlimitWithThrottleOverride.getText().trim().isEmpty())txtSpeedlimitWithThrottleOverride.setText("25");
 		in.readLine();//old options, no longer used
 
 		rdbtnHigh.setSelected(Boolean.parseBoolean(in.readLine()));
@@ -663,6 +665,32 @@ public class OSEC extends JFrame {
 		txtSpeedlimit.setBounds(476, 340, 86, 20);
 		contentPane.add(txtSpeedlimit);
 		txtSpeedlimit.setColumns(10);
+		
+		
+		JLabel lblSpeedLimitwopas = new  JLabel("Without PAS (km/h)");
+		lblSpeedLimitwopas.setBounds(332, 360, 135, 14);
+		lblSpeedLimitwopas.setForeground(Color.GRAY);
+		contentPane.add(lblSpeedLimitwopas);
+
+		txtSpeedlimitWithoutPas = new JTextField();
+		txtSpeedlimitWithoutPas.setText("6");
+		txtSpeedlimitWithoutPas.setBounds(476, 360, 86, 20);
+		contentPane.add(txtSpeedlimitWithoutPas);
+		txtSpeedlimitWithoutPas.setColumns(10);
+		
+		
+		JLabel lblSpeedLimitwto = new JLabel("W. throttle (offroad) (km/h)");
+		lblSpeedLimitwto.setBounds(332, 380, 135, 14);
+		lblSpeedLimitwto.setForeground(Color.GRAY);
+		contentPane.add(lblSpeedLimitwto);
+
+		txtSpeedlimitWithThrottleOverride = new JTextField();
+		txtSpeedlimitWithThrottleOverride.setText("25");
+		txtSpeedlimitWithThrottleOverride.setBounds(476, 380, 86, 20);
+		contentPane.add(txtSpeedlimitWithThrottleOverride);
+		txtSpeedlimitWithThrottleOverride.setColumns(10);
+		
+		
 
 		JLabel lblRideMode = new JLabel("Ride Options");
 		lblRideMode.setFont(new Font("Tahoma", Font.BOLD, 12));
@@ -871,7 +899,9 @@ public class OSEC extends JFrame {
 					iWriter.println(txtWheelCircumference.getText());
 					pWriter.println(text_to_save);
 
-					iWriter.println("");// old options, unused
+					text_to_save = "#define limit_without_pas " + txtSpeedlimitWithoutPas.getText();
+					iWriter.println(txtSpeedlimitWithoutPas.getText());
+					pWriter.println(text_to_save);
 
 					text_to_save = "#define ADC_THROTTLE_MIN_VALUE " + txtThrottlemin.getText();
 					iWriter.println(txtThrottlemin.getText());
@@ -975,7 +1005,11 @@ public class OSEC extends JFrame {
 					iWriter.println(ramp_start.getText());
 					pWriter.println(text_to_save);
 
-					iWriter.println("");// old options, unused
+					text_to_save = "#define limit_with_throttle_override " + txtSpeedlimitWithThrottleOverride.getText();
+					iWriter.println(txtSpeedlimitWithThrottleOverride.getText());
+					pWriter.println(text_to_save);
+					
+					
 					iWriter.println("");// old options, unused
 
 					if (rdbtnHigh.isSelected()) {

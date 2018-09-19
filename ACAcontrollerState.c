@@ -107,6 +107,8 @@ void controllerstate_init(void) {
     // convert static defines to volatile vars
     ui16_aca_flags = ACA;
     ui8_speedlimit_kph = limit;
+    ui8_speedlimit_without_pas_kph = limit_without_pas;
+    ui8_speedlimit_with_throttle_override_kph = limit_with_throttle_override;
     ui8_speedlimit_actual_kph = limit;
     ui8_throttle_min_range = ADC_THROTTLE_MIN_VALUE;
     ui8_throttle_max_range = ADC_THROTTLE_MAX_VALUE;
