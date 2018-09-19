@@ -153,7 +153,7 @@ uint16_t aca_setpoint(uint16_t ui16_time_ticks_between_speed_interrupt, uint16_t
         //limit max erps
     } else if (ui32_erps_filtered > ui16_erps_max) {
         ui32_dutycycle = PI_control(ui32_erps_filtered, ui16_erps_max); //limit the erps to maximum value to have minimum 30 points of sine table for proper commutation
-        ui8_control_state = 2;
+        ui8_control_state = 0;
 
     } else {
 
