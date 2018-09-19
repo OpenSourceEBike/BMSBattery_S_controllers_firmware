@@ -240,9 +240,9 @@ public class OSEC extends JFrame {
 			flt_tqCalibrationFactor.setText("1.0");
 		} else {
 			flt_tqCalibrationFactor.setText("0.0");
-			ramp_end.setText("1000");
+			ramp_end.setText("1500");
 			ramp_end.setEditable(true);
-			ramp_start.setText("7000");
+			ramp_start.setText("64000");
 			ramp_start.setEditable(true);
 			flt_tqCalibrationFactor.setEditable(false);
 

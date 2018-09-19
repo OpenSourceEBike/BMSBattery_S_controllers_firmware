@@ -42,7 +42,6 @@ static uint32_t ui32_erps_accumulated; //for filtering of erps
 static uint16_t ui16_erps_max = PWM_CYCLES_SECOND / 30; //limit erps to have minimum 30 points on the sine curve for proper commutation
 static float float_temp = 0; //for float calculations
 
-static uint16_t ui16_virtual_capped_pas_activity = 0;
 static uint32_t uint32_temp = 0;
 static uint16_t uint16_temp = 0;
 static uint8_t ui8_temp = 0;
@@ -97,15 +96,13 @@ uint16_t aca_setpoint(uint16_t ui16_time_ticks_between_speed_interrupt, uint16_t
     ui32_erps_filtered = ui32_erps_accumulated >> 3;
 
     ui32_time_ticks_between_pas_interrupt_accumulated -= ui32_time_ticks_between_pas_interrupt_accumulated >> 3;
-    ui32_time_ticks_between_pas_interrupt_accumulated += ui16_time_ticks_between_pas_interrupt;
-    ui16_time_ticks_between_pas_interrupt_smoothed = ui32_time_ticks_between_pas_interrupt_accumulated >> 3; // now it's filtered
-
-    // set virtual PAS activity that doesn't exceed ui16_s_ramp_start
-    if (ui16_time_ticks_between_pas_interrupt_smoothed > ui16_s_ramp_start) {
-        ui16_virtual_capped_pas_activity = ui16_s_ramp_start;
-    } else {
-        ui16_virtual_capped_pas_activity = ui16_time_ticks_between_pas_interrupt_smoothed;
+    // do not allow values > ramp_start into smoothing cause it makes startup sluggish
+    if (ui16_time_ticks_between_pas_interrupt > ui16_s_ramp_start) {
+        ui32_time_ticks_between_pas_interrupt_accumulated += ui16_s_ramp_start;
+    }else{
+        ui32_time_ticks_between_pas_interrupt_accumulated += ui16_time_ticks_between_pas_interrupt;
     }
+    ui16_time_ticks_between_pas_interrupt_smoothed = ui32_time_ticks_between_pas_interrupt_accumulated >> 3;
 
     //check for undervoltage --> disable PWM
     if (ui8_BatteryVoltage < BATTERY_VOLTAGE_MIN_VALUE) {
@@ -166,12 +163,12 @@ uint16_t aca_setpoint(uint16_t ui16_time_ticks_between_speed_interrupt, uint16_t
 
         // if torque sim is requested. We could check if we could solve this function with just one line with map function...
         if (ui16_s_ramp_end != 0) {
-            if (ui16_virtual_capped_pas_activity > ui16_s_ramp_end) {
+            if (ui16_time_ticks_between_pas_interrupt_smoothed > ui16_s_ramp_end) {
                 //if you are pedaling slower than defined ramp end
                 //or not pedalling at all
                 //current is proportional to cadence
                 uint32_current_target = (i16_assistlevel[ui8_assistlevel_global & 15]*(ui16_battery_current_max_value) / 100);
-                float_temp = 1.0 - (((float) (ui16_virtual_capped_pas_activity - ui16_s_ramp_end)) / ((float) (ui16_s_ramp_start - ui16_s_ramp_end)));
+                float_temp = 1.0 - (((float) (ui16_time_ticks_between_pas_interrupt_smoothed - ui16_s_ramp_end)) / ((float) (ui16_s_ramp_start - ui16_s_ramp_end)));
                 uint32_current_target = ((uint16_t) (uint32_current_target)*(uint16_t) (float_temp * 100.0)) / 100 + ui16_current_cal_b;
                 ui8_control_state += 1;
 
@@ -193,7 +190,7 @@ uint16_t aca_setpoint(uint16_t ui16_time_ticks_between_speed_interrupt, uint16_t
         // if torque sensor is requested
         if (flt_torquesensorCalibration != 0.0) {
             // flt_torquesensorCalibration is >fummelfactor * NUMBER_OF_PAS_MAGS * 64< (64 cause of <<6)
-            float_temp *= flt_torquesensorCalibration / ((uint32_t) ui16_virtual_capped_pas_activity); // influence of cadence
+            float_temp *= flt_torquesensorCalibration / ((uint32_t) ui16_time_ticks_between_pas_interrupt_smoothed); // influence of cadence
             //increase power linear with speed for convenient commuting :-)
             if ((ui16_aca_flags & SPEED_INFLUENCES_TORQUESENSOR) == SPEED_INFLUENCES_TORQUESENSOR) {
                 float_temp *= ((float) ui16_virtual_erps_speed / ((float) (ui16_speed_kph_to_erps_ratio * ((float) ui8_speedlimit_kph)) / 100.0)); // influence of current speed based on base speed limit
