@@ -823,7 +823,7 @@ public class OSEC extends JFrame {
 		contentPane.add(rdbtnDiganostics);
 
 		cbResetEeprom = new JCheckBox("Write eeprom magic byte (will reset eeprom)");
-		cbResetEeprom.setSelected(false);
+		cbResetEeprom.setSelected(true);
 		cbResetEeprom.setBounds(600, 470, 300, 20);
 		contentPane.add(cbResetEeprom);
 

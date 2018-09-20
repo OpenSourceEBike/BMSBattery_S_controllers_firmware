@@ -64,11 +64,20 @@ extern float current_display;
 typedef struct _lcd_configuration_variables
 {
   uint8_t ui8_assist_level;
-  uint8_t ui8_motor_characteristic;
-  uint8_t ui8_wheel_size;
   uint8_t ui8_max_speed;
-  uint8_t ui8_power_assist_control_mode;
-  uint8_t ui8_controller_max_current;
+  uint8_t ui8_wheel_size;
+  uint8_t ui8_p1;
+  uint8_t ui8_p2;
+  uint8_t ui8_p3;
+  uint8_t ui8_p4;
+  uint8_t ui8_p5;
+  uint8_t ui8_c1;
+  uint8_t ui8_c2;
+  uint8_t ui8_c4;
+  uint8_t ui8_c5;
+  uint8_t ui8_c12;
+  uint8_t ui8_c13;
+  uint8_t ui8_c14;
 } struc_lcd_configuration_variables;
 
 #endif
