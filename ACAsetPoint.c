@@ -38,6 +38,8 @@ static uint16_t ui16_BatteryCurrent_accumulated = 2496L; //8x current offset, fo
 static uint16_t ui16_BatteryVoltage_accumulated;
 static uint32_t ui32_time_ticks_between_pas_interrupt_accumulated = timeout; // for filtering of PAS value 
 static uint32_t ui32_erps_accumulated; //for filtering of erps
+static uint32_t ui32_speedlimit_actual_accumulated;
+static uint32_t ui32_sumtorque_accumulated; //it is already smoothed b4 we get it, we want to smooth it even more though for dynamic assist levels
 
 static uint16_t ui16_erps_max = PWM_CYCLES_SECOND / 30; //limit erps to have minimum 30 points on the sine curve for proper commutation
 static float float_temp = 0; //for float calculations
@@ -61,7 +63,16 @@ uint16_t cutoffSetpoint(uint32_t ui32_dutycycle) {
 
 uint16_t aca_setpoint(uint16_t ui16_time_ticks_between_speed_interrupt, uint16_t ui16_time_ticks_between_pas_interrupt, uint16_t sumtorque, uint16_t setpoint_old) {
 
-    // first select current speed limit
+    // select virtual erps speed based on speedsensor type
+#ifdef SPEEDSENSOR_INTERNAL
+    ui16_virtual_erps_speed = (uint16_t) ui32_erps_filtered;
+#endif
+
+#ifdef SPEEDSENSOR_EXTERNAL
+    ui16_virtual_erps_speed = ui16_speed_kph_to_erps_ratio * ((uint16_t) (ui32_SPEED_km_h / 100)) / 1000 // /100/1000 instead of more plausible /1000/100 cause of 16bit overflow
+#endif
+
+            // first select current speed limit
     if (ui8_offroad_state == 255) {
         ui8_speedlimit_actual_kph = 80;
     } else if (ui8_offroad_state > 15 && sumtorque <= 2) { // allow a slight increase based on ui8_offroad_state
@@ -73,17 +84,19 @@ uint16_t aca_setpoint(uint16_t ui16_time_ticks_between_speed_interrupt, uint16_t
     } else {
         ui8_speedlimit_actual_kph = ui8_speedlimit_kph;
     }
+    
+    // average tq over a longer time period (for dynamic assist level)
+    // FIXME not yet fed into calculation, just send to display 
+    ui32_sumtorque_accumulated -= ui32_sumtorque_accumulated >> 10;
+    ui32_sumtorque_accumulated += sumtorque;
+    ui8_assistlevel_dynamic_addon = ui32_speedlimit_actual_accumulated >> 14;
 
-    // select virtual erps speed based on speedsensor type
-#ifdef SPEEDSENSOR_INTERNAL
-    ui16_virtual_erps_speed = (uint16_t) ui32_erps_filtered;
-#endif
+    // smooth limit so we don't run into abrupt current drops due to overspeed
+    ui32_speedlimit_actual_accumulated -= ui32_speedlimit_actual_accumulated >> 7;
+    ui32_speedlimit_actual_accumulated += ui8_speedlimit_actual_kph << 2;
+    ui8_speedlimit_actual_kph = ui32_speedlimit_actual_accumulated >> 9;
 
-#ifdef SPEEDSENSOR_EXTERNAL
-    ui16_virtual_erps_speed = ui16_speed_kph_to_erps_ratio * ((uint16_t) (ui32_SPEED_km_h / 100)) / 1000 // /100/1000 instead of more plausible /1000/100 cause of 16bit overflow
-#endif
-
-            ui16_BatteryCurrent_accumulated -= ui16_BatteryCurrent_accumulated >> 3;
+    ui16_BatteryCurrent_accumulated -= ui16_BatteryCurrent_accumulated >> 3;
     ui16_BatteryCurrent_accumulated += ui16_adc_read_motor_total_current();
     ui16_BatteryCurrent = ui16_BatteryCurrent_accumulated >> 3;
 
@@ -99,7 +112,7 @@ uint16_t aca_setpoint(uint16_t ui16_time_ticks_between_speed_interrupt, uint16_t
     // do not allow values > ramp_start into smoothing cause it makes startup sluggish
     if (ui16_time_ticks_between_pas_interrupt > ui16_s_ramp_start) {
         ui32_time_ticks_between_pas_interrupt_accumulated += ui16_s_ramp_start;
-    }else{
+    } else {
         ui32_time_ticks_between_pas_interrupt_accumulated += ui16_time_ticks_between_pas_interrupt;
     }
     ui16_time_ticks_between_pas_interrupt_smoothed = ui32_time_ticks_between_pas_interrupt_accumulated >> 3;

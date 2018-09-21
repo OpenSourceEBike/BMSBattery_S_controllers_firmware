@@ -9,7 +9,10 @@
         <group>
             <file>file:/G:/osebikefw/BOdisplay.c</file>
             <file>file:/G:/osebikefw/documentation/LCD3_to_S12SN-1.txt</file>
+            <file>file:/G:/osebikefw/brake.c</file>
+            <file>file:/G:/osebikefw/adc.c</file>
             <file>file:/G:/osebikefw/display.c</file>
+            <file>file:/G:/osebikefw/brake.h</file>
         </group>
     </open-files>
 </project-private>

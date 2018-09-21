@@ -43,6 +43,7 @@ uint8_t ui8_s_motor_angle = 214;
 // internal
 uint32_t uint32_icc_signals = 0;
 
+uint8_t ui8_assistlevel_dynamic_addon = 0;
 uint8_t ui8_assistlevel_global = 83; // 3 + max regen
 uint8_t PAS_act = 3; //recent PAS direction reading
 uint8_t PAS_is_active = 0;
