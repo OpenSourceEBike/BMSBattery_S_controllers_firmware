@@ -241,13 +241,13 @@ uint16_t aca_setpoint(uint16_t ui16_time_ticks_between_speed_interrupt, uint16_t
         ui32_dutycycle = PI_control(ui16_BatteryCurrent, uint32_current_target);
 
         //disable PWM if enabled and motor is at standstill and no power is wanted
-        if (uint_PWM_Enable && ui32_erps_filtered == 0 && uint32_current_target == ui16_current_cal_b) {
+        /*if (uint_PWM_Enable && ui32_erps_filtered == 0 && uint32_current_target == ui16_current_cal_b) {
             TIM1_CtrlPWMOutputs(DISABLE);
             uint_PWM_Enable = 0;
-        }
+        }*/
 
         //enable PWM if disabled and voltage is 2V higher than min, some hysteresis and power is wanted
-        if (!uint_PWM_Enable && ui8_BatteryVoltage > BATTERY_VOLTAGE_MIN_VALUE + 8 && ((ui32_erps_filtered != 0) || (uint32_current_target != ui16_current_cal_b))) {
+        if (!uint_PWM_Enable && ui8_BatteryVoltage > BATTERY_VOLTAGE_MIN_VALUE + 8 ) { //&& ((ui32_erps_filtered != 0) || (uint32_current_target != ui16_current_cal_b))
             TIM1_CtrlPWMOutputs(ENABLE);
             uint_PWM_Enable = 1;
 
