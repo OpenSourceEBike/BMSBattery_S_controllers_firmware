@@ -89,7 +89,7 @@ uint16_t aca_setpoint(uint16_t ui16_time_ticks_between_speed_interrupt, uint16_t
     // FIXME not yet fed into calculation, just send to display 
     ui32_sumtorque_accumulated -= ui32_sumtorque_accumulated >> 10;
     ui32_sumtorque_accumulated += sumtorque;
-    ui8_assistlevel_dynamic_addon = ui32_speedlimit_actual_accumulated >> 13;
+    ui8_assistlevel_dynamic_addon = ui32_sumtorque_accumulated >> 13;
     if ((ui8_assistlevel_dynamic_addon+ui8_assistlevel_global)>5){
         ui8_assistlevel_dynamic_addon = 5-ui8_assistlevel_global;
     }
