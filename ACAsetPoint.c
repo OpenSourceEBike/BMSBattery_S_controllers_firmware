@@ -90,8 +90,8 @@ uint16_t aca_setpoint(uint16_t ui16_time_ticks_between_speed_interrupt, uint16_t
     ui32_sumtorque_accumulated -= ui32_sumtorque_accumulated >> 10;
     ui32_sumtorque_accumulated += sumtorque;
     ui8_assistlevel_dynamic_addon = ui32_sumtorque_accumulated >> 13;
-    if ((ui8_assistlevel_dynamic_addon+ui8_assistlevel_global)>5){
-        ui8_assistlevel_dynamic_addon = 5-ui8_assistlevel_global;
+    if ((ui8_assistlevel_dynamic_addon+(15&ui8_assistlevel_global))>5){
+        ui8_assistlevel_dynamic_addon = 5-(15&ui8_assistlevel_global);
     }
 
     // smooth limit so we don't run into abrupt current drops due to overspeed
@@ -179,18 +179,24 @@ uint16_t aca_setpoint(uint16_t ui16_time_ticks_between_speed_interrupt, uint16_t
 
         // if torque sim is requested. We could check if we could solve this function with just one line with map function...
         if (ui16_s_ramp_end != 0) {
+            
+            // add dynamic assist level based on past throttle input
+            ui8_temp = ui8_assistlevel_global & 15;
+            // FIXME new aca flag to enable/disable this feature
+            ui8_temp += ui8_assistlevel_dynamic_addon;
+            
             if (ui16_time_ticks_between_pas_interrupt_smoothed > ui16_s_ramp_end) {
                 //if you are pedaling slower than defined ramp end
                 //or not pedalling at all
                 //current is proportional to cadence
-                uint32_current_target = (i16_assistlevel[ui8_assistlevel_global & 15]*(ui16_battery_current_max_value) / 100);
+                uint32_current_target = (i16_assistlevel[ui8_temp]*(ui16_battery_current_max_value) / 100);
                 float_temp = 1.0 - (((float) (ui16_time_ticks_between_pas_interrupt_smoothed - ui16_s_ramp_end)) / ((float) (ui16_s_ramp_start - ui16_s_ramp_end)));
                 uint32_current_target = ((uint16_t) (uint32_current_target)*(uint16_t) (float_temp * 100.0)) / 100 + ui16_current_cal_b;
                 ui8_control_state += 1;
 
                 //in you are pedaling faster than in ramp end defined, desired battery current level is set,
             } else {
-                uint32_current_target = (i16_assistlevel[ui8_assistlevel_global & 15]*(ui16_battery_current_max_value) / 100 + ui16_current_cal_b);
+                uint32_current_target = (i16_assistlevel[ui8_temp]*(ui16_battery_current_max_value) / 100 + ui16_current_cal_b);
                 ui8_control_state += 2;
             }
         }
