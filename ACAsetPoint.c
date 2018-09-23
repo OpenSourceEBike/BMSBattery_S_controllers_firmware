@@ -84,19 +84,25 @@ uint16_t aca_setpoint(uint16_t ui16_time_ticks_between_speed_interrupt, uint16_t
     } else {
         ui8_speedlimit_actual_kph = ui8_speedlimit_kph;
     }
-    
+
     // average tq over a longer time period (for dynamic assist level)
     // FIXME not yet fed into calculation, just send to display 
     ui32_sumtorque_accumulated -= ui32_sumtorque_accumulated >> 10;
     ui32_sumtorque_accumulated += sumtorque;
     ui8_assistlevel_dynamic_addon = ui32_sumtorque_accumulated >> 13;
-    if ((ui8_assistlevel_dynamic_addon+(15&ui8_assistlevel_global))>5){
-        ui8_assistlevel_dynamic_addon = 5-(15&ui8_assistlevel_global);
+    if ((ui8_assistlevel_dynamic_addon + (15 & ui8_assistlevel_global)) > 5) {
+        ui8_assistlevel_dynamic_addon = 5 - (15 & ui8_assistlevel_global);
     }
 
     // smooth limit so we don't run into abrupt current drops due to overspeed
-    ui32_speedlimit_actual_accumulated -= ui32_speedlimit_actual_accumulated >> 7;
-    ui32_speedlimit_actual_accumulated += ui8_speedlimit_actual_kph << 2;
+    // ramp up 4 times faster than down
+    if ((ui32_speedlimit_actual_accumulated >> 9) < ui8_speedlimit_actual_kph) {
+        ui32_speedlimit_actual_accumulated -= ui32_speedlimit_actual_accumulated >> 6;
+        ui32_speedlimit_actual_accumulated += ui8_speedlimit_actual_kph << 3;
+    } else {
+        ui32_speedlimit_actual_accumulated -= ui32_speedlimit_actual_accumulated >> 8;
+        ui32_speedlimit_actual_accumulated += ui8_speedlimit_actual_kph << 1;
+    }
     ui8_speedlimit_actual_kph = ui32_speedlimit_actual_accumulated >> 9;
 
     ui16_BatteryCurrent_accumulated -= ui16_BatteryCurrent_accumulated >> 3;
@@ -179,12 +185,12 @@ uint16_t aca_setpoint(uint16_t ui16_time_ticks_between_speed_interrupt, uint16_t
 
         // if torque sim is requested. We could check if we could solve this function with just one line with map function...
         if (ui16_s_ramp_end != 0) {
-            
+
             // add dynamic assist level based on past throttle input
             ui8_temp = ui8_assistlevel_global & 15;
             // FIXME new aca flag to enable/disable this feature
             ui8_temp += ui8_assistlevel_dynamic_addon;
-            
+
             if (ui16_time_ticks_between_pas_interrupt_smoothed > ui16_s_ramp_end) {
                 //if you are pedaling slower than defined ramp end
                 //or not pedalling at all
@@ -253,7 +259,7 @@ uint16_t aca_setpoint(uint16_t ui16_time_ticks_between_speed_interrupt, uint16_t
         }*/
 
         //enable PWM if disabled and voltage is 2V higher than min, some hysteresis and power is wanted
-        if (!uint_PWM_Enable && ui8_BatteryVoltage > BATTERY_VOLTAGE_MIN_VALUE + 8 ) { //&& ((ui32_erps_filtered != 0) || (uint32_current_target != ui16_current_cal_b))
+        if (!uint_PWM_Enable && ui8_BatteryVoltage > BATTERY_VOLTAGE_MIN_VALUE + 8) { //&& ((ui32_erps_filtered != 0) || (uint32_current_target != ui16_current_cal_b))
             TIM1_CtrlPWMOutputs(ENABLE);
             uint_PWM_Enable = 1;
 

@@ -44,6 +44,6 @@
 #define BLUOSEC
 #define TQS_CALIB 0.0
 #define ACA 156
-#define EEPROM_INIT_MAGIC_BYTE 139 // makes sure (chance of fail 1/255) eeprom is invalidated after flashing new config
+#define EEPROM_INIT_MAGIC_BYTE 152 // makes sure (chance of fail 1/255) eeprom is invalidated after flashing new config
 
 #endif /* CONFIG_H_ */
