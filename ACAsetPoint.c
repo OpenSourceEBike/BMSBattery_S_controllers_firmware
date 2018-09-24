@@ -38,7 +38,7 @@ static uint16_t ui16_BatteryCurrent_accumulated = 2496L; //8x current offset, fo
 static uint16_t ui16_BatteryVoltage_accumulated;
 static uint32_t ui32_time_ticks_between_pas_interrupt_accumulated = timeout; // for filtering of PAS value 
 static uint32_t ui32_erps_accumulated; //for filtering of erps
-static uint32_t ui32_speedlimit_actual_accumulated;
+//static uint32_t ui32_speedlimit_actual_accumulated;
 static uint32_t ui32_sumtorque_accumulated; //it is already smoothed b4 we get it, we want to smooth it even more though for dynamic assist levels
 
 static uint16_t ui16_erps_max = PWM_CYCLES_SECOND / 30; //limit erps to have minimum 30 points on the sine curve for proper commutation
@@ -93,17 +93,6 @@ uint16_t aca_setpoint(uint16_t ui16_time_ticks_between_speed_interrupt, uint16_t
     if ((ui8_assistlevel_dynamic_addon + (15 & ui8_assistlevel_global)) > 5) {
         ui8_assistlevel_dynamic_addon = 5 - (15 & ui8_assistlevel_global);
     }
-
-    // smooth limit so we don't run into abrupt current drops due to overspeed
-    // ramp up 4 times faster than down
-    if ((ui32_speedlimit_actual_accumulated >> 9) < ui8_speedlimit_actual_kph) {
-        ui32_speedlimit_actual_accumulated -= ui32_speedlimit_actual_accumulated >> 6;
-        ui32_speedlimit_actual_accumulated += ui8_speedlimit_actual_kph << 3;
-    } else {
-        ui32_speedlimit_actual_accumulated -= ui32_speedlimit_actual_accumulated >> 8;
-        ui32_speedlimit_actual_accumulated += ui8_speedlimit_actual_kph << 1;
-    }
-    ui8_speedlimit_actual_kph = ui32_speedlimit_actual_accumulated >> 9;
 
     ui16_BatteryCurrent_accumulated -= ui16_BatteryCurrent_accumulated >> 3;
     ui16_BatteryCurrent_accumulated += ui16_adc_read_motor_total_current();
@@ -188,9 +177,11 @@ uint16_t aca_setpoint(uint16_t ui16_time_ticks_between_speed_interrupt, uint16_t
 
             // add dynamic assist level based on past throttle input
             ui8_temp = ui8_assistlevel_global & 15;
-            // FIXME new aca flag to enable/disable this feature
-            ui8_temp += ui8_assistlevel_dynamic_addon;
-
+            
+            if ((ui16_aca_flags & DYNAMIC_ASSIST_LEVEL) == DYNAMIC_ASSIST_LEVEL){
+                ui8_temp += ui8_assistlevel_dynamic_addon;
+            }
+            
             if (ui16_time_ticks_between_pas_interrupt_smoothed > ui16_s_ramp_end) {
                 //if you are pedaling slower than defined ramp end
                 //or not pedalling at all

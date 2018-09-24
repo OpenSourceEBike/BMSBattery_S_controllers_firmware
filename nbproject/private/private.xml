@@ -10,12 +10,17 @@
             <file>file:/G:/osebikefw/ACAcommons.c</file>
             <file>file:/G:/osebikefw/config.h</file>
             <file>file:/G:/osebikefw/BOdisplay.c</file>
+            <file>file:/G:/osebikefw/pwm.c</file>
+            <file>file:/G:/osebikefw/main.c</file>
+            <file>file:/G:/osebikefw/PAS.c</file>
             <file>file:/G:/osebikefw/documentation/LCD3_to_S12SN-1.txt</file>
             <file>file:/G:/osebikefw/BOdisplay.h</file>
             <file>file:/G:/osebikefw/ACAcontrollerState.c</file>
+            <file>file:/G:/osebikefw/ACAsetPoint.c</file>
+            <file>file:/G:/osebikefw/ACAcontrollerState.h</file>
+            <file>file:/G:/osebikefw/motor.c</file>
             <file>file:/G:/osebikefw/brake.c</file>
             <file>file:/G:/osebikefw/adc.c</file>
-            <file>file:/G:/osebikefw/ACAsetPoint.c</file>
             <file>file:/G:/osebikefw/display.c</file>
             <file>file:/G:/osebikefw/brake.h</file>
         </group>

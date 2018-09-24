@@ -29,7 +29,7 @@ extern uint8_t ui8_control_state;
 extern uint8_t ui8_assistlevel_global; //assist level for regen (high 4 bits) and torque (low 4 bits)
 extern uint8_t ui8_assistlevel_dynamic_addon;
 extern uint8_t PAS_act;
-extern uint8_t PAS_is_active; 
+extern uint8_t PAS_is_active;
 extern uint16_t ui16_sum_torque;
 extern uint8_t ui8_offroad_state;
 extern uint32_t uint32_current_target;
@@ -121,8 +121,11 @@ typedef enum {
 	PAS_INVERTED = ((uint16_t) 64),
 
 	DUMMY_ALWAYS_ON = ((uint16_t) 128),
-			
-	BYPASS_LOW_SPEED_REGEN_PI_CONTROL = ((uint16_t) 256)
+
+	BYPASS_LOW_SPEED_REGEN_PI_CONTROL = ((uint16_t) 256),
+
+	DYNAMIC_ASSIST_LEVEL = ((uint16_t) 512),
+	PWM_AUTO_OFF = ((uint16_t) 1024)
 } ACA_FLAGS;
 
 #endif /* BOCONTROLLERSTATE_H */
