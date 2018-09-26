@@ -9,7 +9,9 @@
 #ifndef _UART_H
 #define _UART_H
 
-#include "main.h"
+void uart_put_buffered(uint8_t c); 
+uint8_t uart_get_possible();
+uint8_t uart_get_buffered(void);
 
 void uart_init (void);
 void putbyte(uint8_t c);

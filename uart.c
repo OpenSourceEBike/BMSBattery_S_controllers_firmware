@@ -8,10 +8,9 @@
 
 #include <stdint.h>
 #include <stdio.h>
-
+#include "uart.h"
 #include "stm8s.h"
 #include "stm8s_uart2.h"
-#include "motor.h"
 #include "interrupts.h"
 #include "ACAcontrollerState.h"
 
@@ -133,31 +132,6 @@ int getchar(void)
 	while (UART2_GetFlagStatus(UART2_FLAG_RXNE) == RESET);
 
 	c = UART2_ReceiveData8();
-
-	return (c);
-}
-
-char getchar1(void) {
-	uint8_t c = 0;
-	uint8_t a = 0;
-
-	if (UART2_GetFlagStatus(UART2_FLAG_RXNE) == RESET) {
-		return 255;
-	}
-
-	c = UART2_ReceiveData8();
-
-	if (c == '0') {
-		ui8_position_correction_value--;
-	}
-
-
-	if (c == '1') {
-		ui8_position_correction_value++;
-	}
-
-
-
 
 	return (c);
 }
