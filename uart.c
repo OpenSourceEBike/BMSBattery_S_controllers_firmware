@@ -14,8 +14,8 @@
 #include "motor.h"
 #include "ACAcontrollerState.h"
 
-uint8_t ui8_rx_buffer[64];
-uint8_t ui8_tx_buffer[64];
+uint8_t ui8_rx_buffer[128];
+uint8_t ui8_tx_buffer[128];
 uint8_t ui8_rx_fillpointer = 0;
 uint8_t ui8_tx_fillpointer = 0;
 uint8_t ui8_rx_digestpointer = 0;
@@ -23,7 +23,7 @@ uint8_t ui8_tx_digestpointer = 0;
 
 void uart_put_buffered(uint8_t c) {
 	ui8_tx_buffer[ui8_tx_fillpointer] = c;
-	if (ui8_tx_fillpointer++ > 63) {
+	if (ui8_tx_fillpointer++ > 127) {
 		ui8_tx_fillpointer = 0;
 	}
 }
@@ -37,7 +37,7 @@ uint8_t uart_get_possible() {
 
 void uart_get_buffered(uint8_t c) {
 	ui8_rx_buffer[ui8_rx_digestpointer] = c;
-	if (ui8_rx_digestpointer++ > 63) {
+	if (ui8_rx_digestpointer++ > 127) {
 		ui8_rx_digestpointer = 0;
 	}
 }
@@ -47,14 +47,14 @@ void uart_digest(void) {
 	// if there is something to read, read it into cyclic buffer
 	if (UART2_GetFlagStatus(UART2_FLAG_RXNE) == RESET) {
 		ui8_rx_buffer[ui8_rx_fillpointer] = UART2_ReceiveData8();
-		if (ui8_rx_fillpointer++ > 63) {
+		if (ui8_rx_fillpointer++ > 127) {
 			ui8_rx_fillpointer = 0;
 		}
 	}
 	// if there is something to send and we are not already sending
 	if ((ui8_tx_fillpointer != ui8_tx_digestpointer)&&(UART2_GetFlagStatus(UART2_FLAG_TXE) != RESET)) {
 		UART2_SendData8(ui8_tx_buffer[ui8_tx_digestpointer]);
-		if (ui8_tx_digestpointer++ > 63) {
+		if (ui8_tx_digestpointer++ > 127) {
 			ui8_tx_digestpointer = 0;
 		}
 	}
