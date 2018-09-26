@@ -36,11 +36,12 @@ uint8_t uart_get_possible() {
 	return 0;
 }
 
-void uart_get_buffered(uint8_t c) {
-	ui8_rx_buffer[ui8_rx_digestpointer] = c;
+uint8_t uart_get_buffered(void) {
+	uint8_t c = ui8_rx_buffer[ui8_rx_digestpointer];
 	if (ui8_rx_digestpointer++ > 127) {
 		ui8_rx_digestpointer = 0;
 	}
+	return c;
 }
 /*
 void UART2_IRQHandler(void) __interrupt(UART2_IRQHANDLER) {
