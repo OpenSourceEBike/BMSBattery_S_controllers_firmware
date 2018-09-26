@@ -71,6 +71,8 @@ public class OSEC extends JFrame {
 	private JTextField txtNumberOfPas;
 	private JLabel lblSpeedLimit;
 	private JTextField txtSpeedlimit;
+	private JTextField txtSpeedlimitWithoutPas;
+	private JTextField txtSpeedlimitWithThrottleOverride;
 	private JLabel lblSupportFactor;
 	private JLabel lblThrottleMin;
 	private JTextField txtThrottlemin;
@@ -134,6 +136,8 @@ public class OSEC extends JFrame {
 	private JCheckBox cbSpeedInfluencesRegen;
 	private JCheckBox cbSpeedInfluencesTqSensor;
 	private JCheckBox cbPasInverted;
+	private JCheckBox cbPwmOff;
+	private JCheckBox cbDynAssist;
 
 	private JTextField speedWithoutPas;
 	private JTextField speedWithoutThrottleOverride;
@@ -167,7 +171,7 @@ public class OSEC extends JFrame {
 		txtSpeedlimit.setText(in.readLine());
 		txtPasTimeout.setText(in.readLine());
 		txtWheelCircumference.setText(in.readLine());
-		in.readLine();//old options, no longer used
+		txtSpeedlimitWithoutPas.setText(in.readLine());if (txtSpeedlimitWithoutPas.getText().trim().isEmpty())txtSpeedlimitWithoutPas.setText("6");
 		txtThrottlemin.setText(in.readLine());
 		txtThrottlemax.setText(in.readLine());
 		txtUndervoltage.setText(in.readLine());
@@ -195,7 +199,7 @@ public class OSEC extends JFrame {
 
 		cbTorqueSensor.setSelected(Boolean.parseBoolean(in.readLine()));
 		ramp_start.setText(in.readLine());
-		in.readLine();//old options, no longer used
+		txtSpeedlimitWithThrottleOverride.setText(in.readLine());if (txtSpeedlimitWithThrottleOverride.getText().trim().isEmpty())txtSpeedlimitWithThrottleOverride.setText("25");
 		in.readLine();//old options, no longer used
 
 		rdbtnHigh.setSelected(Boolean.parseBoolean(in.readLine()));
@@ -227,6 +231,9 @@ public class OSEC extends JFrame {
 		cbSpeedInfluencesTqSensor.setSelected((acaFlags & 32) > 0);
 		cbPasInverted.setSelected((acaFlags & 64) > 0);
 		cbBypassLowSpeedRegenPiControl.setSelected((acaFlags & 256) > 0);
+		
+		cbDynAssist.setSelected((acaFlags & 512) > 0);
+		cbPwmOff.setSelected((acaFlags & 1024) > 0);
 		in.close();
 	}
 
@@ -240,9 +247,9 @@ public class OSEC extends JFrame {
 			flt_tqCalibrationFactor.setText("1.0");
 		} else {
 			flt_tqCalibrationFactor.setText("0.0");
-			ramp_end.setText("1000");
+			ramp_end.setText("1500");
 			ramp_end.setEditable(true);
-			ramp_start.setText("7000");
+			ramp_start.setText("64000");
 			ramp_start.setEditable(true);
 			flt_tqCalibrationFactor.setEditable(false);
 
@@ -663,6 +670,32 @@ public class OSEC extends JFrame {
 		txtSpeedlimit.setBounds(476, 340, 86, 20);
 		contentPane.add(txtSpeedlimit);
 		txtSpeedlimit.setColumns(10);
+		
+		
+		JLabel lblSpeedLimitwopas = new  JLabel("Without PAS (km/h)");
+		lblSpeedLimitwopas.setBounds(332, 360, 135, 14);
+		lblSpeedLimitwopas.setForeground(Color.GRAY);
+		contentPane.add(lblSpeedLimitwopas);
+
+		txtSpeedlimitWithoutPas = new JTextField();
+		txtSpeedlimitWithoutPas.setText("6");
+		txtSpeedlimitWithoutPas.setBounds(476, 360, 86, 20);
+		contentPane.add(txtSpeedlimitWithoutPas);
+		txtSpeedlimitWithoutPas.setColumns(10);
+		
+		
+		JLabel lblSpeedLimitwto = new JLabel("W. throttle (offroad) (km/h)");
+		lblSpeedLimitwto.setBounds(332, 380, 135, 14);
+		lblSpeedLimitwto.setForeground(Color.GRAY);
+		contentPane.add(lblSpeedLimitwto);
+
+		txtSpeedlimitWithThrottleOverride = new JTextField();
+		txtSpeedlimitWithThrottleOverride.setText("25");
+		txtSpeedlimitWithThrottleOverride.setBounds(476, 380, 86, 20);
+		contentPane.add(txtSpeedlimitWithThrottleOverride);
+		txtSpeedlimitWithThrottleOverride.setColumns(10);
+		
+		
 
 		JLabel lblRideMode = new JLabel("Ride Options");
 		lblRideMode.setFont(new Font("Tahoma", Font.BOLD, 12));
@@ -730,73 +763,85 @@ public class OSEC extends JFrame {
 		cbPasInverted.setBounds(15, 655, 250, 20);
 		cbPasInverted.setForeground(Color.GRAY);
 		contentPane.add(cbPasInverted);
+		
+		cbDynAssist = new JCheckBox("Dynamic Assist Level");
+		cbDynAssist.setSelected(false);
+		cbDynAssist.setBounds(332, 495, 250, 20);
+		cbDynAssist.setForeground(Color.GRAY);
+		contentPane.add(cbDynAssist);
+		
+		cbPwmOff = new JCheckBox("PWM off @freeride");
+		cbPwmOff.setSelected(false);
+		cbPwmOff.setBounds(332, 515, 250, 20);
+		cbPwmOff.setForeground(Color.GRAY);
+		contentPane.add(cbPwmOff);
 
 		JLabel lblMotorSpeed = new JLabel("Motor Speed");
 		lblMotorSpeed.setFont(new Font("Tahoma", Font.BOLD, 12));
-		lblMotorSpeed.setBounds(276, 490, 86, 20);
+		lblMotorSpeed.setBounds(476, 400, 86, 20);
 		contentPane.add(lblMotorSpeed);
 
 		rdbtnNormal = new JRadioButton("Normal");
 		rdbtnNormal.setSelected(true);
 		MotorSpeed.add(rdbtnNormal);
-		rdbtnNormal.setBounds(276, 515, 101, 20);
+		rdbtnNormal.setBounds(476, 425, 101, 20);
 		contentPane.add(rdbtnNormal);
 
 		rdbtnHigh = new JRadioButton("High");
 		MotorSpeed.add(rdbtnHigh);
-		rdbtnHigh.setBounds(276, 535, 101, 20);
+		rdbtnHigh.setBounds(476, 445, 101, 20);
 		contentPane.add(rdbtnHigh);
 
 		lblSpeedSensor = new JLabel("Speed sensor");
 		lblSpeedSensor.setFont(new Font("Tahoma", Font.BOLD, 12));
-		lblSpeedSensor.setBounds(276, 600, 86, 20);
+		lblSpeedSensor.setBounds(332, 400, 86, 20);
 		contentPane.add(lblSpeedSensor);
 
 		rdbtnInternal = new JRadioButton("Internal");
 		rdbtnInternal.setSelected(true);
 		Speedsensor.add(rdbtnInternal);
-		rdbtnInternal.setBounds(276, 625, 101, 20);
+		rdbtnInternal.setBounds(332, 425, 101, 20);
 		contentPane.add(rdbtnInternal);
 
 		rdbtnExternal = new JRadioButton("External");
 		Speedsensor.add(rdbtnExternal);
-		rdbtnExternal.setBounds(276, 645, 101, 20);
+		rdbtnExternal.setBounds(332, 445, 101, 20);
 		contentPane.add(rdbtnExternal);
 
 		lblDiplayType = new JLabel("Display Type");
 		lblDiplayType.setFont(new Font("Tahoma", Font.BOLD, 12));
-		lblDiplayType.setBounds(382, 490, 86, 20);
+		lblDiplayType.setBounds(600, 400, 86, 20);
 		contentPane.add(lblDiplayType);
 
 		rdbtnNodisplay = new JRadioButton("None");
 		rdbtnNodisplay.setSelected(true);
 		displayButtonGroup.add(rdbtnNodisplay);
-		rdbtnNodisplay.setBounds(382, 515, 131, 20);
+		rdbtnNodisplay.setBounds(600, 425, 131, 20);
 		contentPane.add(rdbtnNodisplay);
 
 		rdbtnKingmeterJlcd = new JRadioButton("Kingmeter J-LCD *");
 		displayButtonGroup.add(rdbtnKingmeterJlcd);
-		rdbtnKingmeterJlcd.setBounds(382, 540, 131, 20);
+		rdbtnKingmeterJlcd.setBounds(600, 445, 131, 20);
 		contentPane.add(rdbtnKingmeterJlcd);
 
 		rdbtnKtlcd = new JRadioButton("KT-LCD3");
 		displayButtonGroup.add(rdbtnKtlcd);
-		rdbtnKtlcd.setBounds(382, 565, 131, 20);
+		rdbtnKtlcd.setBounds(750, 425, 131, 20);
 		contentPane.add(rdbtnKtlcd);
 
 		rdbtnBluOsecDisplay = new JRadioButton("BluOsec App");
 		displayButtonGroup.add(rdbtnBluOsecDisplay);
-		rdbtnBluOsecDisplay.setBounds(382, 590, 131, 20);
+		rdbtnBluOsecDisplay.setBounds(750, 445, 131, 20);
 		contentPane.add(rdbtnBluOsecDisplay);
 
 		rdbtnDiganostics = new JRadioButton("Diagnostics");
 		displayButtonGroup.add(rdbtnDiganostics);
-		rdbtnDiganostics.setBounds(382, 615, 131, 20);
+		rdbtnDiganostics.setBounds(750, 465, 131, 20);
 		contentPane.add(rdbtnDiganostics);
 
 		cbResetEeprom = new JCheckBox("Write eeprom magic byte (will reset eeprom)");
-		cbResetEeprom.setSelected(false);
-		cbResetEeprom.setBounds(600, 470, 300, 20);
+		cbResetEeprom.setSelected(true);
+		cbResetEeprom.setBounds(600, 500, 300, 20);
 		contentPane.add(cbResetEeprom);
 
 		JButton btnWriteoptionsbyte = new JButton("Write Option Bytes");
@@ -827,7 +872,7 @@ public class OSEC extends JFrame {
 				}
 			}
 		});
-		btnWriteoptionsbyte.setBounds(600, 565, 320, 51);
+		btnWriteoptionsbyte.setBounds(600, 580, 320, 40);
 		contentPane.add(btnWriteoptionsbyte);
 
 		btnWriteConfiguration = new JButton("Write Configuration");
@@ -871,7 +916,9 @@ public class OSEC extends JFrame {
 					iWriter.println(txtWheelCircumference.getText());
 					pWriter.println(text_to_save);
 
-					iWriter.println("");// old options, unused
+					text_to_save = "#define limit_without_pas " + txtSpeedlimitWithoutPas.getText();
+					iWriter.println(txtSpeedlimitWithoutPas.getText());
+					pWriter.println(text_to_save);
 
 					text_to_save = "#define ADC_THROTTLE_MIN_VALUE " + txtThrottlemin.getText();
 					iWriter.println(txtThrottlemin.getText());
@@ -975,7 +1022,11 @@ public class OSEC extends JFrame {
 					iWriter.println(ramp_start.getText());
 					pWriter.println(text_to_save);
 
-					iWriter.println("");// old options, unused
+					text_to_save = "#define limit_with_throttle_override " + txtSpeedlimitWithThrottleOverride.getText();
+					iWriter.println(txtSpeedlimitWithThrottleOverride.getText());
+					pWriter.println(text_to_save);
+					
+					
 					iWriter.println("");// old options, unused
 
 					if (rdbtnHigh.isSelected()) {
@@ -1053,6 +1104,9 @@ public class OSEC extends JFrame {
 					acaFlags |= (cbPasInverted.isSelected() ? 64 : 0);
 
 					acaFlags |= (cbBypassLowSpeedRegenPiControl.isSelected() ? 256 : 0);
+					
+					acaFlags |= (cbDynAssist.isSelected() ? 512 : 0);
+					acaFlags |= (cbPwmOff.isSelected() ? 1024 : 0);
 
 					iWriter.println(acaFlags);
 
@@ -1086,7 +1140,7 @@ public class OSEC extends JFrame {
 		});
 		btnWriteConfiguration.setFont(new Font("Tahoma", Font.BOLD, 12));
 		btnWriteConfiguration.setForeground(Color.BLUE);
-		btnWriteConfiguration.setBounds(600, 495, 320, 58);
+		btnWriteConfiguration.setBounds(600, 520, 320, 40);
 		contentPane.add(btnWriteConfiguration);
 
 		if (lastSettingsFile != null) {

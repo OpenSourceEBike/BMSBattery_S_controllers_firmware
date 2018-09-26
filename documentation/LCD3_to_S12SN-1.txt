@@ -1,0 +1,145 @@
+S-LCD3 to S12SN communication protocol.
+
+Usable bits from C and P parameters:
+(ui8_rx_buffer [X+2] <- BX)
+
+MX  6 B2&0xF8>>3 + B4&0x20 (+10 on display)
+WZ  5 B2&0x07<<2 + B4&0xC0>>6
+
+P1  8 B3
+P2  2 B4&0x07
+P3  1 B4&0x08
+P4  1 B4&0x10
+P5  8 B0
+
+C1  3 B6&0x38>>3
+C2  3 B6&0x37
+C4  3 B8&0xE0>>5
+C5  4 B7&0x0F
+C12 4 B9&0x0F
+C13 3 B10&0x1C>>2
+C14 2 B7&0x60>>5
+
+Packet consist of 13 bytes. 9600 baud, 8-n-1, byte-by-byte 
+
+B0	B1	B2	B3	B4	B5	B6	B7	B8	B9	B10	B11	B12
+
+(e.g: 12 0 149 160 41 102 18 74 4 20 0 50 14)
+
+for the P and C parameters description please see S-LCD3 user manual available at the bmsbattery.com
+
+B0: parameter P5.
+B1: assist level, front light. 
+b7b6b5b4 b3b2b1b0
+. . . .  . l2l1l0     assist level 0-5, 6-walk (long push down arrow)
+f0. . .  . . . .      bit (mask 0x80) front light, display backlight
+B3: parameter P1.
+B2 and B4 max speed, wheel size, P2,P3,P4
+B2: b7b6b5b4 b3b2b1b0 and B4:b7b6b5b4 b3b2b1b0  
+    s4s3s2s1 s0. . .         . . s5.  . . . .   max speed minus 10,
+    . . . .  . . . .         . . . .  . . . .  km/h;   6bit
+    . . . .  . w4w3w2        w1w0. .  . . . .  wheel size:0x0e-10",
+    . . . .  . . . .         . . . .  . . . .  0x02-12", 0x06-14",
+    . . . .  . . . .         . . . .  . . . .  0x00-16",0x04-18",
+    . . . .  . . . .         . . . .  . . . .  0x08-20", 0x0c-22",
+    . . . .  . . . .         . . . .  . . . .  0x10-24", 0x14"-26",
+    . . . .  . . . .         . . . .  . . . .  0x18-700c 
+    . . . .  . . . .         . . . .  . p2p1p0  par. P2 (B4&&0x07)
+    . . . .  . . . .         . . . .  p0. . .   par. P3 (B4&&0x08)
+    . . . .  . . . .         . . . p0 . . . .   par. P4 (B4&&0x10)
+Example:
+    0 1 1 1  1 . . .         . . 0.   . . . .  25km/h (15+10)
+    1 1 1 1  0 . . .         . . 0.   . . . .  40km/h (30+10)
+    1 0 0 1  0 . . .         . . 1.   . . . .  60km/h (50+10)
+B5: CRC = (xor B0,B1,B2,B3,B4,B6,B7,B8,B9,B10,B11,B12) xor 2.
+B6: parameters C1 and C2
+b7b6b5b4 b3b2b1b0
+. . c2c1 c0. . .       param C1 (mask 0x38)
+. . . .  . c2c1c0      param C2 (mask 0x07) 
+B7: parameter C5 and C7
+b7b6b5b4 b3b2b1b0
+. . . .  c3c2c1c0      param C5 (mask 0x0F)
+. c1c0.  . . . .       param C14 (mask 0x60)
+B8: parameter C4
+b7b6b5b4 b3b2b1b0
+c2c1c0.  . . . .       param C4  (mask 0xE0)
+B9: parameter C12
+b7b6b5b4 b3b2b1b0
+. . . .  c3c2c1c0      param C12  (mask 0x0F)
+B10: parameter C13     
+b7b6b5b4 b3b2b1b0
+. . . c2 c1c0. .       param C13  (mask 0x1C)
+B11: 50 dec (0x32)
+B12: 14 dec (0x0E)
+parameters C3, C6, C7, C8, C9, C10 not sent to MCU
+
+if C11 set to 2 (used to copy LCD to LCD), LCD repeatedly sends 23 bytes, byte by byte, no separators, underlines show not identified values
+
+
+255, wheel diam (in), maxspeed (kmh), level, P1, P2, P3, P4, P5, C1, C2 , C3, C4, C5, C6, C7, C8, 0, 20, C12, C13 ,C14, 55
+
+Example:
+255 26 60 0 160 1 1 0 12 2 1 8 0 10 3 0 1 0 20 4 0 2 55
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

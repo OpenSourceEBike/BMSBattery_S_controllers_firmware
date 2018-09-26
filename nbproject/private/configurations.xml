@@ -4,6 +4,8 @@
     <df root="." name="0">
       <df name=".settings">
       </df>
+      <df name="documentation">
+      </df>
       <df name="experimental settings">
       </df>
       <df name="proven settings">

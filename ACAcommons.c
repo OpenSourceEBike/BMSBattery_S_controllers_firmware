@@ -162,9 +162,9 @@ void updatePasDir(void) {
 void updateRequestedTorque(void) {
 
     if (flt_torquesensorCalibration == 0.0) {
-        ui16_throttle_accumulated -= ui16_throttle_accumulated >> 3;
+        ui16_throttle_accumulated -= ui16_throttle_accumulated >> 4;
         ui16_throttle_accumulated += ui8_adc_read_throttle();
-        ui8_temp = ui16_throttle_accumulated >> 3; //read in value from adc
+        ui8_temp = ui16_throttle_accumulated >> 4; //read in value from adc
         ui16_sum_torque = (uint8_t) map(ui8_temp, ui8_throttle_min_range, ui8_throttle_max_range, 0, SETPOINT_MAX_VALUE); //map throttle to limits
     } else {
         ui16_sum_torque = 0;

@@ -38,11 +38,12 @@ static uint16_t ui16_BatteryCurrent_accumulated = 2496L; //8x current offset, fo
 static uint16_t ui16_BatteryVoltage_accumulated;
 static uint32_t ui32_time_ticks_between_pas_interrupt_accumulated = timeout; // for filtering of PAS value 
 static uint32_t ui32_erps_accumulated; //for filtering of erps
+//static uint32_t ui32_speedlimit_actual_accumulated;
+static uint32_t ui32_sumtorque_accumulated; //it is already smoothed b4 we get it, we want to smooth it even more though for dynamic assist levels
 
 static uint16_t ui16_erps_max = PWM_CYCLES_SECOND / 30; //limit erps to have minimum 30 points on the sine curve for proper commutation
 static float float_temp = 0; //for float calculations
 
-static uint16_t ui16_virtual_capped_pas_activity = 0;
 static uint32_t uint32_temp = 0;
 static uint16_t uint16_temp = 0;
 static uint8_t ui8_temp = 0;
@@ -62,7 +63,16 @@ uint16_t cutoffSetpoint(uint32_t ui32_dutycycle) {
 
 uint16_t aca_setpoint(uint16_t ui16_time_ticks_between_speed_interrupt, uint16_t ui16_time_ticks_between_pas_interrupt, uint16_t sumtorque, uint16_t setpoint_old) {
 
-    // first select current speed limit
+    // select virtual erps speed based on speedsensor type
+#ifdef SPEEDSENSOR_INTERNAL
+    ui16_virtual_erps_speed = (uint16_t) ui32_erps_filtered;
+#endif
+
+#ifdef SPEEDSENSOR_EXTERNAL
+    ui16_virtual_erps_speed = ui16_speed_kph_to_erps_ratio * ((uint16_t) (ui32_SPEED_km_h / 100)) / 1000 // /100/1000 instead of more plausible /1000/100 cause of 16bit overflow
+#endif
+
+            // first select current speed limit
     if (ui8_offroad_state == 255) {
         ui8_speedlimit_actual_kph = 80;
     } else if (ui8_offroad_state > 15 && sumtorque <= 2) { // allow a slight increase based on ui8_offroad_state
@@ -75,16 +85,16 @@ uint16_t aca_setpoint(uint16_t ui16_time_ticks_between_speed_interrupt, uint16_t
         ui8_speedlimit_actual_kph = ui8_speedlimit_kph;
     }
 
-    // select virtual erps speed based on speedsensor type
-#ifdef SPEEDSENSOR_INTERNAL
-    ui16_virtual_erps_speed = (uint16_t) ui32_erps_filtered;
-#endif
+    // average tq over a longer time period (for dynamic assist level)
+    // FIXME not yet fed into calculation, just send to display 
+    ui32_sumtorque_accumulated -= ui32_sumtorque_accumulated >> 10;
+    ui32_sumtorque_accumulated += sumtorque;
+    ui8_assistlevel_dynamic_addon = ui32_sumtorque_accumulated >> 13;
+    if ((ui8_assistlevel_dynamic_addon + (15 & ui8_assistlevel_global)) > 5) {
+        ui8_assistlevel_dynamic_addon = 5 - (15 & ui8_assistlevel_global);
+    }
 
-#ifdef SPEEDSENSOR_EXTERNAL
-    ui16_virtual_erps_speed = ui16_speed_kph_to_erps_ratio * ((uint16_t) (ui32_SPEED_km_h / 100)) / 1000 // /100/1000 instead of more plausible /1000/100 cause of 16bit overflow
-#endif
-
-            ui16_BatteryCurrent_accumulated -= ui16_BatteryCurrent_accumulated >> 3;
+    ui16_BatteryCurrent_accumulated -= ui16_BatteryCurrent_accumulated >> 3;
     ui16_BatteryCurrent_accumulated += ui16_adc_read_motor_total_current();
     ui16_BatteryCurrent = ui16_BatteryCurrent_accumulated >> 3;
 
@@ -97,15 +107,13 @@ uint16_t aca_setpoint(uint16_t ui16_time_ticks_between_speed_interrupt, uint16_t
     ui32_erps_filtered = ui32_erps_accumulated >> 3;
 
     ui32_time_ticks_between_pas_interrupt_accumulated -= ui32_time_ticks_between_pas_interrupt_accumulated >> 3;
-    ui32_time_ticks_between_pas_interrupt_accumulated += ui16_time_ticks_between_pas_interrupt;
-    ui16_time_ticks_between_pas_interrupt_smoothed = ui32_time_ticks_between_pas_interrupt_accumulated >> 3; // now it's filtered
-
-    // set virtual PAS activity that doesn't exceed ui16_s_ramp_start
-    if (ui16_time_ticks_between_pas_interrupt_smoothed > ui16_s_ramp_start) {
-        ui16_virtual_capped_pas_activity = ui16_s_ramp_start;
+    // do not allow values > ramp_start into smoothing cause it makes startup sluggish
+    if (ui16_time_ticks_between_pas_interrupt > ui16_s_ramp_start) {
+        ui32_time_ticks_between_pas_interrupt_accumulated += ui16_s_ramp_start;
     } else {
-        ui16_virtual_capped_pas_activity = ui16_time_ticks_between_pas_interrupt_smoothed;
+        ui32_time_ticks_between_pas_interrupt_accumulated += ui16_time_ticks_between_pas_interrupt;
     }
+    ui16_time_ticks_between_pas_interrupt_smoothed = ui32_time_ticks_between_pas_interrupt_accumulated >> 3;
 
     //check for undervoltage --> disable PWM
     if (ui8_BatteryVoltage < BATTERY_VOLTAGE_MIN_VALUE) {
@@ -156,7 +164,7 @@ uint16_t aca_setpoint(uint16_t ui16_time_ticks_between_speed_interrupt, uint16_t
         //limit max erps
     } else if (ui32_erps_filtered > ui16_erps_max) {
         ui32_dutycycle = PI_control(ui32_erps_filtered, ui16_erps_max); //limit the erps to maximum value to have minimum 30 points of sine table for proper commutation
-        ui8_control_state = 2;
+        ui8_control_state = 0;
 
     } else {
 
@@ -166,18 +174,26 @@ uint16_t aca_setpoint(uint16_t ui16_time_ticks_between_speed_interrupt, uint16_t
 
         // if torque sim is requested. We could check if we could solve this function with just one line with map function...
         if (ui16_s_ramp_end != 0) {
-            if (ui16_virtual_capped_pas_activity > ui16_s_ramp_end) {
+
+            // add dynamic assist level based on past throttle input
+            ui8_temp = ui8_assistlevel_global & 15;
+            
+            if ((ui16_aca_flags & DYNAMIC_ASSIST_LEVEL) == DYNAMIC_ASSIST_LEVEL){
+                ui8_temp += ui8_assistlevel_dynamic_addon;
+            }
+            
+            if (ui16_time_ticks_between_pas_interrupt_smoothed > ui16_s_ramp_end) {
                 //if you are pedaling slower than defined ramp end
                 //or not pedalling at all
                 //current is proportional to cadence
-                uint32_current_target = (i16_assistlevel[ui8_assistlevel_global & 15]*(ui16_battery_current_max_value) / 100);
-                float_temp = 1.0 - (((float) (ui16_virtual_capped_pas_activity - ui16_s_ramp_end)) / ((float) (ui16_s_ramp_start - ui16_s_ramp_end)));
+                uint32_current_target = (i16_assistlevel[ui8_temp]*(ui16_battery_current_max_value) / 100);
+                float_temp = 1.0 - (((float) (ui16_time_ticks_between_pas_interrupt_smoothed - ui16_s_ramp_end)) / ((float) (ui16_s_ramp_start - ui16_s_ramp_end)));
                 uint32_current_target = ((uint16_t) (uint32_current_target)*(uint16_t) (float_temp * 100.0)) / 100 + ui16_current_cal_b;
                 ui8_control_state += 1;
 
                 //in you are pedaling faster than in ramp end defined, desired battery current level is set,
             } else {
-                uint32_current_target = (i16_assistlevel[ui8_assistlevel_global & 15]*(ui16_battery_current_max_value) / 100 + ui16_current_cal_b);
+                uint32_current_target = (i16_assistlevel[ui8_temp]*(ui16_battery_current_max_value) / 100 + ui16_current_cal_b);
                 ui8_control_state += 2;
             }
         }
@@ -193,7 +209,7 @@ uint16_t aca_setpoint(uint16_t ui16_time_ticks_between_speed_interrupt, uint16_t
         // if torque sensor is requested
         if (flt_torquesensorCalibration != 0.0) {
             // flt_torquesensorCalibration is >fummelfactor * NUMBER_OF_PAS_MAGS * 64< (64 cause of <<6)
-            float_temp *= flt_torquesensorCalibration / ((uint32_t) ui16_virtual_capped_pas_activity); // influence of cadence
+            float_temp *= flt_torquesensorCalibration / ((uint32_t) ui16_time_ticks_between_pas_interrupt_smoothed); // influence of cadence
             //increase power linear with speed for convenient commuting :-)
             if ((ui16_aca_flags & SPEED_INFLUENCES_TORQUESENSOR) == SPEED_INFLUENCES_TORQUESENSOR) {
                 float_temp *= ((float) ui16_virtual_erps_speed / ((float) (ui16_speed_kph_to_erps_ratio * ((float) ui8_speedlimit_kph)) / 100.0)); // influence of current speed based on base speed limit
@@ -228,13 +244,13 @@ uint16_t aca_setpoint(uint16_t ui16_time_ticks_between_speed_interrupt, uint16_t
         ui32_dutycycle = PI_control(ui16_BatteryCurrent, uint32_current_target);
 
         //disable PWM if enabled and motor is at standstill and no power is wanted
-        if (uint_PWM_Enable && ui32_erps_filtered == 0 && uint32_current_target == ui16_current_cal_b) {
+        /*if (uint_PWM_Enable && ui32_erps_filtered == 0 && uint32_current_target == ui16_current_cal_b) {
             TIM1_CtrlPWMOutputs(DISABLE);
             uint_PWM_Enable = 0;
-        }
+        }*/
 
         //enable PWM if disabled and voltage is 2V higher than min, some hysteresis and power is wanted
-        if (!uint_PWM_Enable && ui8_BatteryVoltage > BATTERY_VOLTAGE_MIN_VALUE + 8 && ((ui32_erps_filtered != 0) || (uint32_current_target != ui16_current_cal_b))) {
+        if (!uint_PWM_Enable && ui8_BatteryVoltage > BATTERY_VOLTAGE_MIN_VALUE + 8) { //&& ((ui32_erps_filtered != 0) || (uint32_current_target != ui16_current_cal_b))
             TIM1_CtrlPWMOutputs(ENABLE);
             uint_PWM_Enable = 1;
 

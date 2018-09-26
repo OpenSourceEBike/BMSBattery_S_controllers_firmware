@@ -28,6 +28,7 @@ Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301  USA
 #include "uart.h"
 #include "adc.h"
 #include "brake.h"
+#include "ACAeeprom.h"
 #include "interrupts.h"
 //#include "update_setpoint.h" // FIXME, not needed any more?
 #include "ACAcontrollerState.h"
@@ -259,6 +260,16 @@ ui8_tx_buffer [0] = 65;
  // Process received package from the LCD
  //
 
+void digestLcdValues(void){
+    
+    ui8_assistlevel_global=lcd_configuration_variables.ui8_assist_level+80; // always add max regen 
+    
+    if (lcd_configuration_variables.ui8_max_speed != ui8_speedlimit_kph){
+        ui8_speedlimit_kph = lcd_configuration_variables.ui8_max_speed;
+        eeprom_write(OFFSET_MAX_SPEED_DEFAULT, lcd_configuration_variables.ui8_max_speed);
+    }
+}
+
  // see if we have a received package to be processed
 void check_message()
  {
@@ -280,13 +291,26 @@ void check_message()
 	((ui8_crc ^ 3) == ui8_rx_buffer [7])    || // CRC LCD5 Added display 5 Romanta
 	((ui8_crc ^ 2) == ui8_rx_buffer [7])) 	   // CRC LCD3
    { //printf("message valid \r\n");
+       
      lcd_configuration_variables.ui8_assist_level = ui8_rx_buffer [3] & 7;
-     lcd_configuration_variables.ui8_motor_characteristic = ui8_rx_buffer [5];
-     lcd_configuration_variables.ui8_wheel_size = ((ui8_rx_buffer [6] & 192) >> 6) | ((ui8_rx_buffer [4] & 7) << 2);
      lcd_configuration_variables.ui8_max_speed = 10 + ((ui8_rx_buffer [4] & 248) >> 3) | (ui8_rx_buffer [6] & 32);
-     lcd_configuration_variables.ui8_power_assist_control_mode = ui8_rx_buffer [6] & 8;
-     lcd_configuration_variables.ui8_controller_max_current = (ui8_rx_buffer [9] & 15);
-     ui8_assistlevel_global=lcd_configuration_variables.ui8_assist_level+80; // always add max regen 
+     lcd_configuration_variables.ui8_wheel_size = ((ui8_rx_buffer [6] & 192) >> 6) | ((ui8_rx_buffer [4] & 7) << 2);
+     
+     lcd_configuration_variables.ui8_p1 = ui8_rx_buffer[5];
+     lcd_configuration_variables.ui8_p2 = ui8_rx_buffer[6] & 0x07;
+     lcd_configuration_variables.ui8_p3 = ui8_rx_buffer[6] & 0x08;
+     lcd_configuration_variables.ui8_p4 = ui8_rx_buffer[6] & 0x10;
+     lcd_configuration_variables.ui8_p5 = ui8_rx_buffer[2];
+     
+     lcd_configuration_variables.ui8_c1 = (ui8_rx_buffer[8] & 0x38) >>3;
+     lcd_configuration_variables.ui8_c2 = (ui8_rx_buffer[8]  & 0x37);
+     lcd_configuration_variables.ui8_c4 = (ui8_rx_buffer[10]  & 0xE0) >>5;
+     lcd_configuration_variables.ui8_c5 = (ui8_rx_buffer[9]  & 0x0F);
+     lcd_configuration_variables.ui8_c12 = (ui8_rx_buffer[11]  & 0x0F);
+     lcd_configuration_variables.ui8_c13 = (ui8_rx_buffer[12]  & 0x1C) >>2;
+     lcd_configuration_variables.ui8_c14 = (ui8_rx_buffer[9]  & 0x60) >>5;
+     
+     digestLcdValues();
      display_update();
    }
  }
