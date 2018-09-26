@@ -69,6 +69,7 @@ extern uint16_t ui16_speed_kph_to_erps_ratio;
 extern uint32_t ui32_SPEED_km_h; //global variable Speed
 extern uint32_t ui32_SPEED_km_h_accumulated;
 
+extern uint16_t ui16_time_ticks_for_uart_timeout;
 extern uint16_t ui16_time_ticks_for_speed_calculation;
 extern uint16_t ui16_time_ticks_between_speed_interrupt; //Counter for bike speed
 extern uint8_t ui8_SPEED_Flag; //Flag for PAS Interrupt detected

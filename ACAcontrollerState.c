@@ -83,6 +83,7 @@ uint32_t ui32_SPEED_km_h; //global variable Speed
 uint32_t ui32_SPEED_km_h_accumulated;
 uint16_t ui16_time_ticks_between_speed_interrupt = 64000L; //speed in timetics
 uint16_t ui16_time_ticks_for_speed_calculation = 0; //time tics for speed measurement
+uint16_t ui16_time_ticks_for_uart_timeout = 0;
 uint8_t ui8_SPEED_Flag = 0; //flag for SPEED interrupt
 uint8_t ui8_offroad_counter = 0; //counter for offroad switching procedure
 

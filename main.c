@@ -137,6 +137,8 @@ int main(void) {
     printf("System initialized\r\n");
 #endif
     while (1) {
+        
+        uart_send_if_avail();
 
         updateSpeeds();
         updatePasStatus();
