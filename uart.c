@@ -12,6 +12,7 @@
 #include "stm8s.h"
 #include "stm8s_uart2.h"
 #include "motor.h"
+#include "interrupts.h"
 #include "ACAcontrollerState.h"
 
 uint8_t ui8_rx_buffer[128];
@@ -41,9 +42,9 @@ void uart_get_buffered(uint8_t c) {
 		ui8_rx_digestpointer = 0;
 	}
 }
+/*
+void UART2_IRQHandler(void) __interrupt(UART2_IRQHANDLER) {
 
-// needs to run in fastloop
-void uart_digest(void) {
 	// if there is something to read, read it into cyclic buffer
 	if (UART2_GetFlagStatus(UART2_FLAG_RXNE) == RESET) {
 		ui8_rx_buffer[ui8_rx_fillpointer] = UART2_ReceiveData8();
@@ -58,7 +59,22 @@ void uart_digest(void) {
 			ui8_tx_digestpointer = 0;
 		}
 	}
+
+	// catch errors and process them in a reasonable manner which is always to ignore them :)
+	if (UART2_GetITStatus(UART2_IT_IDLE) == SET) {
+		UART2_ReceiveData8(); // -> clear!
+	}
+	if (UART2_GetITStatus(UART2_IT_LBDF) == SET) {
+		UART2_ReceiveData8(); // -> clear!
+	}
+	if (UART2_GetITStatus(UART2_IT_OR) == SET) {
+		UART2_ReceiveData8(); // -> clear!
+	}
+	if (UART2_GetITStatus(UART2_IT_PE) == SET) {
+		UART2_ReceiveData8(); // -> clear!
+	}
 }
+*/
 
 void uart_init(void) {
 	UART2_DeInit();
