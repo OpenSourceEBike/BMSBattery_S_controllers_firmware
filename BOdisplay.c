@@ -203,7 +203,8 @@ void addDetailStateInfos(void) {
 void addBasicStateInfos(void) {
     addPayload(CODE_ACTUAL_MAX_SPEED, ui8_speedlimit_actual_kph);
     addPayload(CODE_ASSIST_LEVEL, ui8_assistlevel_global);
-    addPayload(CODE_ASSIST_LEVEL_DYNAMIC_ADDON, ui8_assistlevel_dynamic_addon);
+	addPayload(CODE_ASSIST_LEVEL_SMOOTHED_PERCENT, ui8_assist_percent_global);
+    addPayload(CODE_ASSIST_LEVEL_DYNAMIC_ADDON, ui8_assist_dynamic_percent_addon);
     addPayload(CODE_BRAKE_STATUS, (int) brake_is_set());
     addPayload(CODE_MOTOR_STATE, ui8_motor_state);
     addPayload(CODE_BATTERY_VOLTAGE, ui8_BatteryVoltage);
@@ -218,7 +219,7 @@ void addBasicStateInfos(void) {
     addPayload(CODE_SETPOINT_STATE, ui8_control_state);
     addPayload(CODE_UPTIME, ui8_uptime);
 
-    // 6 more elements left/avail (max22)
+    // 5 more elements left/avail (max22)
 }
 
 void gatherDynamicPayload(uint8_t function) {

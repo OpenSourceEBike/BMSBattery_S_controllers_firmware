@@ -36,6 +36,7 @@ static int16_t i16_assistlevel[6] = {0, LEVEL_1, LEVEL_2, LEVEL_3, LEVEL_4, LEVE
 static int8_t uint_PWM_Enable = 0; //flag for PWM state
 static uint16_t ui16_BatteryCurrent_accumulated = 2496L; //8x current offset, for filtering or Battery Current
 static uint16_t ui16_BatteryVoltage_accumulated;
+static uint16_t ui16_assist_percent_smoothed;
 static uint32_t ui32_time_ticks_between_pas_interrupt_accumulated = timeout; // for filtering of PAS value 
 static uint32_t ui32_erps_accumulated; //for filtering of erps
 //static uint32_t ui32_speedlimit_actual_accumulated;
@@ -80,14 +81,17 @@ uint16_t aca_setpoint(uint16_t ui16_time_ticks_between_speed_interrupt, uint16_t
 	} else {
 		ui8_speedlimit_actual_kph = ui8_speedlimit_kph;
 	}
-
-	// average tq over a longer time period (for dynamic assist level)
-	// FIXME not yet fed into calculation, just send to display 
+	
+	ui16_assist_percent_smoothed -= ui16_assist_percent_smoothed >> 6;
+	ui16_assist_percent_smoothed += i16_assistlevel[ui8_assistlevel_global & 15];
+	ui8_assist_percent_global = ui16_assist_percent_smoothed >> 6;
+	
+	// average throttle over a longer time period (for dynamic assist level) 
 	ui32_sumthrottle_accumulated -= ui32_sumthrottle_accumulated >> 10;
 	ui32_sumthrottle_accumulated += ui16_sum_throttle;
-	ui8_assistlevel_dynamic_addon = ui32_sumthrottle_accumulated >> 13;
-	if ((ui8_assistlevel_dynamic_addon + (15 & ui8_assistlevel_global)) > 5) {
-		ui8_assistlevel_dynamic_addon = 5 - (15 & ui8_assistlevel_global);
+	ui8_assist_dynamic_percent_addon = ui32_sumthrottle_accumulated >> 10;
+	if ((ui8_assist_dynamic_percent_addon + ui8_assist_percent_global) > 100) {
+		ui8_assist_dynamic_percent_addon = 100 - ui8_assist_percent_global;
 	}
 
 	ui16_BatteryCurrent_accumulated -= ui16_BatteryCurrent_accumulated >> 3;
@@ -173,10 +177,10 @@ uint16_t aca_setpoint(uint16_t ui16_time_ticks_between_speed_interrupt, uint16_t
 		if (flt_torquesensorCalibration == 0.0) {
 
 			// add dynamic assist level based on past throttle input
-			ui8_temp = ui8_assistlevel_global & 15;
+			ui8_temp = ui8_assist_percent_global;
 
 			if ((ui16_aca_flags & DYNAMIC_ASSIST_LEVEL) == DYNAMIC_ASSIST_LEVEL) {
-				ui8_temp += ui8_assistlevel_dynamic_addon;
+				ui8_temp += ui8_assist_dynamic_percent_addon;
 			}
 
 			if (ui16_time_ticks_between_pas_interrupt_smoothed > ui16_s_ramp_end) {
@@ -196,7 +200,7 @@ uint16_t aca_setpoint(uint16_t ui16_time_ticks_between_speed_interrupt, uint16_t
 		}else{ // torque sensor mode
 			
 			float_temp = (float) ui16_sum_torque;
-			float_temp *= ((float) i16_assistlevel[ui8_assistlevel_global & 15] / 100.0);
+			float_temp *= ((float) ui8_assist_percent_global / 100.0);
 
 			if (flt_torquesensorCalibration >1){
 				// flt_torquesensorCalibration is >fummelfactor * NUMBER_OF_PAS_MAGS * 64< (64 cause of <<6)
@@ -225,7 +229,7 @@ uint16_t aca_setpoint(uint16_t ui16_time_ticks_between_speed_interrupt, uint16_t
 
 		// map curret target to assist level, not to maximum value
 		if ((ui16_aca_flags & ASSIST_LVL_AFFECTS_THROTTLE) == 1) {
-			float_temp *= ((float) i16_assistlevel[ui8_assistlevel_global & 15] / 100.0);
+			float_temp *= ((float) ui8_assist_percent_global / 100.0);
 			ui8_control_state += 8;
 		}
 

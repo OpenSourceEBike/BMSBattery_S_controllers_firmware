@@ -47,6 +47,7 @@ typedef enum {
 	CODE_VER_SPEED = ((uint8_t) 0xA6),
 
 	CODE_ASSIST_LEVEL_DYNAMIC_ADDON = ((uint8_t) 0xA7),
+	CODE_ASSIST_LEVEL_SMOOTHED_PERCENT= ((uint8_t) 0xA8),
 
 	CODE_MOTOR_STATE = ((uint8_t) 0xC0),
 	CODE_BATTERY_VOLTAGE = ((uint8_t) 0xC1),
