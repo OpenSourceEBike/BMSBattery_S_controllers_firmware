@@ -39,7 +39,7 @@ static uint16_t ui16_BatteryVoltage_accumulated;
 static uint32_t ui32_time_ticks_between_pas_interrupt_accumulated = timeout; // for filtering of PAS value 
 static uint32_t ui32_erps_accumulated; //for filtering of erps
 //static uint32_t ui32_speedlimit_actual_accumulated;
-static uint32_t ui32_sumtorque_accumulated; //it is already smoothed b4 we get it, we want to smooth it even more though for dynamic assist levels
+static uint32_t ui32_sumthrottle_accumulated; //it is already smoothed b4 we get it, we want to smooth it even more though for dynamic assist levels
 
 static uint16_t ui16_erps_max = PWM_CYCLES_SECOND / 30; //limit erps to have minimum 30 points on the sine curve for proper commutation
 static float float_temp = 0; //for float calculations
@@ -58,10 +58,7 @@ uint16_t cutoffSetpoint(uint32_t ui32_dutycycle) {
 	return ui32_dutycycle;
 }
 
-// note: sumtorque is considered to be throttle input, not torquesensor input
-// to make torquesensor work with ACA probably a few tweaks are needed, as high torquesensor input would override pas input
-
-uint16_t aca_setpoint(uint16_t ui16_time_ticks_between_speed_interrupt, uint16_t ui16_time_ticks_between_pas_interrupt, uint16_t sumtorque, uint16_t setpoint_old) {
+uint16_t aca_setpoint(uint16_t ui16_time_ticks_between_speed_interrupt, uint16_t ui16_time_ticks_between_pas_interrupt, uint16_t setpoint_old) {
 	// select virtual erps speed based on speedsensor type
 #ifdef SPEEDSENSOR_INTERNAL
 	ui16_virtual_erps_speed = (uint16_t) ui32_erps_filtered;
@@ -74,9 +71,9 @@ uint16_t aca_setpoint(uint16_t ui16_time_ticks_between_speed_interrupt, uint16_t
 			// first select current speed limit
 	if (ui8_offroad_state == 255) {
 		ui8_speedlimit_actual_kph = 80;
-	} else if (ui8_offroad_state > 15 && sumtorque <= 2) { // allow a slight increase based on ui8_offroad_state
+	} else if (ui8_offroad_state > 15 && ui16_sum_throttle <= 2) { // allow a slight increase based on ui8_offroad_state
 		ui8_speedlimit_actual_kph = ui8_speedlimit_kph + (ui8_offroad_state - 16);
-	} else if (ui8_offroad_state > 15 && sumtorque > 2) {
+	} else if (ui8_offroad_state > 15 && ui16_sum_throttle > 2) {
 		ui8_speedlimit_actual_kph = ui8_speedlimit_with_throttle_override_kph + (ui8_offroad_state - 16);
 	} else if (ui16_time_ticks_for_pas_calculation > timeout || !PAS_is_active) {
 		ui8_speedlimit_actual_kph = ui8_speedlimit_without_pas_kph;
@@ -86,9 +83,9 @@ uint16_t aca_setpoint(uint16_t ui16_time_ticks_between_speed_interrupt, uint16_t
 
 	// average tq over a longer time period (for dynamic assist level)
 	// FIXME not yet fed into calculation, just send to display 
-	ui32_sumtorque_accumulated -= ui32_sumtorque_accumulated >> 10;
-	ui32_sumtorque_accumulated += sumtorque;
-	ui8_assistlevel_dynamic_addon = ui32_sumtorque_accumulated >> 13;
+	ui32_sumthrottle_accumulated -= ui32_sumthrottle_accumulated >> 10;
+	ui32_sumthrottle_accumulated += ui16_sum_throttle;
+	ui8_assistlevel_dynamic_addon = ui32_sumthrottle_accumulated >> 13;
 	if ((ui8_assistlevel_dynamic_addon + (15 & ui8_assistlevel_global)) > 5) {
 		ui8_assistlevel_dynamic_addon = 5 - (15 & ui8_assistlevel_global);
 	}
@@ -196,19 +193,10 @@ uint16_t aca_setpoint(uint16_t ui16_time_ticks_between_speed_interrupt, uint16_t
 				uint32_current_target = (i16_assistlevel[ui8_temp]*(ui16_battery_current_max_value) / 100 + ui16_current_cal_b);
 				ui8_control_state += 2;
 			}
-		}
-
-		// throttle / torquesensor override following
-		float_temp = (float) sumtorque;
-
-		// map curret target to assist level, not to maximum value
-		if ((ui16_aca_flags & ASSIST_LVL_AFFECTS_THROTTLE) == 1) {
-			float_temp *= ((float) i16_assistlevel[ui8_assistlevel_global & 15] / 100.0);
-			ui8_control_state += 4;
-		}
-		// if torque sensor is requested
-		if (flt_torquesensorCalibration != 0.0) {
+		}else{ // torque sensor mode
 			
+			float_temp = (float) ui16_sum_torque;
+
 			if (flt_torquesensorCalibration >1){
 				// flt_torquesensorCalibration is >fummelfactor * NUMBER_OF_PAS_MAGS * 64< (64 cause of <<6)
 				float_temp *= flt_torquesensorCalibration / ((uint32_t) ui16_time_ticks_between_pas_interrupt_smoothed); // influence of cadence
@@ -220,8 +208,24 @@ uint16_t aca_setpoint(uint16_t ui16_time_ticks_between_speed_interrupt, uint16_t
 				// old version
 				//float_temp *= ((float) ui16_virtual_erps_speed / ((float) (ui16_speed_kph_to_erps_ratio * ((float) ui8_speedlimit_kph)) / 100.0)); // influence of current speed based on base speed limit
 			}
-			ui8_control_state += 8;
+			
+			uint32_current_target = (uint32_t) (float_temp * (float) (ui16_battery_current_max_value) / 255.0 + (float) ui16_current_cal_b);
+			ui8_control_state += 4;
 
+		}
+		
+		
+		// throttle / torquesensor override following
+		if (flt_torquesensorCalibration == 0.0) {
+			float_temp = (float) ui16_sum_throttle;
+		}else{
+			float_temp = (float) ui16_momentary_throttle;
+		}
+
+		// map curret target to assist level, not to maximum value
+		if ((ui16_aca_flags & ASSIST_LVL_AFFECTS_THROTTLE) == 1) {
+			float_temp *= ((float) i16_assistlevel[ui8_assistlevel_global & 15] / 100.0);
+			ui8_control_state += 8;
 		}
 
 		float_temp = float_temp * (float) (ui16_battery_current_max_value) / 255.0 + (float) ui16_current_cal_b; //calculate current target

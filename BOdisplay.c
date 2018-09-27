@@ -213,7 +213,7 @@ void addBasicStateInfos(void) {
     addPayload(CODE_SPEED, ui32_SPEED_km_h);
     addPayload(CODE_BATTERY_CURRENT_HIGH_BYTE, ui16_BatteryCurrent >> 8);
     addPayload(CODE_BATTERY_CURRENT, ui16_BatteryCurrent);
-    addPayload(CODE_SUM_TORQUE, ui16_sum_torque);
+    addPayload(CODE_SUM_TORQUE, ui16_sum_throttle);
     addPayload(CODE_SETPOINT, ui16_setpoint);
     addPayload(CODE_SETPOINT_STATE, ui8_control_state);
     addPayload(CODE_UPTIME, ui8_uptime);

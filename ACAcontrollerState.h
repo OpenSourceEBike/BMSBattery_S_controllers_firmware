@@ -31,6 +31,8 @@ extern uint8_t ui8_assistlevel_dynamic_addon;
 extern uint8_t PAS_act;
 extern uint8_t PAS_is_active;
 extern uint16_t ui16_sum_torque;
+extern uint16_t ui16_sum_throttle;
+extern uint16_t ui16_momentary_throttle;
 extern uint8_t ui8_offroad_state;
 extern uint32_t uint32_current_target;
 extern uint16_t ui16_setpoint;

@@ -21,7 +21,7 @@
 
 #include "config.h"
 
-uint16_t aca_setpoint (uint16_t speed, uint16_t PAS, uint16_t sumtorque, uint16_t setpoint_old );
+uint16_t aca_setpoint (uint16_t speed, uint16_t PAS, uint16_t setpoint_old );
 
 #endif /* ACASETPOINT_H */
 

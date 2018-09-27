@@ -158,7 +158,7 @@ int main(void) {
             updateRequestedTorque(); //now calculates tq for sensor as well
             updateOffroadStatus();
 
-            ui16_setpoint = (uint16_t) aca_setpoint(ui16_time_ticks_between_speed_interrupt, ui16_time_ticks_between_pas_interrupt, ui16_sum_torque, ui16_setpoint); //update setpoint
+            ui16_setpoint = (uint16_t) aca_setpoint(ui16_time_ticks_between_speed_interrupt, ui16_time_ticks_between_pas_interrupt, ui16_setpoint); //update setpoint
 
             //#define DO_CRUISE_CONTROL 1
 #if DO_CRUISE_CONTROL == 1
@@ -167,7 +167,7 @@ int main(void) {
 
             pwm_set_duty_cycle((uint8_t) ui16_setpoint);
 
-            //pwm_set_duty_cycle ((uint8_t)ui16_sum_torque);
+            //pwm_set_duty_cycle ((uint8_t)ui16_sum_throttle);
 
             /****************************************************************************/
             //very slow loop for communication
@@ -182,7 +182,7 @@ int main(void) {
                 }
 
 #ifdef DIAGNOSTICS
-                printf("%u,%u, %u, %u, %u, %u\r\n", ui8_control_state, ui16_setpoint, ui16_motor_speed_erps, ui16_BatteryCurrent, ui16_time_ticks_between_pas_interrupt, ui16_sum_torque);
+                printf("%u,%u, %u, %u, %u, %u\r\n", ui8_control_state, ui16_setpoint, ui16_motor_speed_erps, ui16_BatteryCurrent, ui16_time_ticks_between_pas_interrupt, ui16_sum_throttle);
 
                 //printf("erps %d, motorstate %d, cyclecountertotal %d\r\n", ui16_motor_speed_erps, ui8_motor_state, ui16_PWM_cycles_counter_total);
 
@@ -200,7 +200,7 @@ int main(void) {
                 //printf("%d, %d, %d, %d, %d, %d, %d,\r\n", ui8_position_correction_value, ui16_BatteryCurrent, ui16_setpoint, ui8_regen_throttle, ui16_motor_speed_erps, ui16_ADC_iq_current>>2,ui16_adc_read_battery_voltage());
 
 
-                //printf("correction angle %d, Current %d, Voltage %d, sumtorque %d, setpoint %d, km/h %lu\n",ui8_position_correction_value, i16_deziAmps, ui8_BatteryVoltage, ui16_sum_torque, ui16_setpoint, ui32_SPEED_km_h);
+                //printf("correction angle %d, Current %d, Voltage %d, sumtorque %d, setpoint %d, km/h %lu\n",ui8_position_correction_value, i16_deziAmps, ui8_BatteryVoltage, ui16_sum_throttle, ui16_setpoint, ui32_SPEED_km_h);
 #endif
             }//end of very slow loop
 

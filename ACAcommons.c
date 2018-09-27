@@ -161,26 +161,22 @@ void updatePasDir(void) {
 
 void updateRequestedTorque(void) {
 
+	ui16_momentary_throttle = (uint16_t) map(ui8_adc_read_throttle(), ADC_THROTTLE_MIN_VALUE, ADC_THROTTLE_MAX_VALUE, 0, SETPOINT_MAX_VALUE); //read in recent throttle value for throttle override
+
 	if (flt_torquesensorCalibration == 0.0) {
 		ui16_throttle_accumulated -= ui16_throttle_accumulated >> 4;
 		ui16_throttle_accumulated += ui8_adc_read_throttle();
 		ui8_temp = ui16_throttle_accumulated >> 4; //read in value from adc
-		ui16_sum_torque = (uint8_t) map(ui8_temp, ui8_throttle_min_range, ui8_throttle_max_range, 0, SETPOINT_MAX_VALUE); //map throttle to limits
+		ui16_sum_throttle = (uint8_t) map(ui8_temp, ui8_throttle_min_range, ui8_throttle_max_range, 0, SETPOINT_MAX_VALUE); //map throttle to limits
 	} else {
 
-		// FIXME make this direct behaviour a flag (configurable)
-		if (1) {
-			//read in recent throttle value for override
-			ui16_sum_torque = (uint16_t) map(ui8_adc_read_throttle(), ADC_THROTTLE_MIN_VALUE, ADC_THROTTLE_MAX_VALUE, 0, SETPOINT_MAX_VALUE); //read in recent throttle value for throttle override
-		} else {
-
-			ui16_sum_torque = 0;
-			for (ui8_temp = 0; ui8_temp < NUMBER_OF_PAS_MAGS; ui8_temp++) { // sum up array content
-				ui16_sum_torque += ui16_torque[ui8_temp];
-			}
-
-			ui16_sum_torque /= NUMBER_OF_PAS_MAGS;
+		ui16_sum_torque = 0;
+		for (ui8_temp = 0; ui8_temp < NUMBER_OF_PAS_MAGS; ui8_temp++) { // sum up array content
+			ui16_sum_torque += ui16_torque[ui8_temp];
 		}
+
+		ui16_sum_torque /= NUMBER_OF_PAS_MAGS;
+
 	}
 }
 
