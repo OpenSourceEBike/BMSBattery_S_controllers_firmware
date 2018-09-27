@@ -50,7 +50,7 @@ uint8_t uart_get_buffered(void) {
 }
 // FIXME only needed as long as the other displays do not use new functions
 // and instead have their own irq handler
-#ifdef BLUOSEC
+
 void UART2_IRQHandler(void) __interrupt(UART2_IRQHANDLER) {
 
     // if there is something to read, read it into cyclic buffer
@@ -83,7 +83,7 @@ void UART2_IRQHandler(void) __interrupt(UART2_IRQHANDLER) {
         }
     }
 }
-#endif
+
 void uart_send_if_avail() {
     // if there is something to send and we are not already sending
     if ((ui8_tx_fillpointer != ui8_tx_digestpointer)&&(UART2_GetFlagStatus(UART2_FLAG_TXE) != RESET)) {

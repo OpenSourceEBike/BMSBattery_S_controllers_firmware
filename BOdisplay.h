@@ -124,6 +124,7 @@ typedef enum {
 	ERROR_ADDRESS = ((uint8_t) 0x66)
 } BO_ADDRESS_CODES;
 
-void processBoMessage();
+void display_update();
+void display_init();
 
 #endif /* BODISPLAY_H */

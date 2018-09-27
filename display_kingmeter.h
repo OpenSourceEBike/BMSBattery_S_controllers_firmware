@@ -26,7 +26,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 // Includes
 #include "config.h"
 
-#if (DISPLAY_TYPE & DISPLAY_TYPE_KINGMETER)
+#if defined (DISPLAY_TYPE) && defined (DISPLAY_TYPE_KINGMETER)
 
 
 // Definitions
@@ -186,18 +186,10 @@ typedef struct
 
 }KINGMETER_t;
 
-void KingMeter_Init (KINGMETER_t* KM_ctx);
+
+void display_init();
+void display_update();
 
 
-void KingMeter_Service(KINGMETER_t* KM_ctx);
-
-
-
-
-// Public function prototypes
-
-
-
-
-#endif // KINGMETER_H
 #endif // (DISPLAY_TYPE & DISPLAY_TYPE_KINGMETER)
+#endif // KINGMETER_H

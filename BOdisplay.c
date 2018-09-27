@@ -384,7 +384,11 @@ void digestConfigRequest(uint8_t configAddress, uint8_t requestedCodeLowByte, ui
 
 }
 
-void processBoMessage() {
+void display_init() {
+	// noop just here to have a common interface
+}
+
+void display_update() {
 
 
     uart_fill_rx_packet_buffer(ui8_rx_buffer, 17, &ui8_rx_buffer_counter);

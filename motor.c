@@ -15,7 +15,6 @@
 #include "gpio.h"
 #include "pwm.h"
 #include "config.h"
-#include "display_kingmeter.h"
 #include "adc.h"
 //#include "update_setpoint.h" FIXME, not needed anymore?
 #include "ACAcontrollerState.h"

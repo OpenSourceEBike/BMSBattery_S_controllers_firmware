@@ -143,26 +143,8 @@ int main(void) {
         updateSpeeds();
         updatePasStatus();
 
-#if (DISPLAY_TYPE & DISPLAY_TYPE_KINGMETER)
-        // Update display after message received occurrence
-        if (ui8_msg_received) {
-            ui8_msg_received = 0;
-            //printf("%d\n", ui16_time_ticks_between_speed_interrupt);
-            display_update(); //Display aktualisieren aus Code vom Forumscontroller
-        }
-#endif
-
-#ifdef DISPLAY_TYPE_KT_LCD3
-        // Update display after message received occurrence
-        if (ui8_msg_received) {
-            ui8_msg_received = 0;
-            //printf("%d\n", ui16_time_ticks_between_speed_interrupt);
-            check_message(); //Display aktualisieren aus Code vom Forumscontroller
-        }
-#endif
-
-#ifdef BLUOSEC
-        processBoMessage();
+#if (defined (DISPLAY_TYPE) && defined (DISPLAY_TYPE_KINGMETER)) || defined DISPLAY_TYPE_KT_LCD3 || defined BLUOSEC
+        display_update();
 #endif
 
         // scheduled update of setpoint and duty cycle (slow loop, 50 Hz)
