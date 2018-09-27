@@ -173,7 +173,7 @@ uint16_t aca_setpoint(uint16_t ui16_time_ticks_between_speed_interrupt, uint16_t
 		//if none of the overruling boundaries are concerned, calculate new setpoint
 
 		// if torque sim is requested. We could check if we could solve this function with just one line with map function...
-		if (ui16_s_ramp_end != 0) {
+		if (flt_torquesensorCalibration == 0.0) {
 
 			// add dynamic assist level based on past throttle input
 			ui8_temp = ui8_assistlevel_global & 15;
@@ -207,9 +207,9 @@ uint16_t aca_setpoint(uint16_t ui16_time_ticks_between_speed_interrupt, uint16_t
 			ui8_control_state += 4;
 		}
 		// if torque sensor is requested
-		if (ui16_s_ramp_end == 0) {
+		if (flt_torquesensorCalibration != 0.0) {
 			
-			if (flt_torquesensorCalibration != 0.0){
+			if (flt_torquesensorCalibration >1){
 				// flt_torquesensorCalibration is >fummelfactor * NUMBER_OF_PAS_MAGS * 64< (64 cause of <<6)
 				float_temp *= flt_torquesensorCalibration / ((uint32_t) ui16_time_ticks_between_pas_interrupt_smoothed); // influence of cadence
 			}

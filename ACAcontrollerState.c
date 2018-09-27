@@ -123,6 +123,7 @@ void controllerstate_init(void) {
     ui16_battery_current_max_value = BATTERY_CURRENT_MAX_VALUE;
     ui16_regen_current_max_value = REGEN_CURRENT_MAX_VALUE;
     ui8_current_cal_a = current_cal_a;
+	flt_torquesensorCalibration = TQS_CALIB;
 
     // read in overrides from eeprom if they are > 0, assuming 0s are uninitialized
     eepromHighVal = eeprom_read(OFFSET_BATTERY_CURRENT_MAX_VALUE_HIGH_BYTE);
