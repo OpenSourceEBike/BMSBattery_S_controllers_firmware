@@ -48,6 +48,7 @@ static uint32_t uint32_temp = 0;
 static uint16_t uint16_temp = 0;
 static uint8_t ui8_temp = 0;
 
+
 uint16_t cutoffSetpoint(uint32_t ui32_dutycycle) {
     if (ui32_dutycycle < 5) {
         ui32_dutycycle = 0;
@@ -62,7 +63,7 @@ uint16_t cutoffSetpoint(uint32_t ui32_dutycycle) {
 // to make torquesensor work with ACA probably a few tweaks are needed, as high torquesensor input would override pas input
 
 uint16_t aca_setpoint(uint16_t ui16_time_ticks_between_speed_interrupt, uint16_t ui16_time_ticks_between_pas_interrupt, uint16_t sumtorque, uint16_t setpoint_old) {
-
+  uint8_t ui8_throttle; //read throttle value directly from ADC
     // select virtual erps speed based on speedsensor type
 #ifdef SPEEDSENSOR_INTERNAL
     ui16_virtual_erps_speed = (uint16_t) ui32_erps_filtered;
@@ -215,9 +216,14 @@ uint16_t aca_setpoint(uint16_t ui16_time_ticks_between_speed_interrupt, uint16_t
                 float_temp *= ((float) ui16_virtual_erps_speed / ((float) (ui16_speed_kph_to_erps_ratio * ((float) ui8_speedlimit_kph)) / 100.0)); // influence of current speed based on base speed limit
             }
             ui8_control_state += 8;
+            //read in recent throttle value for override check, a little confusing: uint32_current_target calculated directly from throttle input.
+            ui8_throttle = map (ui8_adc_read_throttle () , ADC_THROTTLE_MIN_VALUE, ADC_THROTTLE_MAX_VALUE, 0, SETPOINT_MAX_VALUE); //read in recent throttle value for throttle override
+            uint32_current_target=(uint32_t)((float)ui8_throttle*(float)(ui16_battery_current_max_value)/255.0*(1-(float)ui32_erps_filtered/2/(float)(ui16_speed_kph_to_erps_ratio * ((float) ui8_speedlimit_kph)))+(float)ui16_current_cal_b); //calculate current target, ramp down linear with speed. Risk: Value is getting negative if speed>2*speedlimit
+
         }
 
         float_temp = float_temp * (float) (ui16_battery_current_max_value) / 255.0 + (float) ui16_current_cal_b; //calculate current target
+
 
         if ((uint32_t) float_temp > uint32_current_target) {
             uint32_current_target = (uint32_t) float_temp; //override torque simulation with throttle / torquesensor
