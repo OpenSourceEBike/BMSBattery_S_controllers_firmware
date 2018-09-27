@@ -204,9 +204,7 @@ uint16_t aca_setpoint(uint16_t ui16_time_ticks_between_speed_interrupt, uint16_t
 			
 			//increase power linear with speed for convenient commuting :-)
 			if ((ui16_aca_flags & SPEED_INFLUENCES_TORQUESENSOR) == SPEED_INFLUENCES_TORQUESENSOR) {
-				float_temp *= (1 - (float) ui16_virtual_erps_speed / 2 / (float) (ui16_speed_kph_to_erps_ratio * ((float) ui8_speedlimit_kph))); //ramp down linear with speed. Risk: Value is getting negative if speed>2*speedlimit
-				// old version
-				//float_temp *= ((float) ui16_virtual_erps_speed / ((float) (ui16_speed_kph_to_erps_ratio * ((float) ui8_speedlimit_kph)) / 100.0)); // influence of current speed based on base speed limit
+				float_temp *= ((float) ui16_virtual_erps_speed / ((float) (ui16_speed_kph_to_erps_ratio * ((float) ui8_speedlimit_kph)) / 100.0)); // influence of current speed based on base speed limit
 			}
 			
 			uint32_current_target = (uint32_t) (float_temp * (float) (ui16_battery_current_max_value) / 255.0 + (float) ui16_current_cal_b);
@@ -219,7 +217,9 @@ uint16_t aca_setpoint(uint16_t ui16_time_ticks_between_speed_interrupt, uint16_t
 		if (flt_torquesensorCalibration == 0.0) {
 			float_temp = (float) ui16_sum_throttle;
 		}else{
-			float_temp = (float) ui16_momentary_throttle;
+			float_temp = (float) ui16_momentary_throttle; // or ui16_sum_throttle
+			float_temp *= (1 - (float) ui16_virtual_erps_speed / 2 / (float) (ui16_speed_kph_to_erps_ratio * ((float) ui8_speedlimit_kph))); //ramp down linear with speed. Risk: Value is getting negative if speed>2*speedlimit
+				
 		}
 
 		// map curret target to assist level, not to maximum value
