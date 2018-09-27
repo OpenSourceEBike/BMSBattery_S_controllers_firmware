@@ -160,6 +160,7 @@ uint16_t aca_setpoint(uint16_t ui16_time_ticks_between_speed_interrupt, uint16_t
         if (((ui16_aca_flags & BYPASS_LOW_SPEED_REGEN_PI_CONTROL) == BYPASS_LOW_SPEED_REGEN_PI_CONTROL) && (ui32_dutycycle == 0)) {
             //try to get best regen at Low Speeds for BionX IGH
             ui32_dutycycle = ui16_virtual_erps_speed * 2;
+            ui8_control_state -= 8;
         }
 
         //limit max erps
