@@ -196,6 +196,7 @@ uint16_t aca_setpoint(uint16_t ui16_time_ticks_between_speed_interrupt, uint16_t
 		}else{ // torque sensor mode
 			
 			float_temp = (float) ui16_sum_torque;
+			float_temp *= ((float) i16_assistlevel[ui8_assistlevel_global & 15] / 100.0);
 
 			if (flt_torquesensorCalibration >1){
 				// flt_torquesensorCalibration is >fummelfactor * NUMBER_OF_PAS_MAGS * 64< (64 cause of <<6)
