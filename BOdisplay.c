@@ -295,11 +295,15 @@ void digestConfigRequest(uint8_t configAddress, uint8_t requestedCodeLowByte, ui
             addPayload(requestedCodeLowByte, ui8_assistlevel_global);
             break;
 		case CODE_ASSIST_PERCENT_WANTED:
+			// also sends new (fake) level in high byte
             ui8_assist_percent_wanted = requestedValue;
+			ui8_assistlevel_global = requestedValueHighByte;
             if (configAddress == EEPROM_ADDRESS) {
                 eeprom_write(OFFSET_ASSIST_PERCENT_WANTED, requestedValue);
+				eeprom_write(OFFSET_ASSIST_LEVEL, requestedValueHighByte);
             }
             addPayload(requestedCodeLowByte, ui8_assist_percent_wanted);
+			addPayload(CODE_ASSIST_LEVEL, ui8_assistlevel_global);
             break;
         case CODE_THROTTLE_MIN_RANGE:
             ui8_throttle_min_range = requestedValue;
