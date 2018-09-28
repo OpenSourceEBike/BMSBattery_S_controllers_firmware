@@ -66,7 +66,7 @@ uint16_t aca_setpoint(uint16_t ui16_time_ticks_between_speed_interrupt, uint16_t
 #endif
 
 #ifdef SPEEDSENSOR_EXTERNAL
-	ui16_virtual_erps_speed = ui16_speed_kph_to_erps_ratio * ((uint16_t) (ui32_SPEED_km_h / 100)) / 1000 // /100/1000 instead of more plausible /1000/100 cause of 16bit overflow
+	ui16_virtual_erps_speed = ui16_speed_kph_to_erps_ratio * ((uint16_t) (ui32_SPEED_km_h / 100)) / 1000; // /100/1000 instead of more plausible /1000/100 cause of 16bit overflow
 #endif
 
 			// first select current speed limit

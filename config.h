@@ -40,7 +40,7 @@
 #define RAMP_START 0
 #define limit_with_throttle_override 35
 #define PWM_CYCLES_SECOND 15625L
-#define SPEEDSENSOR_INTERNAL
+#define SPEEDSENSOR_EXTERNAL
 #define BLUOSEC
 #define TQS_CALIB 1000.0
 #define ACA 426
