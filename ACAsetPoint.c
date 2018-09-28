@@ -82,14 +82,14 @@ uint16_t aca_setpoint(uint16_t ui16_time_ticks_between_speed_interrupt, uint16_t
 		ui8_speedlimit_actual_kph = ui8_speedlimit_kph;
 	}
 
-	// 15 means levels are switched of, use wanted percentage directly instead
-	ui16_assist_percent_smoothed -= ui16_assist_percent_smoothed >> 6;
-	if ((ui8_assistlevel_global & 15) != 15) {
+	// >=8 means levels are switched of, use wanted percentage directly instead
+	ui16_assist_percent_smoothed -= ui16_assist_percent_smoothed >> 4;
+	if ((ui8_assistlevel_global & 15) < 8) {
 		ui16_assist_percent_smoothed += i16_assistlevel[ui8_assistlevel_global & 15];
 	} else {
 		ui16_assist_percent_smoothed += ui8_assist_percent_wanted;
 	}
-	ui8_assist_percent_actual = ui16_assist_percent_smoothed >> 6;
+	ui8_assist_percent_actual = ui16_assist_percent_smoothed >> 4;
 
 
 	// average throttle over a longer time period (for dynamic assist level) 
