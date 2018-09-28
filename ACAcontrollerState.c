@@ -45,7 +45,8 @@ uint32_t uint32_icc_signals = 0;
 
 uint8_t ui8_assist_dynamic_percent_addon = 0;
 uint8_t ui8_assistlevel_global = 83; // 3 + max regen
-uint8_t ui8_assist_percent_global = 20;
+uint8_t ui8_assist_percent_actual = 20;
+uint8_t ui8_assist_percent_wanted =20;
 uint8_t PAS_act = 3; //recent PAS direction reading
 uint8_t PAS_is_active = 0;
 uint16_t ui16_sum_torque = 0; 
@@ -149,6 +150,8 @@ void controllerstate_init(void) {
     if (eepromVal > 0) ui8_current_cal_a = eepromVal;
     eepromVal = eeprom_read(OFFSET_ASSIST_LEVEL);
     if (eepromVal > 0) ui8_assistlevel_global = eepromVal;
+	eepromVal = eeprom_read(OFFSET_ASSIST_PERCENT_WANTED);
+    if (eepromVal > 0) ui8_assist_percent_wanted = eepromVal;
     eepromVal = eeprom_read(OFFSET_THROTTLE_MIN_RANGE);
     if (eepromVal > 0) ui8_throttle_min_range = eepromVal;
     eepromVal = eeprom_read(OFFSET_THROTTLE_MAX_RANGE);

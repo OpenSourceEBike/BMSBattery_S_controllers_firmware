@@ -27,6 +27,7 @@ extern uint8_t eeprom_magic_byte;
 
 typedef enum {
 	OFFSET_MOTOR_ANGLE = ((uint8_t) 0x01),
+	OFFSET_ASSIST_PERCENT_WANTED = ((uint8_t) 0x02),
 	OFFSET_ASSIST_LEVEL = ((uint8_t) 0x03),
 	OFFSET_THROTTLE_MIN_RANGE = ((uint8_t) 0x04),
 	OFFSET_THROTTLE_MAX_RANGE = ((uint8_t) 0x05),

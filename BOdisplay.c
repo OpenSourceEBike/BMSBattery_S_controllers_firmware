@@ -145,7 +145,6 @@ void addConfigStateInfos(void) {
     addPayload(CODE_MAX_SPEED_WITH_THROTTLE_OVERRIDE, ui8_speedlimit_with_throttle_override_kph);
     addPayload(CODE_ACA_FLAGS_HIGH_BYTE, ui16_aca_flags >> 8);
     addPayload(CODE_ACA_FLAGS, ui16_aca_flags);
-    addPayload(CODE_ASSIST_LEVEL, ui8_assistlevel_global);
     addPayload(CODE_THROTTLE_MIN_RANGE, ui8_throttle_min_range);
     addPayload(CODE_THROTTLE_MAX_RANGE, ui8_throttle_max_range);
     addPayload(CODE_MOTOR_SPECIFIC_ANGLE, ui8_s_motor_angle);
@@ -157,7 +156,7 @@ void addConfigStateInfos(void) {
     addPayload(CODE_MAX_BAT_CURRENT_HIGH_BYTE, ui16_battery_current_max_value >> 8);
     addPayload(CODE_MAX_BAT_CURRENT, ui16_battery_current_max_value);
     addPayload(CODE_MAX_REGEN_CURRENT, ui16_regen_current_max_value);
-    // 0 more elements left/avail (max22)
+    // 1 more elements left/avail (max22)
 
 }
 
@@ -203,7 +202,8 @@ void addDetailStateInfos(void) {
 void addBasicStateInfos(void) {
     addPayload(CODE_ACTUAL_MAX_SPEED, ui8_speedlimit_actual_kph);
     addPayload(CODE_ASSIST_LEVEL, ui8_assistlevel_global);
-	addPayload(CODE_ASSIST_LEVEL_SMOOTHED_PERCENT, ui8_assist_percent_global);
+	addPayload(CODE_ASSIST_LEVEL_SMOOTHED_PERCENT, ui8_assist_percent_actual);
+	addPayload(CODE_ASSIST_PERCENT_WANTED, ui8_assist_percent_wanted);
     addPayload(CODE_ASSIST_LEVEL_DYNAMIC_ADDON, ui8_assist_dynamic_percent_addon);
     addPayload(CODE_BRAKE_STATUS, (int) brake_is_set());
     addPayload(CODE_MOTOR_STATE, ui8_motor_state);
@@ -219,7 +219,7 @@ void addBasicStateInfos(void) {
     addPayload(CODE_SETPOINT_STATE, ui8_control_state);
     addPayload(CODE_UPTIME, ui8_uptime);
 
-    // 5 more elements left/avail (max22)
+    // 4 more elements left/avail (max22)
 }
 
 void gatherDynamicPayload(uint8_t function) {
@@ -293,6 +293,13 @@ void digestConfigRequest(uint8_t configAddress, uint8_t requestedCodeLowByte, ui
                 eeprom_write(OFFSET_ASSIST_LEVEL, requestedValue);
             }
             addPayload(requestedCodeLowByte, ui8_assistlevel_global);
+            break;
+		case CODE_ASSIST_PERCENT_WANTED:
+            ui8_assist_percent_wanted = requestedValue;
+            if (configAddress == EEPROM_ADDRESS) {
+                eeprom_write(OFFSET_ASSIST_PERCENT_WANTED, requestedValue);
+            }
+            addPayload(requestedCodeLowByte, ui8_assist_percent_wanted);
             break;
         case CODE_THROTTLE_MIN_RANGE:
             ui8_throttle_min_range = requestedValue;

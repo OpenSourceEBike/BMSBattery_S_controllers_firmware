@@ -69,7 +69,7 @@ uint16_t aca_setpoint(uint16_t ui16_time_ticks_between_speed_interrupt, uint16_t
 	ui16_virtual_erps_speed = ui16_speed_kph_to_erps_ratio * ((uint16_t) (ui32_SPEED_km_h / 100)) / 1000; // /100/1000 instead of more plausible /1000/100 cause of 16bit overflow
 #endif
 
-			// first select current speed limit
+	// first select current speed limit
 	if (ui8_offroad_state == 255) {
 		ui8_speedlimit_actual_kph = 80;
 	} else if (ui8_offroad_state > 15 && ui16_sum_throttle <= 2) { // allow a slight increase based on ui8_offroad_state
@@ -81,17 +81,23 @@ uint16_t aca_setpoint(uint16_t ui16_time_ticks_between_speed_interrupt, uint16_t
 	} else {
 		ui8_speedlimit_actual_kph = ui8_speedlimit_kph;
 	}
-	
+
+	// 15 means levels are switched of, use wanted percentage directly instead
 	ui16_assist_percent_smoothed -= ui16_assist_percent_smoothed >> 6;
-	ui16_assist_percent_smoothed += i16_assistlevel[ui8_assistlevel_global & 15];
-	ui8_assist_percent_global = ui16_assist_percent_smoothed >> 6;
-	
+	if ((ui8_assistlevel_global & 15) != 15) {
+		ui16_assist_percent_smoothed += i16_assistlevel[ui8_assistlevel_global & 15];
+	} else {
+		ui16_assist_percent_smoothed += ui8_assist_percent_wanted;
+	}
+	ui8_assist_percent_actual = ui16_assist_percent_smoothed >> 6;
+
+
 	// average throttle over a longer time period (for dynamic assist level) 
 	ui32_sumthrottle_accumulated -= ui32_sumthrottle_accumulated >> 10;
 	ui32_sumthrottle_accumulated += ui16_sum_throttle;
 	ui8_assist_dynamic_percent_addon = ui32_sumthrottle_accumulated >> 10;
-	if ((ui8_assist_dynamic_percent_addon + ui8_assist_percent_global) > 100) {
-		ui8_assist_dynamic_percent_addon = 100 - ui8_assist_percent_global;
+	if ((ui8_assist_dynamic_percent_addon + ui8_assist_percent_actual) > 100) {
+		ui8_assist_dynamic_percent_addon = 100 - ui8_assist_percent_actual;
 	}
 
 	ui16_BatteryCurrent_accumulated -= ui16_BatteryCurrent_accumulated >> 3;
@@ -177,7 +183,7 @@ uint16_t aca_setpoint(uint16_t ui16_time_ticks_between_speed_interrupt, uint16_t
 		if (flt_torquesensorCalibration == 0.0) {
 
 			// add dynamic assist level based on past throttle input
-			ui8_temp = ui8_assist_percent_global;
+			ui8_temp = ui8_assist_percent_actual;
 
 			if ((ui16_aca_flags & DYNAMIC_ASSIST_LEVEL) == DYNAMIC_ASSIST_LEVEL) {
 				ui8_temp += ui8_assist_dynamic_percent_addon;
@@ -187,49 +193,49 @@ uint16_t aca_setpoint(uint16_t ui16_time_ticks_between_speed_interrupt, uint16_t
 				//if you are pedaling slower than defined ramp end
 				//or not pedalling at all
 				//current is proportional to cadence
-				uint32_current_target = (ui8_temp*(ui16_battery_current_max_value) / 100);
+				uint32_current_target = (ui8_temp * (ui16_battery_current_max_value) / 100);
 				float_temp = 1.0 - (((float) (ui16_time_ticks_between_pas_interrupt_smoothed - ui16_s_ramp_end)) / ((float) (ui16_s_ramp_start - ui16_s_ramp_end)));
 				uint32_current_target = ((uint16_t) (uint32_current_target)*(uint16_t) (float_temp * 100.0)) / 100 + ui16_current_cal_b;
 				ui8_control_state += 1;
 
 				//in you are pedaling faster than in ramp end defined, desired battery current level is set,
 			} else {
-				uint32_current_target = (ui8_temp*(ui16_battery_current_max_value) / 100 + ui16_current_cal_b);
+				uint32_current_target = (ui8_temp * (ui16_battery_current_max_value) / 100 + ui16_current_cal_b);
 				ui8_control_state += 2;
 			}
-		}else{ // torque sensor mode
-			
-			float_temp = (float) ui16_sum_torque;
-			float_temp *= ((float) ui8_assist_percent_global / 100.0);
+		} else { // torque sensor mode
 
-			if (flt_torquesensorCalibration >1){
+			float_temp = (float) ui16_sum_torque;
+			float_temp *= ((float) ui8_assist_percent_actual / 100.0);
+
+			if (flt_torquesensorCalibration > 1) {
 				// flt_torquesensorCalibration is >fummelfactor * NUMBER_OF_PAS_MAGS * 64< (64 cause of <<6)
 				float_temp *= flt_torquesensorCalibration / ((uint32_t) ui16_time_ticks_between_pas_interrupt_smoothed); // influence of cadence
 			}
-			
+
 			//increase power linear with speed for convenient commuting :-)
 			if ((ui16_aca_flags & SPEED_INFLUENCES_TORQUESENSOR) == SPEED_INFLUENCES_TORQUESENSOR) {
-				float_temp *= (1.0+(float) ui16_virtual_erps_speed / ((float) (ui16_speed_kph_to_erps_ratio * ((float) ui8_speedlimit_kph)) / 100.0)); // influence of current speed based on base speed limit
+				float_temp *= (1.0 + (float) ui16_virtual_erps_speed / ((float) (ui16_speed_kph_to_erps_ratio * ((float) ui8_speedlimit_kph)) / 100.0)); // influence of current speed based on base speed limit
 			}
-			
+
 			uint32_current_target = (uint32_t) (float_temp * (float) (ui16_battery_current_max_value) / 255.0 + (float) ui16_current_cal_b);
 			ui8_control_state += 4;
 
 		}
-		
-		
+
+
 		// throttle / torquesensor override following
 		if (flt_torquesensorCalibration == 0.0) {
 			float_temp = (float) ui16_sum_throttle;
-		}else{
+		} else {
 			float_temp = (float) ui16_momentary_throttle; // or ui16_sum_throttle
 			float_temp *= (1 - (float) ui16_virtual_erps_speed / 2 / (float) (ui16_speed_kph_to_erps_ratio * ((float) ui8_speedlimit_kph))); //ramp down linear with speed. Risk: Value is getting negative if speed>2*speedlimit
-				
+
 		}
 
 		// map curret target to assist level, not to maximum value
 		if ((ui16_aca_flags & ASSIST_LVL_AFFECTS_THROTTLE) == 1) {
-			float_temp *= ((float) ui8_assist_percent_global / 100.0);
+			float_temp *= ((float) ui8_assist_percent_actual / 100.0);
 			ui8_control_state += 8;
 		}
 

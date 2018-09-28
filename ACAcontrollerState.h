@@ -26,7 +26,8 @@ extern uint32_t uint32_icc_signals; // inter component communication, very simpl
 extern uint8_t ui8_throttle_min_range;
 extern uint8_t ui8_throttle_max_range;
 extern uint8_t ui8_control_state;
-extern uint8_t ui8_assist_percent_global;
+extern uint8_t ui8_assist_percent_actual;
+extern uint8_t ui8_assist_percent_wanted;
 extern uint8_t ui8_assistlevel_global; //assist level for regen (high 4 bits) and torque (low 4 bits)
 extern uint8_t ui8_assist_dynamic_percent_addon;
 extern uint8_t PAS_act;
