@@ -187,14 +187,14 @@ uint16_t aca_setpoint(uint16_t ui16_time_ticks_between_speed_interrupt, uint16_t
 				//if you are pedaling slower than defined ramp end
 				//or not pedalling at all
 				//current is proportional to cadence
-				uint32_current_target = (i16_assistlevel[ui8_temp]*(ui16_battery_current_max_value) / 100);
+				uint32_current_target = (ui8_temp*(ui16_battery_current_max_value) / 100);
 				float_temp = 1.0 - (((float) (ui16_time_ticks_between_pas_interrupt_smoothed - ui16_s_ramp_end)) / ((float) (ui16_s_ramp_start - ui16_s_ramp_end)));
 				uint32_current_target = ((uint16_t) (uint32_current_target)*(uint16_t) (float_temp * 100.0)) / 100 + ui16_current_cal_b;
 				ui8_control_state += 1;
 
 				//in you are pedaling faster than in ramp end defined, desired battery current level is set,
 			} else {
-				uint32_current_target = (i16_assistlevel[ui8_temp]*(ui16_battery_current_max_value) / 100 + ui16_current_cal_b);
+				uint32_current_target = (ui8_temp*(ui16_battery_current_max_value) / 100 + ui16_current_cal_b);
 				ui8_control_state += 2;
 			}
 		}else{ // torque sensor mode
