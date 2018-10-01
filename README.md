@@ -198,13 +198,15 @@ The tool is started by double-clicking on "OSEC Parameter Configurator. jar" in 
 
 * **Motor Speed** -> High: PWM frequency 20.833 kHz, for very fast rotating motors  
 
-* **Display Type -> None**: No display support. However, parameters (currently fixed in the code) can be sent to a laptop or to the smartphone via a Bluetooth module. To change the output parameters, see the tab "5.Programming new features". Without display, support level 3 is preset. Connect Rx of the display connector to GND (yellow to black) if you don't want to sent any data to the controller, even if you use Tx for diagnostics.  
+* **Display Type -> None**: No display support.
+
+* **Display Type -> BluOsec**: Bluetooth module needed & Android App. see "Supported Displays" below.
 
 * **Display Type -> Kingmeter J-LCD**: Support of the Kingmeter J-LCD and the Lishui Forerider-App. At present, only the normal operating mode works, the programming mode of the display and the app are not supported.  
 
 * **Display Type -> KT-LCD3**: Support of Kunteng LCD3, only the speed and wheel size are used. All other settings are currently without function.  
 
-* **Display Type -> Diagnostics**: If this option is activated, the display protocol is not sent via UART, but some selected internal variables. These five values are sent as default:  
+* **Display Type -> Diagnostics**: If this option is activated, the display protocol is not sent via UART, but some selected internal variables. Connect Rx of the display connector to GND (yellow to black) if you don't want to sent any data to the controller, even if you use Tx for diagnostics. These five values are sent as default:  
 1. duty cycle of the PWM (0... 255)  
 2. ERPS  
 3. battery current (10bit AD converter value)  
@@ -258,9 +260,14 @@ You have to edit the path to your STVP and SDCC installation in the .bat / sh fi
 1. clean the previous built files: $ make -f Makefile_linux clean
 2. build the firmware as main.bin and main.elf: $ make -f Makefile_linux
 
+
+# Supported Displays
+The current code has basic functions for kingmeter J-LCD and LCD3/5 implemented, which also allows the use of the Lishui Bluetooth module and the corresponding Forerider app.
+
+The BluOSEC Android App is in development so that a cheap  [Phone](https://www.kimovil.com/en/compare-smartphones/f_max_d+eurPrice.50) can be used as a display alternative.
+
+In order to use it you need to buy a cheap blutooth module, for instance a HC-05.
+Blue and Red wires on the display  connector need to be shorted for controller startup, blutooth module needs to be connected as follow: Yellow and Green is Tx/Rx, Black is GND. For 5V you have to buy a tiny 50>5V Buck Converter and connect it to the Red wire. Do **NOT** connect the module directly to the 36/48V Red wire! Do **NOT** connect it to any other PAS or throttle Red wire as the controller's internal power supply can't handle that!
+
 # Want to help?
 There is always things to improve, don't hesitate to get involved if you have improvements in mind.
-
-# About displays
-The current code has basic functions for kingmeter J-LCD and LCD3/5 implemented, which also allows the use of the Lishui Bluetooth module and the corresponding Forerider app.
-The BluOSEC Android App is in development so that a cheap  [Phone](https://www.kimovil.com/en/compare-smartphones/f_max_d+eurPrice.50) can be used in conjunction with a blutooth module as a display alternative.
