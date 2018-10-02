@@ -187,7 +187,7 @@ void addDetailStateInfos(void) {
 	 addPayload(CODE_THROTTLE_HIGH_BYTE, ui16_throttle_accumulated >> 8);
 	 addPayload(CODE_THROTTLE, ui16_throttle_accumulated);}
     else {
-	 addPayload(CODE_THROTTLE_HIGH_BYTE, ui16_throttle_accumulated >> 4); //workaround to get momentary throttle to BluOSEC display
+	 addPayload(CODE_THROTTLE_HIGH_BYTE, ui16_momentary_throttle >> 4); //workaround to get momentary throttle to BluOSEC display
 	 addPayload(CODE_THROTTLE, ui16_momentary_throttle<<4);}
 
 
