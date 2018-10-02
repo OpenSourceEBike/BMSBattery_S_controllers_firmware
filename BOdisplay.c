@@ -183,8 +183,14 @@ void addDetailStateInfos(void) {
     addPayload(CODE_PAS_DIR, PAS_is_active);
     addPayload(CODE_CORRECTION_VALUE, ui8_position_correction_value);
     addPayload(CODE_PHASE_CURRENT, ui16_ADC_iq_current >> 2);
-    addPayload(CODE_THROTTLE_HIGH_BYTE, ui16_throttle_accumulated >> 8);
-    addPayload(CODE_THROTTLE, ui16_throttle_accumulated);
+    if (flt_torquesensorCalibration == 0.0) {
+	 addPayload(CODE_THROTTLE_HIGH_BYTE, ui16_throttle_accumulated >> 8);
+	 addPayload(CODE_THROTTLE, ui16_throttle_accumulated);}
+    else {
+	 addPayload(CODE_THROTTLE_HIGH_BYTE, ui16_throttle_accumulated >> 4); //workaround to get momentary throttle to BluOSEC display
+	 addPayload(CODE_THROTTLE, ui16_momentary_throttle<<4);}
+
+
     addPayload(CODE_CURRENT_TARGET_HIGH_BYTE, uint32_current_target >> 8);
     addPayload(CODE_CURRENT_TARGET, uint32_current_target);
     addPayload(CODE_CURRENT_RAMP_HIGH_BYTE, ui16_time_ticks_between_pas_interrupt_smoothed >> 8);
@@ -202,8 +208,8 @@ void addDetailStateInfos(void) {
 void addBasicStateInfos(void) {
     addPayload(CODE_ACTUAL_MAX_SPEED, ui8_speedlimit_actual_kph);
     addPayload(CODE_ASSIST_LEVEL, ui8_assistlevel_global);
-	addPayload(CODE_ASSIST_LEVEL_SMOOTHED_PERCENT, ui8_assist_percent_actual);
-	addPayload(CODE_ASSIST_PERCENT_WANTED, ui8_assist_percent_wanted);
+    addPayload(CODE_ASSIST_LEVEL_SMOOTHED_PERCENT, ui8_assist_percent_actual);
+    addPayload(CODE_ASSIST_PERCENT_WANTED, ui8_assist_percent_wanted);
     addPayload(CODE_ASSIST_LEVEL_DYNAMIC_ADDON, ui8_assist_dynamic_percent_addon);
     addPayload(CODE_BRAKE_STATUS, (int) brake_is_set());
     addPayload(CODE_MOTOR_STATE, ui8_motor_state);
@@ -214,7 +220,7 @@ void addBasicStateInfos(void) {
     addPayload(CODE_SPEED, ui32_SPEED_km_h);
     addPayload(CODE_BATTERY_CURRENT_HIGH_BYTE, ui16_BatteryCurrent >> 8);
     addPayload(CODE_BATTERY_CURRENT, ui16_BatteryCurrent);
-    addPayload(CODE_SUM_TORQUE, ui16_sum_throttle);
+    addPayload(CODE_SUM_TORQUE, ui16_sum_torque);
     addPayload(CODE_SETPOINT, ui16_setpoint);
     addPayload(CODE_SETPOINT_STATE, ui8_control_state);
     addPayload(CODE_UPTIME, ui8_uptime);

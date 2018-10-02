@@ -114,7 +114,8 @@ uint16_t aca_setpoint(uint16_t ui16_time_ticks_between_speed_interrupt, uint16_t
 
 	ui32_time_ticks_between_pas_interrupt_accumulated -= ui32_time_ticks_between_pas_interrupt_accumulated >> 3;
 	// do not allow values > ramp_start into smoothing cause it makes startup sluggish
-	if (ui16_time_ticks_between_pas_interrupt > ui16_s_ramp_start) {
+	if (ui16_time_ticks_between_pas_interrupt > ui16_s_ramp_start && flt_torquesensorCalibration == 0.0
+	    ) {
 		ui32_time_ticks_between_pas_interrupt_accumulated += ui16_s_ramp_start;
 	} else {
 		ui32_time_ticks_between_pas_interrupt_accumulated += ui16_time_ticks_between_pas_interrupt;
@@ -210,7 +211,9 @@ uint16_t aca_setpoint(uint16_t ui16_time_ticks_between_speed_interrupt, uint16_t
 
 			if (flt_torquesensorCalibration > 1) {
 				// flt_torquesensorCalibration is >fummelfactor * NUMBER_OF_PAS_MAGS * 64< (64 cause of <<6)
-				float_temp *= flt_torquesensorCalibration / ((uint32_t) ui16_time_ticks_between_pas_interrupt_smoothed); // influence of cadence
+				float_temp *= flt_torquesensorCalibration / ((float) ui16_time_ticks_between_pas_interrupt_smoothed); // influence of cadence
+				//printf("%lu, %u, %u, %u \r\n", uint32_current_target, ui16_sum_torque,(uint16_t) float_temp, ui16_time_ticks_between_pas_interrupt_smoothed );
+
 			}
 
 			//increase power linear with speed for convenient commuting :-)

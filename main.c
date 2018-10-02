@@ -109,7 +109,7 @@ int main(void) {
     adc_init();
     PAS_init();
     SPEED_init();
-    display_init();
+   // display_init();
 
     //  ITC_SetSoftwarePriority (ITC_IRQ_TIM1_OVF, ITC_PRIORITYLEVEL_2);
 
@@ -182,7 +182,7 @@ int main(void) {
                 }
 
 #ifdef DIAGNOSTICS
-                printf("%u,%u, %u, %u, %u, %u\r\n", ui8_control_state, ui16_setpoint, ui16_motor_speed_erps, ui16_BatteryCurrent, ui16_time_ticks_between_pas_interrupt, ui16_sum_throttle);
+                printf("%u,%u, %u, %u, %u, %u\r\n", ui8_control_state, ui16_setpoint, ui16_motor_speed_erps, ui16_BatteryCurrent, ui16_sum_torque, ui16_momentary_throttle);
 
                 //printf("erps %d, motorstate %d, cyclecountertotal %d\r\n", ui16_motor_speed_erps, ui8_motor_state, ui16_PWM_cycles_counter_total);
 
