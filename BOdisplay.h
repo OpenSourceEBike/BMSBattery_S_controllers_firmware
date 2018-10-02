@@ -82,6 +82,8 @@ typedef enum {
 	CODE_THROTTLE = ((uint8_t) 0xDB),
 	CODE_CURRENT_TARGET_HIGH_BYTE = ((uint8_t) 0xDC),
 	CODE_CURRENT_TARGET = ((uint8_t) 0xDD),
+			
+	CODE_SUM_THROTTLE= ((uint8_t) 0xDE),
 
 	CODE_MOTOR_SPECIFIC_ANGLE = ((uint8_t) 0x80),
 	CODE_ERPS_FACTOR = ((uint8_t) 0x81),
