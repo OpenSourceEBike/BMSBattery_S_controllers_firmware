@@ -27,6 +27,7 @@
             <file>file:/home/overlord/workspaces/Osec/ACAcommons.h</file>
         </group>
         <group>
+            <file>file:/G:/osebikefw/ACAcommons.c</file>
             <file>file:/G:/osebikefw/config.h</file>
             <file>file:/G:/osebikefw/BOdisplay.c</file>
             <file>file:/G:/osebikefw/ACAeeprom.c</file>
@@ -39,6 +40,7 @@
             <file>file:/G:/osebikefw/main.h</file>
             <file>file:/G:/osebikefw/gpio.c</file>
             <file>file:/G:/osebikefw/ACAsetPoint.c</file>
+            <file>file:/G:/osebikefw/ACAcontrollerState.h</file>
             <file>file:/G:/osebikefw/SPEED.c</file>
             <file>file:/G:/osebikefw/motor.c</file>
             <file>file:/G:/osebikefw/brake.c</file>

@@ -397,6 +397,9 @@ void display_update() {
 				signPackage();
 				sendPreparedPackage();
 			} else if (ui8_rx_converted_buffer[0] == STATIC_DATA_ADDRESS) {
+				// static data requests also sends the displays assist configuration
+				ui8_assist_percent_wanted = requestedValue;
+				ui8_assistlevel_global = requestedValueHighByte;
 				prepareBasePackage(STATIC_DATA_ADDRESS, requestedFunction);
 				gatherStaticPayload(requestedFunction);
 				addPayload(CODE_LRC_CHECK, calculatedLrc);
