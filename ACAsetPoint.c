@@ -114,18 +114,14 @@ uint16_t aca_setpoint(uint16_t ui16_time_ticks_between_speed_interrupt, uint16_t
 
 	ui32_time_ticks_between_pas_interrupt_accumulated -= ui32_time_ticks_between_pas_interrupt_accumulated >> 3;
 	// do not allow values > ramp_start into smoothing cause it makes startup sluggish
-	if (ui16_time_ticks_between_pas_interrupt > ui16_s_ramp_start && flt_torquesensorCalibration == 0.0) {
+	// also do not allow values < ramp_start when pedalling backwards
+	if ((!PAS_is_active||(ui16_time_ticks_between_pas_interrupt > ui16_s_ramp_start)) && (flt_torquesensorCalibration == 0.0)) {
 		ui32_time_ticks_between_pas_interrupt_accumulated += ui16_s_ramp_start;
 	} else {
 		ui32_time_ticks_between_pas_interrupt_accumulated += ui16_time_ticks_between_pas_interrupt;
 	}
-	// avoid startup when pedalling backwards
-	if (flt_torquesensorCalibration == 0.0 && !PAS_is_active){
-		ui16_time_ticks_between_pas_interrupt_smoothed = ui16_s_ramp_start;
-	}else{
-		ui16_time_ticks_between_pas_interrupt_smoothed = ui32_time_ticks_between_pas_interrupt_accumulated >> 3;
-	}
-
+	ui16_time_ticks_between_pas_interrupt_smoothed = ui32_time_ticks_between_pas_interrupt_accumulated >> 3;
+	
 	//check for undervoltage --> disable PWM
 	if (ui8_BatteryVoltage < BATTERY_VOLTAGE_MIN_VALUE) {
 
