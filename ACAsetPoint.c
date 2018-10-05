@@ -119,7 +119,12 @@ uint16_t aca_setpoint(uint16_t ui16_time_ticks_between_speed_interrupt, uint16_t
 	} else {
 		ui32_time_ticks_between_pas_interrupt_accumulated += ui16_time_ticks_between_pas_interrupt;
 	}
-	ui16_time_ticks_between_pas_interrupt_smoothed = ui32_time_ticks_between_pas_interrupt_accumulated >> 3;
+	// avoid startup when pedalling backwards
+	if (flt_torquesensorCalibration == 0.0 && !PAS_is_active){
+		ui16_time_ticks_between_pas_interrupt_smoothed = ui16_s_ramp_start;
+	}else{
+		ui16_time_ticks_between_pas_interrupt_smoothed = ui32_time_ticks_between_pas_interrupt_accumulated >> 3;
+	}
 
 	//check for undervoltage --> disable PWM
 	if (ui8_BatteryVoltage < BATTERY_VOLTAGE_MIN_VALUE) {
