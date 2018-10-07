@@ -69,6 +69,7 @@ uint32_t ui32_erps_filtered = 0; //filtered value of erps
 uint16_t ui16_virtual_erps_speed = 0;
 uint16_t ui16_BatteryCurrent = 0; //Battery Current read from ADC8
 uint8_t ui8_position_correction_value = 127; // in 360/256 degrees
+uint8_t ui8_ADC_iq_current_target = 127; // in 360/256 degrees
 uint16_t ui16_ADC_iq_current = 0;
 uint16_t ui16_ADC_iq_current_filtered = 0;
 uint8_t ui8_control_state = 0;

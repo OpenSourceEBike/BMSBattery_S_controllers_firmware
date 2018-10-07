@@ -52,6 +52,7 @@ extern uint16_t ui16_virtual_erps_speed;
 extern uint32_t ui32_erps_filtered; //filtered value of erps
 extern uint16_t ui16_BatteryCurrent;
 extern uint8_t ui8_position_correction_value;
+extern uint8_t ui8_ADC_iq_current_target;
 extern uint16_t ui16_ADC_iq_current;
 extern uint16_t ui16_ADC_iq_current_filtered;
 extern uint8_t ui8_speedlimit_kph;
