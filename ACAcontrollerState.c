@@ -158,6 +158,8 @@ void controllerstate_init(void) {
     if (eepromVal > 0) ui8_throttle_max_range = eepromVal;
     eepromVal = eeprom_read(OFFSET_PAS_TRESHOLD);
     if (eepromVal > 0) flt_s_pas_threshold = int2float(eepromVal, 4.0);
+	eepromVal = eeprom_read(OFFSET_TQ_CALIB);
+    if (eepromVal > 0) flt_torquesensorCalibration = int2float(eepromVal, 8000.0);
     eepromVal = eeprom_read(OFFSET_PID_GAIN_P);
     if (eepromVal > 0) flt_s_pid_gain_p = int2float(eepromVal, 2.0);
     eepromVal = eeprom_read(OFFSET_PID_GAIN_I);

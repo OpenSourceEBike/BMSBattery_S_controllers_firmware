@@ -114,12 +114,13 @@ void addConfigStateInfos(void) {
 	addPayload(CODE_PAS_TRESHOLD, float2int(flt_s_pas_threshold, 4.0));
 	addPayload(CODE_PID_GAIN_P, float2int(flt_s_pid_gain_p, 2.0));
 	addPayload(CODE_PID_GAIN_I, float2int(flt_s_pid_gain_i, 2.0));
+	addPayload(CODE_TQ_CALIB, float2int(flt_torquesensorCalibration, 8000.0));
 	addPayload(CODE_RAMP_END, ui16_s_ramp_end >> 5);
 	addPayload(CODE_RAMP_START, ui16_s_ramp_start >> 6);
 	addPayload(CODE_MAX_BAT_CURRENT_HIGH_BYTE, ui16_battery_current_max_value >> 8);
 	addPayload(CODE_MAX_BAT_CURRENT, ui16_battery_current_max_value);
 	addPayload(CODE_MAX_REGEN_CURRENT, ui16_regen_current_max_value);
-	// 1 more elements left/avail (max22)
+	// 0 more elements left/avail (max22)
 
 }
 
@@ -319,6 +320,13 @@ void digestConfigRequest(uint8_t configAddress, uint8_t requestedCodeLowByte, ui
 				eeprom_write(OFFSET_RAMP_END, requestedValue);
 			}
 			addPayload(requestedCodeLowByte, ui16_s_ramp_end >> 5);
+			break;
+		case CODE_TQ_CALIB:
+			flt_torquesensorCalibration = int2float(requestedValue, 8000.0);
+			if (configAddress == EEPROM_ADDRESS) {
+				eeprom_write(OFFSET_TQ_CALIB, requestedValue);
+			}
+			addPayload(requestedCodeLowByte, float2int(flt_torquesensorCalibration, 8000.0));
 			break;
 		case CODE_RAMP_START:
 			ui16_s_ramp_start = requestedValue << 6;

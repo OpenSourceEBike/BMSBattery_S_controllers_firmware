@@ -104,6 +104,7 @@ typedef enum {
 	CODE_PID_GAIN_I = ((uint8_t) 0x8C),
 	CODE_RAMP_END = ((uint8_t) 0x8D),
 	CODE_RAMP_START = ((uint8_t) 0x8E),
+	CODE_TQ_CALIB = ((uint8_t) 0x8F),
 
 	CODE_ACTUAL_MAX_SPEED = ((uint8_t) 0x90),
 	CODE_MAX_SPEED_WITHOUT_PAS = ((uint8_t) 0x91),

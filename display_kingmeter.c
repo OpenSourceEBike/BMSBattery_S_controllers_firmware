@@ -432,8 +432,8 @@ void kingmeter_update(void) {
 
 	KM.Tx.Error = KM_ERROR_NONE;
 
-	if (((ui8_current_cal_a * ui16_BatteryCurrent) / 10 - ui16_current_cal_b) != 0x99) {
-		KM.Tx.Current_x10 = (ui8_current_cal_a * ui16_BatteryCurrent) / 10 - ui16_current_cal_b; //calculate Amps out of 10bit ADC value
+	if (((ui8_current_cal_a * ui16_BatteryCurrent) / 100 - ui16_current_cal_b) != 0x99) {
+		KM.Tx.Current_x10 = (ui8_current_cal_a * ui16_BatteryCurrent) / 100 - ui16_current_cal_b; //calculate Amps out of 10bit ADC value
 	}
 
 	/* Receive Rx parameters/settings and send Tx parameters */

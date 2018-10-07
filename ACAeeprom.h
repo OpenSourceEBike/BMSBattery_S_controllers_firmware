@@ -47,7 +47,9 @@ typedef enum {
 	OFFSET_CURRENT_CAL_A = ((uint8_t) 0x11),
 
 	OFFSET_ACA_FLAGS_HIGH_BYTE = ((uint8_t) 0x12),
-	OFFSET_ACA_FLAGS = ((uint8_t) 0x13)
+	OFFSET_ACA_FLAGS = ((uint8_t) 0x13),
+			
+	OFFSET_TQ_CALIB = ((uint8_t) 0x14)
 
 } BO_EEPROM_OFFSETS;
 

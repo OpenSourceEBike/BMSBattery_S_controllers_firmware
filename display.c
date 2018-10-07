@@ -137,7 +137,7 @@ void send_message() {
 	// each unit of B8 = 0.25A
 
 
-	ui8_tx_buffer [8] = (uint8_t) (((ui16_BatteryCurrent - ui16_current_cal_b + 1) << 2) / ui8_current_cal_a);
+	ui8_tx_buffer [8] = (uint8_t) ((((ui16_BatteryCurrent - ui16_current_cal_b + 1) << 2)*10) / ui8_current_cal_a);
 	// B9: motor temperature
 	ui8_tx_buffer [9] = i8_motor_temperature - 15; //according to documentation at endless sphere
 	// B10 and B11: 0

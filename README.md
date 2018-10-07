@@ -154,7 +154,7 @@ The tool is started by double-clicking on "OSEC Parameter Configurator. jar" in 
 
 * **Motor specific angle**: with this value the timing of the motor control can be changed. As a result, manufacturing inaccuracies of the Hall sensor positions in the motor can be compensated. Only change if the motor starts badly.  
 
-* **Battery Current cal a**: Factor a in the calibration function Current in ampere = a * ADC value Required for internal calculation of the current from the 10bit ADC value. Only needs to be changed if the calibration obviously does not fit with the preset values.
+* **Battery Current cal a**: Factor a in the calibration function. 1A = a/10 * ADC value. Required for internal calculation of the current from the 10bit ADC value. Only needs to be changed if the calibration obviously does not fit with the preset values.
 
 * **Temperature cal a**: Factor a in the calibration function temperature in °C = a * ADC value + b. For temperature calculation from external sensor connected to pad X4 and GND. Temperature is shown in the LCD3 but not processed to reduce power if temperature is getting to high actually.
 
