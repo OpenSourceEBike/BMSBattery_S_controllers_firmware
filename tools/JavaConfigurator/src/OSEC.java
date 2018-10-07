@@ -234,6 +234,7 @@ public class OSEC extends JFrame {
 		
 		cbDynAssist.setSelected((acaFlags & 512) > 0);
 		cbPwmOff.setSelected((acaFlags & 1024) > 0);
+		cbTorqueSensor.setSelected((acaFlags & 2048) > 0);
 		in.close();
 	}
 
@@ -770,7 +771,7 @@ public class OSEC extends JFrame {
 		cbDynAssist.setForeground(Color.GRAY);
 		contentPane.add(cbDynAssist);
 		
-		cbPwmOff = new JCheckBox("PWM off @freeride");
+		cbPwmOff = new JCheckBox("PWM off @freerunning");
 		cbPwmOff.setSelected(false);
 		cbPwmOff.setBounds(332, 515, 250, 20);
 		cbPwmOff.setForeground(Color.GRAY);
@@ -1107,6 +1108,7 @@ public class OSEC extends JFrame {
 					
 					acaFlags |= (cbDynAssist.isSelected() ? 512 : 0);
 					acaFlags |= (cbPwmOff.isSelected() ? 1024 : 0);
+					acaFlags |= (cbTorqueSensor.isSelected() ? 2048 : 0);
 
 					iWriter.println(acaFlags);
 

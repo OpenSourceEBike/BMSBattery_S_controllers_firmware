@@ -34,7 +34,7 @@
 //:304100305F\r\n 
 //  0 A 0 (as chars)
 uint8_t ui8_rx_buffer[17]; // modbus ascii with max 8 bytes payload (array including padding)
-uint8_t ui8_tx_buffer[49]; // (max 22*8bit key + 22*8bit data points + bounced checksum(+ key) + address + function + checksum) (array excluding padding)
+uint8_t ui8_tx_buffer[53]; // (max 24*8bit key + 24*8bit data points + bounced checksum(+ key) + address + function + checksum) (array excluding padding)
 uint8_t ui8_rx_converted_buffer[7]; // for decoded ascii values
 
 uint8_t ui8_rx_buffer_counter = 0;
@@ -119,8 +119,8 @@ void addConfigStateInfos(void) {
 	addPayload(CODE_RAMP_START, ui16_s_ramp_start >> 6);
 	addPayload(CODE_MAX_BAT_CURRENT_HIGH_BYTE, ui16_battery_current_max_value >> 8);
 	addPayload(CODE_MAX_BAT_CURRENT, ui16_battery_current_max_value);
-	addPayload(CODE_MAX_REGEN_CURRENT, ui16_regen_current_max_value);
-	// 0 more elements left/avail (max22)
+	addPayload(CODE_CORRECTION_ADC_CURRENT_TARGET, ui8_ADC_iq_current_target);
+	// 1 more elements left/avail (max24)
 
 }
 
@@ -138,7 +138,7 @@ void addHallStateInfos(void) {
 	addPayload(CODE_HALL_ORDER_BASE + 0x04, uint8_t_hall_order[4]);
 	addPayload(CODE_HALL_ORDER_BASE + 0x05, uint8_t_hall_order[5]);
 
-	// 10 more elements left/avail (max22)
+	// 12 more elements left/avail (max24)
 }
 
 void addDetailStateInfos(void) {
@@ -160,7 +160,7 @@ void addDetailStateInfos(void) {
 	addPayload(CODE_VER_SPEED_HIGH_BYTE, ui16_virtual_erps_speed >> 8);
 	addPayload(CODE_VER_SPEED, ui16_virtual_erps_speed);
 
-	// 3 more elements left/avail (max22)
+	// 5 more elements left/avail (max24)
 }
 
 void addBasicStateInfos(void) {
@@ -184,7 +184,7 @@ void addBasicStateInfos(void) {
 	addPayload(CODE_SETPOINT_STATE, ui8_control_state);
 	addPayload(CODE_UPTIME, ui8_uptime);
 
-	// 3 more elements left/avail (max22)
+	// 5 more elements left/avail (max24)
 }
 
 void gatherDynamicPayload(uint8_t function) {
@@ -291,6 +291,13 @@ void digestConfigRequest(uint8_t configAddress, uint8_t requestedCodeLowByte, ui
 				eeprom_write(OFFSET_MOTOR_ANGLE, requestedValue);
 			}
 			addPayload(requestedCodeLowByte, ui8_s_motor_angle);
+			break;
+		case CODE_CORRECTION_ADC_CURRENT_TARGET:
+			ui8_ADC_iq_current_target = requestedValue;
+			if (configAddress == EEPROM_ADDRESS) {
+				eeprom_write(OFFSET_CORRECTION_ADC_CURRENT_TARGET, requestedValue);
+			}
+			addPayload(requestedCodeLowByte, ui8_ADC_iq_current_target);
 			break;
 
 		case CODE_PAS_TRESHOLD:

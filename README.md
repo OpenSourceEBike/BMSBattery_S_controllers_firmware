@@ -17,6 +17,8 @@ This firmware replaces the closed source one on Kunteng sine wave controllers. I
 
 **But** if you want something added / changed that isn't already implemented / beta / buggy, you have to get involved yourself. This is a hobbyists project and there is no one else to blame than yourself if something isn't working as desired ;-)
 
+[BluOSEC App is now here](https://github.com/Xnyle/bluosec-apk/raw/Master/BluOsec-release.apk).
+
 ### What works:  
 Sine wave control with simplified FOC  
 motor stopp while braking  
@@ -264,7 +266,7 @@ You have to edit the path to your STVP and SDCC installation in the .bat / sh fi
 # Supported Displays
 The current code has basic functions for kingmeter J-LCD and LCD3/5 implemented, which also allows the use of the Lishui Bluetooth module and the corresponding Forerider app.
 
-The BluOSEC Android App is in development so that a cheap  [Phone](https://www.kimovil.com/en/compare-smartphones/f_max_d+eurPrice.50) can be used as a display alternative.
+The [BluOSEC](https://github.com/Xnyle/bluosec-apk/raw/Master/BluOsec-release.apk) Android App is in development so that a cheap  [Phone](https://www.kimovil.com/en/compare-smartphones/f_max_d+eurPrice.50) can be used as a display alternative.
 
 In order to use it you need to buy a cheap blutooth module, for instance a HC-05.
 Blue and Red wires on the display  connector need to be shorted for controller startup, blutooth module needs to be connected as follow: Yellow and Green is Tx/Rx, Black is GND. For 5V you have to buy a tiny 50>5V Buck Converter and connect it to the Red wire. Do **NOT** connect the module directly to the 36/48V Red wire! Do **NOT** connect it to any other PAS or throttle Red wire as the controller's internal power supply can't handle that!

@@ -155,10 +155,10 @@ void updateHallOrder(uint8_t hall_sensors) {
 }
 
 void updatePasDir(void) {
-	if ((flt_torquesensorCalibration >64.0)&&(ui16_time_ticks_between_pas_interrupt < timeout)) {
+	if (((ui16_aca_flags & TQ_SENSOR_MODE) == TQ_SENSOR_MODE)&&(ui16_time_ticks_between_pas_interrupt < timeout)) {
 		//only for Torquesensor Mode.
 		PAS_is_active = 1;
-	} else if ((flt_torquesensorCalibration <=64.0) && (PAS_act > 3)) {
+	} else if (((ui16_aca_flags & TQ_SENSOR_MODE) != TQ_SENSOR_MODE) && (PAS_act > 3)) {
 		//set direction only if enough pulses in the right direction are detected.
 		PAS_is_active = 1;
 	} else {
@@ -170,7 +170,7 @@ void updateRequestedTorque(void) {
 
 	ui16_momentary_throttle = (uint16_t) map(ui8_adc_read_throttle(), ADC_THROTTLE_MIN_VALUE, ADC_THROTTLE_MAX_VALUE, 0, SETPOINT_MAX_VALUE); //read in recent throttle value for throttle override
 
-	if (flt_torquesensorCalibration <= 64.0) {
+	if (((ui16_aca_flags & TQ_SENSOR_MODE) != TQ_SENSOR_MODE)) {
 		ui16_throttle_accumulated -= ui16_throttle_accumulated >> 4;
 		ui16_throttle_accumulated += ui8_adc_read_throttle();
 		ui8_temp = ui16_throttle_accumulated >> 4; //read in value from adc
@@ -230,7 +230,7 @@ void updatePasStatus(void) {
 		}
 
 
-		if (flt_torquesensorCalibration > 64.0) {
+		if (((ui16_aca_flags & TQ_SENSOR_MODE) == TQ_SENSOR_MODE)) {
 			ui8_temp = ui8_adc_read_throttle(); //read in recent torque value
 			ui16_torque[ui8_torque_index] = (uint8_t) map(ui8_temp, ui8_throttle_min_range, ui8_throttle_max_range, 0, SETPOINT_MAX_VALUE); //map throttle to limits
 

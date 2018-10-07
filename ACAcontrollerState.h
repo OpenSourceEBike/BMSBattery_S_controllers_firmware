@@ -131,7 +131,9 @@ typedef enum {
 	BYPASS_LOW_SPEED_REGEN_PI_CONTROL = ((uint16_t) 256),
 
 	DYNAMIC_ASSIST_LEVEL = ((uint16_t) 512),
-	PWM_AUTO_OFF = ((uint16_t) 1024)
+	PWM_AUTO_OFF = ((uint16_t) 1024),
+			
+	TQ_SENSOR_MODE = ((uint16_t) 2048)
 } ACA_FLAGS;
 
 #endif /* BOCONTROLLERSTATE_H */
