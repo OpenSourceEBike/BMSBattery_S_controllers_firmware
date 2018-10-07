@@ -115,7 +115,7 @@ uint16_t aca_setpoint(uint16_t ui16_time_ticks_between_speed_interrupt, uint16_t
 	ui32_time_ticks_between_pas_interrupt_accumulated -= ui32_time_ticks_between_pas_interrupt_accumulated >> 3;
 	// do not allow values > ramp_start into smoothing cause it makes startup sluggish
 	// also do not allow values < ramp_start when pedalling backwards
-	if ((!PAS_is_active||(ui16_time_ticks_between_pas_interrupt > ui16_s_ramp_start)) && (flt_torquesensorCalibration == 0.0)) {
+	if ((!PAS_is_active||(ui16_time_ticks_between_pas_interrupt > ui16_s_ramp_start)) && (flt_torquesensorCalibration <=64.0)) {
 		ui32_time_ticks_between_pas_interrupt_accumulated += ui16_s_ramp_start;
 	} else {
 		ui32_time_ticks_between_pas_interrupt_accumulated += ui16_time_ticks_between_pas_interrupt;
@@ -181,7 +181,7 @@ uint16_t aca_setpoint(uint16_t ui16_time_ticks_between_speed_interrupt, uint16_t
 		//if none of the overruling boundaries are concerned, calculate new setpoint
 
 		// if torque sim is requested. We could check if we could solve this function with just one line with map function...
-		if (flt_torquesensorCalibration == 0.0) {
+		if (flt_torquesensorCalibration <= 64.0) {
 
 			// add dynamic assist level based on past throttle input
 			ui8_temp = ui8_assist_percent_actual;
@@ -209,7 +209,7 @@ uint16_t aca_setpoint(uint16_t ui16_time_ticks_between_speed_interrupt, uint16_t
 			float_temp = (float) ui16_sum_torque;
 			float_temp *= ((float) ui8_assist_percent_actual / 100.0);
 
-			if (flt_torquesensorCalibration > 1) {
+			if (flt_torquesensorCalibration > 64.0) {
 				// flt_torquesensorCalibration is >fummelfactor * NUMBER_OF_PAS_MAGS * 64< (64 cause of <<6)
 				float_temp *= flt_torquesensorCalibration / ((float) ui16_time_ticks_between_pas_interrupt_smoothed); // influence of cadence
 				//printf("%lu, %u, %u, %u \r\n", uint32_current_target, ui16_sum_torque,(uint16_t) float_temp, ui16_time_ticks_between_pas_interrupt_smoothed );
@@ -228,7 +228,7 @@ uint16_t aca_setpoint(uint16_t ui16_time_ticks_between_speed_interrupt, uint16_t
 
 
 		// throttle / torquesensor override following
-		if (flt_torquesensorCalibration == 0.0) {
+		if (flt_torquesensorCalibration <=64.0) {
 			float_temp = (float) ui16_sum_throttle;
 		} else {
 			float_temp = (float) ui16_momentary_throttle; // or ui16_sum_throttle
