@@ -244,7 +244,7 @@ public class OSEC extends JFrame {
 			ramp_start.setText("0");
 			ramp_start.setEditable(false);
 			flt_tqCalibrationFactor.setEditable(true);
-			flt_tqCalibrationFactor.setText("1.0");
+			flt_tqCalibrationFactor.setText("1000.0");
 		} else {
 			flt_tqCalibrationFactor.setText("0.0");
 			ramp_end.setText("1500");
@@ -655,7 +655,7 @@ public class OSEC extends JFrame {
 		contentPane.add(lblTqCalibrationFactor);
 
 		flt_tqCalibrationFactor = new JTextField();
-		flt_tqCalibrationFactor.setText("1.0");
+		flt_tqCalibrationFactor.setText("1000.0");
 		flt_tqCalibrationFactor.setColumns(10);
 		flt_tqCalibrationFactor.setBounds(476, 320, 86, 20);
 		contentPane.add(flt_tqCalibrationFactor);
