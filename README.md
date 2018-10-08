@@ -271,5 +271,7 @@ The [BluOSEC](https://github.com/Xnyle/bluosec-apk/raw/master/BluOsec-release.ap
 In order to use it you need to buy a cheap blutooth module, for instance a HC-05.
 Blue and Red wires on the display  connector need to be shorted for controller startup, blutooth module needs to be connected as follow: Yellow and Green is Tx/Rx, Black is GND. For 5V you have to buy a tiny 50>5V Buck Converter and connect it to the Red wire. Do **NOT** connect the module directly to the 36/48V Red wire! Do **NOT** connect it to any other PAS or throttle Red wire as the controller's internal power supply can't handle that!
 
+![module wiring](https://opensourceebikefirmware.bitbucket.io/windows_instructions/images/Connection%20from%20display%20connector%20to%20module.PNG)
+
 # Want to help?
 There is always things to improve, don't hesitate to get involved if you have improvements in mind.
