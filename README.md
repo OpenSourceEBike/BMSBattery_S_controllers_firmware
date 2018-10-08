@@ -108,7 +108,7 @@ A few steps are required to set up the software. But they should also be feasibl
 
 1. download and install [Java Runtime Environment](https://java.com/de/download/)  
 
-2. download [SDCC](https://sourceforge.net/projects/sdcc/files/snapshot_builds/x86_64-w64-mingw32-setup/)   3.7.x and install it. Choose one of the recent .exe files, not the link in the green button. Make sure, that the checkbox for setting the path is activated.  
+2. download and install [SDCC](https://sourceforge.net/projects/sdcc/files/latest/download).   Make sure, that the checkbox for setting the path is activated.  
 
 3. download or clone the [Github repository](https://github.com/stancecoke/BMSBattery_S_controllers_firmware) and unpack it to the desired location, in the simplest case directly to C: \  
 
