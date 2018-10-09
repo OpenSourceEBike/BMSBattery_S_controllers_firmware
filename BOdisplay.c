@@ -67,7 +67,7 @@ uint8_t calcLRC(uint8_t ints[], uint8_t start, uint8_t end) {
 	return (~LRC) + 1;
 }
 
-void sendPreparedPackage(void) {
+void sendPreparedAsciiPackage(void) {
 	uint8_t j;
 	uart_put_buffered(0x3A);
 	for (j = 0; j < ui8_tx_buffer_counter; j++) {
@@ -76,6 +76,22 @@ void sendPreparedPackage(void) {
 	}
 	uart_put_buffered(0x0D);
 	uart_put_buffered(0x0A);
+}
+
+void sendPreparedRtuPackage(void) {
+	uint8_t j;
+	for (j = 0; j < ui8_tx_buffer_counter; j++) {
+		uart_put_buffered(ui8_tx_buffer[j]);
+	}
+	uart_put_buffered(0x00);
+	uart_put_buffered(0x00);
+	uart_put_buffered(0x00);
+	uart_put_buffered(0x00);
+}
+
+void sendPreparedPackage(void) {
+	//sendPreparedAsciiPackage();
+	sendPreparedRtuPackage();
 }
 
 void addPayload(uint8_t id, uint8_t value) {

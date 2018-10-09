@@ -38,13 +38,16 @@
             <file>file:/G:/osebikefw/BOdisplay.h</file>
             <file>file:/G:/osebikefw/ACAcontrollerState.c</file>
             <file>file:/G:/osebikefw/display_kingmeter.c</file>
+            <file>file:/G:/osebikefw/test/offRoadTest.c</file>
             <file>file:/G:/osebikefw/gpio.c</file>
             <file>file:/G:/osebikefw/ACAsetPoint.c</file>
             <file>file:/G:/osebikefw/ACAcontrollerState.h</file>
             <file>file:/G:/osebikefw/SPEED.c</file>
+            <file>file:/G:/osebikefw/README.md</file>
             <file>file:/G:/osebikefw/motor.c</file>
             <file>file:/G:/osebikefw/ACAsetPoint.h</file>
             <file>file:/G:/osebikefw/brake.c</file>
+            <file>file:/G:/osebikefw/ACAeeprom.h</file>
             <file>file:/G:/osebikefw/display.c</file>
         </group>
     </open-files>
