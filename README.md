@@ -108,7 +108,7 @@ A few steps are required to set up the software. But they should also be feasibl
 
 1. download and install [Java Runtime Environment](https://java.com/de/download/)  
 
-2. download [SDCC](https://sourceforge.net/projects/sdcc/files/snapshot_builds/x86_64-w64-mingw32-setup/)   3.7.x and install it. Choose one of the recent .exe files, not the link in the green button. Make sure, that the checkbox for setting the path is activated.  
+2. download and install [SDCC](https://sourceforge.net/projects/sdcc/files/latest/download).   Make sure, that the checkbox for setting the path is activated.  
 
 3. download or clone the [Github repository](https://github.com/stancecoke/BMSBattery_S_controllers_firmware) and unpack it to the desired location, in the simplest case directly to C: \  
 
@@ -133,6 +133,8 @@ There is a dedicated button in the Java tool for that purpose. Attention! If thi
 This makes sure, that the controller and the motor work together in principle. Still it can be necessary to swap the wires after flashing the firmware to a different combination. If the motor doesn't start properly with the custom firmware (turns not or only very slowly with noise and high current) try to find the right combination by trial and error. Also test the other peripheral devices such as throttle, PAS and brake lever for correct function on the entire system beforehand!  
 
 The tool is started by double-clicking on "OSEC Parameter Configurator. jar" in the project directory.
+
+![](https://www.pedelecforum.de/wiki/lib/exe/fetch.php?w=800&tok=e4a899&media=elektrotechnik:crome-b.png)
 
 ## General parameter settings:  
 
@@ -270,6 +272,8 @@ The [BluOSEC](https://github.com/Xnyle/bluosec-apk/raw/master/BluOsec-release.ap
 
 In order to use it you need to buy a cheap blutooth module, for instance a HC-05.
 Blue and Red wires on the display  connector need to be shorted for controller startup, blutooth module needs to be connected as follow: Yellow and Green is Tx/Rx, Black is GND. For 5V you have to buy a tiny 50>5V Buck Converter and connect it to the Red wire. Do **NOT** connect the module directly to the 36/48V Red wire! Do **NOT** connect it to any other PAS or throttle Red wire as the controller's internal power supply can't handle that!
+
+![module wiring](https://opensourceebikefirmware.bitbucket.io/windows_instructions/images/Connection%20from%20display%20connector%20to%20module.PNG)
 
 # Want to help?
 There is always things to improve, don't hesitate to get involved if you have improvements in mind.
