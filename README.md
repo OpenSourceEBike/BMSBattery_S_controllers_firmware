@@ -134,6 +134,8 @@ This makes sure, that the controller and the motor work together in principle. S
 
 The tool is started by double-clicking on "OSEC Parameter Configurator. jar" in the project directory.
 
+![](https://www.pedelecforum.de/wiki/lib/exe/fetch.php?w=800&tok=e4a899&media=elektrotechnik:crome-b.png)
+
 ## General parameter settings:  
 
 * **Number of PAS magnets**: Number of magnets in the PAS disk. Required for correct calculation of the cadence  
