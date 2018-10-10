@@ -135,7 +135,7 @@ void addConfigStateInfos(void) {
 	addPayload(CODE_RAMP_START, ui16_s_ramp_start >> 6);
 	addPayload(CODE_MAX_BAT_CURRENT_HIGH_BYTE, ui16_battery_current_max_value >> 8);
 	addPayload(CODE_MAX_BAT_CURRENT, ui16_battery_current_max_value);
-	addPayload(CODE_CORRECTION_ADC_CURRENT_TARGET, ui8_ADC_iq_current_target);
+	addPayload(CODE_CORRECTION_AT_ANGLE, ui8_correction_at_angle);
 	// 1 more elements left/avail (max24)
 
 }
@@ -308,12 +308,12 @@ void digestConfigRequest(uint8_t configAddress, uint8_t requestedCodeLowByte, ui
 			}
 			addPayload(requestedCodeLowByte, ui8_s_motor_angle);
 			break;
-		case CODE_CORRECTION_ADC_CURRENT_TARGET:
-			ui8_ADC_iq_current_target = requestedValue;
+		case CODE_CORRECTION_AT_ANGLE:
+			ui8_correction_at_angle = requestedValue;
 			if (configAddress == EEPROM_ADDRESS) {
-				eeprom_write(OFFSET_CORRECTION_ADC_CURRENT_TARGET, requestedValue);
+				eeprom_write(OFFSET_CORRECTION_AT_ANGLE, requestedValue);
 			}
-			addPayload(requestedCodeLowByte, ui8_ADC_iq_current_target);
+			addPayload(requestedCodeLowByte, ui8_correction_at_angle);
 			break;
 
 		case CODE_PAS_TRESHOLD:
