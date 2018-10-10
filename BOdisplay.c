@@ -33,7 +33,7 @@
 // example
 //:304100305F\r\n 
 //  0 A 0 (as chars)
-uint8_t ui8_rx_buffer[17]; // modbus ascii with max 8 bytes payload (array including padding)
+uint8_t ui8_rx_buffer[17]; // modbus ascii with max 8 bytes payload (array including padding) // modbus rtu uses only 11 bytes
 uint8_t ui8_tx_buffer[53]; // (max 24*8bit key + 24*8bit data points + bounced checksum(+ key) + address + function + checksum) (array excluding padding)
 uint8_t ui8_rx_converted_buffer[7]; // for decoded ascii values
 
@@ -395,16 +395,26 @@ void display_init() {
 	// noop just here to have a common interface
 }
 
-void display_update() {
+uint8_t readRtu(){
+	uart_fill_rx_packet_buffer(ui8_rx_buffer, 11, &ui8_rx_buffer_counter);
+	if (ui8_rx_buffer_counter == 11) {
+		ui8_rx_converted_buffer[0] = ui8_rx_buffer[0];
+		ui8_rx_converted_buffer[1] = ui8_rx_buffer[1];
+		ui8_rx_converted_buffer[2] = ui8_rx_buffer[2];
+		ui8_rx_converted_buffer[3] = ui8_rx_buffer[3];
+		ui8_rx_converted_buffer[4] = ui8_rx_buffer[4];
+		ui8_rx_converted_buffer[5] = ui8_rx_buffer[5];
+		ui8_rx_converted_buffer[6] = ui8_rx_buffer[6];
+		// allow fetching of new data
+		ui8_rx_buffer_counter = 0;
+		return 1;
+	}
+	return 0;
+}
 
-
+uint8_t readAscii(){
 	uart_fill_rx_packet_buffer(ui8_rx_buffer, 17, &ui8_rx_buffer_counter);
-
-
 	if (ui8_rx_buffer_counter == 17) {
-
-		uint8_t calculatedLrc;
-
 		ui8_rx_converted_buffer[0] = (hex2int(ui8_rx_buffer[1]) << 4) + hex2int(ui8_rx_buffer[2]);
 		ui8_rx_converted_buffer[1] = (hex2int(ui8_rx_buffer[3]) << 4) + hex2int(ui8_rx_buffer[4]);
 		ui8_rx_converted_buffer[2] = (hex2int(ui8_rx_buffer[5]) << 4) + hex2int(ui8_rx_buffer[6]);
@@ -412,6 +422,22 @@ void display_update() {
 		ui8_rx_converted_buffer[4] = (hex2int(ui8_rx_buffer[9]) << 4) + hex2int(ui8_rx_buffer[10]);
 		ui8_rx_converted_buffer[5] = (hex2int(ui8_rx_buffer[11]) << 4) + hex2int(ui8_rx_buffer[12]);
 		ui8_rx_converted_buffer[6] = (hex2int(ui8_rx_buffer[13]) << 4) + hex2int(ui8_rx_buffer[14]);
+		// allow fetching of new data
+		ui8_rx_buffer_counter = 0;
+		return 1;
+	}
+	return 0;
+}
+
+uint8_t readUart(){
+	return readRtu();
+}
+
+void display_update() {
+
+	if (readUart()) {
+
+		uint8_t calculatedLrc;
 		calculatedLrc = calcLRC(ui8_rx_converted_buffer, 0, 6);
 
 
@@ -458,8 +484,6 @@ void display_update() {
 			sendPreparedPackage();
 		}
 
-		// allow fetching of new data
-		ui8_rx_buffer_counter = 0;
 	}
 }
 
