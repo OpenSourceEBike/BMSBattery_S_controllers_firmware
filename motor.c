@@ -28,8 +28,8 @@ uint16_t ui16_PWM_cycles_counter = 0;
 uint16_t ui16_PWM_cycles_counter_6 = 0;
 uint16_t ui16_PWM_cycles_counter_total = 0;
 
-uint8_t ui8_motor_rotor_position = 0; // in 360/256 degrees
-uint8_t ui8_motor_rotor_absolute_position = 0; // in 360/256 degrees
+uint8_t ui8_sinetable_position = 0; // in 360/256 degrees
+uint8_t ui8_motor_rotor_hall_position = 0; // in 360/256 degrees
 uint8_t ui8_position_correction_value1 = 0; // in 360/256 degrees
 
 uint16_t ui16_PWM_cycles_counter_total_div_4 = 0;
@@ -115,16 +115,15 @@ void hall_sensors_read_and_action(void) {
 #endif
 
 
-				ui8_motor_rotor_absolute_position = ANGLE_180 + ui8_s_motor_angle;
+				ui8_motor_rotor_hall_position = ANGLE_180;
 				break;
 
 			case 1:
 				uint8_t_hall_case[4] = ui8_adc_read_phase_B_current();
 
 				if (ui8_motor_state != MOTOR_STATE_RUNNING_INTERPOLATION_360_DEGREES) {
-					/*if(ui8_regen_flag)ui8_motor_rotor_absolute_position = ANGLE_300 + ui8_s_motor_angle;
-					else*/
-					ui8_motor_rotor_absolute_position = ANGLE_240 + ui8_s_motor_angle;
+
+					ui8_motor_rotor_hall_position = ANGLE_240;
 				}
 				break;
 
@@ -135,24 +134,22 @@ void hall_sensors_read_and_action(void) {
 
 				if (ui8_motor_state != MOTOR_STATE_RUNNING_INTERPOLATION_360_DEGREES) {
 
-					/*if(ui8_regen_flag)ui8_motor_rotor_absolute_position = ANGLE_1 + ui8_s_motor_angle;
-					else*/
-					ui8_motor_rotor_absolute_position = ANGLE_300 + ui8_s_motor_angle;
+
+					ui8_motor_rotor_hall_position = ANGLE_300;
 				}
 				break;
 
 			case 4: //rotor position 0 degree
 				ui8_half_rotation_flag = 1;
-				if ((ui16_aca_flags & ANGLE_CORRECTION_ENABLED) == ANGLE_CORRECTION_ENABLED){
+				if ((ui16_aca_flags & ANGLE_CORRECTION_ENABLED) == ANGLE_CORRECTION_ENABLED) {
 					ui8_foc_enable_flag = 1;
 				}
 				uint8_t_hall_case[0] = ui8_adc_read_phase_B_current();
 
 				debug_pin_reset();
 				if (ui8_motor_state != MOTOR_STATE_RUNNING_INTERPOLATION_360_DEGREES) {
-					/*if(ui8_regen_flag)ui8_motor_rotor_absolute_position = ANGLE_60 + ui8_s_motor_angle;
-					else */
-					ui8_motor_rotor_absolute_position = ANGLE_1 + ui8_s_motor_angle;
+
+					ui8_motor_rotor_hall_position = ANGLE_1;
 				}
 				break;
 
@@ -161,9 +158,8 @@ void hall_sensors_read_and_action(void) {
 
 
 				if (ui8_motor_state != MOTOR_STATE_RUNNING_INTERPOLATION_360_DEGREES) {
-					/*if(ui8_regen_flag)ui8_motor_rotor_absolute_position = ANGLE_120 + ui8_s_motor_angle;
-					else */
-					ui8_motor_rotor_absolute_position = ANGLE_60 + ui8_s_motor_angle;
+
+					ui8_motor_rotor_hall_position = ANGLE_60;
 				}
 				break;
 
@@ -172,9 +168,8 @@ void hall_sensors_read_and_action(void) {
 
 
 				if (ui8_motor_state != MOTOR_STATE_RUNNING_INTERPOLATION_360_DEGREES) {
-					/* if(ui8_regen_flag)ui8_motor_rotor_absolute_position = ANGLE_180 + ui8_s_motor_angle;
-					 else */
-					ui8_motor_rotor_absolute_position = ANGLE_120 + ui8_s_motor_angle;
+
+					ui8_motor_rotor_hall_position = ANGLE_120;
 				}
 				break;
 
@@ -196,9 +191,9 @@ void updateCorrection() {
 		ui16_ADC_iq_current_accumulated -= ui16_ADC_iq_current_accumulated >> 3;
 		ui16_ADC_iq_current_accumulated += ui16_adc_read_phase_B_current();
 		ui16_ADC_iq_current = ui16_ADC_iq_current_accumulated >> 3; // this value is regualted to be zero by FOC 
-		
-		ui8_variableDebugB=ui16_adc_read_phase_B_current()>>2;
-		
+
+		ui8_variableDebugB = ui16_adc_read_phase_B_current() >> 2;
+
 		if (ui16_motor_speed_erps > 3 && ui16_BatteryCurrent > ui16_current_cal_b + 3) { //normal riding,
 			if (ui16_ADC_iq_current >> 2 > 128 && ui8_position_correction_value < 143) {
 				ui8_position_correction_value++;
@@ -259,28 +254,28 @@ void motor_fast_loop(void) {
 	if (ui8_motor_state == MOTOR_STATE_RUNNING_INTERPOLATION_60_DEGREES) {
 		ui8_interpolation_angle = (ui16_PWM_cycles_counter_6 << 8) / ui16_PWM_cycles_counter_total;
 #if MOTOR_TYPE == MOTOR_TYPE_Q85
-		ui8_motor_rotor_position = ui8_motor_rotor_absolute_position + ui8_position_correction_value + ui8_interpolation_angle;
+		ui8_sinetable_position = ui8_motor_rotor_hall_position + ui8_s_motor_angle + ui8_position_correction_value + ui8_interpolation_angle;
 #elif MOTOR_TYPE == MOTOR_TYPE_EUC2
-		ui8_motor_rotor_position = ui8_motor_rotor_absolute_position + ui8_position_correction_value - ui8_interpolation_angle;
+		ui8_sinetable_position = ui8_motor_rotor_hall_position + ui8_s_motor_angle + ui8_position_correction_value - ui8_interpolation_angle;
 #endif
 	} else if (ui8_motor_state == MOTOR_STATE_RUNNING_INTERPOLATION_360_DEGREES) {
 		ui8_interpolation_angle = (ui16_PWM_cycles_counter << 8) / ui16_PWM_cycles_counter_total;
 #if MOTOR_TYPE == MOTOR_TYPE_Q85
-		ui8_motor_rotor_position = ui8_motor_rotor_absolute_position + ui8_position_correction_value + ui8_interpolation_angle;
+		ui8_sinetable_position = ui8_motor_rotor_hall_position + ui8_s_motor_angle + ui8_position_correction_value + ui8_interpolation_angle;
 #elif MOTOR_TYPE == MOTOR_TYPE_EUC2
-		ui8_motor_rotor_position = ui8_motor_rotor_absolute_position + ui8_position_correction_value - ui8_interpolation_angle;
+		ui8_sinetable_position = ui8_motor_rotor_hall_position + ui8_s_motor_angle + ui8_position_correction_value - ui8_interpolation_angle;
 #endif
 	} else // MOTOR_STATE_COAST || MOTOR_STATE_RUNNING_NO_INTERPOLATION_60_DEGREES
 #endif
 	{
-		ui8_motor_rotor_position = ui8_motor_rotor_absolute_position + ui8_position_correction_value;
+		ui8_sinetable_position = ui8_motor_rotor_hall_position + ui8_s_motor_angle + ui8_position_correction_value;
 	}
 
-	
+
 	// check if FOC control is needed
-	if ((ui8_foc_enable_flag) && ((ui8_motor_rotor_position-ui8_position_correction_value) >= (ui8_correction_at_angle)) && ((ui8_motor_rotor_position-ui8_position_correction_value) < (ui8_correction_at_angle+8))) {
-		ui8_variableDebugA = ui8_motor_rotor_position;
-		ui8_variableDebugC = ui8_motor_rotor_position-ui8_position_correction_value;
+	if ((ui8_foc_enable_flag) && ((ui8_sinetable_position - ui8_position_correction_value) >= (ui8_correction_at_angle)) && ((ui8_sinetable_position - ui8_position_correction_value) < (ui8_correction_at_angle + 8))) {
+		ui8_variableDebugA = ui8_sinetable_position;
+		ui8_variableDebugC = ui8_sinetable_position - ui8_position_correction_value;
 		// make sure we just execute one time per ERPS, so reset the flag
 		ui8_foc_enable_flag = 0;
 		updateCorrection();

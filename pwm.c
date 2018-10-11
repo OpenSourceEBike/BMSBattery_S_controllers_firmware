@@ -660,7 +660,7 @@ void pwm_apply_duty_cycle (uint8_t ui8_duty_cycle_value)
   ui8__duty_cycle = ui8_duty_cycle_value;
 
   // scale and apply _duty_cycle
-  ui8_temp = ui8_svm_table[ui8_motor_rotor_position];
+  ui8_temp = ui8_svm_table[ui8_sinetable_position];
   if (ui8_temp > MIDDLE_PWM_VALUE_DUTY_CYCLE_MAX)
   {
     ui16_value = ((uint16_t) (ui8_temp - MIDDLE_PWM_VALUE_DUTY_CYCLE_MAX)) * ui8__duty_cycle;
@@ -675,7 +675,7 @@ void pwm_apply_duty_cycle (uint8_t ui8_duty_cycle_value)
   }
 
   // add 120 degrees and limit
-  ui8_temp = ui8_svm_table[(uint8_t) (ui8_motor_rotor_position + 85 /* 120º */)];
+  ui8_temp = ui8_svm_table[(uint8_t) (ui8_sinetable_position + 85 /* 120º */)];
   if (ui8_temp > MIDDLE_PWM_VALUE_DUTY_CYCLE_MAX)
   {
     ui16_value = ((uint16_t) (ui8_temp - MIDDLE_PWM_VALUE_DUTY_CYCLE_MAX)) * ui8__duty_cycle;
@@ -690,7 +690,7 @@ void pwm_apply_duty_cycle (uint8_t ui8_duty_cycle_value)
   }
 
   // subtract 120 degrees and limit
-  ui8_temp = ui8_svm_table[(uint8_t) (ui8_motor_rotor_position + 171 /* 240º */)];
+  ui8_temp = ui8_svm_table[(uint8_t) (ui8_sinetable_position + 171 /* 240º */)];
   if (ui8_temp > MIDDLE_PWM_VALUE_DUTY_CYCLE_MAX)
   {
     ui16_value = ((uint16_t) (ui8_temp - MIDDLE_PWM_VALUE_DUTY_CYCLE_MAX)) * ui8__duty_cycle;
@@ -710,17 +710,17 @@ void pwm_apply_duty_cycle (uint8_t ui8_duty_cycle_value)
   TIM1_SetCompare3((uint16_t) (ui8_value_b << 1));
 #elif (SVM_TABLE == SINE) || (SVM_TABLE == SINE_SVM_ORIGINAL)
   // scale and apply _duty_cycle
-  ui8_value_a = ui8_svm_table[ui8_motor_rotor_position];
+  ui8_value_a = ui8_svm_table[ui8_sinetable_position];
   ui16_value = (uint16_t) (ui8_value_a * ui8_duty_cycle_value);
   ui8_value_a = (uint8_t) (ui16_value >> 8);
 
   // add 120 degrees and limit
-  ui8_value_b = ui8_svm_table[(uint8_t) (ui8_motor_rotor_position + 85 /* 120º */)];
+  ui8_value_b = ui8_svm_table[(uint8_t) (ui8_sinetable_position + 85 /* 120º */)];
   ui16_value = (uint16_t) (ui8_value_b * ui8_duty_cycle_value);
   ui8_value_b = (uint8_t) (ui16_value >> 8);
 
   // subtract 120 degrees and limit
-  ui8_value_c = ui8_svm_table[(uint8_t) (ui8_motor_rotor_position + 171 /* 240º */)];
+  ui8_value_c = ui8_svm_table[(uint8_t) (ui8_sinetable_position + 171 /* 240º */)];
   ui16_value = (uint16_t) (ui8_value_c * ui8_duty_cycle_value);
   ui8_value_c = (uint8_t) (ui16_value >> 8);
 

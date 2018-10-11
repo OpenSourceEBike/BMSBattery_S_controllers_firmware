@@ -18,7 +18,7 @@
 #define MOTOR_STATE_RUNNING_INTERPOLATION_60_DEGREES 2
 #define MOTOR_STATE_RUNNING_INTERPOLATION_360_DEGREES 3
 
-extern uint8_t ui8_motor_rotor_position;
+extern uint8_t ui8_sinetable_position;
 extern uint8_t ui8_position_correction_value1;
 extern uint16_t ui16_speed_inverse;
 extern uint16_t ui16_PWM_cycles_counter_total;
