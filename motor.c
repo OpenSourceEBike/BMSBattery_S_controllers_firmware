@@ -130,9 +130,6 @@ void hall_sensors_read_and_action(void) {
 
 			case 5: //rotor position 300 degree
 
-				// disable flag if it has not been picked up
-				// (cause >= ring calculations only work correctly away from overflow point)
-				ui8_foc_enable_flag = 0;
 				uint8_t_hall_case[5] = ui8_adc_read_phase_B_current();
 
 
@@ -146,6 +143,7 @@ void hall_sensors_read_and_action(void) {
 
 			case 4: //rotor position 0 degree
 				ui8_half_rotation_flag = 1;
+				ui8_foc_enable_flag = 1;
 				uint8_t_hall_case[0] = ui8_adc_read_phase_B_current();
 
 				debug_pin_reset();
@@ -157,8 +155,6 @@ void hall_sensors_read_and_action(void) {
 				break;
 
 			case 6://rotor position 60 degree
-				// enable FOC from 60° to 300°
-				ui8_foc_enable_flag = 1;
 				uint8_t_hall_case[1] = ui8_adc_read_phase_B_current();
 
 
@@ -278,9 +274,9 @@ void motor_fast_loop(void) {
 		ui8_motor_rotor_position = ui8_motor_rotor_absolute_position + ui8_position_correction_value;
 	}
 
-
+	
 	// check if FOC control is needed
-	if ((ui8_foc_enable_flag) && (ui8_motor_rotor_position >= (ui8_correction_at_angle))) {
+	if ((ui8_foc_enable_flag) && (ui8_motor_rotor_position >= (ui8_correction_at_angle)) && (ui8_motor_rotor_position < (ui8_correction_at_angle+8))) {
 		ui8_variableDebugA = ui8_motor_rotor_position;
 		// make sure we just execute one time per ERPS, so reset the flag
 		ui8_foc_enable_flag = 0;
