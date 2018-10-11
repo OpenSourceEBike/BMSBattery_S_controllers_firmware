@@ -81,17 +81,8 @@ void hall_sensors_read_and_action(void) {
 			case 3://rotor position 180 degree
 				// full electric revolution recognized, update counters
 				uint8_t_hall_case[3] = ui8_adc_read_phase_B_current();
+				debug_pin_set();
 
-				if (ui8_adc_read_throttle_busy == 0) {
-					debug_pin_set();
-					if (ui8_duty_cycle_target > 5) {
-						ui16_ADC_iq_current_accumulated -= ui16_ADC_iq_current_accumulated >> 3;
-						ui16_ADC_iq_current_accumulated += ui16_adc_read_phase_B_current();
-						ui16_ADC_iq_current = ui16_ADC_iq_current_accumulated >> 3; // this value is regualted to be zero by FOC in this case without averaging
-
-					}
-
-				}
 				if (ui8_half_rotation_flag) {
 					ui8_half_rotation_flag = 0;
 					if (ui16_PWM_cycles_counter > 20) ui16_PWM_cycles_counter_total = ui16_PWM_cycles_counter;
@@ -140,8 +131,8 @@ void hall_sensors_read_and_action(void) {
 			case 5: //rotor position 300 degree
 
 				// disable flag if it has not been picked up
-				// (cause ring calculations only work correctly -90°to90° relative to hallsensor signal)
-				ui8_foc_enable_flag=0;
+				// (cause >= ring calculations only work correctly away from overflow point)
+				ui8_foc_enable_flag = 0;
 				uint8_t_hall_case[5] = ui8_adc_read_phase_B_current();
 
 
@@ -167,7 +158,7 @@ void hall_sensors_read_and_action(void) {
 
 			case 6://rotor position 60 degree
 				// enable FOC from 60° to 300°
-				ui8_foc_enable_flag=1;
+				ui8_foc_enable_flag = 1;
 				uint8_t_hall_case[1] = ui8_adc_read_phase_B_current();
 
 
@@ -203,16 +194,23 @@ void hall_sensors_read_and_action(void) {
 
 void updateCorrection() {
 
-	if (ui16_motor_speed_erps > 3 && ui16_BatteryCurrent > ui16_current_cal_b + 3) { //normal riding,
-		if (ui16_ADC_iq_current >> 2 > 127 && ui8_position_correction_value < 135) {
-			ui8_position_correction_value++;
-		} else if (ui16_ADC_iq_current >> 2 < (127 - 2) && ui8_position_correction_value > 90) {
-			ui8_position_correction_value--;
+	if (ui8_duty_cycle_target > 5) {
+		ui16_ADC_iq_current_accumulated -= ui16_ADC_iq_current_accumulated >> 3;
+		ui16_ADC_iq_current_accumulated += ui16_adc_read_phase_B_current();
+		ui16_ADC_iq_current = ui16_ADC_iq_current_accumulated >> 3; // this value is regualted to be zero by FOC 
+
+		
+		if (ui16_motor_speed_erps > 3 && ui16_BatteryCurrent > ui16_current_cal_b + 3) { //normal riding,
+			if (ui16_ADC_iq_current >> 2 > 128 && ui8_position_correction_value < 143) {
+				ui8_position_correction_value++;
+			} else if (ui16_ADC_iq_current >> 2 < 126 && ui8_position_correction_value > 111) {
+				ui8_position_correction_value--;
+			}
+		} else if (ui16_motor_speed_erps > 3 && ui16_BatteryCurrent < ui16_current_cal_b - 3) {//regen
+			ui8_position_correction_value = 127; //set advance angle to neutral value
+		} else if (ui16_motor_speed_erps < 3) {
+			ui8_position_correction_value = 127; //reset advance angle at very low speed)
 		}
-	} else if (ui16_motor_speed_erps > 3 && ui16_BatteryCurrent < ui16_current_cal_b - 3) {//regen
-		ui8_position_correction_value = 127; //set advance angle to neutral value
-	} else if (ui16_motor_speed_erps < 3) {
-		ui8_position_correction_value = 127; //reset advance angle at very low speed)
 	}
 }
 
@@ -281,13 +279,13 @@ void motor_fast_loop(void) {
 
 
 	// check if FOC control is needed
-	if ((ui8_foc_enable_flag) && (ui8_motor_rotor_position >= ui8_correction_at_angle)) {
+	if ((ui8_foc_enable_flag) && (ui8_motor_rotor_position >= (ui8_correction_at_angle+ui8_s_motor_angle)) {
 		// make sure we just execute one time per ERPS, so reset the flag
-		ui8_foc_enable_flag=0;
+		ui8_foc_enable_flag = 0;
 		updateCorrection();
 	}
-	
-	
+
+
 	//reset watchdog
 	IWDG->KR = IWDG_KEY_REFRESH;
 	pwm_duty_cycle_controller();

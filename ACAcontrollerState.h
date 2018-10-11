@@ -83,8 +83,6 @@ extern uint8_t ui8_offroad_counter;
 
 extern uint16_t ui16_aca_flags;
 
-extern uint8_t ui8_adc_read_throttle_busy;
-
 extern uint16_t ui16_torque[NUMBER_OF_PAS_MAGS];
 extern uint8_t ui8_torque_index;
 

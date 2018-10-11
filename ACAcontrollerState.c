@@ -94,7 +94,6 @@ uint8_t ui8_offroad_counter = 0; //counter for offroad switching procedure
 
 uint16_t ui16_aca_flags = 0; //if throttle input should be bases on assist level and other flags
 
-uint8_t ui8_adc_read_throttle_busy = 0;
 uint16_t ui16_torque[NUMBER_OF_PAS_MAGS]; //array for torque values of one crank revolution
 uint8_t ui8_torque_index = 0; //counter for torque array
 
