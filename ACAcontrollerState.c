@@ -75,6 +75,10 @@ uint16_t ui16_ADC_iq_current_filtered = 0;
 uint8_t ui8_control_state = 0;
 uint8_t ui8_uptime = 0;
 
+uint8_t ui8_variableDebugA = 0;
+uint8_t ui8_variableDebugB = 0;
+uint8_t ui8_variableDebugC = 0;
+
 int8_t i8_motor_temperature = 0;
 
 uint8_t uint8_t_hall_case[7];

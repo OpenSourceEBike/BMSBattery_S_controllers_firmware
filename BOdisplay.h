@@ -47,8 +47,8 @@ typedef enum {
 	CODE_VER_SPEED = ((uint8_t) 0xA6),
 
 	CODE_ASSIST_LEVEL_DYNAMIC_ADDON = ((uint8_t) 0xA7),
-	CODE_ASSIST_LEVEL_SMOOTHED_PERCENT= ((uint8_t) 0xA8),
-	CODE_ASSIST_PERCENT_WANTED= ((uint8_t) 0xA9),
+	CODE_ASSIST_LEVEL_SMOOTHED_PERCENT = ((uint8_t) 0xA8),
+	CODE_ASSIST_PERCENT_WANTED = ((uint8_t) 0xA9),
 
 	CODE_MOTOR_STATE = ((uint8_t) 0xC0),
 	CODE_BATTERY_VOLTAGE = ((uint8_t) 0xC1),
@@ -82,8 +82,8 @@ typedef enum {
 	CODE_THROTTLE = ((uint8_t) 0xDB),
 	CODE_CURRENT_TARGET_HIGH_BYTE = ((uint8_t) 0xDC),
 	CODE_CURRENT_TARGET = ((uint8_t) 0xDD),
-			
-	CODE_SUM_THROTTLE= ((uint8_t) 0xDE),
+
+	CODE_SUM_THROTTLE = ((uint8_t) 0xDE),
 
 	CODE_MOTOR_SPECIFIC_ANGLE = ((uint8_t) 0x80),
 	CODE_ERPS_FACTOR = ((uint8_t) 0x81),
@@ -116,8 +116,12 @@ typedef enum {
 
 	CODE_ACA_FLAGS_HIGH_BYTE = ((uint8_t) 0x97),
 	CODE_ACA_FLAGS = ((uint8_t) 0x98),
-			
+
 	CODE_CORRECTION_AT_ANGLE = ((uint8_t) 0x99),
+
+	CODE_VAR_DEBUG_A = ((uint8_t) 0x9A),
+	CODE_VAR_DEBUG_B = ((uint8_t) 0x9B),
+	CODE_VAR_DEBUG_C = ((uint8_t) 0x9C),
 
 	CODE_HALL_ORDER_BASE = ((uint8_t) 0x10),
 	CODE_CURRENT_AT_HALL_POSITION_BASE = ((uint8_t) 0x00)

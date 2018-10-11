@@ -198,7 +198,8 @@ void updateCorrection() {
 		ui16_ADC_iq_current_accumulated -= ui16_ADC_iq_current_accumulated >> 3;
 		ui16_ADC_iq_current_accumulated += ui16_adc_read_phase_B_current();
 		ui16_ADC_iq_current = ui16_ADC_iq_current_accumulated >> 3; // this value is regualted to be zero by FOC 
-
+		
+		ui8_variableDebugB=ui16_adc_read_phase_B_current()>>2;
 		
 		if (ui16_motor_speed_erps > 3 && ui16_BatteryCurrent > ui16_current_cal_b + 3) { //normal riding,
 			if (ui16_ADC_iq_current >> 2 > 128 && ui8_position_correction_value < 143) {
@@ -280,6 +281,7 @@ void motor_fast_loop(void) {
 
 	// check if FOC control is needed
 	if ((ui8_foc_enable_flag) && (ui8_motor_rotor_position >= (ui8_correction_at_angle))) {
+		ui8_variableDebugA = ui8_motor_rotor_position;
 		// make sure we just execute one time per ERPS, so reset the flag
 		ui8_foc_enable_flag = 0;
 		updateCorrection();

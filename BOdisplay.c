@@ -153,8 +153,12 @@ void addHallStateInfos(void) {
 	addPayload(CODE_HALL_ORDER_BASE + 0x03, uint8_t_hall_order[3]);
 	addPayload(CODE_HALL_ORDER_BASE + 0x04, uint8_t_hall_order[4]);
 	addPayload(CODE_HALL_ORDER_BASE + 0x05, uint8_t_hall_order[5]);
+	
+	addPayload(CODE_VAR_DEBUG_A, ui8_variableDebugA);
+	addPayload(CODE_VAR_DEBUG_B, ui8_variableDebugB);
+	addPayload(CODE_VAR_DEBUG_C, ui8_variableDebugC);
 
-	// 12 more elements left/avail (max24)
+	// 9 more elements left/avail (max24)
 }
 
 void addDetailStateInfos(void) {

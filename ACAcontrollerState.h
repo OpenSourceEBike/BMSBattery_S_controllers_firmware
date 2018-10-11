@@ -61,6 +61,10 @@ extern uint8_t ui8_speedlimit_actual_kph;
 extern uint8_t ui8_speedlimit_with_throttle_override_kph;
 extern uint8_t ui8_uptime;
 
+extern uint8_t ui8_variableDebugA;
+extern uint8_t ui8_variableDebugB;
+extern uint8_t ui8_variableDebugC;
+
 extern int8_t i8_motor_temperature;
 
 extern uint8_t uint8_t_hall_case[7];
