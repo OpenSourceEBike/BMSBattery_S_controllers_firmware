@@ -276,7 +276,7 @@ void motor_fast_loop(void) {
 
 	
 	// check if FOC control is needed
-	if ((ui8_foc_enable_flag) && (ui8_motor_rotor_position >= (ui8_correction_at_angle)) && (ui8_motor_rotor_position < (ui8_correction_at_angle+8))) {
+	if ((ui8_foc_enable_flag) && ((ui8_motor_rotor_position-ui8_position_correction_value) >= (ui8_correction_at_angle)) && (ui8_motor_rotor_position < (ui8_correction_at_angle+8))) {
 		ui8_variableDebugA = ui8_motor_rotor_position;
 		// make sure we just execute one time per ERPS, so reset the flag
 		ui8_foc_enable_flag = 0;
