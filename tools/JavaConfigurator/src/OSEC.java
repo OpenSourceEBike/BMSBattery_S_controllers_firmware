@@ -137,6 +137,7 @@ public class OSEC extends JFrame {
 	private JCheckBox cbSpeedInfluencesTqSensor;
 	private JCheckBox cbPasInverted;
 	private JCheckBox cbPwmOff;
+	private JCheckBox cbCorrectionEnabled;
 	private JCheckBox cbDynAssist;
 
 	private JTextField speedWithoutPas;
@@ -235,6 +236,7 @@ public class OSEC extends JFrame {
 		cbDynAssist.setSelected((acaFlags & 512) > 0);
 		cbPwmOff.setSelected((acaFlags & 1024) > 0);
 		cbTorqueSensor.setSelected((acaFlags & 2048) > 0);
+		cbCorrectionEnabled.setSelected((acaFlags & 4096)>0);
 		in.close();
 	}
 
@@ -776,6 +778,12 @@ public class OSEC extends JFrame {
 		cbPwmOff.setBounds(332, 515, 250, 20);
 		cbPwmOff.setForeground(Color.GRAY);
 		contentPane.add(cbPwmOff);
+		
+		cbCorrectionEnabled = new JCheckBox("Enable rotor angle correction");
+		cbCorrectionEnabled.setSelected(false);
+		cbCorrectionEnabled.setBounds(332, 535, 250, 20);
+		cbCorrectionEnabled.setForeground(Color.GRAY);
+		contentPane.add(cbCorrectionEnabled);
 
 		JLabel lblMotorSpeed = new JLabel("Motor Speed");
 		lblMotorSpeed.setFont(new Font("Tahoma", Font.BOLD, 12));
@@ -1109,7 +1117,8 @@ public class OSEC extends JFrame {
 					acaFlags |= (cbDynAssist.isSelected() ? 512 : 0);
 					acaFlags |= (cbPwmOff.isSelected() ? 1024 : 0);
 					acaFlags |= (cbTorqueSensor.isSelected() ? 2048 : 0);
-
+					acaFlags |= (cbCorrectionEnabled.isSelected() ? 4096 : 0);
+					
 					iWriter.println(acaFlags);
 
 					pWriter.println("#define ACA " + acaFlags);
