@@ -143,7 +143,9 @@ void hall_sensors_read_and_action(void) {
 
 			case 4: //rotor position 0 degree
 				ui8_half_rotation_flag = 1;
-				ui8_foc_enable_flag = 1;
+				if ((ui16_aca_flags & ANGLE_CORRECTION_ENABLED) == ANGLE_CORRECTION_ENABLED){
+					ui8_foc_enable_flag = 1;
+				}
 				uint8_t_hall_case[0] = ui8_adc_read_phase_B_current();
 
 				debug_pin_reset();
@@ -276,7 +278,7 @@ void motor_fast_loop(void) {
 
 	
 	// check if FOC control is needed
-	if ((ui8_foc_enable_flag) && ((ui8_motor_rotor_position-ui8_position_correction_value) >= (ui8_correction_at_angle)) && (ui8_motor_rotor_position < (ui8_correction_at_angle+8))) {
+	if ((ui8_foc_enable_flag) && ((ui8_motor_rotor_position-ui8_position_correction_value) >= (ui8_correction_at_angle)) && ((ui8_motor_rotor_position-ui8_position_correction_value) < (ui8_correction_at_angle+8))) {
 		ui8_variableDebugA = ui8_motor_rotor_position;
 		ui8_variableDebugC = ui8_motor_rotor_position-ui8_position_correction_value;
 		// make sure we just execute one time per ERPS, so reset the flag
