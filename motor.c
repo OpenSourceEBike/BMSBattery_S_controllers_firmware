@@ -185,24 +185,30 @@ void hall_sensors_read_and_action(void) {
 }
 
 void updateCorrection() {
-
+	
 	if (ui8_duty_cycle_target > 5) {
 		ui16_ADC_iq_current_accumulated -= ui16_ADC_iq_current_accumulated >> 3;
 		ui16_ADC_iq_current_accumulated += ui16_adc_read_phase_B_current();
 		ui16_ADC_iq_current = ui16_ADC_iq_current_accumulated >> 3; // this value is regualted to be zero by FOC 
-
-		if (ui16_motor_speed_erps > 3 && ui16_BatteryCurrent > ui16_current_cal_b + 3) { //normal riding,
-			if (ui16_ADC_iq_current >> 2 > 128 && ui8_position_correction_value < 143) {
-				ui8_position_correction_value++;
-			} else if (ui16_ADC_iq_current >> 2 < 126 && ui8_position_correction_value > 111) {
-				ui8_position_correction_value--;
-			}
-		} else if (ui16_motor_speed_erps > 3 && ui16_BatteryCurrent < ui16_current_cal_b - 3) {//regen
-			ui8_position_correction_value = 127; //set advance angle to neutral value
-		} else if (ui16_motor_speed_erps < 3) {
-			ui8_position_correction_value = 127; //reset advance angle at very low speed)
-		}
 	}
+	
+	if ((ui16_aca_flags & ANGLE_CORRECTION_ENABLED) != ANGLE_CORRECTION_ENABLED) {
+		ui8_position_correction_value = 127; //set advance angle to neutral value
+		return;
+	}
+
+	if (ui16_motor_speed_erps > 3 && ui16_BatteryCurrent > ui16_current_cal_b + 3) { //normal riding,
+		if (ui16_ADC_iq_current >> 2 > 128 && ui8_position_correction_value < 143) {
+			ui8_position_correction_value++;
+		} else if (ui16_ADC_iq_current >> 2 < 126 && ui8_position_correction_value > 111) {
+			ui8_position_correction_value--;
+		}
+	} else if (ui16_motor_speed_erps > 3 && ui16_BatteryCurrent < ui16_current_cal_b - 3) {//regen
+		ui8_position_correction_value = 127; //set advance angle to neutral value
+	} else if (ui16_motor_speed_erps < 3) {
+		ui8_position_correction_value = 127; //reset advance angle at very low speed)
+	}
+	
 }
 
 // runs every 64us (PWM frequency)
@@ -274,17 +280,14 @@ void motor_fast_loop(void) {
 
 
 	// check if FOC control is needed
-	if ((ui8_foc_enable_flag) && ((ui8_assumed_motor_position) >= (ui8_correction_at_angle)) && ((ui8_assumed_motor_position) < (ui8_correction_at_angle + 8))) {
+	if ((ui8_foc_enable_flag) && ((ui8_assumed_motor_position) >= (ui8_correction_at_angle)) && ((ui8_assumed_motor_position) < (ui8_correction_at_angle + 4))) {
 		// make sure we just execute one time per ERPS, so reset the flag
 		ui8_foc_enable_flag = 0;
 
 		ui8_variableDebugA = ui8_assumed_motor_position;
-		ui8_variableDebugC = ui8_assumed_motor_position + ui8_position_correction_value - 127;
-		ui8_variableDebugB = ui16_adc_read_phase_B_current() >> 2;
-
-		if ((ui16_aca_flags & ANGLE_CORRECTION_ENABLED) == ANGLE_CORRECTION_ENABLED) {
-			updateCorrection();
-		}
+		ui8_variableDebugB = ui8_assumed_motor_position + ui8_position_correction_value - 127;
+		
+		updateCorrection();
 	}
 
 
