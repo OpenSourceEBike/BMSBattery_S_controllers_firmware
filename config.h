@@ -39,12 +39,19 @@
 #define PAS_THRESHOLD 1.9
 #define RAMP_START 64000
 #define limit_with_throttle_override 35
+#define CORRECTION_AT_ANGLE 90
 #define PWM_CYCLES_SECOND 15625L
 #define SPEEDSENSOR_INTERNAL
+#define ANGLE_4_0 0
+#define ANGLE_6_60 42
+#define ANGLE_2_120 85
+#define ANGLE_3_180 127
 #define BLUOSEC
+#define ANGLE_1_240 170
+#define ANGLE_5_300 212
 #define TQS_CALIB 0.0
 #define ACA 4766
 #define EEPROM_NOINIT // eeprom will not be cleared
-#define EEPROM_INIT_MAGIC_BYTE 25 // makes sure (chance of fail 1/255) eeprom is invalidated after flashing new config
+#define EEPROM_INIT_MAGIC_BYTE 141 // makes sure (chance of fail 1/255) eeprom is invalidated after flashing new config
 
 #endif /* CONFIG_H_ */
