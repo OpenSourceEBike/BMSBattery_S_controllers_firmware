@@ -66,6 +66,9 @@ void hall_sensors_read_and_action(void) {
 	hall_sensors = (GPIO_ReadInputData(HALL_SENSORS__PORT) & (HALL_SENSORS_MASK));
 	if ((hall_sensors != hall_sensors_last) || (ui8_motor_state == MOTOR_STATE_COAST)) // let's run the code when motor is stopped/coast so it can pick right motor position for correct startup
 	{
+		if (hall_sensors_last >0 && hall_sensors_last < 7) {
+			uint8_t_60deg_pwm_cycles[hall_sensors_last-1] = ui16_PWM_cycles_counter_6;
+		}
 		updateHallOrder(hall_sensors);
 
 		//printf("hall change! %d, %d \n", hall_sensors, hall_sensors_last );
@@ -175,9 +178,6 @@ void hall_sensors_read_and_action(void) {
 				break;
 		}
 
-		if (hall_sensors < 6) {
-			uint8_t_60deg_pwm_cycles[hall_sensors] = ui16_PWM_cycles_counter_6>>4;
-		}
 		ui16_PWM_cycles_counter_6 = 0;
 	}
 }
