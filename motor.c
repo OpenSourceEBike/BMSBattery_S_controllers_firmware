@@ -32,7 +32,6 @@ uint8_t ui8_assumed_motor_position = 0;
 uint8_t ui8_sinetable_position = 0; // in 360/256 degrees
 uint8_t ui8_motor_rotor_hall_position = 0; // in 360/256 degrees
 
-uint16_t ui16_PWM_cycles_counter_total_div_4 = 0;
 uint8_t ui8_interpolation_angle = 0;
 
 uint16_t ui16_adc_current_phase_B = 0;
@@ -88,7 +87,6 @@ void hall_sensors_read_and_action(void) {
 					if (ui16_PWM_cycles_counter > 20) ui16_PWM_cycles_counter_total = ui16_PWM_cycles_counter;
 
 					ui16_PWM_cycles_counter = 0;
-					ui16_PWM_cycles_counter_total_div_4 = ui16_PWM_cycles_counter_total >> 2;
 					ui16_motor_speed_erps = ((uint16_t) PWM_CYCLES_SECOND) / ui16_PWM_cycles_counter_total; // this division takes ~4.2us
 
 				}
@@ -177,21 +175,21 @@ void hall_sensors_read_and_action(void) {
 				break;
 		}
 
-
-
-		// FIXME, this basically disables this mode?
+		if (hall_sensors < 6) {
+			uint8_t_60deg_pwm_cycles[hall_sensors] = ui16_PWM_cycles_counter_6>>4;
+		}
 		ui16_PWM_cycles_counter_6 = 0;
 	}
 }
 
 void updateCorrection() {
-	
+
 	if (ui8_duty_cycle_target > 5) {
 		ui16_ADC_iq_current_accumulated -= ui16_ADC_iq_current_accumulated >> 3;
 		ui16_ADC_iq_current_accumulated += ui16_adc_read_phase_B_current();
 		ui16_ADC_iq_current = ui16_ADC_iq_current_accumulated >> 3; // this value is regualted to be zero by FOC 
 	}
-	
+
 	if ((ui16_aca_flags & ANGLE_CORRECTION_ENABLED) != ANGLE_CORRECTION_ENABLED) {
 		ui8_position_correction_value = 127; //set advance angle to neutral value
 		return;
@@ -208,7 +206,7 @@ void updateCorrection() {
 	} else if (ui16_motor_speed_erps < 3) {
 		ui8_position_correction_value = 127; //reset advance angle at very low speed)
 	}
-	
+
 }
 
 // runs every 64us (PWM frequency)
@@ -286,7 +284,7 @@ void motor_fast_loop(void) {
 
 		ui8_variableDebugA = ui8_assumed_motor_position;
 		ui8_variableDebugB = ui8_assumed_motor_position + ui8_position_correction_value - 127;
-		
+
 		updateCorrection();
 	}
 

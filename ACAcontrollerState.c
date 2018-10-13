@@ -81,6 +81,7 @@ uint8_t ui8_variableDebugC = 0;
 
 int8_t i8_motor_temperature = 0;
 
+uint8_t uint8_t_60deg_pwm_cycles[6];
 uint8_t uint8_t_hall_case[7];
 uint8_t uint8_t_hall_order[6];
 int8_t int8_t_hall_counter = 0;

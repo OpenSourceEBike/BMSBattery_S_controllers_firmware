@@ -123,6 +123,7 @@ typedef enum {
 	CODE_VAR_DEBUG_B = ((uint8_t) 0x9B),
 	CODE_VAR_DEBUG_C = ((uint8_t) 0x9C),
 
+	CODE_60_DEG_PWM_CYCLES= ((uint8_t) 0x08),
 	CODE_HALL_ORDER_BASE = ((uint8_t) 0x10),
 	CODE_CURRENT_AT_HALL_POSITION_BASE = ((uint8_t) 0x00)
 } BO_VALUE_CODES;
