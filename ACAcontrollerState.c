@@ -39,6 +39,12 @@ float flt_torquesensorCalibration = 0.0;
 uint16_t ui16_s_ramp_end = 1500;
 uint16_t ui16_s_ramp_start = 7000;
 uint8_t ui8_s_motor_angle = 214;
+uint8_t ui8_s_hall_angle4_0 = 0;
+uint8_t ui8_s_hall_angle6_60 = 42;
+uint8_t ui8_s_hall_angle2_120 = 85;
+uint8_t ui8_s_hall_angle3_180 = 127;
+uint8_t ui8_s_hall_angle1_240 = 170;
+uint8_t ui8_s_hall_angle5_300 = 212;
 
 // internal
 uint32_t uint32_icc_signals = 0;
@@ -46,10 +52,10 @@ uint32_t uint32_icc_signals = 0;
 uint8_t ui8_assist_dynamic_percent_addon = 0;
 uint8_t ui8_assistlevel_global = 83; // 3 + max regen
 uint8_t ui8_assist_percent_actual = 20;
-uint8_t ui8_assist_percent_wanted =20;
+uint8_t ui8_assist_percent_wanted = 20;
 uint8_t PAS_act = 3; //recent PAS direction reading
 uint8_t PAS_is_active = 0;
-uint16_t ui16_sum_torque = 0; 
+uint16_t ui16_sum_torque = 0;
 uint16_t ui16_sum_throttle = 0;
 uint16_t ui16_momentary_throttle = 0;
 uint8_t ui8_offroad_state = 0; //state of offroad switching procedure
@@ -111,76 +117,95 @@ uint8_t ui8_PAS_update_call_when_inactive_counter = 50; //increased when no pas 
 uint8_t ui8_PAS_Flag = 0;
 
 void controllerstate_init(void) {
-    uint8_t di;
-    uint8_t eepromVal;
-    uint8_t eepromHighVal;
+	uint8_t di;
+	uint8_t eepromVal;
+	uint8_t eepromHighVal;
 
-    // convert static defines to volatile vars
-    ui16_aca_flags = ACA;
-    ui8_speedlimit_kph = limit;
-    ui8_speedlimit_without_pas_kph = limit_without_pas;
-    ui8_speedlimit_with_throttle_override_kph = limit_with_throttle_override;
-    ui8_speedlimit_actual_kph = limit;
-    ui8_throttle_min_range = ADC_THROTTLE_MIN_VALUE;
-    ui8_throttle_max_range = ADC_THROTTLE_MAX_VALUE;
-    flt_s_pas_threshold = PAS_THRESHOLD;
-    flt_s_pid_gain_p = P_FACTOR;
-    flt_s_pid_gain_i = I_FACTOR;
-    ui16_s_ramp_start = RAMP_START;
-    ui16_s_ramp_end = RAMP_END;
-    ui8_s_motor_angle = MOTOR_ROTOR_DELTA_PHASE_ANGLE_RIGHT;
-    ui16_battery_current_max_value = BATTERY_CURRENT_MAX_VALUE;
-    ui16_regen_current_max_value = REGEN_CURRENT_MAX_VALUE;
-    ui8_current_cal_a = current_cal_a;
+	// convert static defines to volatile vars
+	ui16_aca_flags = ACA;
+	ui8_speedlimit_kph = limit;
+	ui8_speedlimit_without_pas_kph = limit_without_pas;
+	ui8_speedlimit_with_throttle_override_kph = limit_with_throttle_override;
+	ui8_speedlimit_actual_kph = limit;
+	ui8_throttle_min_range = ADC_THROTTLE_MIN_VALUE;
+	ui8_throttle_max_range = ADC_THROTTLE_MAX_VALUE;
+	flt_s_pas_threshold = PAS_THRESHOLD;
+	flt_s_pid_gain_p = P_FACTOR;
+	flt_s_pid_gain_i = I_FACTOR;
+	ui16_s_ramp_start = RAMP_START;
+	ui16_s_ramp_end = RAMP_END;
+	ui8_s_motor_angle = MOTOR_ROTOR_DELTA_PHASE_ANGLE_RIGHT;
+	ui8_s_hall_angle4_0 = ANGLE_4_0;
+	ui8_s_hall_angle6_60 = ANGLE_6_60;
+	ui8_s_hall_angle2_120 = ANGLE_2_120;
+	ui8_s_hall_angle3_180 = ANGLE_3_180;
+	ui8_s_hall_angle1_240 = ANGLE_1_240;
+	ui8_s_hall_angle5_300 = ANGLE_5_300;
+	ui16_battery_current_max_value = BATTERY_CURRENT_MAX_VALUE;
+	ui16_regen_current_max_value = REGEN_CURRENT_MAX_VALUE;
+	ui8_current_cal_a = current_cal_a;
 	flt_torquesensorCalibration = TQS_CALIB;
 
-    // read in overrides from eeprom if they are > 0, assuming 0s are uninitialized
-    eepromHighVal = eeprom_read(OFFSET_BATTERY_CURRENT_MAX_VALUE_HIGH_BYTE);
-    eepromVal = eeprom_read(OFFSET_BATTERY_CURRENT_MAX_VALUE);
-    if (eepromVal > 0 || eepromHighVal > 0) ui16_battery_current_max_value = ((uint16_t) eepromHighVal << 8) + (uint16_t) eepromVal;
+	// read in overrides from eeprom if they are > 0, assuming 0s are uninitialized
+	eepromHighVal = eeprom_read(OFFSET_BATTERY_CURRENT_MAX_VALUE_HIGH_BYTE);
+	eepromVal = eeprom_read(OFFSET_BATTERY_CURRENT_MAX_VALUE);
+	if (eepromVal > 0 || eepromHighVal > 0) ui16_battery_current_max_value = ((uint16_t) eepromHighVal << 8) + (uint16_t) eepromVal;
 
-    eepromHighVal = eeprom_read(OFFSET_ACA_FLAGS_HIGH_BYTE);
-    eepromVal = eeprom_read(OFFSET_ACA_FLAGS);
-    if (eepromVal > 0 || eepromHighVal > 0)  ui16_aca_flags = ((uint16_t) eepromHighVal << 8) + (uint16_t) eepromVal;
-    
-    eepromVal = eeprom_read(OFFSET_REGEN_CURRENT_MAX_VALUE);
-    if (eepromVal > 0) ui16_regen_current_max_value = eepromVal;
-    eepromVal = eeprom_read(OFFSET_MAX_SPEED_DEFAULT);
-    if (eepromVal > 0) ui8_speedlimit_kph = eepromVal;
-    eepromVal = eeprom_read(OFFSET_MAX_SPEED_WITHOUT_PAS);
-    if (eepromVal > 0) ui8_speedlimit_without_pas_kph = eepromVal;
-    eepromVal = eeprom_read(OFFSET_MAX_SPEED_WITH_THROTTLE_OVERRIDE);
-    if (eepromVal > 0) ui8_speedlimit_with_throttle_override_kph = eepromVal;
-    eepromVal = eeprom_read(OFFSET_CURRENT_CAL_A);
-    if (eepromVal > 0) ui8_current_cal_a = eepromVal;
-    eepromVal = eeprom_read(OFFSET_ASSIST_LEVEL);
-    if (eepromVal > 0) ui8_assistlevel_global = eepromVal;
+	eepromHighVal = eeprom_read(OFFSET_ACA_FLAGS_HIGH_BYTE);
+	eepromVal = eeprom_read(OFFSET_ACA_FLAGS);
+	if (eepromVal > 0 || eepromHighVal > 0) ui16_aca_flags = ((uint16_t) eepromHighVal << 8) + (uint16_t) eepromVal;
+
+	eepromVal = eeprom_read(OFFSET_REGEN_CURRENT_MAX_VALUE);
+	if (eepromVal > 0) ui16_regen_current_max_value = eepromVal;
+	eepromVal = eeprom_read(OFFSET_MAX_SPEED_DEFAULT);
+	if (eepromVal > 0) ui8_speedlimit_kph = eepromVal;
+	eepromVal = eeprom_read(OFFSET_MAX_SPEED_WITHOUT_PAS);
+	if (eepromVal > 0) ui8_speedlimit_without_pas_kph = eepromVal;
+	eepromVal = eeprom_read(OFFSET_MAX_SPEED_WITH_THROTTLE_OVERRIDE);
+	if (eepromVal > 0) ui8_speedlimit_with_throttle_override_kph = eepromVal;
+	eepromVal = eeprom_read(OFFSET_CURRENT_CAL_A);
+	if (eepromVal > 0) ui8_current_cal_a = eepromVal;
+	eepromVal = eeprom_read(OFFSET_ASSIST_LEVEL);
+	if (eepromVal > 0) ui8_assistlevel_global = eepromVal;
 	eepromVal = eeprom_read(OFFSET_ASSIST_PERCENT_WANTED);
-    if (eepromVal > 0) ui8_assist_percent_wanted = eepromVal;
-    eepromVal = eeprom_read(OFFSET_THROTTLE_MIN_RANGE);
-    if (eepromVal > 0) ui8_throttle_min_range = eepromVal;
-    eepromVal = eeprom_read(OFFSET_THROTTLE_MAX_RANGE);
-    if (eepromVal > 0) ui8_throttle_max_range = eepromVal;
-    eepromVal = eeprom_read(OFFSET_PAS_TRESHOLD);
-    if (eepromVal > 0) flt_s_pas_threshold = int2float(eepromVal, 4.0);
+	if (eepromVal > 0) ui8_assist_percent_wanted = eepromVal;
+	eepromVal = eeprom_read(OFFSET_THROTTLE_MIN_RANGE);
+	if (eepromVal > 0) ui8_throttle_min_range = eepromVal;
+	eepromVal = eeprom_read(OFFSET_THROTTLE_MAX_RANGE);
+	if (eepromVal > 0) ui8_throttle_max_range = eepromVal;
+	eepromVal = eeprom_read(OFFSET_PAS_TRESHOLD);
+	if (eepromVal > 0) flt_s_pas_threshold = int2float(eepromVal, 4.0);
 	eepromVal = eeprom_read(OFFSET_TQ_CALIB);
-    if (eepromVal > 0) flt_torquesensorCalibration = int2float(eepromVal, 8000.0);
-    eepromVal = eeprom_read(OFFSET_PID_GAIN_P);
-    if (eepromVal > 0) flt_s_pid_gain_p = int2float(eepromVal, 2.0);
-    eepromVal = eeprom_read(OFFSET_PID_GAIN_I);
-    if (eepromVal > 0) flt_s_pid_gain_i = int2float(eepromVal, 2.0);
-    eepromVal = eeprom_read(OFFSET_RAMP_END);
-    if (eepromVal > 0) ui16_s_ramp_end = eepromVal << 5;
-    eepromVal = eeprom_read(OFFSET_RAMP_START);
-    if (eepromVal > 0) ui16_s_ramp_start = eepromVal << 6;
-    eepromVal = eeprom_read(OFFSET_MOTOR_ANGLE);
-    if (eepromVal > 0) ui8_s_motor_angle = eepromVal;
+	if (eepromVal > 0) flt_torquesensorCalibration = int2float(eepromVal, 8000.0);
+	eepromVal = eeprom_read(OFFSET_PID_GAIN_P);
+	if (eepromVal > 0) flt_s_pid_gain_p = int2float(eepromVal, 2.0);
+	eepromVal = eeprom_read(OFFSET_PID_GAIN_I);
+	if (eepromVal > 0) flt_s_pid_gain_i = int2float(eepromVal, 2.0);
+	eepromVal = eeprom_read(OFFSET_RAMP_END);
+	if (eepromVal > 0) ui16_s_ramp_end = eepromVal << 5;
+	eepromVal = eeprom_read(OFFSET_RAMP_START);
+	if (eepromVal > 0) ui16_s_ramp_start = eepromVal << 6;
+	eepromVal = eeprom_read(OFFSET_MOTOR_ANGLE);
+	if (eepromVal > 0) ui8_s_motor_angle = eepromVal;
 	eepromVal = eeprom_read(OFFSET_CORRECTION_AT_ANGLE);
-    if (eepromVal > 0) ui8_correction_at_angle = eepromVal;
+	if (eepromVal > 0) ui8_correction_at_angle = eepromVal;
+	
+	eepromVal = eeprom_read(OFFSET_HALL_ANGLE_4_0);
+	if (eepromVal > 0) ui8_s_hall_angle4_0 = eepromVal;
+	eepromVal = eeprom_read(OFFSET_HALL_ANGLE_6_60);
+	if (eepromVal > 0) ui8_s_hall_angle6_60 = eepromVal;
+	eepromVal = eeprom_read(OFFSET_HALL_ANGLE_2_120);
+	if (eepromVal > 0) ui8_s_hall_angle2_120 = eepromVal;
+	eepromVal = eeprom_read(OFFSET_HALL_ANGLE_3_180);
+	if (eepromVal > 0) ui8_s_hall_angle3_180 = eepromVal;
+	eepromVal = eeprom_read(OFFSET_HALL_ANGLE_1_240);
+	if (eepromVal > 0) ui8_s_hall_angle1_240 = eepromVal;
+	eepromVal = eeprom_read(OFFSET_HALL_ANGLE_5_300);
+	if (eepromVal > 0) ui8_s_hall_angle5_300 = eepromVal;
 
-    for (di = 0; di < 6; di++) {
-        uint8_t_hall_order[di] = 0;
-    }
-    
+	for (di = 0; di < 6; di++) {
+		uint8_t_hall_order[di] = 0;
+	}
+
 }
 

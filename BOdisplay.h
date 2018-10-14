@@ -50,6 +50,13 @@ typedef enum {
 	CODE_ASSIST_LEVEL_SMOOTHED_PERCENT = ((uint8_t) 0xA8),
 	CODE_ASSIST_PERCENT_WANTED = ((uint8_t) 0xA9),
 
+	CODE_HALL_ANGLE_4_0 = ((uint8_t) 0xAA),
+	CODE_HALL_ANGLE_6_60 = ((uint8_t) 0xAB),
+	CODE_HALL_ANGLE_2_120 = ((uint8_t) 0xAC),
+	CODE_HALL_ANGLE_3_180 = ((uint8_t) 0xAD),
+	CODE_HALL_ANGLE_1_240 = ((uint8_t) 0xAE),
+	CODE_HALL_ANGLE_5_300 = ((uint8_t) 0xAF),
+
 	CODE_MOTOR_STATE = ((uint8_t) 0xC0),
 	CODE_BATTERY_VOLTAGE = ((uint8_t) 0xC1),
 	CODE_UPTIME = ((uint8_t) 0xC2),
@@ -123,7 +130,7 @@ typedef enum {
 	CODE_VAR_DEBUG_B = ((uint8_t) 0x9B),
 	CODE_VAR_DEBUG_C = ((uint8_t) 0x9C),
 
-	CODE_60_DEG_PWM_CYCLES= ((uint8_t) 0x08),
+	CODE_60_DEG_PWM_CYCLES = ((uint8_t) 0x08),
 	CODE_HALL_ORDER_BASE = ((uint8_t) 0x10),
 	CODE_CURRENT_AT_HALL_POSITION_BASE = ((uint8_t) 0x00)
 } BO_VALUE_CODES;

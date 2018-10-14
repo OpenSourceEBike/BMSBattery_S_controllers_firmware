@@ -48,9 +48,16 @@ typedef enum {
 
 	OFFSET_ACA_FLAGS_HIGH_BYTE = ((uint8_t) 0x12),
 	OFFSET_ACA_FLAGS = ((uint8_t) 0x13),
-			
+
 	OFFSET_TQ_CALIB = ((uint8_t) 0x14),
-	OFFSET_CORRECTION_AT_ANGLE = ((uint8_t) 0x15)
+	OFFSET_CORRECTION_AT_ANGLE = ((uint8_t) 0x15),
+
+	OFFSET_HALL_ANGLE_4_0 = ((uint8_t) 0x16),
+	OFFSET_HALL_ANGLE_6_60 = ((uint8_t) 0x17),
+	OFFSET_HALL_ANGLE_2_120 = ((uint8_t) 0x18),
+	OFFSET_HALL_ANGLE_3_180 = ((uint8_t) 0x19),
+	OFFSET_HALL_ANGLE_1_240 = ((uint8_t) 0x1A),
+	OFFSET_HALL_ANGLE_5_300 = ((uint8_t) 0x1B)
 
 } BO_EEPROM_OFFSETS;
 

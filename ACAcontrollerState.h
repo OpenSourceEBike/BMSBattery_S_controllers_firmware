@@ -108,6 +108,12 @@ extern float flt_s_pid_gain_i;
 extern uint16_t ui16_s_ramp_end;
 extern uint16_t ui16_s_ramp_start;
 extern uint8_t ui8_s_motor_angle;
+extern uint8_t ui8_s_hall_angle4_0;
+extern uint8_t ui8_s_hall_angle6_60;
+extern uint8_t ui8_s_hall_angle2_120;
+extern uint8_t ui8_s_hall_angle3_180;
+extern uint8_t ui8_s_hall_angle1_240;
+extern uint8_t ui8_s_hall_angle5_300;
 
 
 void controllerstate_init(void);

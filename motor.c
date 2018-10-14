@@ -16,7 +16,6 @@
 #include "pwm.h"
 #include "config.h"
 #include "adc.h"
-//#include "update_setpoint.h" FIXME, not needed anymore?
 #include "ACAcontrollerState.h"
 #include "ACAcommons.h"
 
@@ -116,7 +115,7 @@ void hall_sensors_read_and_action(void) {
 #endif
 
 
-				ui8_motor_rotor_hall_position = ANGLE_180;
+				ui8_motor_rotor_hall_position = ui8_s_hall_angle3_180;
 				break;
 
 			case 1:
@@ -124,7 +123,7 @@ void hall_sensors_read_and_action(void) {
 
 				if (ui8_motor_state != MOTOR_STATE_RUNNING_INTERPOLATION_360_DEGREES) {
 
-					ui8_motor_rotor_hall_position = ANGLE_240;
+					ui8_motor_rotor_hall_position = ui8_s_hall_angle1_240;
 				}
 				break;
 
@@ -136,7 +135,7 @@ void hall_sensors_read_and_action(void) {
 				if (ui8_motor_state != MOTOR_STATE_RUNNING_INTERPOLATION_360_DEGREES) {
 
 
-					ui8_motor_rotor_hall_position = ANGLE_300;
+					ui8_motor_rotor_hall_position = ui8_s_hall_angle5_300;
 				}
 				break;
 
@@ -149,7 +148,7 @@ void hall_sensors_read_and_action(void) {
 				debug_pin_reset();
 				if (ui8_motor_state != MOTOR_STATE_RUNNING_INTERPOLATION_360_DEGREES) {
 
-					ui8_motor_rotor_hall_position = ANGLE_1;
+					ui8_motor_rotor_hall_position = ui8_s_hall_angle4_0;
 				}
 				break;
 
@@ -159,7 +158,7 @@ void hall_sensors_read_and_action(void) {
 
 				if (ui8_motor_state != MOTOR_STATE_RUNNING_INTERPOLATION_360_DEGREES) {
 
-					ui8_motor_rotor_hall_position = ANGLE_60;
+					ui8_motor_rotor_hall_position = ui8_s_hall_angle6_60;
 				}
 				break;
 
@@ -169,7 +168,7 @@ void hall_sensors_read_and_action(void) {
 
 				if (ui8_motor_state != MOTOR_STATE_RUNNING_INTERPOLATION_360_DEGREES) {
 
-					ui8_motor_rotor_hall_position = ANGLE_120;
+					ui8_motor_rotor_hall_position = ui8_s_hall_angle2_120;
 				}
 				break;
 
