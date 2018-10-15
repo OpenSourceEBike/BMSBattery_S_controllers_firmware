@@ -75,6 +75,7 @@ public class OSEC extends JFrame {
 	private JTextField txtSpeedlimitWithThrottleOverride;
 	private JLabel lblThrottleMin;
 	private JTextField txtThrottlemin;
+	private JTextField batteryVoltageCalib;
 	private JLabel lblThrottleMax;
 	private JTextField txtThrottlemax;
 	private JButton lblHttpsopensourceebikefirmwarebitbucketio;
@@ -265,6 +266,10 @@ public class OSEC extends JFrame {
 		cbPwmOff.setSelected((acaFlags & 1024) > 0);
 		cbTorqueSensor.setSelected((acaFlags & 2048) > 0);
 		cbCorrectionEnabled.setSelected((acaFlags & 4096) > 0);
+		tmp = in.readLine();
+		if (tmp.trim().length() > 0) {
+			batteryVoltageCalib.setText(tmp);
+		}
 		in.close();
 	}
 
@@ -523,6 +528,17 @@ public class OSEC extends JFrame {
 		GearRatio.setBounds(150, 390, 86, 20);
 		contentPane.add(GearRatio);
 
+		JLabel lblBatVolCal = new JLabel("Battery Voltage Calib");
+		lblBatVolCal.setBounds(15, 410, 110, 20);
+		lblBatVolCal.setForeground(Color.GRAY);
+		contentPane.add(lblBatVolCal);
+
+		batteryVoltageCalib = new JTextField();
+		batteryVoltageCalib.setText("70");
+		batteryVoltageCalib.setColumns(2);
+		batteryVoltageCalib.setBounds(150, 410, 86, 20);
+		contentPane.add(batteryVoltageCalib);
+
 		JLabel lblPasThreshold = new JLabel("PAS threshold");
 		lblPasThreshold.setBounds(15, 430, 86, 20);
 		lblPasThreshold.setForeground(Color.GRAY);
@@ -650,7 +666,7 @@ public class OSEC extends JFrame {
 		contentPane.add(lblCorrectionAtAngle);
 
 		txtCorrectionAtAngle = new JTextField();
-		txtCorrectionAtAngle.setText("127");
+		txtCorrectionAtAngle.setText("85");
 		txtCorrectionAtAngle.setColumns(10);
 		txtCorrectionAtAngle.setBounds(530, 210, 50, 20);
 		contentPane.add(txtCorrectionAtAngle);
@@ -1236,6 +1252,10 @@ public class OSEC extends JFrame {
 						pWriter.println("#define EEPROM_NOINIT // eeprom will not be cleared");
 					}
 					pWriter.println("#define EEPROM_INIT_MAGIC_BYTE " + (System.currentTimeMillis() % 256) + " // makes sure (chance of fail 1/255) eeprom is invalidated after flashing new config");
+
+					text_to_save = "#define ADC_BATTERY_VOLTAGE_K " + batteryVoltageCalib.getText();
+					iWriter.println(batteryVoltageCalib.getText());
+					pWriter.println(text_to_save);
 
 					pWriter.println("\r\n#endif /* CONFIG_H_ */");
 

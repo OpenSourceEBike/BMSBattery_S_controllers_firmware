@@ -57,7 +57,9 @@ typedef enum {
 	OFFSET_HALL_ANGLE_2_120 = ((uint8_t) 0x18),
 	OFFSET_HALL_ANGLE_3_180 = ((uint8_t) 0x19),
 	OFFSET_HALL_ANGLE_1_240 = ((uint8_t) 0x1A),
-	OFFSET_HALL_ANGLE_5_300 = ((uint8_t) 0x1B)
+	OFFSET_HALL_ANGLE_5_300 = ((uint8_t) 0x1B),
+
+	OFFSET_BATTERY_VOLTAGE_CALIB = ((uint8_t) 0x1C)
 
 } BO_EEPROM_OFFSETS;
 

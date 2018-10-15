@@ -88,7 +88,7 @@ void send_message() {
 #endif
 
 	// calc battery pack state of charge (SOC)
-	ui16_battery_volts = ((uint16_t) ui8_adc_read_battery_voltage()) * ((uint16_t) ADC_BATTERY_VOLTAGE_K);
+	ui16_battery_volts = ((uint16_t) ui8_adc_read_battery_voltage()) * ((uint16_t) ui8_s_battery_voltage_calibration);
 	if (ui16_battery_volts > ((uint16_t) BATTERY_PACK_VOLTS_80)) {
 		ui8_battery_soc = 16;
 	}// 4 bars | full

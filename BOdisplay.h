@@ -24,9 +24,11 @@ typedef enum {
 	FUN_ERROR = ((uint8_t) 0x66),
 	FUN_DETAIL_INFOS = ((uint8_t) 0x40),
 	FUN_BASIC_INFOS = ((uint8_t) 0x41),
-	FUN_CONFIG_INFOS = ((uint8_t) 0x42),
+	FUN_CONFIG_INFOS_A = ((uint8_t) 0x42),
 	FUN_HALL_INFOS = ((uint8_t) 0x43),
-	FUN_SET_CONFIG = ((uint8_t) 0x44)
+	FUN_SET_CONFIG = ((uint8_t) 0x44),
+	FUN_CONFIG_INFOS_B = ((uint8_t) 0x45),
+	FUN_NOOP = ((uint8_t) 0x46)
 } BO_FUN_CODES;
 
 typedef enum {
@@ -71,6 +73,8 @@ typedef enum {
 
 	CODE_ER_SPEED_HIGH_BYTE = ((uint8_t) 0xCA),
 	CODE_ER_SPEED = ((uint8_t) 0xCB),
+			
+	CODE_ADC_BATTERY_VOLTAGE_CALIB = ((uint8_t) 0xCC),
 
 	CODE_SUM_TORQUE = ((uint8_t) 0xD0),
 	CODE_SETPOINT = ((uint8_t) 0xD1),

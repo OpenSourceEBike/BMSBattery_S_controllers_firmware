@@ -46,6 +46,8 @@ uint8_t ui8_s_hall_angle3_180 = 127;
 uint8_t ui8_s_hall_angle1_240 = 170;
 uint8_t ui8_s_hall_angle5_300 = 212;
 
+uint8_t ui8_s_battery_voltage_calibration;
+
 // internal
 uint32_t uint32_icc_signals = 0;
 
@@ -75,7 +77,7 @@ uint32_t ui32_erps_filtered = 0; //filtered value of erps
 uint16_t ui16_virtual_erps_speed = 0;
 uint16_t ui16_BatteryCurrent = 0; //Battery Current read from ADC8
 uint8_t ui8_position_correction_value = 127; // in 360/256 degrees
-uint8_t ui8_correction_at_angle = 127; // advance angle testing
+uint8_t ui8_correction_at_angle = 85; // 85 is correct, cause of weird angle definition
 uint16_t ui16_ADC_iq_current = 0;
 uint16_t ui16_ADC_iq_current_filtered = 0;
 uint8_t ui8_control_state = 0;
@@ -123,6 +125,7 @@ void controllerstate_init(void) {
 
 	// convert static defines to volatile vars
 	ui16_aca_flags = ACA;
+	ui8_s_battery_voltage_calibration = ADC_BATTERY_VOLTAGE_K;
 	ui8_speedlimit_kph = limit;
 	ui8_speedlimit_without_pas_kph = limit_without_pas;
 	ui8_speedlimit_with_throttle_override_kph = limit_with_throttle_override;
@@ -202,6 +205,9 @@ void controllerstate_init(void) {
 	if (eepromVal > 0) ui8_s_hall_angle1_240 = eepromVal;
 	eepromVal = eeprom_read(OFFSET_HALL_ANGLE_5_300);
 	if (eepromVal > 0) ui8_s_hall_angle5_300 = eepromVal;
+	
+	eepromVal = eeprom_read(OFFSET_BATTERY_VOLTAGE_CALIB);
+	if (eepromVal > 0) ui8_s_battery_voltage_calibration = eepromVal;
 
 	for (di = 0; di < 6; di++) {
 		uint8_t_hall_order[di] = 0;

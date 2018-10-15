@@ -111,7 +111,7 @@ void signPackage(void) {
 	ui8_tx_buffer_counter++;
 }
 
-void addConfigStateInfos(void) {
+void addConfigStateInfosA(void) {
 
 	// float casts might be costly but they are only requested once every 10 seconds
 	addPayload(CODE_ERPS_FACTOR, (uint16_t) (((float) wheel_circumference) / ((float) GEAR_RATIO)));
@@ -137,14 +137,22 @@ void addConfigStateInfos(void) {
 	addPayload(CODE_MAX_BAT_CURRENT, ui16_battery_current_max_value);
 	addPayload(CODE_CORRECTION_AT_ANGLE, ui8_correction_at_angle);
 
+	// 7 more elements left/avail (max30)
+
+}
+
+void addConfigStateInfosB(void) {
+
 	addPayload(CODE_HALL_ANGLE_4_0, ui8_s_hall_angle4_0);
 	addPayload(CODE_HALL_ANGLE_6_60, ui8_s_hall_angle6_60);
 	addPayload(CODE_HALL_ANGLE_2_120, ui8_s_hall_angle2_120);
 	addPayload(CODE_HALL_ANGLE_3_180, ui8_s_hall_angle3_180);
 	addPayload(CODE_HALL_ANGLE_1_240, ui8_s_hall_angle1_240);
 	addPayload(CODE_HALL_ANGLE_5_300, ui8_s_hall_angle5_300);
-	// 1 more elements left/avail (max30)
 
+	addPayload(CODE_ADC_BATTERY_VOLTAGE_CALIB, ui8_s_battery_voltage_calibration);
+
+	// 23 more elements left/avail (max30)
 }
 
 void addHallStateInfos(void) {
@@ -238,7 +246,11 @@ void gatherDynamicPayload(uint8_t function) {
 
 void gatherStaticPayload(uint8_t function) {
 	switch (function) {
-		case FUN_CONFIG_INFOS:addConfigStateInfos();
+		case FUN_CONFIG_INFOS_A:
+			addConfigStateInfosA();
+			break;
+		case FUN_CONFIG_INFOS_B:
+			addConfigStateInfosB();
 			break;
 		default:
 			addPayload(CODE_ERROR, CODE_ERROR);
@@ -284,6 +296,13 @@ void digestConfigRequest(uint8_t configAddress, uint8_t requestedCodeLowByte, ui
 				eeprom_write(OFFSET_CURRENT_CAL_A, requestedValue);
 			}
 			addPayload(requestedCodeLowByte, ui8_current_cal_a);
+			break;
+		case CODE_ADC_BATTERY_VOLTAGE_CALIB:
+			ui8_s_battery_voltage_calibration = requestedValue;
+			if (configAddress == EEPROM_ADDRESS) {
+				eeprom_write(OFFSET_BATTERY_VOLTAGE_CALIB, requestedValue);
+			}
+			addPayload(requestedCodeLowByte, ui8_s_battery_voltage_calibration);
 			break;
 		case CODE_ASSIST_LEVEL:
 			ui8_assistlevel_global = requestedValue;

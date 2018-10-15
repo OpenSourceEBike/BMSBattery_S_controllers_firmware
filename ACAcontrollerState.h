@@ -115,6 +115,7 @@ extern uint8_t ui8_s_hall_angle3_180;
 extern uint8_t ui8_s_hall_angle1_240;
 extern uint8_t ui8_s_hall_angle5_300;
 
+extern uint8_t ui8_s_battery_voltage_calibration;
 
 void controllerstate_init(void);
 
