@@ -97,7 +97,6 @@ void hall_sensors_read_and_action(void) {
 					ui16_motor_speed_erps = 0;
 				}
 				// update motor state based on motor speed
-#if MOTOR_TYPE == MOTOR_TYPE_Q85
 				if (ui16_motor_speed_erps > 1000) {
 					ui8_motor_state = MOTOR_STATE_RUNNING_INTERPOLATION_360_DEGREES;
 				} else if (ui16_motor_speed_erps > 3
@@ -106,14 +105,6 @@ void hall_sensors_read_and_action(void) {
 				} else {
 					ui8_motor_state = MOTOR_STATE_RUNNING_NO_INTERPOLATION_60_DEGREES;
 				}
-#elif MOTOR_TYPE == MOTOR_TYPE_EUC2
-				if (ui16_motor_speed_erps > 10) {
-					ui8_motor_state = MOTOR_STATE_RUNNING_INTERPOLATION_60_DEGREES;
-				} else {
-					ui8_motor_state = MOTOR_STATE_RUNNING_NO_INTERPOLATION_60_DEGREES;
-				}
-#endif
-
 
 				ui8_motor_rotor_hall_position = ui8_s_hall_angle3_180;
 				break;
@@ -253,18 +244,12 @@ void motor_fast_loop(void) {
 	//  // interpolation seems a problem when motor starts, so avoid to do it at very low speed
 	if (ui8_motor_state == MOTOR_STATE_RUNNING_INTERPOLATION_60_DEGREES) {
 		ui8_interpolation_angle = (ui16_PWM_cycles_counter_6 << 8) / ui16_PWM_cycles_counter_total;
-#if MOTOR_TYPE == MOTOR_TYPE_Q85
 		ui8_sinetable_position = ui8_motor_rotor_hall_position + ui8_s_motor_angle + ui8_position_correction_value + ui8_interpolation_angle;
-#elif MOTOR_TYPE == MOTOR_TYPE_EUC2
-		ui8_sinetable_position = ui8_motor_rotor_hall_position + ui8_s_motor_angle + ui8_position_correction_value - ui8_interpolation_angle;
-#endif
+
 	} else if (ui8_motor_state == MOTOR_STATE_RUNNING_INTERPOLATION_360_DEGREES) {
 		ui8_interpolation_angle = (ui16_PWM_cycles_counter << 8) / ui16_PWM_cycles_counter_total;
-#if MOTOR_TYPE == MOTOR_TYPE_Q85
 		ui8_sinetable_position = ui8_motor_rotor_hall_position + ui8_s_motor_angle + ui8_position_correction_value + ui8_interpolation_angle;
-#elif MOTOR_TYPE == MOTOR_TYPE_EUC2
-		ui8_sinetable_position = ui8_motor_rotor_hall_position + ui8_s_motor_angle + ui8_position_correction_value - ui8_interpolation_angle;
-#endif
+
 	} else // MOTOR_STATE_COAST || MOTOR_STATE_RUNNING_NO_INTERPOLATION_60_DEGREES
 #endif
 	{

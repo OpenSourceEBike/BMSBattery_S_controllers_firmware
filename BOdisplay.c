@@ -150,10 +150,16 @@ void addConfigStateInfosB(void) {
 	addPayload(CODE_HALL_ANGLE_1_240, ui8_s_hall_angle1_240);
 	addPayload(CODE_HALL_ANGLE_5_300, ui8_s_hall_angle5_300);
 
-	addPayload(CODE_MAX_REGEN_CURRENT,ui16_regen_current_max_value);
+	addPayload(CODE_ASSIST_PERCENT_LEVEL_1, ui8_a_s_assistlevels[1]);
+	addPayload(CODE_ASSIST_PERCENT_LEVEL_2, ui8_a_s_assistlevels[2]);
+	addPayload(CODE_ASSIST_PERCENT_LEVEL_3, ui8_a_s_assistlevels[3]);
+	addPayload(CODE_ASSIST_PERCENT_LEVEL_4, ui8_a_s_assistlevels[4]);
+	addPayload(CODE_ASSIST_PERCENT_LEVEL_5, ui8_a_s_assistlevels[5]);
+
+	addPayload(CODE_MAX_REGEN_CURRENT, ui16_regen_current_max_value);
 	addPayload(CODE_ADC_BATTERY_VOLTAGE_CALIB, ui8_s_battery_voltage_calibration);
 
-	// 23 more elements left/avail (max30)
+	// 17 more elements left/avail (max30)
 }
 
 void addHallStateInfos(void) {
@@ -304,6 +310,41 @@ void digestConfigRequest(uint8_t configAddress, uint8_t requestedCodeLowByte, ui
 				eeprom_write(OFFSET_BATTERY_VOLTAGE_CALIB, requestedValue);
 			}
 			addPayload(requestedCodeLowByte, ui8_s_battery_voltage_calibration);
+			break;
+		case CODE_ASSIST_PERCENT_LEVEL_1:
+			ui8_a_s_assistlevels[1] = requestedValue;
+			if (configAddress == EEPROM_ADDRESS) {
+				eeprom_write(OFFSET_ASSIST_PERCENT_LEVEL_1, requestedValue);
+			}
+			addPayload(requestedCodeLowByte, ui8_a_s_assistlevels[1]);
+			break;
+		case CODE_ASSIST_PERCENT_LEVEL_2:
+			ui8_a_s_assistlevels[2] = requestedValue;
+			if (configAddress == EEPROM_ADDRESS) {
+				eeprom_write(OFFSET_ASSIST_PERCENT_LEVEL_2, requestedValue);
+			}
+			addPayload(requestedCodeLowByte, ui8_a_s_assistlevels[2]);
+			break;
+		case CODE_ASSIST_PERCENT_LEVEL_3:
+			ui8_a_s_assistlevels[3] = requestedValue;
+			if (configAddress == EEPROM_ADDRESS) {
+				eeprom_write(OFFSET_ASSIST_PERCENT_LEVEL_3, requestedValue);
+			}
+			addPayload(requestedCodeLowByte, ui8_a_s_assistlevels[3]);
+			break;
+		case CODE_ASSIST_PERCENT_LEVEL_4:
+			ui8_a_s_assistlevels[4] = requestedValue;
+			if (configAddress == EEPROM_ADDRESS) {
+				eeprom_write(OFFSET_ASSIST_PERCENT_LEVEL_4, requestedValue);
+			}
+			addPayload(requestedCodeLowByte, ui8_a_s_assistlevels[4]);
+			break;
+		case CODE_ASSIST_PERCENT_LEVEL_5:
+			ui8_a_s_assistlevels[5] = requestedValue;
+			if (configAddress == EEPROM_ADDRESS) {
+				eeprom_write(OFFSET_ASSIST_PERCENT_LEVEL_5, requestedValue);
+			}
+			addPayload(requestedCodeLowByte, ui8_a_s_assistlevels[5]);
 			break;
 		case CODE_ASSIST_LEVEL:
 			ui8_assistlevel_global = requestedValue;

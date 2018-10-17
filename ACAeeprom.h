@@ -23,7 +23,7 @@
 extern uint8_t eeprom_magic_byte;
 
 #define EEPROM_BASE_ADDRESS    0x4000
-#define EEPROM_MAX_INIT_RANGE 0x1F // we should at least have 640 avail / 32 in use for now
+#define EEPROM_MAX_INIT_RANGE 0x2F // we should at least have 640 avail / 48 in use for now
 
 typedef enum {
 	OFFSET_MOTOR_ANGLE = ((uint8_t) 0x01),
@@ -59,7 +59,13 @@ typedef enum {
 	OFFSET_HALL_ANGLE_1_240 = ((uint8_t) 0x1A),
 	OFFSET_HALL_ANGLE_5_300 = ((uint8_t) 0x1B),
 
-	OFFSET_BATTERY_VOLTAGE_CALIB = ((uint8_t) 0x1C)
+	OFFSET_BATTERY_VOLTAGE_CALIB = ((uint8_t) 0x1C),
+
+	OFFSET_ASSIST_PERCENT_LEVEL_1 = ((uint8_t) 0x20),
+	OFFSET_ASSIST_PERCENT_LEVEL_2 = ((uint8_t) 0x21),
+	OFFSET_ASSIST_PERCENT_LEVEL_3 = ((uint8_t) 0x22),
+	OFFSET_ASSIST_PERCENT_LEVEL_4 = ((uint8_t) 0x23),
+	OFFSET_ASSIST_PERCENT_LEVEL_5 = ((uint8_t) 0x24)
 
 } BO_EEPROM_OFFSETS;
 

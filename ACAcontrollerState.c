@@ -51,6 +51,7 @@ uint8_t ui8_s_battery_voltage_calibration;
 // internal
 uint32_t uint32_icc_signals = 0;
 
+uint8_t ui8_a_s_assistlevels[6];
 uint8_t ui8_assist_dynamic_percent_addon = 0;
 uint8_t ui8_assistlevel_global = 66; // 2 + regen 4
 uint8_t ui8_assist_percent_actual = 20;
@@ -124,6 +125,12 @@ void controllerstate_init(void) {
 	uint8_t eepromHighVal;
 
 	// convert static defines to volatile vars
+	ui8_a_s_assistlevels[0] =0;
+	ui8_a_s_assistlevels[1] =LEVEL_1;
+	ui8_a_s_assistlevels[2] =LEVEL_2;
+	ui8_a_s_assistlevels[3] =LEVEL_3;
+	ui8_a_s_assistlevels[4] =LEVEL_4;
+	ui8_a_s_assistlevels[5] =LEVEL_5;
 	ui16_aca_flags = ACA;
 	ui8_s_battery_voltage_calibration = ADC_BATTERY_VOLTAGE_K;
 	ui8_speedlimit_kph = limit;
@@ -206,6 +213,17 @@ void controllerstate_init(void) {
 	if (eepromVal > 0) ui8_s_hall_angle1_240 = eepromVal;
 	eepromVal = eeprom_read(OFFSET_HALL_ANGLE_5_300);
 	if (eepromVal > 0) ui8_s_hall_angle5_300 = eepromVal;
+	
+	eepromVal = eeprom_read(OFFSET_ASSIST_PERCENT_LEVEL_1);
+	if (eepromVal > 0) ui8_a_s_assistlevels[1] = eepromVal;
+	eepromVal = eeprom_read(OFFSET_ASSIST_PERCENT_LEVEL_2);
+	if (eepromVal > 0) ui8_a_s_assistlevels[2] = eepromVal;
+	eepromVal = eeprom_read(OFFSET_ASSIST_PERCENT_LEVEL_3);
+	if (eepromVal > 0) ui8_a_s_assistlevels[3] = eepromVal;
+	eepromVal = eeprom_read(OFFSET_ASSIST_PERCENT_LEVEL_4);
+	if (eepromVal > 0) ui8_a_s_assistlevels[4] = eepromVal;
+	eepromVal = eeprom_read(OFFSET_ASSIST_PERCENT_LEVEL_5);
+	if (eepromVal > 0) ui8_a_s_assistlevels[5] = eepromVal;
 	
 	eepromVal = eeprom_read(OFFSET_BATTERY_VOLTAGE_CALIB);
 	if (eepromVal > 0) ui8_s_battery_voltage_calibration = eepromVal;

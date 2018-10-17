@@ -59,6 +59,12 @@ typedef enum {
 	CODE_HALL_ANGLE_1_240 = ((uint8_t) 0xAE),
 	CODE_HALL_ANGLE_5_300 = ((uint8_t) 0xAF),
 
+	CODE_ASSIST_PERCENT_LEVEL_1 = ((uint8_t) 0xB0),
+	CODE_ASSIST_PERCENT_LEVEL_2 = ((uint8_t) 0xB1),
+	CODE_ASSIST_PERCENT_LEVEL_3 = ((uint8_t) 0xB2),
+	CODE_ASSIST_PERCENT_LEVEL_4 = ((uint8_t) 0xB3),
+	CODE_ASSIST_PERCENT_LEVEL_5 = ((uint8_t) 0xB4),
+
 	CODE_MOTOR_STATE = ((uint8_t) 0xC0),
 	CODE_BATTERY_VOLTAGE = ((uint8_t) 0xC1),
 	CODE_UPTIME = ((uint8_t) 0xC2),
@@ -73,7 +79,7 @@ typedef enum {
 
 	CODE_ER_SPEED_HIGH_BYTE = ((uint8_t) 0xCA),
 	CODE_ER_SPEED = ((uint8_t) 0xCB),
-			
+
 	CODE_ADC_BATTERY_VOLTAGE_CALIB = ((uint8_t) 0xCC),
 
 	CODE_SUM_TORQUE = ((uint8_t) 0xD0),

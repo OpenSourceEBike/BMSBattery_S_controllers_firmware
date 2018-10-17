@@ -9,11 +9,6 @@
 #ifndef _MAIN_H_
 #define _MAIN_H_
 
-#define MOTOR_TYPE_Q85 1
-#define MOTOR_TYPE_EUC2 2
-
-#define MOTOR_TYPE MOTOR_TYPE_Q85
-
 #define SVM_TABLE_LEN 256
 #define SVM_TABLE_LEN_x1024 262144 //(256 * 1024)
 

@@ -31,7 +31,6 @@
 #include "adc.h" // FIXME ugly cross reference
 
 static uint32_t ui32_dutycycle; // local version of setpoint
-static int16_t i16_assistlevel[6] = {0, LEVEL_1, LEVEL_2, LEVEL_3, LEVEL_4, LEVEL_5}; // difference between setpoint and actual value
 
 static int8_t uint_PWM_Enable = 0; //flag for PWM state
 static uint16_t ui16_BatteryCurrent_accumulated = 2496L; //8x current offset, for filtering or Battery Current
@@ -85,7 +84,7 @@ uint16_t aca_setpoint(uint16_t ui16_time_ticks_between_speed_interrupt, uint16_t
 	// >=8 means levels are switched of, use wanted percentage directly instead
 	ui16_assist_percent_smoothed -= ui16_assist_percent_smoothed >> 4;
 	if ((ui8_assistlevel_global & 15) < 8) {
-		ui16_assist_percent_smoothed += i16_assistlevel[ui8_assistlevel_global & 15];
+		ui16_assist_percent_smoothed += ui8_a_s_assistlevels[ui8_assistlevel_global & 15];
 	} else {
 		ui16_assist_percent_smoothed += ui8_assist_percent_wanted;
 	}
@@ -137,7 +136,7 @@ uint16_t aca_setpoint(uint16_t ui16_time_ticks_between_speed_interrupt, uint16_t
 		//Current target based on regen assist level
 		if ((ui16_aca_flags & DIGITAL_REGEN) == DIGITAL_REGEN) {
 
-			ui8_temp = i16_assistlevel[ui8_assistlevel_global >> 4];
+			ui8_temp = ui8_a_s_assistlevels[ui8_assistlevel_global >> 4];
 			ui8_control_state -= 1;
 
 			//Current target based on linear input on pad X4
