@@ -35,10 +35,11 @@
             <file>file:/G:/osebikefw/ACAcontrollerState.c</file>
             <file>file:/G:/osebikefw/BOdisplay.h</file>
             <file>file:/G:/osebikefw/main.h</file>
+            <file>file:/G:/osebikefw/ACAsetPoint.c</file>
             <file>file:/G:/osebikefw/ACAcontrollerState.h</file>
             <file>file:/G:/osebikefw/motor.c</file>
-            <file>file:/G:/osebikefw/adc.c</file>
             <file>file:/G:/osebikefw/ACAeeprom.h</file>
+            <file>file:/G:/osebikefw/display.c</file>
             <file>file:/G:/osebikefw/motor.h</file>
         </group>
     </open-files>
