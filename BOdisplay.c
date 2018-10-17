@@ -150,6 +150,7 @@ void addConfigStateInfosB(void) {
 	addPayload(CODE_HALL_ANGLE_1_240, ui8_s_hall_angle1_240);
 	addPayload(CODE_HALL_ANGLE_5_300, ui8_s_hall_angle5_300);
 
+	addPayload(CODE_MAX_REGEN_CURRENT,ui16_regen_current_max_value);
 	addPayload(CODE_ADC_BATTERY_VOLTAGE_CALIB, ui8_s_battery_voltage_calibration);
 
 	// 23 more elements left/avail (max30)
