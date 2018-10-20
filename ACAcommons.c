@@ -58,24 +58,32 @@ int32_t map(int32_t x, int32_t in_min, int32_t in_max, int32_t out_min, int32_t 
 		return (x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
 }
 
-uint32_t PI_control(uint16_t pv, uint16_t setpoint) {
+uint32_t PI_control(uint16_t pv, uint16_t setpoint, uint8_t uint_PWM_Enable) {
 	float float_p;
 	static float float_i;
-	static float float_dc=0;
+	static float float_dc = 0;
 	float_p = ((float) setpoint - (float) pv) * flt_s_pid_gain_p;
-	//if (float_p > 3)float_p = 3;
-	//if (float_p<-3)float_p = -3;
 	float_i += ((float) setpoint - (float) pv) * flt_s_pid_gain_i;
+	
 	if (float_i > 255)float_i = 255;
 	if (float_i < 0)float_i = 0;
-
-	if (float_p + float_i > float_dc + 5)float_dc += 5;
-	else if (float_p + float_i < float_dc - 5)float_dc -= 5;
-	else float_dc = float_p + float_i;
+	
+	if (!uint_PWM_Enable && ((ui16_aca_experimental_flags & PWM_AUTO_OFF) == PWM_AUTO_OFF)) {
+		float_i = ui32_erps_filtered * flt_s_motor_constant - float_p;
+	}
+	
+	if (float_p + float_i > float_dc + 5) {
+		float_dc += 5;
+	} else if (float_p + float_i < float_dc - 5) {
+		float_dc -= 5;
+	} else {
+		float_dc = float_p + float_i;
+	}
+	
 	if (float_dc > 255)float_dc = 255;
 	if (float_dc < 0)float_dc = 0;
 
-	return ((uint32_t)(float_dc));
+	return ((uint32_t) (float_dc));
 }
 
 void updateSpeeds(void) {

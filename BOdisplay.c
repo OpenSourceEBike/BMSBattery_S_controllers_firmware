@@ -159,7 +159,11 @@ void addConfigStateInfosB(void) {
 	addPayload(CODE_MAX_REGEN_CURRENT, ui16_regen_current_max_value);
 	addPayload(CODE_ADC_BATTERY_VOLTAGE_CALIB, ui8_s_battery_voltage_calibration);
 
-	// 17 more elements left/avail (max30)
+	addPayload(CODE_ACA_EXPERIMENTAL_FLAGS_HIGH_BYTE, ui16_aca_experimental_flags >> 8);
+	addPayload(CODE_ACA_EXPERIMENTAL_FLAGS, ui16_aca_experimental_flags);
+	
+	addPayload(CODE_MOTOR_CONSTANT, flt_s_motor_constant);
+	// 14 more elements left/avail (max30)
 }
 
 void addHallStateInfos(void) {
@@ -280,6 +284,15 @@ void digestConfigRequest(uint8_t configAddress, uint8_t requestedCodeLowByte, ui
 			}
 			addPayload(CODE_ACA_FLAGS_HIGH_BYTE, ui16_aca_flags >> 8);
 			addPayload(requestedCodeLowByte, ui16_aca_flags);
+			break;
+		case CODE_ACA_EXPERIMENTAL_FLAGS:
+			ui16_aca_experimental_flags = ((uint16_t) requestedValueHighByte << 8)+(uint16_t) requestedValue;
+			if (configAddress == EEPROM_ADDRESS) {
+				eeprom_write(OFFSET_ACA_EXPERIMENTAL_FLAGS_HIGH_BYTE, requestedValueHighByte);
+				eeprom_write(OFFSET_ACA_EXPERIMENTAL_FLAGS, requestedValue);
+			}
+			addPayload(CODE_ACA_EXPERIMENTAL_FLAGS_HIGH_BYTE, ui16_aca_experimental_flags >> 8);
+			addPayload(requestedCodeLowByte, ui16_aca_experimental_flags);
 			break;
 		case CODE_MAX_BAT_CURRENT:
 			ui16_battery_current_max_value = ((uint16_t) requestedValueHighByte << 8)+(uint16_t) requestedValue;
@@ -442,6 +455,13 @@ void digestConfigRequest(uint8_t configAddress, uint8_t requestedCodeLowByte, ui
 				eeprom_write(OFFSET_PAS_TRESHOLD, requestedValue);
 			}
 			addPayload(requestedCodeLowByte, float2int(flt_s_pas_threshold, 4.0));
+			break;
+		case CODE_MOTOR_CONSTANT:
+			flt_s_motor_constant = int2float(requestedValue, 4.0);
+			if (configAddress == EEPROM_ADDRESS) {
+				eeprom_write(OFFSET_MOTOR_CONSTANT, requestedValue);
+			}
+			addPayload(requestedCodeLowByte, float2int(flt_s_motor_constant, 4.0));
 			break;
 		case CODE_PID_GAIN_P:
 			flt_s_pid_gain_p = int2float(requestedValue, 2.0);

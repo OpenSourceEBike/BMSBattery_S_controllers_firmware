@@ -35,6 +35,7 @@ uint8_t ui8_speedlimit_actual_kph; // dynamic speedlimit based on current state
 float flt_s_pas_threshold = 1.7;
 float flt_s_pid_gain_p = 0.5;
 float flt_s_pid_gain_i = 0.2;
+float flt_s_motor_constant = 1.5;
 float flt_torquesensorCalibration = 0.0;
 uint16_t ui16_s_ramp_end = 1500;
 uint16_t ui16_s_ramp_start = 7000;
@@ -106,7 +107,8 @@ uint16_t ui16_time_ticks_for_uart_timeout = 0;
 uint8_t ui8_SPEED_Flag = 0; //flag for SPEED interrupt
 uint8_t ui8_offroad_counter = 0; //counter for offroad switching procedure
 
-uint16_t ui16_aca_flags = 0; //if throttle input should be bases on assist level and other flags
+uint16_t ui16_aca_flags = 0;
+uint16_t ui16_aca_experimental_flags = 0;
 
 uint16_t ui16_torque[NUMBER_OF_PAS_MAGS]; //array for torque values of one crank revolution
 uint8_t ui8_torque_index = 0; //counter for torque array
@@ -132,6 +134,7 @@ void controllerstate_init(void) {
 	ui8_a_s_assistlevels[4] =LEVEL_4;
 	ui8_a_s_assistlevels[5] =LEVEL_5;
 	ui16_aca_flags = ACA;
+	ui16_aca_experimental_flags = ACA_EXPERIMENTAL;
 	ui8_s_battery_voltage_calibration = ADC_BATTERY_VOLTAGE_K;
 	ui8_speedlimit_kph = limit;
 	ui8_speedlimit_without_pas_kph = limit_without_pas;
@@ -165,6 +168,9 @@ void controllerstate_init(void) {
 	eepromHighVal = eeprom_read(OFFSET_ACA_FLAGS_HIGH_BYTE);
 	eepromVal = eeprom_read(OFFSET_ACA_FLAGS);
 	if (eepromVal > 0 || eepromHighVal > 0) ui16_aca_flags = ((uint16_t) eepromHighVal << 8) + (uint16_t) eepromVal;
+	eepromHighVal = eeprom_read(OFFSET_ACA_EXPERIMENTAL_FLAGS_HIGH_BYTE);
+	eepromVal = eeprom_read(OFFSET_ACA_EXPERIMENTAL_FLAGS);
+	if (eepromVal > 0 || eepromHighVal > 0) ui16_aca_experimental_flags = ((uint16_t) eepromHighVal << 8) + (uint16_t) eepromVal;
 
 	eepromVal = eeprom_read(OFFSET_REGEN_CURRENT_MAX_VALUE);
 	if (eepromVal > 0) ui16_regen_current_max_value = eepromVal;
@@ -227,6 +233,9 @@ void controllerstate_init(void) {
 	
 	eepromVal = eeprom_read(OFFSET_BATTERY_VOLTAGE_CALIB);
 	if (eepromVal > 0) ui8_s_battery_voltage_calibration = eepromVal;
+	
+	eepromVal = eeprom_read(OFFSET_MOTOR_CONSTANT);
+	if (eepromVal > 0) flt_s_motor_constant = int2float(eepromVal, 4.0);
 
 	for (di = 0; di < 6; di++) {
 		uint8_t_hall_order[di] = 0;

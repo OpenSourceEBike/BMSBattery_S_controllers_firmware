@@ -161,7 +161,7 @@ uint16_t aca_setpoint(uint16_t ui16_time_ticks_between_speed_interrupt, uint16_t
 		}
 
 		uint32_current_target = (uint32_t) ui16_current_cal_b - float_temp;
-		ui32_dutycycle = PI_control(ui16_BatteryCurrent, uint32_current_target);
+		ui32_dutycycle = PI_control(ui16_BatteryCurrent, uint32_current_target,uint_PWM_Enable);
 		if (((ui16_aca_flags & BYPASS_LOW_SPEED_REGEN_PI_CONTROL) == BYPASS_LOW_SPEED_REGEN_PI_CONTROL) && (ui32_dutycycle == 0)) {
 			//try to get best regen at Low Speeds for BionX IGH
 			ui32_dutycycle = ui16_virtual_erps_speed * 2;
@@ -170,7 +170,7 @@ uint16_t aca_setpoint(uint16_t ui16_time_ticks_between_speed_interrupt, uint16_t
 
 		//limit max erps
 	} else if (ui32_erps_filtered > ui16_erps_max) {
-		ui32_dutycycle = PI_control(ui32_erps_filtered, ui16_erps_max); //limit the erps to maximum value to have minimum 30 points of sine table for proper commutation
+		ui32_dutycycle = PI_control(ui32_erps_filtered, ui16_erps_max,uint_PWM_Enable); //limit the erps to maximum value to have minimum 30 points of sine table for proper commutation
 		ui8_control_state = 0;
 
 	} else {
@@ -266,19 +266,29 @@ uint16_t aca_setpoint(uint16_t ui16_time_ticks_between_speed_interrupt, uint16_t
 			ui8_control_state += 128;
 		}
 		//send current target to PI-controller
-		ui32_dutycycle = PI_control(ui16_BatteryCurrent, uint32_current_target);
+		ui32_dutycycle = PI_control(ui16_BatteryCurrent, uint32_current_target,uint_PWM_Enable);
+		if ((ui16_aca_experimental_flags & DC_STATIC_ZERO) == DC_STATIC_ZERO) {
+			ui32_dutycycle = 0;
+		}
+		
+		if ((ui16_aca_experimental_flags & PWM_AUTO_OFF) == PWM_AUTO_OFF) {
+			//disable PWM if enabled and no power is wanted
+			if (uint_PWM_Enable && ui32_erps_filtered == 0 && uint32_current_target == ui16_current_cal_b) {
+				TIM1_CtrlPWMOutputs(DISABLE);
+				uint_PWM_Enable = 0;
+			}
+			//enable PWM if disabled and voltage is 2V higher than min, some hysteresis and power is wanted
+			if (!uint_PWM_Enable && ui8_BatteryVoltage > BATTERY_VOLTAGE_MIN_VALUE + 8 && (uint32_current_target != ui16_current_cal_b)){
+				TIM1_CtrlPWMOutputs(ENABLE);
+				uint_PWM_Enable = 1;
+			}
+		}else{
 
-		//disable PWM if enabled and motor is at standstill and no power is wanted
-		/*if (uint_PWM_Enable && ui32_erps_filtered == 0 && uint32_current_target == ui16_current_cal_b) {
-			TIM1_CtrlPWMOutputs(DISABLE);
-			uint_PWM_Enable = 0;
-		}*/
-
-		//enable PWM if disabled and voltage is 2V higher than min, some hysteresis and power is wanted
-		if (!uint_PWM_Enable && ui8_BatteryVoltage > BATTERY_VOLTAGE_MIN_VALUE + 8) { //&& ((ui32_erps_filtered != 0) || (uint32_current_target != ui16_current_cal_b))
-			TIM1_CtrlPWMOutputs(ENABLE);
-			uint_PWM_Enable = 1;
-
+			//enable PWM if disabled and voltage is 2V higher than min, some hysteresis
+			if (!uint_PWM_Enable && ui8_BatteryVoltage > BATTERY_VOLTAGE_MIN_VALUE + 8) { 
+				TIM1_CtrlPWMOutputs(ENABLE);
+				uint_PWM_Enable = 1;
+			}
 		}
 	}
 	return cutoffSetpoint(ui32_dutycycle);

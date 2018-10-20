@@ -20,7 +20,7 @@
 
 #include "config.h"
 
-uint32_t PI_control(uint16_t ist, uint16_t soll);
+uint32_t PI_control(uint16_t pv, uint16_t setpoint, uint8_t uint_PWM_Enable);
 uint32_t CheckSpeed(uint16_t current_target, uint16_t speed, uint16_t softLimit, uint16_t hardLimit);
 int32_t map(int32_t x, int32_t in_min, int32_t in_max, int32_t out_min, int32_t out_max);
 

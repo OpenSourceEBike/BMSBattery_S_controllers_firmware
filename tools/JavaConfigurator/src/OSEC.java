@@ -137,6 +137,7 @@ public class OSEC extends JFrame {
 	private JCheckBox cbSpeedInfluencesTqSensor;
 	private JCheckBox cbPasInverted;
 	private JCheckBox cbPwmOff;
+	private JCheckBox cbDcNull;
 	private JCheckBox cbCorrectionEnabled;
 	private JCheckBox cbDynAssist;
 
@@ -263,13 +264,18 @@ public class OSEC extends JFrame {
 		cbBypassLowSpeedRegenPiControl.setSelected((acaFlags & 256) > 0);
 
 		cbDynAssist.setSelected((acaFlags & 512) > 0);
-		cbPwmOff.setSelected((acaFlags & 1024) > 0);
+		
 		cbTorqueSensor.setSelected((acaFlags & 2048) > 0);
 		cbCorrectionEnabled.setSelected((acaFlags & 4096) > 0);
 		tmp = in.readLine();
 		if (tmp.trim().length() > 0) {
 			batteryVoltageCalib.setText(tmp);
 		}
+		
+		
+		int acaExperimentalFlags = Integer.parseInt(in.readLine());
+		cbPwmOff.setSelected((acaExperimentalFlags & 1024) > 0);
+		cbDcNull.setSelected((acaExperimentalFlags & 1) > 0);
 		in.close();
 	}
 
@@ -895,17 +901,24 @@ public class OSEC extends JFrame {
 		cbDynAssist.setForeground(Color.GRAY);
 		contentPane.add(cbDynAssist);
 
-		cbPwmOff = new JCheckBox("PWM off @freerunning");
-		cbPwmOff.setSelected(false);
-		cbPwmOff.setBounds(250, 515, 250, 20);
-		cbPwmOff.setForeground(Color.GRAY);
-		contentPane.add(cbPwmOff);
-
 		cbCorrectionEnabled = new JCheckBox("Enable rotor angle correction");
 		cbCorrectionEnabled.setSelected(false);
-		cbCorrectionEnabled.setBounds(250, 535, 250, 20);
+		cbCorrectionEnabled.setBounds(250, 515, 250, 20);
 		cbCorrectionEnabled.setForeground(Color.GRAY);
 		contentPane.add(cbCorrectionEnabled);
+		
+		cbPwmOff = new JCheckBox("PWM off @coast (experimental)");
+		cbPwmOff.setSelected(false);
+		cbPwmOff.setBounds(250, 535, 250, 20);
+		cbPwmOff.setForeground(Color.ORANGE);
+		contentPane.add(cbPwmOff);
+		
+		cbDcNull = new JCheckBox("DC static zero (testing/experimental)");
+		cbDcNull.setSelected(false);
+		cbDcNull.setBounds(250, 555, 250, 20);
+		cbDcNull.setForeground(Color.ORANGE);
+		contentPane.add(cbDcNull);
+
 
 		JLabel lblMotorSpeed = new JLabel("Motor Speed");
 		lblMotorSpeed.setFont(new Font("Tahoma", Font.BOLD, 12));
@@ -1251,7 +1264,7 @@ public class OSEC extends JFrame {
 					acaFlags |= (cbBypassLowSpeedRegenPiControl.isSelected() ? 256 : 0);
 
 					acaFlags |= (cbDynAssist.isSelected() ? 512 : 0);
-					acaFlags |= (cbPwmOff.isSelected() ? 1024 : 0);
+
 					acaFlags |= (cbTorqueSensor.isSelected() ? 2048 : 0);
 					acaFlags |= (cbCorrectionEnabled.isSelected() ? 4096 : 0);
 
@@ -1267,6 +1280,13 @@ public class OSEC extends JFrame {
 					text_to_save = "#define ADC_BATTERY_VOLTAGE_K " + batteryVoltageCalib.getText();
 					iWriter.println(batteryVoltageCalib.getText());
 					pWriter.println(text_to_save);
+					
+					
+					int acaExperimentalFlags = 128;
+					acaExperimentalFlags |= (cbDcNull.isSelected() ? 1 : 0);
+					acaExperimentalFlags |= (cbPwmOff.isSelected() ? 1024 : 0);
+					iWriter.println(acaExperimentalFlags);
+					pWriter.println("#define ACA_EXPERIMENTAL " + acaExperimentalFlags);
 
 					pWriter.println("\r\n#endif /* CONFIG_H_ */");
 
