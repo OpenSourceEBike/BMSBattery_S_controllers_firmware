@@ -82,7 +82,7 @@ uint8_t ui8_position_correction_value = 127; // in 360/256 degrees
 uint8_t ui8_correction_at_angle = 85; // 85 is correct, cause of weird angle definition
 uint16_t ui16_ADC_iq_current = 0;
 uint16_t ui16_ADC_iq_current_filtered = 0;
-uint8_t ui8_control_state = 0;
+uint16_t ui16_control_state = 0;
 uint8_t ui8_uptime = 0;
 
 uint8_t ui8_variableDebugA = 0;

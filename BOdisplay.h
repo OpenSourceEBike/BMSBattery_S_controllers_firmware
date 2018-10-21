@@ -84,10 +84,12 @@ typedef enum {
 
 	CODE_SUM_TORQUE = ((uint8_t) 0xD0),
 	CODE_SETPOINT = ((uint8_t) 0xD1),
-	CODE_SETPOINT_STATE = ((uint8_t) 0xD2),
+			
+	CODE_SETPOINT_STATE_HIGH_BYTE = ((uint8_t) 0xD2),
+	CODE_SETPOINT_STATE = ((uint8_t) 0xD3),
 
-	CODE_CURRENT_RAMP_HIGH_BYTE = ((uint8_t) 0xD3),
-	CODE_CURRENT_RAMP = ((uint8_t) 0xD4),
+	CODE_CURRENT_RAMP_HIGH_BYTE = ((uint8_t) 0xD4),
+	CODE_CURRENT_RAMP = ((uint8_t) 0xD5),
 
 
 	CODE_PAS_COUNTER_HIGH_BYTE = ((uint8_t) 0xD6),

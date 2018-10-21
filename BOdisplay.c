@@ -233,10 +233,11 @@ void addBasicStateInfos(void) {
 	addPayload(CODE_SUM_TORQUE, ui16_sum_torque);
 	addPayload(CODE_SUM_THROTTLE, ui16_sum_throttle);
 	addPayload(CODE_SETPOINT, ui16_setpoint);
-	addPayload(CODE_SETPOINT_STATE, ui8_control_state);
+	addPayload(CODE_SETPOINT_STATE_HIGH_BYTE, ui16_control_state >> 8);
+	addPayload(CODE_SETPOINT_STATE, ui16_control_state);
 	addPayload(CODE_UPTIME, ui8_uptime);
 
-	// 9 more elements left/avail (max30)
+	// 8 more elements left/avail (max30)
 }
 
 void gatherDynamicPayload(uint8_t function) {

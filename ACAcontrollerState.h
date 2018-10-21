@@ -25,7 +25,7 @@ extern uint32_t uint32_icc_signals; // inter component communication, very simpl
 
 extern uint8_t ui8_throttle_min_range;
 extern uint8_t ui8_throttle_max_range;
-extern uint8_t ui8_control_state;
+extern uint16_t ui16_control_state;
 extern uint8_t ui8_a_s_assistlevels[6];
 extern uint8_t ui8_assist_percent_actual;
 extern uint8_t ui8_assist_percent_wanted;
