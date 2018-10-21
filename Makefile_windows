@@ -97,7 +97,6 @@ ENTF = cmd /C del
 
 clean:
 	@echo "Cleaning files..."
-
 	@$(ENTF) *.asm 
 	@$(ENTF) *.rel
 	@$(ENTF) *.lk

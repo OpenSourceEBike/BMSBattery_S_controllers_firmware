@@ -1,4 +1,5 @@
-PATH = %PATH%;C:\Program Files\STMicroelectronics\st_toolset\stvp;C:\Program Files (x86)\STMicroelectronics\st_toolset\stvp;C:\SDCC\usr\local\bin;%~dp0tools\cygwin\bin
+PATH = %PATH%;C:\Program Files\STMicroelectronics\st_toolset\stvp;C:\Program Files (x86)\STMicroelectronics\st_toolset\stvp;C:\SDCC\usr\local\bin
+REM ;%~dp0tools\cygwin\bin
 cd %~dp0
 del main.hex
 sdcc --version
