@@ -162,7 +162,7 @@ void addConfigStateInfosB(void) {
 	addPayload(CODE_ACA_EXPERIMENTAL_FLAGS_HIGH_BYTE, ui16_aca_experimental_flags >> 8);
 	addPayload(CODE_ACA_EXPERIMENTAL_FLAGS, ui16_aca_experimental_flags);
 	
-	addPayload(CODE_MOTOR_CONSTANT, flt_s_motor_constant);
+	addPayload(CODE_MOTOR_CONSTANT, float2int(flt_s_motor_constant, 4.0));
 	// 14 more elements left/avail (max30)
 }
 
