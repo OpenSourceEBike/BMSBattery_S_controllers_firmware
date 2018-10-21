@@ -96,15 +96,15 @@ $(PNAME): $(MAINSRC) $(RELS)
 ENTF = cmd /C del
 
 clean:
-	@echo "Cleaning files..."
-	@$(ENTF) *.asm 
-	@$(ENTF) *.rel
-	@$(ENTF) *.lk
-	@$(ENTF) *.lst
-	@$(ENTF) *.rst
-	@$(ENTF) *.sym
-	@$(ENTF) *.cdb
-	@$(ENTF) *.map
-	@$(ENTF) *.adb 
-	@echo "Done."
+	echo "Cleaning files..."
+	$(ENTF) *.asm 
+	$(ENTF) *.rel
+	$(ENTF) *.lk
+	$(ENTF) *.lst
+	$(ENTF) *.rst
+	$(ENTF) *.sym
+	$(ENTF) *.cdb
+	$(ENTF) *.map
+	$(ENTF) *.adb 
+	echo "Done."
 
