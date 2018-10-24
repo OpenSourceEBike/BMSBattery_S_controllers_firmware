@@ -683,7 +683,7 @@ public class OSEC extends JFrame {
 		contentPane.add(lblCorrectionAtAngle);
 
 		txtCorrectionAtAngle = new JTextField();
-		txtCorrectionAtAngle.setText("85");
+		txtCorrectionAtAngle.setText("127");
 		txtCorrectionAtAngle.setColumns(10);
 		txtCorrectionAtAngle.setBounds(530, 210, 50, 20);
 		contentPane.add(txtCorrectionAtAngle);

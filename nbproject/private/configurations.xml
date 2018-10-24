@@ -47,13 +47,18 @@
           <in>stm8s_awu.c</in>
           <in>stm8s_beep.c</in>
           <in>stm8s_can.c</in>
+          <in>stm8s_clk.asm</in>
           <in>stm8s_clk.c</in>
+          <in>stm8s_exti.asm</in>
           <in>stm8s_exti.c</in>
           <in>stm8s_flash.c</in>
+          <in>stm8s_gpio.asm</in>
           <in>stm8s_gpio.c</in>
           <in>stm8s_i2c.c</in>
           <in>stm8s_it.c</in>
+          <in>stm8s_itc.asm</in>
           <in>stm8s_itc.c</in>
+          <in>stm8s_iwdg.asm</in>
           <in>stm8s_iwdg.c</in>
           <in>stm8s_rst.c</in>
           <in>stm8s_spi.c</in>
@@ -64,6 +69,7 @@
           <in>stm8s_tim5.c</in>
           <in>stm8s_tim6.c</in>
           <in>stm8s_uart1.c</in>
+          <in>stm8s_uart2.asm</in>
           <in>stm8s_uart2.c</in>
           <in>stm8s_uart3.c</in>
           <in>stm8s_uart4.c</in>

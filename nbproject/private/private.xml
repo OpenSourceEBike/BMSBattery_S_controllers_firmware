@@ -29,8 +29,10 @@
         <group>
             <file>file:/G:/osebikefw/config.h</file>
             <file>file:/G:/osebikefw/BOdisplay.c</file>
+            <file>file:/G:/osebikefw/ACAeeprom.c</file>
             <file>file:/G:/osebikefw/pwm.c</file>
             <file>file:/G:/osebikefw/main.c</file>
+            <file>file:/G:/osebikefw/Start_Compiling.bat</file>
             <file>file:/G:/osebikefw/cruise_control.c</file>
             <file>file:/G:/osebikefw/ACAcontrollerState.c</file>
             <file>file:/G:/osebikefw/BOdisplay.h</file>
@@ -38,10 +40,13 @@
             <file>file:/G:/osebikefw/ACAcontrollerState.h</file>
             <file>file:/G:/osebikefw/ACAcommons.h</file>
             <file>file:/G:/osebikefw/motor.c</file>
+            <file>file:/G:/osebikefw/Makefile_linux</file>
             <file>file:/G:/osebikefw/gpio.h</file>
             <file>file:/G:/osebikefw/StdPeriphLib/src/stm8s_tim1.c</file>
+            <file>file:/G:/osebikefw/WriteOptionBytes.bat</file>
             <file>file:/G:/osebikefw/ACAeeprom.h</file>
             <file>file:/G:/osebikefw/display.c</file>
+            <file>file:/G:/osebikefw/Makefile_windows</file>
             <file>file:/G:/osebikefw/motor.h</file>
         </group>
     </open-files>
