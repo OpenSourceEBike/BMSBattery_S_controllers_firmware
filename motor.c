@@ -244,17 +244,17 @@ void motor_fast_loop(void) {
 	//  // interpolation seems a problem when motor starts, so avoid to do it at very low speed
 	if (ui8_motor_state == MOTOR_STATE_RUNNING_INTERPOLATION_60_DEGREES) {
 		ui8_interpolation_angle = (ui16_PWM_cycles_counter_6 << 8) / ui16_PWM_cycles_counter_total;
-		ui8_sinetable_position = ui8_motor_rotor_hall_position + ui8_s_motor_angle + ui8_position_correction_value + ui8_interpolation_angle;
+		ui8_sinetable_position = ui8_motor_rotor_hall_position + ui8_s_motor_angle + ui8_position_correction_value -127 + ui8_interpolation_angle;
 
 	} else if (ui8_motor_state == MOTOR_STATE_RUNNING_INTERPOLATION_360_DEGREES) {
 		ui8_interpolation_angle = (ui16_PWM_cycles_counter << 8) / ui16_PWM_cycles_counter_total;
-		ui8_sinetable_position = ui8_motor_rotor_hall_position + ui8_s_motor_angle + ui8_position_correction_value + ui8_interpolation_angle;
+		ui8_sinetable_position = ui8_motor_rotor_hall_position + ui8_s_motor_angle + ui8_position_correction_value -127 + ui8_interpolation_angle;
 
 	} else // MOTOR_STATE_COAST || MOTOR_STATE_RUNNING_NO_INTERPOLATION_60_DEGREES
 #endif
 	{
 		ui8_interpolation_angle = 0;
-		ui8_sinetable_position = ui8_motor_rotor_hall_position + ui8_s_motor_angle + ui8_position_correction_value;
+		ui8_sinetable_position = ui8_motor_rotor_hall_position + ui8_s_motor_angle + ui8_position_correction_value -127;
 	}
 
 	//ui8_assumed_motor_position = ui8_motor_rotor_hall_position + ui8_interpolation_angle + ui8_s_motor_angle + ui8_position_correction_value - 127;
