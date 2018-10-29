@@ -78,7 +78,6 @@ public class OSEC extends JFrame {
 	private JTextField batteryVoltageCalib;
 	private JLabel lblThrottleMax;
 	private JTextField txtThrottlemax;
-	private JButton lblHttpsopensourceebikefirmwarebitbucketio;
 	private JLabel lblOpenSourceFirmware;
 	private JButton btnWriteConfiguration;
 	private JTextField txtMaxbatterycurrent;
@@ -769,27 +768,33 @@ public class OSEC extends JFrame {
 		Morse_Time_3.setBounds(350, 230, 50, 20);
 		contentPane.add(Morse_Time_3);
 
-		lblHttpsopensourceebikefirmwarebitbucketio = new JButton("https://opensourceebikefirmware.bitbucket.io/");
-		lblHttpsopensourceebikefirmwarebitbucketio.addActionListener(new ActionListener() {
+		JButton btnWiki = new JButton("Wiki Documentation");
+		btnWiki.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				if (Desktop.isDesktopSupported()) {
 					try {
-						try {
-							Desktop.getDesktop().browse(new URI("https://opensourceebikefirmware.bitbucket.io/"));
-						} catch (URISyntaxException e) {
-							// TODO Auto-generated catch block
-							e.printStackTrace();
-						}
-					} catch (IOException e) {
-						/* TODO: error handling */ }
-				} else {
-					/* TODO: error handling */ }
-
+						Desktop.getDesktop().browse(new URI("https://github.com/stancecoke/BMSBattery_S_controllers_firmware/wiki"));
+					} catch (Exception e) {}
+				} 
 			}
 		});
-		lblHttpsopensourceebikefirmwarebitbucketio.setForeground(Color.BLUE);
-		lblHttpsopensourceebikefirmwarebitbucketio.setBounds(600, 20, 320, 29);
-		contentPane.add(lblHttpsopensourceebikefirmwarebitbucketio);
+		btnWiki.setForeground(Color.BLUE);
+		btnWiki.setBounds(600, 20, 150, 29);
+		contentPane.add(btnWiki);
+		
+		JButton btnGit = new JButton("Git Repository");
+		btnGit.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				if (Desktop.isDesktopSupported()) {
+					try {
+						Desktop.getDesktop().browse(new URI("https://github.com/stancecoke/BMSBattery_S_controllers_firmware"));
+					} catch (Exception e) {}
+				} 
+			}
+		});
+		btnGit.setForeground(Color.BLUE);
+		btnGit.setBounds(770, 20, 150, 29);
+		contentPane.add(btnGit);
 
 		lblOpenSourceFirmware = new JLabel("Open Source Firmware for E-Bike Controller");
 		lblOpenSourceFirmware.setHorizontalAlignment(SwingConstants.CENTER);
