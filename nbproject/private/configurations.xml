@@ -42,6 +42,7 @@
           <in>stm8s_wwdg.h</in>
         </df>
         <df name="src">
+          <in>stm8s_adc1.asm</in>
           <in>stm8s_adc1.c</in>
           <in>stm8s_adc2.c</in>
           <in>stm8s_awu.c</in>
@@ -51,6 +52,7 @@
           <in>stm8s_clk.c</in>
           <in>stm8s_exti.asm</in>
           <in>stm8s_exti.c</in>
+          <in>stm8s_flash.asm</in>
           <in>stm8s_flash.c</in>
           <in>stm8s_gpio.asm</in>
           <in>stm8s_gpio.c</in>
@@ -62,7 +64,9 @@
           <in>stm8s_iwdg.c</in>
           <in>stm8s_rst.c</in>
           <in>stm8s_spi.c</in>
+          <in>stm8s_tim1.asm</in>
           <in>stm8s_tim1.c</in>
+          <in>stm8s_tim2.asm</in>
           <in>stm8s_tim2.c</in>
           <in>stm8s_tim3.c</in>
           <in>stm8s_tim4.c</in>
