@@ -192,10 +192,15 @@ void display_update() {
 
 		// see if CRC is ok
 		if (((ui8_crc ^ 10) == ui8_rx_buffer [5]) || // some versions of CRC LCD5 (??)
-				((ui8_crc ^ 5) == ui8_rx_buffer [5]) || // CRC LCD3 (tested with KT36/48SVPR, from PSWpower)
-				((ui8_crc ^ 9) == ui8_rx_buffer [5]) || // CRC LCD5
+				((ui8_crc ^ 1) == ui8_rx_buffer [5]) || // CRC LCD3 (tested with KT36/48SVPR, from PSWpower)
+				((ui8_crc ^ 2) == ui8_rx_buffer [5]) || // CRC LCD5
 				((ui8_crc ^ 3) == ui8_rx_buffer [5]) || // CRC LCD5 Added display 5 Romanta
-				((ui8_crc ^ 2) == ui8_rx_buffer [5])) // CRC LCD3
+				((ui8_crc ^ 4) == ui8_rx_buffer [5]) ||
+		    		((ui8_crc ^ 5) == ui8_rx_buffer [5]) ||
+		    		((ui8_crc ^ 6) == ui8_rx_buffer [5]) ||
+		    		((ui8_crc ^ 7) == ui8_rx_buffer [5]) ||
+		    		((ui8_crc ^ 8) == ui8_rx_buffer [5]) ||
+				((ui8_crc ^ 9) == ui8_rx_buffer [5])) // CRC LCD3
 		{
 
 			lcd_configuration_variables.ui8_assist_level = ui8_rx_buffer [1] & 7;
