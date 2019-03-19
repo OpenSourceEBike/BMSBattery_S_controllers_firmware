@@ -52,8 +52,9 @@
 #define TQS_CALIB 0.0
 #define ACA 4764
 #define EEPROM_NOINIT // eeprom will not be cleared
-#define EEPROM_INIT_MAGIC_BYTE 37 // makes sure (chance of fail 1/255) eeprom is invalidated after flashing new config
+#define EEPROM_INIT_MAGIC_BYTE 152 // makes sure (chance of fail 1/255) eeprom is invalidated after flashing new config
 #define ADC_BATTERY_VOLTAGE_K 68
 #define ACA_EXPERIMENTAL 128
+#define BATTERY_VOLTAGE_MAX_VALUE 200
 
 #endif /* CONFIG_H_ */

@@ -131,41 +131,50 @@ uint16_t aca_setpoint(uint16_t ui16_time_ticks_between_speed_interrupt, uint16_t
 
 		// check for brake --> set regen current
 	} else if (brake_is_set()) {
+		
+		if (ui8_BatteryVoltage > BATTERY_VOLTAGE_MAX_VALUE) {
+		
+			//check for overvoltage during regen --> override current target (might still slightly overshoot BATTERY_VOLTAGE_MAX_VALUE due to PI control.
+			uint32_current_target = (uint32_t) ui16_current_cal_b;
+			ui32_dutycycle = PI_control(ui16_BatteryCurrent, uint32_current_target,uint_PWM_Enable);
+			ui16_control_state = 255;
+		}else{
 
-		ui16_control_state = 255;
-		//Current target based on regen assist level
-		if ((ui16_aca_flags & DIGITAL_REGEN) == DIGITAL_REGEN) {
+			ui16_control_state = 255;
+			//Current target based on regen assist level
+			if ((ui16_aca_flags & DIGITAL_REGEN) == DIGITAL_REGEN) {
 
-			ui8_temp = ui8_a_s_assistlevels[ui8_assistlevel_global >> 4];
-			ui16_control_state -= 1;
+				ui8_temp = ui8_a_s_assistlevels[ui8_assistlevel_global >> 4];
+				ui16_control_state -= 1;
 
-			//Current target based on linear input on pad X4
-		} else {
-			ui8_temp = map(ui16_adc_read_x4_value() >> 2, ui8_throttle_min_range, ui8_throttle_max_range, 0, 100); //map regen throttle to limits
-			ui16_control_state -= 2;
-		}
-		float_temp = (float) ui8_temp * (float) (ui16_regen_current_max_value) / 100.0;
-
-		//Current target gets ramped down with speed
-		if (((ui16_aca_flags & SPEED_INFLUENCES_REGEN) == SPEED_INFLUENCES_REGEN) && (ui16_virtual_erps_speed < ((ui16_speed_kph_to_erps_ratio * ((uint16_t) ui8_speedlimit_kph)) / 100))) {
-
-			if (ui16_virtual_erps_speed < 15) {
-				// turn of regen at low speeds
-				// based on erps in order to avoid an additional calculation
-				float_temp = 0.0;
+				//Current target based on linear input on pad X4
 			} else {
-
-				float_temp *= ((float) ui16_virtual_erps_speed / ((float) (ui16_speed_kph_to_erps_ratio * ((float) ui8_speedlimit_kph)) / 100.0)); // influence of current speed based on base speed limit
-				ui16_control_state -= 4;
+				ui8_temp = map(ui16_adc_read_x4_value() >> 2, ui8_throttle_min_range, ui8_throttle_max_range, 0, 100); //map regen throttle to limits
+				ui16_control_state -= 2;
 			}
-		}
+			float_temp = (float) ui8_temp * (float) (ui16_regen_current_max_value) / 100.0;
 
-		uint32_current_target = (uint32_t) ui16_current_cal_b - float_temp;
-		ui32_dutycycle = PI_control(ui16_BatteryCurrent, uint32_current_target,uint_PWM_Enable);
-		if (((ui16_aca_flags & BYPASS_LOW_SPEED_REGEN_PI_CONTROL) == BYPASS_LOW_SPEED_REGEN_PI_CONTROL) && (ui32_dutycycle == 0)) {
-			//try to get best regen at Low Speeds for BionX IGH
-			ui32_dutycycle = ui16_virtual_erps_speed * 2;
-			ui16_control_state -= 8;
+			//Current target gets ramped down with speed
+			if (((ui16_aca_flags & SPEED_INFLUENCES_REGEN) == SPEED_INFLUENCES_REGEN) && (ui16_virtual_erps_speed < ((ui16_speed_kph_to_erps_ratio * ((uint16_t) ui8_speedlimit_kph)) / 100))) {
+
+				if (ui16_virtual_erps_speed < 15) {
+					// turn of regen at low speeds
+					// based on erps in order to avoid an additional calculation
+					float_temp = 0.0;
+				} else {
+
+					float_temp *= ((float) ui16_virtual_erps_speed / ((float) (ui16_speed_kph_to_erps_ratio * ((float) ui8_speedlimit_kph)) / 100.0)); // influence of current speed based on base speed limit
+					ui16_control_state -= 4;
+				}
+			}
+
+			uint32_current_target = (uint32_t) ui16_current_cal_b - float_temp;
+			ui32_dutycycle = PI_control(ui16_BatteryCurrent, uint32_current_target,uint_PWM_Enable);
+			if (((ui16_aca_flags & BYPASS_LOW_SPEED_REGEN_PI_CONTROL) == BYPASS_LOW_SPEED_REGEN_PI_CONTROL) && (ui32_dutycycle == 0)) {
+				//try to get best regen at Low Speeds for BionX IGH
+				ui32_dutycycle = ui16_virtual_erps_speed * 2;
+				ui16_control_state -= 8;
+			}
 		}
 
 		//limit max erps

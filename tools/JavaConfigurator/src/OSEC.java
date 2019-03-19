@@ -82,6 +82,7 @@ public class OSEC extends JFrame {
 	private JButton btnWriteConfiguration;
 	private JTextField txtMaxbatterycurrent;
 	private JTextField txtUndervoltage;
+	private JTextField txtOvervoltage;
 	//private final ButtonGroup Ridingmode = new ButtonGroup();
 	private JTextField txtMotor_specific_angle;
 	private JTextField txtBatteryCurcala;
@@ -275,6 +276,8 @@ public class OSEC extends JFrame {
 		int acaExperimentalFlags = Integer.parseInt(in.readLine());
 		cbPwmOff.setSelected((acaExperimentalFlags & 1024) > 0);
 		cbDcNull.setSelected((acaExperimentalFlags & 1) > 0);
+		
+		txtOvervoltage.setText(in.readLine());
 		in.close();
 	}
 
@@ -487,33 +490,14 @@ public class OSEC extends JFrame {
 		txtMaxregencurrent.setBounds(150, 230, 86, 20);
 		contentPane.add(txtMaxregencurrent);
 
-		JLabel lblUndervoltageLimit = new JLabel("Undervoltage limit");
-		lblUndervoltageLimit.setBounds(15, 250, 121, 14);
-		contentPane.add(lblUndervoltageLimit);
-
-		txtUndervoltage = new JTextField();
-		txtUndervoltage.setText("127");
-		txtUndervoltage.setBounds(150, 250, 86, 20);
-		contentPane.add(txtUndervoltage);
-		txtUndervoltage.setColumns(10);
-
-		JLabel lblNumberSerialCells = new JLabel("Serial cells");
-		lblNumberSerialCells.setBounds(15, 270, 86, 14);
-		contentPane.add(lblNumberSerialCells);
-
-		CellsNumber = new JTextField();
-		CellsNumber.setText("10");
-		CellsNumber.setColumns(10);
-		CellsNumber.setBounds(150, 270, 86, 20);
-		contentPane.add(CellsNumber);
 
 		JLabel lblBatteryCurrentCal = new JLabel("Battery Current cal a");
-		lblBatteryCurrentCal.setBounds(15, 290, 121, 14);
+		lblBatteryCurrentCal.setBounds(15, 250, 121, 14);
 		contentPane.add(lblBatteryCurrentCal);
 
 		txtBatteryCurcala = new JTextField();
 		txtBatteryCurcala.setText("10");
-		txtBatteryCurcala.setBounds(150, 290, 86, 20);
+		txtBatteryCurcala.setBounds(150, 250, 86, 20);
 		contentPane.add(txtBatteryCurcala);
 		txtBatteryCurcala.setColumns(10);
 
@@ -568,17 +552,6 @@ public class OSEC extends JFrame {
 		GearRatio.setColumns(10);
 		GearRatio.setBounds(150, 390, 86, 20);
 		contentPane.add(GearRatio);
-
-		JLabel lblBatVolCal = new JLabel("Battery Voltage Calib");
-		lblBatVolCal.setBounds(15, 410, 110, 20);
-		lblBatVolCal.setForeground(Color.GRAY);
-		contentPane.add(lblBatVolCal);
-
-		batteryVoltageCalib = new JTextField();
-		batteryVoltageCalib.setText("70");
-		batteryVoltageCalib.setColumns(2);
-		batteryVoltageCalib.setBounds(150, 410, 86, 20);
-		contentPane.add(batteryVoltageCalib);
 
 		JLabel lblPasThreshold = new JLabel("PAS threshold");
 		lblPasThreshold.setBounds(15, 430, 86, 20);
@@ -733,7 +706,50 @@ public class OSEC extends JFrame {
 		txtMotor_specific_angle.setBounds(530, 230, 50, 20);
 		contentPane.add(txtMotor_specific_angle);
 		txtMotor_specific_angle.setColumns(10);
+		
+		
+		JLabel lblUndervoltageLimit = new JLabel("Undervoltage");
+		lblUndervoltageLimit.setBounds(415, 270, 121, 14);
+		contentPane.add(lblUndervoltageLimit);
 
+		txtUndervoltage = new JTextField();
+		txtUndervoltage.setText("127");
+		txtUndervoltage.setBounds(530, 270, 50, 20);
+		contentPane.add(txtUndervoltage);
+		txtUndervoltage.setColumns(3);
+
+		JLabel lblNumberSerialCells = new JLabel("# Cells");
+		lblNumberSerialCells.setBounds(415, 290, 121, 14);
+		contentPane.add(lblNumberSerialCells);
+
+		CellsNumber = new JTextField();
+		CellsNumber.setText("10");
+		CellsNumber.setColumns(10);
+		CellsNumber.setBounds(530, 290, 50, 20);
+		contentPane.add(CellsNumber);
+		
+		JLabel lblOvervoltageLimit = new JLabel("Overvoltage");
+		lblOvervoltageLimit.setBounds(415, 310, 121, 14);
+		contentPane.add(lblOvervoltageLimit);
+
+		txtOvervoltage = new JTextField();
+		txtOvervoltage.setText("150");
+		txtOvervoltage.setBounds(530, 310, 50, 20);
+		contentPane.add(txtOvervoltage);
+		txtOvervoltage.setColumns(3);
+		
+		JLabel lblBatVolCal = new JLabel("Volt Calib");
+		lblBatVolCal.setBounds(415, 330, 121, 14);
+		lblBatVolCal.setForeground(Color.GRAY);
+		contentPane.add(lblBatVolCal);
+
+		batteryVoltageCalib = new JTextField();
+		batteryVoltageCalib.setText("70");
+		batteryVoltageCalib.setColumns(2);
+		batteryVoltageCalib.setBounds(530, 330, 50, 20);
+		contentPane.add(batteryVoltageCalib);
+		
+		
 		JList list = new JList();
 		list.setBounds(441, 177, 1, 1);
 		contentPane.add(list);
@@ -804,36 +820,36 @@ public class OSEC extends JFrame {
 		contentPane.add(lblOpenSourceFirmware);
 
 		JLabel lblTqCalibrationFactor = new JLabel("TQ Calib");
-		lblTqCalibrationFactor.setBounds(250, 260, 80, 14);
+		lblTqCalibrationFactor.setBounds(250, 270, 80, 14);
 		lblTqCalibrationFactor.setForeground(Color.GRAY);
 		contentPane.add(lblTqCalibrationFactor);
 
 		flt_tqCalibrationFactor = new JTextField();
 		flt_tqCalibrationFactor.setText("1000.0");
 		flt_tqCalibrationFactor.setColumns(10);
-		flt_tqCalibrationFactor.setBounds(350, 260, 50, 20);
+		flt_tqCalibrationFactor.setBounds(350, 270, 50, 20);
 		contentPane.add(flt_tqCalibrationFactor);
 
 		JLabel lblRampEnd = new JLabel("Ramp end");
-		lblRampEnd.setBounds(250, 280, 80, 14);
+		lblRampEnd.setBounds(250, 290, 80, 14);
 		lblRampEnd.setForeground(Color.GRAY);
 		contentPane.add(lblRampEnd);
 
 		ramp_end = new JTextField();
 		ramp_end.setText("2000");
 		ramp_end.setColumns(10);
-		ramp_end.setBounds(350, 280, 50, 20);
+		ramp_end.setBounds(350, 290, 50, 20);
 		contentPane.add(ramp_end);
 
 		JLabel lblRampStart = new JLabel("Ramp start");
-		lblRampStart.setBounds(250, 300, 80, 14);
+		lblRampStart.setBounds(250, 310, 80, 14);
 		lblRampStart.setForeground(Color.GRAY);
 		contentPane.add(lblRampStart);
 
 		ramp_start = new JTextField();
 		ramp_start.setText("7000");
 		ramp_start.setColumns(10);
-		ramp_start.setBounds(350, 300, 50, 20);
+		ramp_start.setBounds(350, 310, 50, 20);
 		contentPane.add(ramp_start);
 
 		lblSpeedLimit = new JLabel("Limit (km/h)");
@@ -1328,6 +1344,10 @@ public class OSEC extends JFrame {
 					acaExperimentalFlags |= (cbPwmOff.isSelected() ? 1024 : 0);
 					iWriter.println(acaExperimentalFlags);
 					pWriter.println("#define ACA_EXPERIMENTAL " + acaExperimentalFlags);
+					
+					text_to_save = "#define BATTERY_VOLTAGE_MAX_VALUE " + txtOvervoltage.getText();
+					iWriter.println(txtUndervoltage.getText());
+					pWriter.println(text_to_save);
 
 					pWriter.println("\r\n#endif /* CONFIG_H_ */");
 
