@@ -58,6 +58,41 @@ uint16_t cutoffSetpoint(uint32_t ui32_dutycycle) {
 	return ui32_dutycycle;
 }
 
+BitStatus checkMaxErpsOverride(){
+	if (ui32_erps_filtered > ui16_erps_max) {
+		ui32_dutycycle = PI_control(ui32_erps_filtered, ui16_erps_max,uint_PWM_Enable); //limit the erps to maximum value to have minimum 30 points of sine table for proper commutation
+		ui16_control_state = 0;
+		return 1;
+	}
+	return 0;
+}
+
+BitStatus checkUnderVoltageOverride(){
+	//check for undervoltage --> ramp down power starting 6.25% above min
+	ui8_temp = BATTERY_VOLTAGE_MIN_VALUE + BATTERY_VOLTAGE_MIN_VALUE>>5;
+	if (ui8_BatteryVoltage < ui8_temp) {
+
+		uint32_current_target = map(ui8_BatteryVoltage, BATTERY_VOLTAGE_MIN_VALUE, ui8_temp, ui16_current_cal_b, uint32_current_target );
+		ui32_dutycycle = PI_control(ui16_BatteryCurrent, uint32_current_target,uint_PWM_Enable);
+		ui16_control_state = 255;
+		return 1;
+    }
+	return 0;
+}
+
+BitStatus checkOverVoltageOverride(){
+	//check for overvoltage --> ramp down regen starting 3.125% below max
+	ui8_temp = BATTERY_VOLTAGE_MAX_VALUE - BATTERY_VOLTAGE_MAX_VALUE>>6;
+	if (ui8_BatteryVoltage > ui8_temp) {
+
+		uint32_current_target = map(ui8_BatteryVoltage, ui8_temp, BATTERY_VOLTAGE_MAX_VALUE, uint32_current_target, ui16_current_cal_b );
+		ui32_dutycycle = PI_control(ui16_BatteryCurrent, uint32_current_target,uint_PWM_Enable);
+		ui16_control_state = 255;
+		return 1;
+    }
+	return 0;
+}
+
 uint16_t aca_setpoint(uint16_t ui16_time_ticks_between_speed_interrupt, uint16_t ui16_time_ticks_between_pas_interrupt, uint16_t setpoint_old) {
 	// select virtual erps speed based on speedsensor type
 #ifdef SPEEDSENSOR_INTERNAL
@@ -121,67 +156,49 @@ uint16_t aca_setpoint(uint16_t ui16_time_ticks_between_speed_interrupt, uint16_t
 	}
 	ui16_time_ticks_between_pas_interrupt_smoothed = ui32_time_ticks_between_pas_interrupt_accumulated >> 3;
 	
-	//check for undervoltage --> disable PWM
-	if (ui8_BatteryVoltage < BATTERY_VOLTAGE_MIN_VALUE) {
-
-		TIM1_CtrlPWMOutputs(DISABLE);
-		uint_PWM_Enable = 0; // highest priority: Stop motor for undervoltage protection
-		ui32_dutycycle = 0;
+	// check for brake --> set regen current
+	if (brake_is_set()) {
+		
 		ui16_control_state = 255;
+		//Current target based on regen assist level
+		if ((ui16_aca_flags & DIGITAL_REGEN) == DIGITAL_REGEN) {
 
-		// check for brake --> set regen current
-	} else if (brake_is_set()) {
-		
-		if (ui8_BatteryVoltage > BATTERY_VOLTAGE_MAX_VALUE) {
-		
-			//check for overvoltage during regen --> override current target (might still slightly overshoot BATTERY_VOLTAGE_MAX_VALUE due to PI control.
-			uint32_current_target = (uint32_t) ui16_current_cal_b;
-			ui32_dutycycle = PI_control(ui16_BatteryCurrent, uint32_current_target,uint_PWM_Enable);
-			ui16_control_state = 255;
-		}else{
+			ui8_temp = ui8_a_s_assistlevels[ui8_assistlevel_global >> 4];
+			ui16_control_state -= 1;
 
-			ui16_control_state = 255;
-			//Current target based on regen assist level
-			if ((ui16_aca_flags & DIGITAL_REGEN) == DIGITAL_REGEN) {
+			//Current target based on linear input on pad X4
+		} else {
+			ui8_temp = map(ui16_adc_read_x4_value() >> 2, ui8_throttle_min_range, ui8_throttle_max_range, 0, 100); //map regen throttle to limits
+			ui16_control_state -= 2;
+		}
+		float_temp = (float) ui8_temp * (float) (ui16_regen_current_max_value) / 100.0;
 
-				ui8_temp = ui8_a_s_assistlevels[ui8_assistlevel_global >> 4];
-				ui16_control_state -= 1;
+		//Current target gets ramped down with speed
+		if (((ui16_aca_flags & SPEED_INFLUENCES_REGEN) == SPEED_INFLUENCES_REGEN) && (ui16_virtual_erps_speed < ((ui16_speed_kph_to_erps_ratio * ((uint16_t) ui8_speedlimit_kph)) / 100))) {
 
-				//Current target based on linear input on pad X4
+			if (ui16_virtual_erps_speed < 15) {
+				// turn of regen at low speeds
+				// based on erps in order to avoid an additional calculation
+				float_temp = 0.0;
 			} else {
-				ui8_temp = map(ui16_adc_read_x4_value() >> 2, ui8_throttle_min_range, ui8_throttle_max_range, 0, 100); //map regen throttle to limits
-				ui16_control_state -= 2;
-			}
-			float_temp = (float) ui8_temp * (float) (ui16_regen_current_max_value) / 100.0;
 
-			//Current target gets ramped down with speed
-			if (((ui16_aca_flags & SPEED_INFLUENCES_REGEN) == SPEED_INFLUENCES_REGEN) && (ui16_virtual_erps_speed < ((ui16_speed_kph_to_erps_ratio * ((uint16_t) ui8_speedlimit_kph)) / 100))) {
-
-				if (ui16_virtual_erps_speed < 15) {
-					// turn of regen at low speeds
-					// based on erps in order to avoid an additional calculation
-					float_temp = 0.0;
-				} else {
-
-					float_temp *= ((float) ui16_virtual_erps_speed / ((float) (ui16_speed_kph_to_erps_ratio * ((float) ui8_speedlimit_kph)) / 100.0)); // influence of current speed based on base speed limit
-					ui16_control_state -= 4;
-				}
-			}
-
-			uint32_current_target = (uint32_t) ui16_current_cal_b - float_temp;
-			ui32_dutycycle = PI_control(ui16_BatteryCurrent, uint32_current_target,uint_PWM_Enable);
-			if (((ui16_aca_flags & BYPASS_LOW_SPEED_REGEN_PI_CONTROL) == BYPASS_LOW_SPEED_REGEN_PI_CONTROL) && (ui32_dutycycle == 0)) {
-				//try to get best regen at Low Speeds for BionX IGH
-				ui32_dutycycle = ui16_virtual_erps_speed * 2;
-				ui16_control_state -= 8;
+				float_temp *= ((float) ui16_virtual_erps_speed / ((float) (ui16_speed_kph_to_erps_ratio * ((float) ui8_speedlimit_kph)) / 100.0)); // influence of current speed based on base speed limit
+				ui16_control_state -= 4;
 			}
 		}
 
-		//limit max erps
-	} else if (ui32_erps_filtered > ui16_erps_max) {
-		ui32_dutycycle = PI_control(ui32_erps_filtered, ui16_erps_max,uint_PWM_Enable); //limit the erps to maximum value to have minimum 30 points of sine table for proper commutation
-		ui16_control_state = 0;
-
+		uint32_current_target = (uint32_t) ui16_current_cal_b - float_temp;
+		
+		if (!checkOverVoltageOverride()){
+			ui32_dutycycle = PI_control(ui16_BatteryCurrent, uint32_current_target,uint_PWM_Enable);
+		}
+		
+		if (((ui16_aca_flags & BYPASS_LOW_SPEED_REGEN_PI_CONTROL) == BYPASS_LOW_SPEED_REGEN_PI_CONTROL) && (ui32_dutycycle == 0)) {
+			//try to get best regen at Low Speeds for BionX IGH
+			ui32_dutycycle = ui16_virtual_erps_speed * 2;
+			ui16_control_state -= 8;
+		}
+		
 	} else {
 
 		uint32_current_target = ui16_current_cal_b; // reset target to zero
@@ -274,11 +291,14 @@ uint16_t aca_setpoint(uint16_t ui16_time_ticks_between_speed_interrupt, uint16_t
 			uint32_current_target = (PHASE_CURRENT_MAX_VALUE) * setpoint_old / 255 + ui16_current_cal_b;
 			ui16_control_state += 128;
 		}
-		//send current target to PI-controller
-		ui32_dutycycle = PI_control(ui16_BatteryCurrent, uint32_current_target,uint_PWM_Enable);
+		
 		if ((ui16_aca_experimental_flags & DC_STATIC_ZERO) == DC_STATIC_ZERO) {
 			ui32_dutycycle = 0;
 			ui16_control_state += 256;
+		}else if (!checkUnderVoltageOverride() && !checkMaxErpsOverride()){
+		
+			//send current target to PI-controller
+			ui32_dutycycle = PI_control(ui16_BatteryCurrent, uint32_current_target,uint_PWM_Enable);
 		}
 		
 		if ((ui16_aca_experimental_flags & PWM_AUTO_OFF) == PWM_AUTO_OFF) {
@@ -288,15 +308,15 @@ uint16_t aca_setpoint(uint16_t ui16_time_ticks_between_speed_interrupt, uint16_t
 				TIM1_CtrlPWMOutputs(DISABLE);
 				uint_PWM_Enable = 0;
 			}
-			//enable PWM if disabled and voltage is 2V higher than min, some hysteresis and power is wanted
-			if (!uint_PWM_Enable && ui8_BatteryVoltage > BATTERY_VOLTAGE_MIN_VALUE + 8 && (uint32_current_target != ui16_current_cal_b)){
+			//enable PWM if disabled and voltage is 12.5% higher than min, some hysteresis and power is wanted
+			if (!uint_PWM_Enable && ui8_BatteryVoltage > (BATTERY_VOLTAGE_MIN_VALUE +  BATTERY_VOLTAGE_MIN_VALUE >>4) && (uint32_current_target != ui16_current_cal_b)){
 				TIM1_CtrlPWMOutputs(ENABLE);
 				uint_PWM_Enable = 1;
 			}
 		}else{
 
-			//enable PWM if disabled and voltage is 2V higher than min, some hysteresis
-			if (!uint_PWM_Enable && ui8_BatteryVoltage > BATTERY_VOLTAGE_MIN_VALUE + 8) { 
+			//enable PWM if disabled and voltage is 12.5% higher than min, some hysteresis
+			if (!uint_PWM_Enable && ui8_BatteryVoltage > (BATTERY_VOLTAGE_MIN_VALUE + BATTERY_VOLTAGE_MIN_VALUE >>4)) { 
 				TIM1_CtrlPWMOutputs(ENABLE);
 				uint_PWM_Enable = 1;
 			}
