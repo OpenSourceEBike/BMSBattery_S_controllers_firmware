@@ -139,6 +139,7 @@ public class OSEC extends JFrame {
 	private JCheckBox cbPwmOff;
 	private JCheckBox cbDcNull;
 	private JCheckBox cbCorrectionEnabled;
+	private JCheckBox cbPowerBasedControlEnabled;
 	private JCheckBox cbDynAssist;
 
 	private JTextField txtAngle4;
@@ -264,7 +265,7 @@ public class OSEC extends JFrame {
 		cbBypassLowSpeedRegenPiControl.setSelected((acaFlags & 256) > 0);
 
 		cbDynAssist.setSelected((acaFlags & 512) > 0);
-		
+		cbPowerBasedControlEnabled.setSelected((acaFlags & 1024) > 0);
 		cbTorqueSensor.setSelected((acaFlags & 2048) > 0);
 		cbCorrectionEnabled.setSelected((acaFlags & 4096) > 0);
 		tmp = in.readLine();
@@ -710,6 +711,7 @@ public class OSEC extends JFrame {
 		
 		JLabel lblUndervoltageLimit = new JLabel("Undervoltage");
 		lblUndervoltageLimit.setBounds(415, 270, 121, 14);
+		lblUndervoltageLimit.setForeground(Color.GRAY);
 		contentPane.add(lblUndervoltageLimit);
 
 		txtUndervoltage = new JTextField();
@@ -730,6 +732,7 @@ public class OSEC extends JFrame {
 		
 		JLabel lblOvervoltageLimit = new JLabel("Overvoltage");
 		lblOvervoltageLimit.setBounds(415, 310, 121, 14);
+		lblOvervoltageLimit.setForeground(Color.GRAY);
 		contentPane.add(lblOvervoltageLimit);
 
 		txtOvervoltage = new JTextField();
@@ -964,15 +967,21 @@ public class OSEC extends JFrame {
 		cbCorrectionEnabled.setForeground(Color.GRAY);
 		contentPane.add(cbCorrectionEnabled);
 		
+		cbPowerBasedControlEnabled = new JCheckBox("Power based control");
+		cbPowerBasedControlEnabled.setSelected(false);
+		cbPowerBasedControlEnabled.setBounds(250, 535, 250, 20);
+		cbPowerBasedControlEnabled.setForeground(Color.GRAY);
+		contentPane.add(cbPowerBasedControlEnabled);
+		
 		cbPwmOff = new JCheckBox("PWM off @coast (experimental)");
 		cbPwmOff.setSelected(false);
-		cbPwmOff.setBounds(250, 535, 250, 20);
+		cbPwmOff.setBounds(250, 615, 250, 20);
 		cbPwmOff.setForeground(Color.ORANGE);
 		contentPane.add(cbPwmOff);
 		
 		cbDcNull = new JCheckBox("DC static zero (testing/experimental)");
 		cbDcNull.setSelected(false);
-		cbDcNull.setBounds(250, 555, 250, 20);
+		cbDcNull.setBounds(250, 635, 250, 20);
 		cbDcNull.setForeground(Color.ORANGE);
 		contentPane.add(cbDcNull);
 
@@ -1321,7 +1330,7 @@ public class OSEC extends JFrame {
 					acaFlags |= (cbBypassLowSpeedRegenPiControl.isSelected() ? 256 : 0);
 
 					acaFlags |= (cbDynAssist.isSelected() ? 512 : 0);
-
+					acaFlags |= (cbPowerBasedControlEnabled.isSelected() ? 1024 : 0);
 					acaFlags |= (cbTorqueSensor.isSelected() ? 2048 : 0);
 					acaFlags |= (cbCorrectionEnabled.isSelected() ? 4096 : 0);
 

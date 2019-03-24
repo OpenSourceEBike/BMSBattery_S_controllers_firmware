@@ -235,7 +235,7 @@ uint16_t aca_setpoint(uint16_t ui16_time_ticks_between_speed_interrupt, uint16_t
 			float_temp = (float) ui16_sum_torque;
 			float_temp *= ((float) ui8_assist_percent_actual / 100.0);
 
-			if (((ui16_aca_flags & TQ_SENSOR_MODE) == TQ_SENSOR_MODE)) {
+			if (flt_torquesensorCalibration != 0.0) {
 				// flt_torquesensorCalibration is >fummelfactor * NUMBER_OF_PAS_MAGS * 64< (64 cause of <<6)
 				float_temp *= flt_torquesensorCalibration / ((float) ui16_time_ticks_between_pas_interrupt_smoothed); // influence of cadence
 				//printf("%lu, %u, %u, %u \r\n", uint32_current_target, ui16_sum_torque,(uint16_t) float_temp, ui16_time_ticks_between_pas_interrupt_smoothed );
@@ -263,7 +263,7 @@ uint16_t aca_setpoint(uint16_t ui16_time_ticks_between_speed_interrupt, uint16_t
 		}
 
 		// map curret target to assist level, not to maximum value
-		if ((ui16_aca_flags & ASSIST_LVL_AFFECTS_THROTTLE) == 1) {
+		if ((ui16_aca_flags & ASSIST_LVL_AFFECTS_THROTTLE) == ASSIST_LVL_AFFECTS_THROTTLE) {
 			float_temp *= ((float) ui8_assist_percent_actual / 100.0);
 			controll_state_temp += 8;
 		}
@@ -272,7 +272,15 @@ uint16_t aca_setpoint(uint16_t ui16_time_ticks_between_speed_interrupt, uint16_t
 
 
 		if ((uint32_t) float_temp > uint32_current_target) {
-			uint32_current_target = (uint32_t) float_temp; //override torque simulation with throttle / torquesensor
+			if (((ui16_aca_flags & TQ_SENSOR_MODE) == TQ_SENSOR_MODE)) {
+				if (uint32_current_target > ui16_current_cal_b){
+					//override cadence based torque with torquesensor-throttle only if there is cadence based contribution
+					uint32_current_target = (uint32_t) float_temp;
+				}
+			}else{
+				//override torque simulation with throttle
+				uint32_current_target = (uint32_t) float_temp; 
+			}
 			controll_state_temp += 16;
 		}
 
@@ -291,6 +299,13 @@ uint16_t aca_setpoint(uint16_t ui16_time_ticks_between_speed_interrupt, uint16_t
 		if (setpoint_old > 0 && (uint32_current_target - ui16_current_cal_b)*255 / setpoint_old > PHASE_CURRENT_MAX_VALUE) { // limit phase current according to Phase Current = battery current/duty cycle
 			uint32_current_target = (PHASE_CURRENT_MAX_VALUE) * setpoint_old / 255 + ui16_current_cal_b;
 			controll_state_temp += 128;
+		}
+		
+		// control power instead of current
+		if ((ui16_aca_flags & POWER_BASED_CONTROL) == POWER_BASED_CONTROL) {
+			// nominal voltage based on limits
+			ui8_temp = ((ui8_s_battery_voltage_max - ui8_s_battery_voltage_min)>>1)+ui8_s_battery_voltage_min;
+			uint32_current_target*=ui8_temp/ui8_BatteryVoltage;
 		}
 		
 		if ((ui16_aca_experimental_flags & DC_STATIC_ZERO) == DC_STATIC_ZERO) {

@@ -146,8 +146,9 @@ typedef enum {
 
 	DYNAMIC_ASSIST_LEVEL = ((uint16_t) 512),
 	
+	POWER_BASED_CONTROL= ((uint16_t) 1024),
 	TQ_SENSOR_MODE = ((uint16_t) 2048),
-	ANGLE_CORRECTION_ENABLED = ((uint16_t) 4096)
+	ANGLE_CORRECTION_ENABLED = ((uint16_t) 4096)		
 } ACA_FLAGS;
 
 typedef enum {
