@@ -48,6 +48,8 @@ uint8_t ui8_s_hall_angle1_240 = 170;
 uint8_t ui8_s_hall_angle5_300 = 212;
 
 uint8_t ui8_s_battery_voltage_calibration;
+uint8_t ui8_s_battery_voltage_min;
+uint8_t ui8_s_battery_voltage_max;
 
 // internal
 uint32_t uint32_icc_signals = 0;
@@ -136,6 +138,8 @@ void controllerstate_init(void) {
 	ui16_aca_flags = ACA;
 	ui16_aca_experimental_flags = ACA_EXPERIMENTAL;
 	ui8_s_battery_voltage_calibration = ADC_BATTERY_VOLTAGE_K;
+	ui8_s_battery_voltage_min = BATTERY_VOLTAGE_MIN_VALUE;
+	ui8_s_battery_voltage_max = BATTERY_VOLTAGE_MAX_VALUE;
 	ui8_speedlimit_kph = limit;
 	ui8_speedlimit_without_pas_kph = limit_without_pas;
 	ui8_speedlimit_with_throttle_override_kph = limit_with_throttle_override;
@@ -233,6 +237,10 @@ void controllerstate_init(void) {
 	
 	eepromVal = eeprom_read(OFFSET_BATTERY_VOLTAGE_CALIB);
 	if (eepromVal > 0) ui8_s_battery_voltage_calibration = eepromVal;
+	eepromVal = eeprom_read(OFFSET_BATTERY_VOLTAGE_MIN);
+	if (eepromVal > 0) ui8_s_battery_voltage_min = eepromVal;
+	eepromVal = eeprom_read(OFFSET_BATTERY_VOLTAGE_MAX);
+	if (eepromVal > 0) ui8_s_battery_voltage_max = eepromVal;
 	
 	eepromVal = eeprom_read(OFFSET_MOTOR_CONSTANT);
 	if (eepromVal > 0) flt_s_motor_constant = int2float(eepromVal, 4.0);

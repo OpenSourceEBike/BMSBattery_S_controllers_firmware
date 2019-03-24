@@ -119,6 +119,8 @@ extern uint8_t ui8_s_hall_angle1_240;
 extern uint8_t ui8_s_hall_angle5_300;
 
 extern uint8_t ui8_s_battery_voltage_calibration;
+extern uint8_t ui8_s_battery_voltage_min;
+extern uint8_t ui8_s_battery_voltage_max;
 
 void controllerstate_init(void);
 

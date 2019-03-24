@@ -158,12 +158,14 @@ void addConfigStateInfosB(void) {
 
 	addPayload(CODE_MAX_REGEN_CURRENT, ui16_regen_current_max_value);
 	addPayload(CODE_ADC_BATTERY_VOLTAGE_CALIB, ui8_s_battery_voltage_calibration);
+	addPayload(CODE_ADC_BATTERY_VOLTAGE_MIN, ui8_s_battery_voltage_min);
+	addPayload(CODE_ADC_BATTERY_VOLTAGE_MAX, ui8_s_battery_voltage_max);
 
 	addPayload(CODE_ACA_EXPERIMENTAL_FLAGS_HIGH_BYTE, ui16_aca_experimental_flags >> 8);
 	addPayload(CODE_ACA_EXPERIMENTAL_FLAGS, ui16_aca_experimental_flags);
 	
 	addPayload(CODE_MOTOR_CONSTANT, float2int(flt_s_motor_constant, 4.0));
-	// 14 more elements left/avail (max30)
+	// 12 more elements left/avail (max30)
 }
 
 void addHallStateInfos(void) {
@@ -324,6 +326,20 @@ void digestConfigRequest(uint8_t configAddress, uint8_t requestedCodeLowByte, ui
 				eeprom_write(OFFSET_BATTERY_VOLTAGE_CALIB, requestedValue);
 			}
 			addPayload(requestedCodeLowByte, ui8_s_battery_voltage_calibration);
+			break;
+		case CODE_ADC_BATTERY_VOLTAGE_MIN:
+			ui8_s_battery_voltage_min = requestedValue;
+			if (configAddress == EEPROM_ADDRESS) {
+				eeprom_write(OFFSET_BATTERY_VOLTAGE_MIN, requestedValue);
+			}
+			addPayload(requestedCodeLowByte, ui8_s_battery_voltage_min);
+			break;
+		case CODE_ADC_BATTERY_VOLTAGE_MAX:
+			ui8_s_battery_voltage_max = requestedValue;
+			if (configAddress == EEPROM_ADDRESS) {
+				eeprom_write(OFFSET_BATTERY_VOLTAGE_MAX, requestedValue);
+			}
+			addPayload(requestedCodeLowByte, ui8_s_battery_voltage_max);
 			break;
 		case CODE_ASSIST_PERCENT_LEVEL_1:
 			ui8_a_s_assistlevels[1] = requestedValue;

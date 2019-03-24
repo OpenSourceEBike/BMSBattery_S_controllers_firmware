@@ -81,6 +81,8 @@ typedef enum {
 	CODE_ER_SPEED = ((uint8_t) 0xCB),
 
 	CODE_ADC_BATTERY_VOLTAGE_CALIB = ((uint8_t) 0xCC),
+	CODE_ADC_BATTERY_VOLTAGE_MIN = ((uint8_t) 0xCD),
+	CODE_ADC_BATTERY_VOLTAGE_MAX = ((uint8_t) 0xCE),
 
 	CODE_SUM_TORQUE = ((uint8_t) 0xD0),
 	CODE_SETPOINT = ((uint8_t) 0xD1),

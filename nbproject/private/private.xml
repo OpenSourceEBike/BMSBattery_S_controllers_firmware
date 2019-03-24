@@ -27,7 +27,6 @@
             <file>file:/home/overlord/workspaces/Osec/ACAcommons.h</file>
         </group>
         <group>
-            <file>file:/G:/osebikefw/ACAcommons.c</file>
             <file>file:/G:/osebikefw/config.h</file>
             <file>file:/G:/osebikefw/BOdisplay.c</file>
             <file>file:/G:/osebikefw/ACAeeprom.c</file>
@@ -41,6 +40,7 @@
             <file>file:/G:/osebikefw/Makefile_linux</file>
             <file>file:/G:/osebikefw/StdPeriphLib/src/stm8s_tim1.c</file>
             <file>file:/G:/osebikefw/WriteOptionBytes.bat</file>
+            <file>file:/G:/osebikefw/timers.c</file>
             <file>file:/G:/osebikefw/ACAeeprom.h</file>
             <file>file:/G:/osebikefw/Makefile_windows</file>
             <file>file:/G:/osebikefw/motor.h</file>
@@ -49,10 +49,14 @@
             <file>file:/G:/osebikefw/main.c</file>
             <file>file:/G:/osebikefw/cruise_control.c</file>
             <file>file:/G:/osebikefw/display_kingmeter.c</file>
+            <file>file:/G:/osebikefw/main.h</file>
             <file>file:/G:/osebikefw/ACAsetPoint.c</file>
             <file>file:/G:/osebikefw/gpio.c</file>
+            <file>file:/G:/osebikefw/uart.c</file>
             <file>file:/G:/osebikefw/gpio.h</file>
             <file>file:/G:/osebikefw/brake.c</file>
+            <file>file:/G:/osebikefw/adc.c</file>
+            <file>file:/G:/osebikefw/cruise_control.h</file>
             <file>file:/G:/osebikefw/display.c</file>
         </group>
     </open-files>
