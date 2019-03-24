@@ -70,7 +70,7 @@ BitStatus checkMaxErpsOverride(){
 
 BitStatus checkUnderVoltageOverride(){
 	//check for undervoltage --> ramp down power starting 6.25% above min
-	ui8_temp = ui8_s_battery_voltage_min + (ui8_s_battery_voltage_min>>5);
+	ui8_temp = ui8_s_battery_voltage_min + (ui8_s_battery_voltage_min>>4);
 	if (ui8_BatteryVoltage < ui8_temp) {
 
 		uint32_current_target = map(ui8_BatteryVoltage, ui8_s_battery_voltage_min, ui8_temp, ui16_current_cal_b, uint32_current_target );
@@ -83,7 +83,7 @@ BitStatus checkUnderVoltageOverride(){
 
 BitStatus checkOverVoltageOverride(){
 	//check for overvoltage --> ramp down regen starting 3.125% below max
-	ui8_temp = ui8_s_battery_voltage_max - (ui8_s_battery_voltage_max>>6);
+	ui8_temp = ui8_s_battery_voltage_max - (ui8_s_battery_voltage_max>>5);
 	if (ui8_BatteryVoltage > ui8_temp) {
 
 		uint32_current_target = map(ui8_BatteryVoltage, ui8_temp, ui8_s_battery_voltage_max, uint32_current_target, ui16_current_cal_b );
@@ -310,14 +310,14 @@ uint16_t aca_setpoint(uint16_t ui16_time_ticks_between_speed_interrupt, uint16_t
 				uint_PWM_Enable = 0;
 			}
 			//enable PWM if disabled and voltage is 6.25% higher than min, some hysteresis and power is wanted
-			if (!uint_PWM_Enable && ui8_BatteryVoltage > (ui8_s_battery_voltage_min +  (ui8_s_battery_voltage_min >>5)) && (uint32_current_target != ui16_current_cal_b)){
+			if (!uint_PWM_Enable && ui8_BatteryVoltage > (ui8_s_battery_voltage_min +  (ui8_s_battery_voltage_min >>4)) && (uint32_current_target != ui16_current_cal_b)){
 				TIM1_CtrlPWMOutputs(ENABLE);
 				uint_PWM_Enable = 1;
 			}
 		}else{
 
 			//enable PWM if disabled and voltage is 6.25% higher than min, some hysteresis
-			if (!uint_PWM_Enable && ui8_BatteryVoltage > (ui8_s_battery_voltage_min + (ui8_s_battery_voltage_min >>5))) { 
+			if (!uint_PWM_Enable && ui8_BatteryVoltage > (ui8_s_battery_voltage_min + (ui8_s_battery_voltage_min >>4))) { 
 				TIM1_CtrlPWMOutputs(ENABLE);
 				uint_PWM_Enable = 1;
 			}
