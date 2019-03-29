@@ -110,7 +110,7 @@ uint8_t ui8_SPEED_Flag = 0; //flag for SPEED interrupt
 uint8_t ui8_offroad_counter = 0; //counter for offroad switching procedure
 uint16_t ui16_idle_counter = 0;
 uint16_t ui16_passcode = 0;
-uint8_t ui8_lockstatus = 1;
+uint8_t ui8_lockstatus = 255;
 
 uint16_t ui16_aca_flags = 0;
 uint16_t ui16_aca_experimental_flags = 0;

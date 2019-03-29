@@ -259,17 +259,23 @@ void updatePasStatus(void) {
 void updateSlowLoopStates(void) {
 	
 	if (ui16_motor_speed_erps == 0) {
-		ui16_idle_counter++;
+		if (ui16_idle_counter < 64000){
+			ui16_idle_counter++;
+		}
 	} else {
 		ui16_idle_counter = 0;
 	}
 	
+	// debug only
+	ui8_variableDebugA = ui16_passcode;
+	ui8_variableDebugB = ui16_passcode >>8;
+	
 	//disable lock if passcode is not at least 4 digits
-	if (ui16_passcode < 1000){
-		ui8_lockstatus = 0;
+	if (ui16_passcode < 1001){
+		ui8_lockstatus = 16;
 	}else if (((ui16_aca_flags & IDLE_LOCKS_CONTROLLER) == IDLE_LOCKS_CONTROLLER) && (ui16_idle_counter > 3000)) {
 		//lock after 60 seconds idle
-		ui8_lockstatus = 1;
+		ui8_lockstatus = 255;
 	}
 	
 	if (((ui16_aca_flags & IDLE_DISABLES_OFFROAD) == IDLE_DISABLES_OFFROAD) && (ui8_offroad_state > 4) && (ui16_idle_counter > 3000)) {
