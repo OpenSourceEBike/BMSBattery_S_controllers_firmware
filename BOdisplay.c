@@ -287,8 +287,8 @@ void digestConfigRequest(uint8_t configAddress, uint8_t requestedCodeLowByte, ui
 				eeprom_write(OFFSET_PASSCODE, requestedValue);
 				addPayload(CODE_PASSCODE_HIGH_BYTE, ui16_aca_flags >> 8);
 				addPayload(requestedCodeLowByte, ui16_aca_flags);
-			}else if ((ui8_lockstatus == 1) && (configAddress != EEPROM_ADDRESS) && (ui16_passcode == (((uint16_t) requestedValueHighByte << 8)+(uint16_t) requestedValue))){
-				// unlock if locked and correct code
+			}else if ((configAddress != EEPROM_ADDRESS) && (ui16_passcode == (((uint16_t) requestedValueHighByte << 8)+(uint16_t) requestedValue))){
+				// unlock if correct code was sent
 				ui8_lockstatus = 0;
 				addPayload(CODE_PASSCODE_HIGH_BYTE, ui16_aca_flags >> 8);
 				addPayload(requestedCodeLowByte, ui16_aca_flags);

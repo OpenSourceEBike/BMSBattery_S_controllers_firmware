@@ -264,8 +264,8 @@ void updateSlowLoopStates(void) {
 		ui16_idle_counter = 0;
 	}
 	
-	//disable lock if passcode is 0
-	if (ui16_passcode == 0){
+	//disable lock if passcode is not at least 4 digits
+	if (ui16_passcode < 1000){
 		ui8_lockstatus = 0;
 	}else if (((ui16_aca_flags & IDLE_LOCKS_CONTROLLER) == IDLE_LOCKS_CONTROLLER) && (ui16_idle_counter > 3000)) {
 		//lock after 60 seconds idle
