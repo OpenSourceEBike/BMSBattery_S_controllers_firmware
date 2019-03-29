@@ -87,6 +87,7 @@ extern uint8_t ui8_SPEED_Flag; //Flag for PAS Interrupt detected
 extern uint16_t ui16_time_ticks_between_speed_interrupt; //Speed duration of one wheel revolution (tics * 64us)
 extern uint8_t ui8_offroad_counter;
 extern uint16_t ui16_idle_counter;
+extern uint16_t ui16_no_pass_counter;
 extern uint16_t ui16_passcode;
 extern uint8_t ui8_lockstatus;
 
@@ -153,7 +154,6 @@ typedef enum {
 	TQ_SENSOR_MODE = ((uint16_t) 2048),
 	ANGLE_CORRECTION_ENABLED = ((uint16_t) 4096),
 			
-	IDLE_LOCKS_CONTROLLER = ((uint16_t) 8192),
 	IDLE_DISABLES_OFFROAD = ((uint16_t) 16384)
 			
 			

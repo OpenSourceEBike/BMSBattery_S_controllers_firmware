@@ -258,6 +258,10 @@ void updatePasStatus(void) {
 
 void updateSlowLoopStates(void) {
 	
+	if (ui16_no_pass_counter < 64000){
+		ui16_no_pass_counter++;
+	}
+	
 	if (ui16_motor_speed_erps == 0) {
 		if (ui16_idle_counter < 64000){
 			ui16_idle_counter++;
@@ -267,13 +271,15 @@ void updateSlowLoopStates(void) {
 	}
 	
 	// debug only
+	ui8_variableDebugC = ui16_no_pass_counter>>8;
 	ui8_variableDebugA = ui16_passcode;
 	ui8_variableDebugB = ui16_passcode >>8;
 	
 	//disable lock if passcode is not at least 4 digits
 	if (ui16_passcode < 1001){
 		ui8_lockstatus = 16;
-	}else if (((ui16_aca_flags & IDLE_LOCKS_CONTROLLER) == IDLE_LOCKS_CONTROLLER) && (ui16_idle_counter > 3000)) {
+		ui16_no_pass_counter =0;
+	}else if (ui16_no_pass_counter > 3000) {
 		//lock after 60 seconds idle
 		ui8_lockstatus = 255;
 	}

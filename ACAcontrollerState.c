@@ -109,6 +109,7 @@ uint16_t ui16_time_ticks_for_uart_timeout = 0;
 uint8_t ui8_SPEED_Flag = 0; //flag for SPEED interrupt
 uint8_t ui8_offroad_counter = 0; //counter for offroad switching procedure
 uint16_t ui16_idle_counter = 0;
+uint16_t ui16_no_pass_counter = 3000;
 uint16_t ui16_passcode = 0;
 uint8_t ui8_lockstatus = 255;
 
