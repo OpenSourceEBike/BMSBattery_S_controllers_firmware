@@ -30,7 +30,7 @@ float int2float(uint8_t in, float maxRange);
 void setSignal(uint8_t signal);
 uint8_t readAndClearSignal(uint8_t signal);
 void updateHallOrder(uint8_t hall_sensors);
-void updateOffroadStatus(void);
+void updateSlowLoopStates(void);
 void initErpsRatio(void);
 void updateSpeeds(void);
 void updatePasStatus(void);

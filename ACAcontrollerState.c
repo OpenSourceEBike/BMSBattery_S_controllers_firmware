@@ -108,6 +108,9 @@ uint16_t ui16_time_ticks_for_speed_calculation = 0; //time tics for speed measur
 uint16_t ui16_time_ticks_for_uart_timeout = 0;
 uint8_t ui8_SPEED_Flag = 0; //flag for SPEED interrupt
 uint8_t ui8_offroad_counter = 0; //counter for offroad switching procedure
+uint16_t ui16_idle_counter = 0;
+uint16_t ui16_passcode = 0;
+uint8_t ui8_lockstatus = 1;
 
 uint16_t ui16_aca_flags = 0;
 uint16_t ui16_aca_experimental_flags = 0;
@@ -169,6 +172,10 @@ void controllerstate_init(void) {
 	eepromVal = eeprom_read(OFFSET_BATTERY_CURRENT_MAX_VALUE);
 	if (eepromVal > 0 || eepromHighVal > 0) ui16_battery_current_max_value = ((uint16_t) eepromHighVal << 8) + (uint16_t) eepromVal;
 
+	eepromHighVal = eeprom_read(OFFSET_PASSCODE_HIGH_BYTE);
+	eepromVal = eeprom_read(OFFSET_PASSCODE);
+	if (eepromVal > 0 || eepromHighVal > 0) ui16_passcode = ((uint16_t) eepromHighVal << 8) + (uint16_t) eepromVal;
+	
 	eepromHighVal = eeprom_read(OFFSET_ACA_FLAGS_HIGH_BYTE);
 	eepromVal = eeprom_read(OFFSET_ACA_FLAGS);
 	if (eepromVal > 0 || eepromHighVal > 0) ui16_aca_flags = ((uint16_t) eepromHighVal << 8) + (uint16_t) eepromVal;

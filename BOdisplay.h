@@ -64,6 +64,9 @@ typedef enum {
 	CODE_ASSIST_PERCENT_LEVEL_3 = ((uint8_t) 0xB2),
 	CODE_ASSIST_PERCENT_LEVEL_4 = ((uint8_t) 0xB3),
 	CODE_ASSIST_PERCENT_LEVEL_5 = ((uint8_t) 0xB4),
+			
+	CODE_PASSCODE_HIGH_BYTE = ((uint8_t) 0xBE),
+	CODE_PASSCODE = ((uint8_t) 0xBF),
 
 	CODE_MOTOR_STATE = ((uint8_t) 0xC0),
 	CODE_BATTERY_VOLTAGE = ((uint8_t) 0xC1),
@@ -112,6 +115,8 @@ typedef enum {
 
 	CODE_CURRENT_CAL_B_HIGH_BYTE = ((uint8_t) 0x88),
 	CODE_CURRENT_CAL_B = ((uint8_t) 0x89),
+			
+	CODE_LOCKSTATUS = ((uint8_t) 0x83),
 
 	CODE_EEPROM_MAGIC_BYTE = ((uint8_t) 0x84),
 	CODE_MAX_SPEED_DEFAULT = ((uint8_t) 0x85),

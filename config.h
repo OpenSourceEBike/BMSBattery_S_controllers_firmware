@@ -41,7 +41,7 @@
 #define limit_with_throttle_override 25
 #define CORRECTION_AT_ANGLE 127
 #define PWM_CYCLES_SECOND 15625L
-#define DISPLAY_TYPE_KT_LCD3
+#define BLUOSEC
 #define SPEEDSENSOR_INTERNAL
 #define ANGLE_4_0 1
 #define ANGLE_6_60 43

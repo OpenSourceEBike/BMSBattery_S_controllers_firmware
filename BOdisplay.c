@@ -213,7 +213,7 @@ void addDetailStateInfos(void) {
 	addPayload(CODE_PAS_COUNTER, ui16_time_ticks_between_pas_interrupt);
 	addPayload(CODE_VER_SPEED_HIGH_BYTE, ui16_virtual_erps_speed >> 8);
 	addPayload(CODE_VER_SPEED, ui16_virtual_erps_speed);
-
+	addPayload(CODE_LOCKSTATUS, ui8_lockstatus);
 	// 9 more elements left/avail (max30)
 }
 
@@ -278,6 +278,23 @@ void digestConfigRequest(uint8_t configAddress, uint8_t requestedCodeLowByte, ui
 		case CODE_OFFROAD:
 			ui8_offroad_state = requestedValue;
 			addPayload(requestedCodeLowByte, ui8_offroad_state);
+			break;
+		case CODE_PASSCODE:
+			if ((ui8_lockstatus == 0) && (configAddress == EEPROM_ADDRESS)){
+				// write new passcode only if unlocked
+				ui16_passcode == ((uint16_t) requestedValueHighByte << 8)+(uint16_t) requestedValue;
+				eeprom_write(OFFSET_PASSCODE_HIGH_BYTE, requestedValueHighByte);
+				eeprom_write(OFFSET_PASSCODE, requestedValue);
+				addPayload(CODE_PASSCODE_HIGH_BYTE, ui16_aca_flags >> 8);
+				addPayload(requestedCodeLowByte, ui16_aca_flags);
+			}else if ((ui8_lockstatus == 1) && (configAddress != EEPROM_ADDRESS) && (ui16_passcode == (((uint16_t) requestedValueHighByte << 8)+(uint16_t) requestedValue))){
+				// unlock if locked and correct code
+				ui8_lockstatus = 0;
+				addPayload(CODE_PASSCODE_HIGH_BYTE, ui16_aca_flags >> 8);
+				addPayload(requestedCodeLowByte, ui16_aca_flags);
+			}else{
+				addPayload(CODE_ERROR, CODE_ERROR);
+			}
 			break;
 		case CODE_ACA_FLAGS:
 			ui16_aca_flags = ((uint16_t) requestedValueHighByte << 8)+(uint16_t) requestedValue;

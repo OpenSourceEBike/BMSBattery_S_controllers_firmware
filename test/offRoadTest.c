@@ -79,7 +79,7 @@ int kbhit(void) {
 	return 0;
 }
 
-void updateOffroadStatus(void) {
+void updateSlowLoopStates(void) {
 
 	if (((ui16_aca_flags & BRAKE_DISABLES_OFFROAD) == BRAKE_DISABLES_OFFROAD) && (ui8_offroad_state > 4)) {
 		// if disabling is enabled :)
@@ -177,7 +177,7 @@ void main() {
 		nanosleep((const struct timespec[]){
 			{0, 20000000L}
 		}, NULL);
-		updateOffroadStatus();
+		updateSlowLoopStates();
 
 		if (((ui16_aca_flags & BRAKE_DISABLES_OFFROAD) == BRAKE_DISABLES_OFFROAD) && 1 == 1) {
 			printf(" disabler on  ");

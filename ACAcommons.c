@@ -256,8 +256,27 @@ void updatePasStatus(void) {
 	}
 }
 
-void updateOffroadStatus(void) {
-
+void updateSlowLoopStates(void) {
+	
+	if (ui16_motor_speed_erps == 0) {
+		ui16_idle_counter++;
+	} else {
+		ui16_idle_counter = 0;
+	}
+	
+	//disable lock if passcode is 0
+	if (ui16_passcode == 0){
+		ui8_lockstatus = 0;
+	}else if (((ui16_aca_flags & IDLE_LOCKS_CONTROLLER) == IDLE_LOCKS_CONTROLLER) && (ui16_idle_counter > 3000)) {
+		//lock after 60 seconds idle
+		ui8_lockstatus = 1;
+	}
+	
+	if (((ui16_aca_flags & IDLE_DISABLES_OFFROAD) == IDLE_DISABLES_OFFROAD) && (ui8_offroad_state > 4) && (ui16_idle_counter > 3000)) {
+		//disable after 60 seconds idle
+		ui8_offroad_state = 0;
+	}
+	
 	if (((ui16_aca_flags & BRAKE_DISABLES_OFFROAD) == BRAKE_DISABLES_OFFROAD) && (ui8_offroad_state > 4)) {
 		// if disabling is enabled :)
 		if (!GPIO_ReadInputPin(BRAKE__PORT, BRAKE__PIN)) {
