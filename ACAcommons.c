@@ -174,6 +174,10 @@ void updatePasDir(void) {
 	}
 }
 
+void updateX4(void) {
+	ui16_x4_value = ui16_adc_read_x4_value();
+}
+
 void updateRequestedTorque(void) {
 
 	ui16_momentary_throttle = (uint16_t) map(ui8_adc_read_throttle(), ADC_THROTTLE_MIN_VALUE, ADC_THROTTLE_MAX_VALUE, 0, SETPOINT_MAX_VALUE); //read in recent throttle value for throttle override

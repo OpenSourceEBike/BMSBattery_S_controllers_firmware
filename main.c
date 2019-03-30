@@ -159,6 +159,7 @@ int main(void) {
 			checkPasInActivity();
 			updateRequestedTorque(); //now calculates tq for sensor as well
 			updateSlowLoopStates();
+			updateX4();
 
 			ui16_setpoint = (uint16_t) aca_setpoint(ui16_time_ticks_between_speed_interrupt, ui16_time_ticks_between_pas_interrupt, ui16_setpoint); //update setpoint
 

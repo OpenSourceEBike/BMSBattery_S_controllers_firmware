@@ -43,6 +43,7 @@ extern uint16_t ui16_throttle_accumulated;
 extern uint16_t ui16_current_cal_b;
 extern uint8_t ui8_current_cal_a;
 extern uint16_t ui16_x4_cal_b;
+extern uint16_t ui16_x4_value;
 extern uint16_t ui16_throttle_cal_b;
 extern uint16_t ui16_battery_current_max_value;
 extern uint16_t ui16_regen_current_max_value;

@@ -71,6 +71,7 @@ uint16_t ui16_throttle_accumulated = 0;
 uint8_t ui8_current_cal_a = 0;
 uint16_t ui16_current_cal_b = 0;
 uint16_t ui16_x4_cal_b = 0;
+uint16_t ui16_x4_value = 0;
 uint16_t ui16_throttle_cal_b = 0;
 uint16_t ui16_battery_current_max_value = 0;
 uint16_t ui16_regen_current_max_value = 0;

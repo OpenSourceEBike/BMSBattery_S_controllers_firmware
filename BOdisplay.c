@@ -238,8 +238,10 @@ void addBasicStateInfos(void) {
 	addPayload(CODE_SETPOINT_STATE_HIGH_BYTE, ui16_control_state >> 8);
 	addPayload(CODE_SETPOINT_STATE, ui16_control_state);
 	addPayload(CODE_UPTIME, ui8_uptime);
+	addPayload(CODE_X4VALUE_HIGH_BYTE, ui16_x4_value >> 8);
+	addPayload(CODE_X4VALUE, ui16_x4_value);
 
-	// 8 more elements left/avail (max30)
+	// 6 more elements left/avail (max30)
 }
 
 void gatherDynamicPayload(uint8_t function) {

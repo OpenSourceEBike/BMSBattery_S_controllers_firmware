@@ -65,6 +65,9 @@ typedef enum {
 	CODE_ASSIST_PERCENT_LEVEL_4 = ((uint8_t) 0xB3),
 	CODE_ASSIST_PERCENT_LEVEL_5 = ((uint8_t) 0xB4),
 			
+	CODE_X4VALUE_HIGH_BYTE = ((uint8_t) 0xBC),
+	CODE_X4VALUE = ((uint8_t) 0xBD),
+			
 	CODE_PASSCODE_HIGH_BYTE = ((uint8_t) 0xBE),
 	CODE_PASSCODE = ((uint8_t) 0xBF),
 
