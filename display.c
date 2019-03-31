@@ -71,21 +71,19 @@ void send_message() {
 	//if (pas_is_set ()) { ui8_moving_indication |= (1 << 4); }
 
 
-#ifdef SPEEDSENSOR_EXTERNAL
-	if (ui16_time_ticks_between_speed_interrupt > 65000) {
-		ui16_wheel_period_ms = 4500;
-	} else {
-		ui16_wheel_period_ms = (uint16_t) ((float) ui16_time_ticks_between_speed_interrupt / ((float) PWM_CYCLES_SECOND / 1000.0)); //must be /1000 devided in /125/8 for better resolution
+	if (((ui16_aca_flags & EXTERNAL_SPEED_SENSOR) == EXTERNAL_SPEED_SENSOR)) {
+		if (ui16_time_ticks_between_speed_interrupt > 65000) {
+			ui16_wheel_period_ms = 4500;
+		} else {
+			ui16_wheel_period_ms = (uint16_t) ((float) ui16_time_ticks_between_speed_interrupt / ((float) PWM_CYCLES_SECOND / 1000.0)); //must be /1000 devided in /125/8 for better resolution
+		}
+	}else{
+		if (ui32_erps_filtered == 0) {
+			ui16_wheel_period_ms = 4500;
+		} else {
+			ui16_wheel_period_ms = (uint16_t) (1000.0 * (float) GEAR_RATIO / (float) ui32_erps_filtered);
+		}
 	}
-#endif
-
-#ifdef SPEEDSENSOR_INTERNAL
-	if (ui32_erps_filtered == 0) {
-		ui16_wheel_period_ms = 4500;
-	} else {
-		ui16_wheel_period_ms = (uint16_t) (1000.0 * (float) GEAR_RATIO / (float) ui32_erps_filtered);
-	}
-#endif
 
 	// calc battery pack state of charge (SOC)
 	ui16_battery_volts = ((uint16_t) ui8_adc_read_battery_voltage()) * ((uint16_t) ui8_s_battery_voltage_calibration);

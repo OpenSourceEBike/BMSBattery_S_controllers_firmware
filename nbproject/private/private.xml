@@ -29,10 +29,17 @@
         <group>
             <file>file:/G:/osebikefw/ACAcommons.c</file>
             <file>file:/G:/osebikefw/BOdisplay.c</file>
+            <file>file:/G:/osebikefw/ACAeeprom.c</file>
+            <file>file:/G:/osebikefw/main.c</file>
+            <file>file:/G:/osebikefw/adc.h</file>
             <file>file:/G:/osebikefw/BOdisplay.h</file>
             <file>file:/G:/osebikefw/ACAcontrollerState.c</file>
-            <file>file:/G:/osebikefw/ACAeeprom.h</file>
+            <file>file:/G:/osebikefw/ACAsetPoint.c</file>
+            <file>file:/G:/osebikefw/ACAcontrollerState.h</file>
             <file>file:/G:/osebikefw/ACAcommons.h</file>
+            <file>file:/G:/osebikefw/adc.c</file>
+            <file>file:/G:/osebikefw/ACAeeprom.h</file>
+            <file>file:/G:/osebikefw/display.c</file>
         </group>
     </open-files>
 </project-private>

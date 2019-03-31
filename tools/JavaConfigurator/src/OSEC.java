@@ -89,7 +89,6 @@ public class OSEC extends JFrame {
 	private JLabel lblDiplayType;
 	private final ButtonGroup displayButtonGroup = new ButtonGroup();
 	private final ButtonGroup MotorSpeed = new ButtonGroup();
-	private final ButtonGroup Speedsensor = new ButtonGroup();
 
 	private JTextField Assist_Level_1;
 	private JTextField Assist_Level_2;
@@ -110,9 +109,6 @@ public class OSEC extends JFrame {
 	private JTextField txtMaxregencurrent;
 	private JRadioButton rdbtnNormal;
 	private JRadioButton rdbtnHigh;
-	private JLabel lblSpeedSensor;
-	private JRadioButton rdbtnInternal;
-	private JRadioButton rdbtnExternal;
 	private JTextField CellsNumber;
 	private JTextField PAS_threshold;
 	private JTextField txtMaxphasecurrent;
@@ -139,6 +135,8 @@ public class OSEC extends JFrame {
 	private JCheckBox cbPwmOff;
 	private JCheckBox cbDcNull;
 	private JCheckBox cbCorrectionEnabled;
+	private JCheckBox cbExternalSpeedSensor;
+	private JCheckBox cbIdleDisablesOffroad;
 	private JCheckBox cbPowerBasedControlEnabled;
 	private JCheckBox cbDynAssist;
 
@@ -222,8 +220,8 @@ public class OSEC extends JFrame {
 		rdbtnNormal.setSelected(Boolean.parseBoolean(in.readLine()));
 		rdbtnKtlcd.setSelected(Boolean.parseBoolean(in.readLine()));
 		rdbtnKingmeterJlcd.setSelected(Boolean.parseBoolean(in.readLine()));
-		rdbtnInternal.setSelected(Boolean.parseBoolean(in.readLine()));
-		rdbtnExternal.setSelected(Boolean.parseBoolean(in.readLine()));
+		in.readLine();
+		in.readLine(); // old unused
 		rdbtnDiganostics.setSelected(Boolean.parseBoolean(in.readLine()));
 		tmp = in.readLine();
 		if (tmp.trim().length() > 0) {
@@ -268,6 +266,8 @@ public class OSEC extends JFrame {
 		cbPowerBasedControlEnabled.setSelected((acaFlags & 1024) > 0);
 		cbTorqueSensor.setSelected((acaFlags & 2048) > 0);
 		cbCorrectionEnabled.setSelected((acaFlags & 4096) > 0);
+		cbIdleDisablesOffroad.setSelected((acaFlags & 16384) > 0);
+		cbExternalSpeedSensor.setSelected((acaFlags & 8192) > 0);
 		tmp = in.readLine();
 		if (tmp.trim().length() > 0) {
 			batteryVoltageCalib.setText(tmp);
@@ -973,6 +973,18 @@ public class OSEC extends JFrame {
 		cbPowerBasedControlEnabled.setForeground(Color.GRAY);
 		contentPane.add(cbPowerBasedControlEnabled);
 		
+		cbIdleDisablesOffroad = new JCheckBox("Idle disables offroad");
+		cbIdleDisablesOffroad.setSelected(false);
+		cbIdleDisablesOffroad.setBounds(250, 555, 250, 20);
+		cbIdleDisablesOffroad.setForeground(Color.GRAY);
+		contentPane.add(cbIdleDisablesOffroad);
+		
+		cbExternalSpeedSensor = new JCheckBox("External Speed-Sensor");
+		cbExternalSpeedSensor.setSelected(false);
+		cbExternalSpeedSensor.setBounds(250, 575, 250, 20);
+		cbExternalSpeedSensor.setForeground(Color.GRAY);
+		contentPane.add(cbExternalSpeedSensor);
+		
 		cbPwmOff = new JCheckBox("PWM off @coast (experimental)");
 		cbPwmOff.setSelected(false);
 		cbPwmOff.setBounds(250, 615, 250, 20);
@@ -1001,22 +1013,6 @@ public class OSEC extends JFrame {
 		MotorSpeed.add(rdbtnHigh);
 		rdbtnHigh.setBounds(440, 445, 101, 20);
 		contentPane.add(rdbtnHigh);
-
-		lblSpeedSensor = new JLabel("Speed sensor");
-		lblSpeedSensor.setFont(new Font("Tahoma", Font.BOLD, 12));
-		lblSpeedSensor.setBounds(250, 400, 86, 20);
-		contentPane.add(lblSpeedSensor);
-
-		rdbtnInternal = new JRadioButton("Internal");
-		rdbtnInternal.setSelected(true);
-		Speedsensor.add(rdbtnInternal);
-		rdbtnInternal.setBounds(250, 425, 101, 20);
-		contentPane.add(rdbtnInternal);
-
-		rdbtnExternal = new JRadioButton("External");
-		Speedsensor.add(rdbtnExternal);
-		rdbtnExternal.setBounds(250, 445, 101, 20);
-		contentPane.add(rdbtnExternal);
 
 		lblDiplayType = new JLabel("Display Type");
 		lblDiplayType.setFont(new Font("Tahoma", Font.BOLD, 12));
@@ -1268,17 +1264,8 @@ public class OSEC extends JFrame {
 					}
 					iWriter.println(rdbtnKingmeterJlcd.isSelected());
 
-					if (rdbtnInternal.isSelected()) {
-						text_to_save = "#define SPEEDSENSOR_INTERNAL";
-						pWriter.println(text_to_save);
-					}
-					iWriter.println(rdbtnInternal.isSelected());
-
-					if (rdbtnExternal.isSelected()) {
-						text_to_save = "#define SPEEDSENSOR_EXTERNAL";
-						pWriter.println(text_to_save);
-					}
-					iWriter.println(rdbtnExternal.isSelected());
+					iWriter.println("");
+					iWriter.println("");
 
 					if (rdbtnDiganostics.isSelected()) {
 						text_to_save = "#define DIAGNOSTICS";
@@ -1333,6 +1320,8 @@ public class OSEC extends JFrame {
 					acaFlags |= (cbPowerBasedControlEnabled.isSelected() ? 1024 : 0);
 					acaFlags |= (cbTorqueSensor.isSelected() ? 2048 : 0);
 					acaFlags |= (cbCorrectionEnabled.isSelected() ? 4096 : 0);
+					acaFlags |= (cbIdleDisablesOffroad.isSelected() ? 16384 : 0);
+					acaFlags |= (cbExternalSpeedSensor.isSelected() ? 8192 : 0);
 
 					iWriter.println(acaFlags);
 

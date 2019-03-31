@@ -154,7 +154,7 @@ typedef enum {
 	POWER_BASED_CONTROL= ((uint16_t) 1024),
 	TQ_SENSOR_MODE = ((uint16_t) 2048),
 	ANGLE_CORRECTION_ENABLED = ((uint16_t) 4096),
-			
+	EXTERNAL_SPEED_SENSOR = ((uint16_t) 8192),	
 	IDLE_DISABLES_OFFROAD = ((uint16_t) 16384)
 			
 			

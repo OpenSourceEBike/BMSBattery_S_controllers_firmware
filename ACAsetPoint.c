@@ -96,13 +96,11 @@ BitStatus checkOverVoltageOverride(){
 
 uint16_t aca_setpoint(uint16_t ui16_time_ticks_between_speed_interrupt, uint16_t ui16_time_ticks_between_pas_interrupt, uint16_t setpoint_old) {
 	// select virtual erps speed based on speedsensor type
-#ifdef SPEEDSENSOR_INTERNAL
-	ui16_virtual_erps_speed = (uint16_t) ui32_erps_filtered;
-#endif
-
-#ifdef SPEEDSENSOR_EXTERNAL
-	ui16_virtual_erps_speed = ui16_speed_kph_to_erps_ratio * ((uint16_t) (ui32_SPEED_km_h / 100)) / 1000; // /100/1000 instead of more plausible /1000/100 cause of 16bit overflow
-#endif
+	if (((ui16_aca_flags & EXTERNAL_SPEED_SENSOR) == EXTERNAL_SPEED_SENSOR)) {
+		ui16_virtual_erps_speed = ui16_speed_kph_to_erps_ratio * ((uint16_t) (ui32_SPEED_km_h / 100)) / 1000; // /100/1000 instead of more plausible /1000/100 cause of 16bit overflow
+	}else{
+		ui16_virtual_erps_speed = (uint16_t) ui32_erps_filtered;
+	}
 
 	// first select current speed limit
 	if (ui8_offroad_state == 255) {

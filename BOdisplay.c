@@ -211,10 +211,8 @@ void addDetailStateInfos(void) {
 	addPayload(CODE_PAS_HIGH_COUNTER, ui16_PAS_High);
 	addPayload(CODE_PAS_COUNTER_HIGH_BYTE, ui16_time_ticks_between_pas_interrupt >> 8);
 	addPayload(CODE_PAS_COUNTER, ui16_time_ticks_between_pas_interrupt);
-	addPayload(CODE_VER_SPEED_HIGH_BYTE, ui16_virtual_erps_speed >> 8);
-	addPayload(CODE_VER_SPEED, ui16_virtual_erps_speed);
 	addPayload(CODE_LOCKSTATUS, ui8_lockstatus);
-	// 8 more elements left/avail (max30)
+	// 10 more elements left/avail (max30)
 }
 
 void addBasicStateInfos(void) {
@@ -240,8 +238,9 @@ void addBasicStateInfos(void) {
 	addPayload(CODE_UPTIME, ui8_uptime);
 	addPayload(CODE_X4VALUE_HIGH_BYTE, ui16_x4_value >> 8);
 	addPayload(CODE_X4VALUE, ui16_x4_value);
-
-	// 6 more elements left/avail (max30)
+    addPayload(CODE_VER_SPEED_HIGH_BYTE, ui16_virtual_erps_speed >> 8);
+	addPayload(CODE_VER_SPEED, ui16_virtual_erps_speed);
+	// 4 more elements left/avail (max30)
 }
 
 void gatherDynamicPayload(uint8_t function) {
