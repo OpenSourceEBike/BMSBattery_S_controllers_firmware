@@ -54,6 +54,8 @@ uint8_t ui8_s_battery_voltage_max;
 // internal
 uint32_t uint32_icc_signals = 0;
 
+uint8_t ui8_gear_ratio = 1;
+
 uint8_t ui8_a_s_assistlevels[6];
 uint8_t ui8_assist_dynamic_percent_addon = 0;
 uint8_t ui8_assistlevel_global = 66; // 2 + regen 4
@@ -168,6 +170,7 @@ void controllerstate_init(void) {
 	ui8_current_cal_a = current_cal_a;
 	ui8_correction_at_angle = CORRECTION_AT_ANGLE;
 	flt_torquesensorCalibration = TQS_CALIB;
+	ui8_gear_ratio = GEAR_RATIO;
 
 	// read in overrides from eeprom if they are > 0, assuming 0s are uninitialized
 	eepromHighVal = eeprom_read(OFFSET_BATTERY_CURRENT_MAX_VALUE_HIGH_BYTE);
@@ -185,6 +188,9 @@ void controllerstate_init(void) {
 	eepromVal = eeprom_read(OFFSET_ACA_EXPERIMENTAL_FLAGS);
 	if (eepromVal > 0 || eepromHighVal > 0) ui16_aca_experimental_flags = ((uint16_t) eepromHighVal << 8) + (uint16_t) eepromVal;
 
+	eepromVal = eeprom_read(OFFSET_GEAR_RATIO);
+	if (eepromVal > 0) ui8_gear_ratio = eepromVal;
+	
 	eepromVal = eeprom_read(OFFSET_REGEN_CURRENT_MAX_VALUE);
 	if (eepromVal > 0) ui16_regen_current_max_value = eepromVal;
 	eepromVal = eeprom_read(OFFSET_MAX_SPEED_DEFAULT);

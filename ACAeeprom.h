@@ -75,7 +75,8 @@ typedef enum {
 	OFFSET_BATTERY_VOLTAGE_MAX = ((uint8_t) 0x26),
 			
 	OFFSET_PASSCODE_HIGH_BYTE = ((uint8_t) 0x27),
-	OFFSET_PASSCODE = ((uint8_t) 0x28)
+	OFFSET_PASSCODE = ((uint8_t) 0x28),
+	OFFSET_GEAR_RATIO = ((uint8_t) 0x29)
 
 } BO_EEPROM_OFFSETS;
 

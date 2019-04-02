@@ -151,7 +151,7 @@ uint8_t readAndClearSignal(uint8_t signal) {
 
 void initErpsRatio(void) {
 	//if (readAndClearSignal(SIGNAL_SPEEDLIMIT_CHANGED) == 1) 
-	ui16_speed_kph_to_erps_ratio = (uint16_t) ((float) GEAR_RATIO * 1000000.0 / ((float) wheel_circumference * 36.0));
+	ui16_speed_kph_to_erps_ratio = (uint16_t) ((float) ui8_gear_ratio * 1000000.0 / ((float) wheel_circumference * 36.0));
 }
 
 void updateHallOrder(uint8_t hall_sensors) {

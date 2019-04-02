@@ -81,7 +81,7 @@ void send_message() {
 		if (ui32_erps_filtered == 0) {
 			ui16_wheel_period_ms = 4500;
 		} else {
-			ui16_wheel_period_ms = (uint16_t) (1000.0 * (float) GEAR_RATIO / (float) ui32_erps_filtered);
+			ui16_wheel_period_ms = (uint16_t) (1000.0 * (float) ui8_gear_ratio / (float) ui32_erps_filtered);
 		}
 	}
 

@@ -114,7 +114,9 @@ void signPackage(void) {
 void addConfigStateInfosA(void) {
 
 	// float casts might be costly but they are only requested once every 10 seconds
-	addPayload(CODE_ERPS_FACTOR, (uint16_t) (((float) wheel_circumference) / ((float) GEAR_RATIO)));
+	addPayload(CODE_ERPS_FACTOR, ui8_gear_ratio);
+	addPayload(CODE_WHEEL_CIRCUMFENCE_HIGH_BYTE, wheel_circumference >>8);
+	addPayload(CODE_WHEEL_CIRCUMFENCE, wheel_circumference);
 	addPayload(CODE_CURRENT_CAL_A, ui8_current_cal_a);
 	addPayload(CODE_CURRENT_CAL_B_HIGH_BYTE, ui16_current_cal_b >> 8);
 	addPayload(CODE_CURRENT_CAL_B, ui16_current_cal_b);
@@ -137,7 +139,7 @@ void addConfigStateInfosA(void) {
 	addPayload(CODE_MAX_BAT_CURRENT, ui16_battery_current_max_value);
 	addPayload(CODE_CORRECTION_AT_ANGLE, ui8_correction_at_angle);
 
-	// 7 more elements left/avail (max30)
+	// 5 more elements left/avail (max30)
 
 }
 
@@ -276,6 +278,15 @@ void digestConfigRequest(uint8_t configAddress, uint8_t requestedCodeLowByte, ui
 
 
 	switch (requestedCodeLowByte) {
+		case CODE_ERPS_FACTOR:
+			ui8_gear_ratio = requestedValue;
+			if (configAddress == EEPROM_ADDRESS) {
+				eeprom_write(OFFSET_GEAR_RATIO, requestedValue);
+			}
+			// special processing, reinit ratio
+			initErpsRatio();
+			addPayload(requestedCodeLowByte, ui8_gear_ratio);
+			break;
 		case CODE_OFFROAD:
 			ui8_offroad_state = requestedValue;
 			addPayload(requestedCodeLowByte, ui8_offroad_state);

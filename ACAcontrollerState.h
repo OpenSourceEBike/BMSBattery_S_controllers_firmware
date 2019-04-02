@@ -76,6 +76,7 @@ extern int8_t int8_t_hall_counter;
 extern uint8_t ui8_hall_debug_counter;
 extern uint8_t ui8_hall_order_counter;
 
+extern uint8_t ui8_gear_ratio;
 extern uint16_t ui16_speed_kph_to_erps_ratio;
 
 extern uint32_t ui32_SPEED_km_h; //global variable Speed

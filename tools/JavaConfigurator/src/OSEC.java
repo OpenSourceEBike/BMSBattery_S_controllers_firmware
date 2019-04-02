@@ -494,6 +494,7 @@ public class OSEC extends JFrame {
 
 		JLabel lblBatteryCurrentCal = new JLabel("Battery Current cal a");
 		lblBatteryCurrentCal.setBounds(15, 250, 121, 14);
+		lblBatteryCurrentCal.setForeground(Color.GRAY);
 		contentPane.add(lblBatteryCurrentCal);
 
 		txtBatteryCurcala = new JTextField();
@@ -546,6 +547,7 @@ public class OSEC extends JFrame {
 
 		JLabel lblGearRatio = new JLabel("Gear Ratio");
 		lblGearRatio.setBounds(15, 390, 131, 14);
+		lblGearRatio.setForeground(Color.GRAY);
 		contentPane.add(lblGearRatio);
 
 		GearRatio = new JTextField();
@@ -1344,7 +1346,7 @@ public class OSEC extends JFrame {
 					pWriter.println("#define ACA_EXPERIMENTAL " + acaExperimentalFlags);
 					
 					text_to_save = "#define BATTERY_VOLTAGE_MAX_VALUE " + txtOvervoltage.getText();
-					iWriter.println(txtUndervoltage.getText());
+					iWriter.println(txtOvervoltage.getText());
 					pWriter.println(text_to_save);
 
 					pWriter.println("\r\n#endif /* CONFIG_H_ */");
