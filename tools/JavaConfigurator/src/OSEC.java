@@ -272,29 +272,32 @@ public class OSEC extends JFrame {
 		if (tmp.trim().length() > 0) {
 			batteryVoltageCalib.setText(tmp);
 		}
-		
-		
+
 		int acaExperimentalFlags = Integer.parseInt(in.readLine());
 		cbPwmOff.setSelected((acaExperimentalFlags & 1024) > 0);
 		cbDcNull.setSelected((acaExperimentalFlags & 1) > 0);
-		
+
 		txtOvervoltage.setText(in.readLine());
 		in.close();
 	}
 
-	private void updateDependiencies() {
+	private void updateDependiencies(boolean resetActivatedValue) {
 		if (cbTorqueSensor.isSelected()) {
 			ramp_end.setText("0");
 			ramp_end.setEditable(false);
 			ramp_start.setText("0");
 			ramp_start.setEditable(false);
 			flt_tqCalibrationFactor.setEditable(true);
-			flt_tqCalibrationFactor.setText("1000.0");
+			if (resetActivatedValue) {
+				flt_tqCalibrationFactor.setText("1000.0");
+			}
 		} else {
 			flt_tqCalibrationFactor.setText("0.0");
-			ramp_end.setText("1500");
+			if (resetActivatedValue) {
+				ramp_end.setText("1500");
+				ramp_start.setText("64000");
+			}
 			ramp_end.setEditable(true);
-			ramp_start.setText("64000");
 			ramp_start.setEditable(true);
 			flt_tqCalibrationFactor.setEditable(false);
 
@@ -332,7 +335,7 @@ public class OSEC extends JFrame {
 		}
 		File provenSettingsDir = new File(experimentalSettingsDir.getAbsolutePath() + File.separator + "proven settings");
 		experimentalSettingsDir = new File(experimentalSettingsDir.getAbsolutePath() + File.separator + "experimental settings");
-		
+
 		DefaultListModel provenSettingsFilesModel = new DefaultListModel();
 		DefaultListModel experimentalSettingsFilesModel = new DefaultListModel();
 		for (File file : experimentalSettingsDir.listFiles()) {
@@ -349,14 +352,14 @@ public class OSEC extends JFrame {
 				}
 			}
 		}
-		
+
 		JLabel lblES = new JLabel("Proven Settings");
 		lblES.setBounds(600, 85, 320, 20);
 		contentPane.add(lblES);
 		JLabel lblPS = new JLabel("Experimental Settings");
 		lblPS.setBounds(600, 235, 320, 20);
 		contentPane.add(lblPS);
-		
+
 		JList provenSettingsList = new JList(provenSettingsFilesModel);
 		provenSettingsList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		provenSettingsList.setLayoutOrientation(JList.VERTICAL);
@@ -376,7 +379,6 @@ public class OSEC extends JFrame {
 		expListScroller.setPreferredSize(new Dimension(280, 120));
 		expListScroller.setBounds(600, 255, 320, 140);
 		contentPane.add(expListScroller);
-		
 
 		provenSettingsList.addMouseListener(new MouseAdapter() {
 			@Override
@@ -389,7 +391,7 @@ public class OSEC extends JFrame {
 					Logger.getLogger(OSEC.class.getName()).log(Level.SEVERE, null, ex);
 				}
 				provenSettingsList.clearSelection();
-				updateDependiencies();
+				updateDependiencies(false);
 			}
 		});
 		experimentalSettingsList.addMouseListener(new MouseAdapter() {
@@ -403,7 +405,7 @@ public class OSEC extends JFrame {
 					Logger.getLogger(OSEC.class.getName()).log(Level.SEVERE, null, ex);
 				}
 				experimentalSettingsList.clearSelection();
-				updateDependiencies();
+				updateDependiencies(false);
 			}
 		});
 
@@ -490,7 +492,6 @@ public class OSEC extends JFrame {
 		txtMaxregencurrent.setColumns(10);
 		txtMaxregencurrent.setBounds(150, 230, 86, 20);
 		contentPane.add(txtMaxregencurrent);
-
 
 		JLabel lblBatteryCurrentCal = new JLabel("Battery Current cal a");
 		lblBatteryCurrentCal.setBounds(15, 250, 121, 14);
@@ -709,8 +710,7 @@ public class OSEC extends JFrame {
 		txtMotor_specific_angle.setBounds(530, 230, 50, 20);
 		contentPane.add(txtMotor_specific_angle);
 		txtMotor_specific_angle.setColumns(10);
-		
-		
+
 		JLabel lblUndervoltageLimit = new JLabel("Undervoltage");
 		lblUndervoltageLimit.setBounds(415, 270, 121, 14);
 		lblUndervoltageLimit.setForeground(Color.GRAY);
@@ -731,7 +731,7 @@ public class OSEC extends JFrame {
 		CellsNumber.setColumns(10);
 		CellsNumber.setBounds(530, 290, 50, 20);
 		contentPane.add(CellsNumber);
-		
+
 		JLabel lblOvervoltageLimit = new JLabel("Overvoltage");
 		lblOvervoltageLimit.setBounds(415, 310, 121, 14);
 		lblOvervoltageLimit.setForeground(Color.GRAY);
@@ -742,7 +742,7 @@ public class OSEC extends JFrame {
 		txtOvervoltage.setBounds(530, 310, 50, 20);
 		contentPane.add(txtOvervoltage);
 		txtOvervoltage.setColumns(3);
-		
+
 		JLabel lblBatVolCal = new JLabel("Volt Calib");
 		lblBatVolCal.setBounds(415, 330, 121, 14);
 		lblBatVolCal.setForeground(Color.GRAY);
@@ -753,8 +753,7 @@ public class OSEC extends JFrame {
 		batteryVoltageCalib.setColumns(2);
 		batteryVoltageCalib.setBounds(530, 330, 50, 20);
 		contentPane.add(batteryVoltageCalib);
-		
-		
+
 		JList list = new JList();
 		list.setBounds(441, 177, 1, 1);
 		contentPane.add(list);
@@ -795,22 +794,24 @@ public class OSEC extends JFrame {
 				if (Desktop.isDesktopSupported()) {
 					try {
 						Desktop.getDesktop().browse(new URI("https://github.com/stancecoke/BMSBattery_S_controllers_firmware/wiki"));
-					} catch (Exception e) {}
-				} 
+					} catch (Exception e) {
+					}
+				}
 			}
 		});
 		btnWiki.setForeground(Color.BLUE);
 		btnWiki.setBounds(600, 20, 150, 29);
 		contentPane.add(btnWiki);
-		
+
 		JButton btnGit = new JButton("Git Repository");
 		btnGit.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				if (Desktop.isDesktopSupported()) {
 					try {
 						Desktop.getDesktop().browse(new URI("https://github.com/stancecoke/BMSBattery_S_controllers_firmware"));
-					} catch (Exception e) {}
-				} 
+					} catch (Exception e) {
+					}
+				}
 			}
 		});
 		btnGit.setForeground(Color.BLUE);
@@ -911,7 +912,7 @@ public class OSEC extends JFrame {
 		cbTorqueSensor.addItemListener(new ItemListener() {
 			@Override
 			public void itemStateChanged(ItemEvent e) {
-				updateDependiencies();
+				updateDependiencies(true);
 			}
 		});
 
@@ -968,37 +969,36 @@ public class OSEC extends JFrame {
 		cbCorrectionEnabled.setBounds(250, 515, 250, 20);
 		cbCorrectionEnabled.setForeground(Color.GRAY);
 		contentPane.add(cbCorrectionEnabled);
-		
+
 		cbPowerBasedControlEnabled = new JCheckBox("Power based control");
 		cbPowerBasedControlEnabled.setSelected(false);
 		cbPowerBasedControlEnabled.setBounds(250, 535, 250, 20);
 		cbPowerBasedControlEnabled.setForeground(Color.GRAY);
 		contentPane.add(cbPowerBasedControlEnabled);
-		
+
 		cbIdleDisablesOffroad = new JCheckBox("Idle disables offroad");
 		cbIdleDisablesOffroad.setSelected(false);
 		cbIdleDisablesOffroad.setBounds(250, 555, 250, 20);
 		cbIdleDisablesOffroad.setForeground(Color.GRAY);
 		contentPane.add(cbIdleDisablesOffroad);
-		
+
 		cbExternalSpeedSensor = new JCheckBox("External Speed-Sensor");
 		cbExternalSpeedSensor.setSelected(false);
 		cbExternalSpeedSensor.setBounds(250, 575, 250, 20);
 		cbExternalSpeedSensor.setForeground(Color.GRAY);
 		contentPane.add(cbExternalSpeedSensor);
-		
+
 		cbPwmOff = new JCheckBox("PWM off @coast (experimental)");
 		cbPwmOff.setSelected(false);
 		cbPwmOff.setBounds(250, 615, 250, 20);
 		cbPwmOff.setForeground(Color.ORANGE);
 		contentPane.add(cbPwmOff);
-		
+
 		cbDcNull = new JCheckBox("DC static zero (testing/experimental)");
 		cbDcNull.setSelected(false);
 		cbDcNull.setBounds(250, 635, 250, 20);
 		cbDcNull.setForeground(Color.ORANGE);
 		contentPane.add(cbDcNull);
-
 
 		JLabel lblMotorSpeed = new JLabel("Motor Speed");
 		lblMotorSpeed.setFont(new Font("Tahoma", Font.BOLD, 12));
@@ -1337,14 +1337,13 @@ public class OSEC extends JFrame {
 					text_to_save = "#define ADC_BATTERY_VOLTAGE_K " + batteryVoltageCalib.getText();
 					iWriter.println(batteryVoltageCalib.getText());
 					pWriter.println(text_to_save);
-					
-					
+
 					int acaExperimentalFlags = 128;
 					acaExperimentalFlags |= (cbDcNull.isSelected() ? 1 : 0);
 					acaExperimentalFlags |= (cbPwmOff.isSelected() ? 1024 : 0);
 					iWriter.println(acaExperimentalFlags);
 					pWriter.println("#define ACA_EXPERIMENTAL " + acaExperimentalFlags);
-					
+
 					text_to_save = "#define BATTERY_VOLTAGE_MAX_VALUE " + txtOvervoltage.getText();
 					iWriter.println(txtOvervoltage.getText());
 					pWriter.println(text_to_save);
@@ -1383,7 +1382,7 @@ public class OSEC extends JFrame {
 			}
 			provenSettingsList.clearSelection();
 			experimentalSettingsList.clearSelection();
-			updateDependiencies();
+			updateDependiencies(false);
 		}
 	}
 }
