@@ -105,7 +105,7 @@ uint8_t ui8_hall_order_counter = 5;
 uint16_t ui16_speed_kph_to_erps_ratio = 0;
 
 uint32_t ui32_speed_sensor_rpks; //speed sensor rounds per 1000 sec
-uint16_t ui16_SPEED_km_h_accumulated;
+uint16_t ui32_speed_sensor_rpks_accumulated = 0;
 uint16_t ui16_time_ticks_between_speed_interrupt = 64000L; //speed in timetics
 uint16_t ui16_time_ticks_for_speed_calculation = 0; //time tics for speed measurement
 uint16_t ui16_time_ticks_for_uart_timeout = 0;
