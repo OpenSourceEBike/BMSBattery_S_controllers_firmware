@@ -94,9 +94,9 @@ void updateSpeeds(void) {
 			ui16_time_ticks_between_speed_interrupt = ui16_time_ticks_for_speed_calculation; //save recent speed
 			ui16_time_ticks_for_speed_calculation = 0; //reset speed counter
 
-			ui32_SPEED_km_h_accumulated -= ui32_SPEED_km_h_accumulated >> 2;
-			ui32_SPEED_km_h_accumulated += (wheel_circumference * PWM_CYCLES_SECOND * 36L) / (10L * (uint32_t) ui16_time_ticks_between_speed_interrupt); // speed km/h*1000 from external sensor
-			ui32_SPEED_km_h = ui32_SPEED_km_h_accumulated >> 2; //calculate speed in m/h conversion from sec to hour --> *3600, conversion from mm to km --> /1000000, tic frequency 15625 Hz
+			ui32_speed_sensor_rpks_accumulated -= ui32_speed_sensor_rpks_accumulated >> 2;
+			ui32_speed_sensor_rpks_accumulated += (((uint32_t)PWM_CYCLES_SECOND)*1000) / ((uint32_t) ui16_time_ticks_between_speed_interrupt); // speed in rounds per 1000 seconds
+			ui32_speed_sensor_rpks = ui32_speed_sensor_rpks_accumulated >> 2; //tic frequency 15625 Hz
 		}
 
 		ui8_SPEED_Flag = 0; //reset interrupt flag
@@ -106,7 +106,7 @@ void updateSpeeds(void) {
 	// FIXME, the following is gathered from two places that were executed just in that order
 	// distinction 40000/65529 doesn't really make much sense
 	if (ui16_time_ticks_for_speed_calculation > 40000) {
-		ui32_SPEED_km_h = 0;
+		ui32_speed_sensor_rpks = 0;
 	}
 	if (ui16_time_ticks_for_speed_calculation > 65529 && ui16_time_ticks_between_speed_interrupt != 65530) {
 		ui16_time_ticks_between_speed_interrupt = 65530; //Set Display to 0 km/h

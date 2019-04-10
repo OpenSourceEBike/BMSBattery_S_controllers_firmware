@@ -79,8 +79,8 @@ extern uint8_t ui8_hall_order_counter;
 extern uint8_t ui8_gear_ratio;
 extern uint16_t ui16_speed_kph_to_erps_ratio;
 
-extern uint32_t ui32_SPEED_km_h; //global variable Speed
-extern uint32_t ui32_SPEED_km_h_accumulated;
+extern uint32_t ui32_speed_sensor_rpks; //speed sensor rounds per 1000 sec
+extern uint32_t ui32_speed_sensor_rpks_accumulated;
 
 extern uint16_t ui16_time_ticks_for_uart_timeout;
 extern uint16_t ui16_time_ticks_for_speed_calculation;

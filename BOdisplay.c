@@ -228,8 +228,8 @@ void addBasicStateInfos(void) {
 	addPayload(CODE_BATTERY_VOLTAGE, ui8_BatteryVoltage);
 	addPayload(CODE_ER_SPEED_HIGH_BYTE, ui16_motor_speed_erps >> 8);
 	addPayload(CODE_ER_SPEED, ui16_motor_speed_erps);
-	addPayload(CODE_SPEED_HIGH_BYTE, ui32_SPEED_km_h >> 8);
-	addPayload(CODE_SPEED, ui32_SPEED_km_h);
+	addPayload(CODE_SENSOR_RPKS_HIGH_BYTE, ui32_speed_sensor_rpks >> 8);
+	addPayload(CODE_SENSOR_RPKS, ui32_speed_sensor_rpks);
 	addPayload(CODE_BATTERY_CURRENT_HIGH_BYTE, ui16_BatteryCurrent >> 8);
 	addPayload(CODE_BATTERY_CURRENT, ui16_BatteryCurrent);
 	addPayload(CODE_SUM_TORQUE, ui16_sum_torque);
