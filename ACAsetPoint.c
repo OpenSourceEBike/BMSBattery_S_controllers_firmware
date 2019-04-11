@@ -251,9 +251,13 @@ uint16_t aca_setpoint(uint16_t ui16_time_ticks_between_speed_interrupt, uint16_t
 		}
 
 
+		float float_temp = 0.0;
 		// throttle / torquesensor override following
 		if (((ui16_aca_flags & TQ_SENSOR_MODE) != TQ_SENSOR_MODE)) {
-			float_temp = (float) ui16_sum_throttle;
+			if (ui8_speedlimit_kph > 1){
+				// do not apply throttle at very low speed limits (technical restriction, speelimit can and should never be lover than 1)
+				float_temp = (float) ui16_sum_throttle;
+			}
 		} else {
 			float_temp = (float) ui16_momentary_throttle; // or ui16_sum_throttle
 			float_temp *= (1 - (float) ui16_virtual_erps_speed / 2 / (float) (ui16_speed_kph_to_erps_ratio * ((float) ui8_speedlimit_kph))); //ramp down linear with speed. Risk: Value is getting negative if speed>2*speedlimit
