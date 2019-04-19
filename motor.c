@@ -43,6 +43,8 @@ int8_t hall_sensors_last = 0;
 uint16_t ui16_ADC_iq_current_accumulated = 4096;
 uint16_t ui16_iq_current_ma = 0;
 
+static uint8_t ui8_tmp = 0;
+
 void TIM1_UPD_OVF_TRG_BRK_IRQHandler(void) __interrupt(TIM1_UPD_OVF_TRG_BRK_IRQHANDLER) {
 	adc_trigger();
 	hall_sensors_read_and_action();
@@ -97,10 +99,7 @@ void hall_sensors_read_and_action(void) {
 					ui16_motor_speed_erps = 0;
 				}
 				// update motor state based on motor speed
-				if (ui16_motor_speed_erps > 1000) {
-					ui8_motor_state = MOTOR_STATE_RUNNING_INTERPOLATION_360_DEGREES;
-				} else if (ui16_motor_speed_erps > 3
-						) {
+				if (ui16_motor_speed_erps > 3) {
 					ui8_motor_state = MOTOR_STATE_RUNNING_INTERPOLATION_60_DEGREES;
 				} else {
 					ui8_motor_state = MOTOR_STATE_RUNNING_NO_INTERPOLATION_60_DEGREES;
@@ -111,23 +110,13 @@ void hall_sensors_read_and_action(void) {
 
 			case 1:
 				uint8_t_hall_case[4] = ui8_adc_read_phase_B_current();
-
-				if (ui8_motor_state != MOTOR_STATE_RUNNING_INTERPOLATION_360_DEGREES) {
-
-					ui8_motor_rotor_hall_position = ui8_s_hall_angle1_240;
-				}
+				ui8_motor_rotor_hall_position = ui8_s_hall_angle1_240;
 				break;
 
 			case 5: //rotor position 300 degree
 
 				uint8_t_hall_case[5] = ui8_adc_read_phase_B_current();
-
-
-				if (ui8_motor_state != MOTOR_STATE_RUNNING_INTERPOLATION_360_DEGREES) {
-
-
-					ui8_motor_rotor_hall_position = ui8_s_hall_angle5_300;
-				}
+				ui8_motor_rotor_hall_position = ui8_s_hall_angle5_300;
 				break;
 
 			case 4: //rotor position 0 degree
@@ -135,32 +124,18 @@ void hall_sensors_read_and_action(void) {
 				ui8_foc_enable_flag = 1;
 
 				uint8_t_hall_case[0] = ui8_adc_read_phase_B_current();
-
 				debug_pin_reset();
-				if (ui8_motor_state != MOTOR_STATE_RUNNING_INTERPOLATION_360_DEGREES) {
-
-					ui8_motor_rotor_hall_position = ui8_s_hall_angle4_0;
-				}
+				ui8_motor_rotor_hall_position = ui8_s_hall_angle4_0;
 				break;
 
 			case 6://rotor position 60 degree
 				uint8_t_hall_case[1] = ui8_adc_read_phase_B_current();
-
-
-				if (ui8_motor_state != MOTOR_STATE_RUNNING_INTERPOLATION_360_DEGREES) {
-
-					ui8_motor_rotor_hall_position = ui8_s_hall_angle6_60;
-				}
+				ui8_motor_rotor_hall_position = ui8_s_hall_angle6_60;
 				break;
 
 			case 2://rotor position 120 degree
 				uint8_t_hall_case[2] = ui8_adc_read_phase_B_current();
-
-
-				if (ui8_motor_state != MOTOR_STATE_RUNNING_INTERPOLATION_360_DEGREES) {
-
-					ui8_motor_rotor_hall_position = ui8_s_hall_angle2_120;
-				}
+				ui8_motor_rotor_hall_position = ui8_s_hall_angle2_120;
 				break;
 
 			default:
@@ -238,21 +213,26 @@ void motor_fast_loop(void) {
 		hall_sensors_read_and_action();
 	}
 
-#define DO_INTERPOLATION 1 // may be usefull when debugging
-#if DO_INTERPOLATION == 1
+
 	//  // calculate the interpolation angle
 	//  // interpolation seems a problem when motor starts, so avoid to do it at very low speed
 	if (ui8_motor_state == MOTOR_STATE_RUNNING_INTERPOLATION_60_DEGREES) {
 		ui8_interpolation_angle = (ui16_PWM_cycles_counter_6 << 8) / ui16_PWM_cycles_counter_total;
-		ui8_sinetable_position = ui8_motor_rotor_hall_position + ui8_s_motor_angle + ui8_position_correction_value -127 + ui8_interpolation_angle;
+		
+		ui8_tmp = ui8_motor_rotor_hall_position + ui8_s_motor_angle + ui8_position_correction_value -127 + ui8_interpolation_angle;
+		if ((ui16_aca_experimental_flags & AVOID_MOTOR_CYCLES_JITTER) != AVOID_MOTOR_CYCLES_JITTER){
+			ui8_sinetable_position = ui8_tmp;
+		}else{
+			// if we would go back slightly, stay at current position; if we would go back a lot, something must be seriously wrong anyway
+			if ((ui8_tmp-ui8_sinetable_position)<248){
+				ui8_sinetable_position = ui8_tmp;
+			}else{
+				// debug only count anti jitter occurrences
+				ui8_variableDebugA += 1;
+			}
+		}
 
-	} else if (ui8_motor_state == MOTOR_STATE_RUNNING_INTERPOLATION_360_DEGREES) {
-		ui8_interpolation_angle = (ui16_PWM_cycles_counter << 8) / ui16_PWM_cycles_counter_total;
-		ui8_sinetable_position = ui8_motor_rotor_hall_position + ui8_s_motor_angle + ui8_position_correction_value -127 + ui8_interpolation_angle;
-
-	} else // MOTOR_STATE_COAST || MOTOR_STATE_RUNNING_NO_INTERPOLATION_60_DEGREES
-#endif
-	{
+	} else {// MOTOR_STATE_COAST || MOTOR_STATE_RUNNING_NO_INTERPOLATION_60_DEGREES
 		ui8_interpolation_angle = 0;
 		ui8_sinetable_position = ui8_motor_rotor_hall_position + ui8_s_motor_angle + ui8_position_correction_value -127;
 	}
@@ -266,8 +246,8 @@ void motor_fast_loop(void) {
 		// make sure we just execute one time per ERPS, so reset the flag
 		ui8_foc_enable_flag = 0;
 
-		ui8_variableDebugA = ui8_assumed_motor_position;
-		ui8_variableDebugB = ui8_assumed_motor_position + ui8_position_correction_value - 127;
+		//ui8_variableDebugA = ui8_assumed_motor_position;
+		//ui8_variableDebugB = ui8_assumed_motor_position + ui8_position_correction_value - 127;
 
 		updateCorrection();
 	}

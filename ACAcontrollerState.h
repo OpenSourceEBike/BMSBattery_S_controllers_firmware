@@ -164,6 +164,7 @@ typedef enum {
 typedef enum {
 
 	DC_STATIC_ZERO = ((uint16_t) 1),
+	AVOID_MOTOR_CYCLES_JITTER = ((uint16_t) 2),
 	DUMMY_EXP_ALWAYS_ON = ((uint16_t) 128),
 	PWM_AUTO_OFF = ((uint16_t) 1024),
 			

@@ -134,6 +134,7 @@ public class OSEC extends JFrame {
 	private JCheckBox cbPasInverted;
 	private JCheckBox cbPwmOff;
 	private JCheckBox cbDcNull;
+	private JCheckBox cbAntiJitter;
 	private JCheckBox cbCorrectionEnabled;
 	private JCheckBox cbExternalSpeedSensor;
 	private JCheckBox cbIdleDisablesOffroad;
@@ -276,6 +277,7 @@ public class OSEC extends JFrame {
 		int acaExperimentalFlags = Integer.parseInt(in.readLine());
 		cbPwmOff.setSelected((acaExperimentalFlags & 1024) > 0);
 		cbDcNull.setSelected((acaExperimentalFlags & 1) > 0);
+		cbAntiJitter.setSelected((acaExperimentalFlags & 2) > 0);
 
 		txtOvervoltage.setText(in.readLine());
 		in.close();
@@ -999,6 +1001,12 @@ public class OSEC extends JFrame {
 		cbDcNull.setBounds(250, 635, 250, 20);
 		cbDcNull.setForeground(Color.ORANGE);
 		contentPane.add(cbDcNull);
+		
+		cbAntiJitter = new JCheckBox("Motor anti jitter (@60° interpol.)");
+		cbAntiJitter.setSelected(false);
+		cbAntiJitter.setBounds(250, 655, 250, 20);
+		cbAntiJitter.setForeground(Color.ORANGE);
+		contentPane.add(cbAntiJitter);
 
 		JLabel lblMotorSpeed = new JLabel("Motor Speed");
 		lblMotorSpeed.setFont(new Font("Tahoma", Font.BOLD, 12));
@@ -1340,6 +1348,7 @@ public class OSEC extends JFrame {
 
 					int acaExperimentalFlags = 128;
 					acaExperimentalFlags |= (cbDcNull.isSelected() ? 1 : 0);
+					acaExperimentalFlags |= (cbAntiJitter.isSelected() ? 2 : 0);
 					acaExperimentalFlags |= (cbPwmOff.isSelected() ? 1024 : 0);
 					iWriter.println(acaExperimentalFlags);
 					pWriter.println("#define ACA_EXPERIMENTAL " + acaExperimentalFlags);

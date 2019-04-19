@@ -276,8 +276,6 @@ void updateSlowLoopStates(void) {
 	
 	// debug only
 	ui8_variableDebugC = ui16_no_pass_counter>>8;
-	ui8_variableDebugA = ui16_passcode;
-	ui8_variableDebugB = ui16_passcode >>8;
 	
 	//disable lock if passcode is not at least 4 digits
 	if (ui16_passcode < 1001){
