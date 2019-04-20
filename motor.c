@@ -225,7 +225,7 @@ void motor_fast_loop(void) {
 		}else{
 			ui8_variableDebugA = ui8_tmp-ui8_sinetable_position;
 			// if we would go back slightly, stay at current position; if we would go back a lot, something must be seriously wrong anyway
-			if ((ui8_tmp-ui8_sinetable_position)<248){
+			if ((ui8_tmp-ui8_sinetable_position)<224){
 				ui8_sinetable_position = ui8_tmp;
 				
 			}else{
