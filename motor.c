@@ -132,7 +132,7 @@ void hall_sensors_read_and_action(void) {
 				uint8_t_hall_case[1] = ui8_adc_read_phase_B_current();
 				ui8_motor_rotor_hall_position = ui8_s_hall_angle6_60;
 				
-				ui8_variableDebugC = ui8_sinetable_position -ui8_s_motor_angle - ui8_position_correction_value +127 - ui8_interpolation_angle;
+				ui8_variableDebugC = ui8_interpolation_angle;
 				break;
 
 			case 2://rotor position 120 degree
