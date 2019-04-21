@@ -81,6 +81,7 @@
         </df>
       </df>
       <df name="test">
+        <in>motorTest.c</in>
         <in>offRoadTest.c</in>
       </df>
       <df name="tools">
