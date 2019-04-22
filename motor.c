@@ -222,8 +222,13 @@ void motor_fast_loop(void) {
 		ui16_PWM_cycles_counter_6++;
 	}else {// MOTOR_STATE_COAST || MOTOR_STATE_RUNNING_NO_INTERPOLATION
 		
-		ui8_interpolation_angle = 0;
-		//ui8_interpolation_angle = 21; //30deg+ (avg between hall sensor change)
+		//!!! abuse of option only for debugging !!! FIXME
+		if ((ui16_aca_experimental_flags & DISABLE_60_DEG_INTERPOLATION) != DISABLE_60_DEG_INTERPOLATION){
+			ui8_interpolation_angle = 0;
+		}else{
+			ui8_interpolation_angle = 21; //30deg+ (avg between hall sensor change)
+		}
+		
 		ui8_interpolation_start_position = ui8_motor_rotor_hall_position;
 		
 		
