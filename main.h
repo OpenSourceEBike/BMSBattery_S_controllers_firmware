@@ -49,7 +49,7 @@
 #define ADC_PHASE_B_CURRENT_FACTOR_MA 21 // 0,030273437 * 1000 * 0.707
 
 
-#define PWM_CYCLES_COUNTER_MAX 3000 // bei h�heren Werten wird angenommen, der Motor steht.
+#define PWM_CYCLES_COUNTER_MAX 3000 // higher values assume motor is at standstill.
 
 
 // 2 seconds to get up to max PWM duty cycle value of 255 (127 * 255 * 64us ~= 2 seconds)

@@ -78,7 +78,6 @@ public class OSEC extends JFrame {
 	private JTextField batteryVoltageCalib;
 	private JLabel lblThrottleMax;
 	private JTextField txtThrottlemax;
-	private JLabel lblOpenSourceFirmware;
 	private JButton btnWriteConfiguration;
 	private JTextField txtMaxbatterycurrent;
 	private JTextField txtUndervoltage;
@@ -135,6 +134,8 @@ public class OSEC extends JFrame {
 	private JCheckBox cbPwmOff;
 	private JCheckBox cbDcNull;
 	private JCheckBox cbAntiJitter;
+	private JCheckBox cbDisable60DegInterpolation;
+	private JCheckBox cbDisableInterpolation;
 	private JCheckBox cbCorrectionEnabled;
 	private JCheckBox cbExternalSpeedSensor;
 	private JCheckBox cbIdleDisablesOffroad;
@@ -278,6 +279,8 @@ public class OSEC extends JFrame {
 		cbPwmOff.setSelected((acaExperimentalFlags & 1024) > 0);
 		cbDcNull.setSelected((acaExperimentalFlags & 1) > 0);
 		cbAntiJitter.setSelected((acaExperimentalFlags & 2) > 0);
+		cbDisableInterpolation.setSelected((acaExperimentalFlags & 4) > 0);
+		cbDisable60DegInterpolation.setSelected((acaExperimentalFlags & 8) > 0);
 
 		txtOvervoltage.setText(in.readLine());
 		in.close();
@@ -324,12 +327,34 @@ public class OSEC extends JFrame {
 		footnote.setBounds(600, 650, 320, 25);
 		contentPane.add(footnote);
 
-		JLabel lblTollesProgramm = new JLabel("C#ROME-B Parameter Configurator");
-		lblTollesProgramm.setHorizontalAlignment(SwingConstants.CENTER);
-		lblTollesProgramm.setForeground(Color.GRAY);
-		lblTollesProgramm.setFont(new Font("Tahoma", Font.PLAIN, 18));
-		lblTollesProgramm.setBounds(114, 11, 326, 34);
-		contentPane.add(lblTollesProgramm);
+		JLabel lblTitle = new JLabel("OSEC Parameter Configurator");
+		lblTitle.setHorizontalAlignment(SwingConstants.RIGHT);
+		lblTitle.setForeground(Color.black);
+		lblTitle.setFont(new Font("Tahoma", Font.PLAIN, 18));
+		lblTitle.setBounds(100, 4, 300, 34);
+		contentPane.add(lblTitle);
+		
+		JLabel lblOpenSourceFirmware = new JLabel("Open Source Firmware for E-Bike Controller");
+		lblOpenSourceFirmware.setHorizontalAlignment(SwingConstants.RIGHT);
+		lblOpenSourceFirmware.setFont(new Font("Tahoma", Font.PLAIN, 11));
+		lblOpenSourceFirmware.setForeground(Color.BLUE);
+		lblOpenSourceFirmware.setBounds(100, 34, 300, 14);
+		contentPane.add(lblOpenSourceFirmware);
+		
+		JLabel lblRTFM = new JLabel("Read the friendly Wiki before using");
+		lblRTFM.setHorizontalAlignment(SwingConstants.RIGHT);
+		lblRTFM.setFont(new Font("Tahoma", Font.PLAIN, 11));
+		lblRTFM.setForeground(Color.RED);
+		lblRTFM.setBounds(100, 50, 300, 14);
+		contentPane.add(lblRTFM);
+		
+		JLabel lblgray = new JLabel("Gray settings can be changed @ runtime (via BluOsec App)");
+		lblgray.setHorizontalAlignment(SwingConstants.RIGHT);
+		lblgray.setFont(new Font("Tahoma", Font.PLAIN, 11));
+		lblgray.setForeground(Color.GRAY);
+		lblgray.setBounds(100, 66, 300, 14);
+		contentPane.add(lblgray);
+
 
 		experimentalSettingsDir = new File(Paths.get(".").toAbsolutePath().normalize().toString());
 		while (!Arrays.asList(experimentalSettingsDir.list()).contains("experimental settings")) {
@@ -801,7 +826,7 @@ public class OSEC extends JFrame {
 				}
 			}
 		});
-		btnWiki.setForeground(Color.BLUE);
+		btnWiki.setForeground(Color.RED);
 		btnWiki.setBounds(600, 20, 150, 29);
 		contentPane.add(btnWiki);
 
@@ -819,13 +844,6 @@ public class OSEC extends JFrame {
 		btnGit.setForeground(Color.BLUE);
 		btnGit.setBounds(770, 20, 150, 29);
 		contentPane.add(btnGit);
-
-		lblOpenSourceFirmware = new JLabel("Open Source Firmware for E-Bike Controller");
-		lblOpenSourceFirmware.setHorizontalAlignment(SwingConstants.CENTER);
-		lblOpenSourceFirmware.setFont(new Font("Tahoma", Font.PLAIN, 11));
-		lblOpenSourceFirmware.setForeground(Color.BLUE);
-		lblOpenSourceFirmware.setBounds(154, 42, 255, 14);
-		contentPane.add(lblOpenSourceFirmware);
 
 		JLabel lblTqCalibrationFactor = new JLabel("TQ Calib");
 		lblTqCalibrationFactor.setBounds(250, 270, 80, 14);
@@ -962,51 +980,65 @@ public class OSEC extends JFrame {
 
 		cbDynAssist = new JCheckBox("Dynamic Assist Level");
 		cbDynAssist.setSelected(false);
-		cbDynAssist.setBounds(250, 495, 250, 20);
+		cbDynAssist.setBounds(250, 475, 250, 20);
 		cbDynAssist.setForeground(Color.GRAY);
 		contentPane.add(cbDynAssist);
 
 		cbCorrectionEnabled = new JCheckBox("Enable rotor angle correction");
 		cbCorrectionEnabled.setSelected(false);
-		cbCorrectionEnabled.setBounds(250, 515, 250, 20);
+		cbCorrectionEnabled.setBounds(250, 495, 250, 20);
 		cbCorrectionEnabled.setForeground(Color.GRAY);
 		contentPane.add(cbCorrectionEnabled);
 
 		cbPowerBasedControlEnabled = new JCheckBox("Power based control");
 		cbPowerBasedControlEnabled.setSelected(false);
-		cbPowerBasedControlEnabled.setBounds(250, 535, 250, 20);
+		cbPowerBasedControlEnabled.setBounds(250, 515, 250, 20);
 		cbPowerBasedControlEnabled.setForeground(Color.GRAY);
 		contentPane.add(cbPowerBasedControlEnabled);
 
 		cbIdleDisablesOffroad = new JCheckBox("Idle disables offroad");
 		cbIdleDisablesOffroad.setSelected(false);
-		cbIdleDisablesOffroad.setBounds(250, 555, 250, 20);
+		cbIdleDisablesOffroad.setBounds(250, 535, 250, 20);
 		cbIdleDisablesOffroad.setForeground(Color.GRAY);
 		contentPane.add(cbIdleDisablesOffroad);
 
 		cbExternalSpeedSensor = new JCheckBox("External Speed-Sensor");
 		cbExternalSpeedSensor.setSelected(false);
-		cbExternalSpeedSensor.setBounds(250, 575, 250, 20);
+		cbExternalSpeedSensor.setBounds(250, 555, 250, 20);
 		cbExternalSpeedSensor.setForeground(Color.GRAY);
 		contentPane.add(cbExternalSpeedSensor);
 
+		cbAntiJitter = new JCheckBox("Motor anti jitter (@60° interpol.)");
+		cbAntiJitter.setSelected(false);
+		cbAntiJitter.setBounds(250, 575, 250, 20);
+		cbAntiJitter.setForeground(Color.ORANGE);
+		contentPane.add(cbAntiJitter);
+		
+		cbDisableInterpolation = new JCheckBox("Disable interpolation");
+		cbDisableInterpolation.setSelected(false);
+		cbDisableInterpolation.setBounds(250, 595, 250, 20);
+		cbDisableInterpolation.setForeground(Color.ORANGE);
+		contentPane.add(cbDisableInterpolation);
+		
+		cbDisable60DegInterpolation = new JCheckBox("Disable 60° interpolation");
+		cbDisable60DegInterpolation.setSelected(false);
+		cbDisable60DegInterpolation.setBounds(250, 615, 250, 20);
+		cbDisable60DegInterpolation.setForeground(Color.ORANGE);
+		contentPane.add(cbDisable60DegInterpolation);
+		
 		cbPwmOff = new JCheckBox("PWM off @coast (experimental)");
 		cbPwmOff.setSelected(false);
-		cbPwmOff.setBounds(250, 615, 250, 20);
-		cbPwmOff.setForeground(Color.ORANGE);
+		cbPwmOff.setBounds(250, 635, 250, 20);
+		cbPwmOff.setForeground(Color.RED);
 		contentPane.add(cbPwmOff);
 
 		cbDcNull = new JCheckBox("DC static zero (testing/experimental)");
 		cbDcNull.setSelected(false);
-		cbDcNull.setBounds(250, 635, 250, 20);
-		cbDcNull.setForeground(Color.ORANGE);
+		cbDcNull.setBounds(250, 655, 250, 20);
+		cbDcNull.setForeground(Color.RED);
 		contentPane.add(cbDcNull);
 		
-		cbAntiJitter = new JCheckBox("Motor anti jitter (@60° interpol.)");
-		cbAntiJitter.setSelected(false);
-		cbAntiJitter.setBounds(250, 655, 250, 20);
-		cbAntiJitter.setForeground(Color.ORANGE);
-		contentPane.add(cbAntiJitter);
+		
 
 		JLabel lblMotorSpeed = new JLabel("Motor Speed");
 		lblMotorSpeed.setFont(new Font("Tahoma", Font.BOLD, 12));
@@ -1060,9 +1092,9 @@ public class OSEC extends JFrame {
 		cbResetEeprom.setBounds(600, 500, 300, 20);
 		contentPane.add(cbResetEeprom);
 
-		JButton btnWriteoptionsbyte = new JButton("Write Option Bytes");
+		JButton btnWriteoptionsbyte = new JButton("Unlock Controller");
 		btnWriteoptionsbyte.setFont(new Font("Tahoma", Font.BOLD, 12));
-		btnWriteoptionsbyte.setForeground(Color.BLUE);
+		btnWriteoptionsbyte.setForeground(Color.RED);
 		btnWriteoptionsbyte.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				{
@@ -1349,6 +1381,8 @@ public class OSEC extends JFrame {
 					int acaExperimentalFlags = 128;
 					acaExperimentalFlags |= (cbDcNull.isSelected() ? 1 : 0);
 					acaExperimentalFlags |= (cbAntiJitter.isSelected() ? 2 : 0);
+					acaExperimentalFlags |= (cbDisableInterpolation.isSelected() ? 4 : 0);
+					acaExperimentalFlags |= (cbDisable60DegInterpolation.isSelected() ? 8 : 0);
 					acaExperimentalFlags |= (cbPwmOff.isSelected() ? 1024 : 0);
 					iWriter.println(acaExperimentalFlags);
 					pWriter.println("#define ACA_EXPERIMENTAL " + acaExperimentalFlags);

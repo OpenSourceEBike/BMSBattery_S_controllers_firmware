@@ -28,12 +28,20 @@
 #define MORSE_TOLERANCE 50
 
 uint16_t ui16;
+uint16_t ui16b;
 uint8_t ui8;
 uint8_t ui8b;
 uint8_t ui8a;
 uint8_t ui8X;
 
 void main() {
+	
+		ui16=200;
+		ui16b=1000;
+		ui8 = (ui16 << 8) / ui16;
+		
+		printf("cycles test\r\n");
+		printf("%d \r\n", ui8);
 	
 		ui8a = 1 + 238 + 128 -127 + 48;
 		ui8b = 46 + 238 + 128 -127 + 1;
