@@ -23,23 +23,25 @@ A graphical tool is available, which allows the use of the firmware even for les
 
 ### What works:  
 Sine wave control with simplified FOC  
-motor stopp while braking  
-Emergency stop if current consumption is too high (not tested)  
+Overvoltage (regeneration) and undervoltage protection
+Motor stopp while braking   
 Driving modes:  
-- Throttle  
-- Throttle + PAS  
-- torque sensor  
-- torque simulation  
-- Recuperation via analog "thumb brake" signal or by digitally by brake switch  
-- Kingmeter J-LCD and Forerider App  
-- Kunteng LCD3  / LCD5
-- Reverse step detection PAS
+- PAS sensor with torque simulation and reverse step detection
+- Throttle (also as override)
+- Torque sensor  
+- Recuperation via analog "thumb brake" signal or digitally by brake switch  
 - Start-up support in torque sensor mode  
 - Pushing aid
+- Block commutation during start-up (only if you have o motor without "weird" angle definitions. 
+Displays:
+- Kunteng LCD3 / LCD5 (C/P parameters mapped differently)
+- BluOsec App as Display / as Tripmonitor / for on the fly configuration  
+- Kingmeter J-LCD and Forerider App (not tested for a long time now)
 
-### What doesn't work:  
+### What doesn't:
 
-- Block commutation during start-up  
+- You debug it thoroughly
+- You tell us / patch it yourself ;-)
 
 # For further reading
 
