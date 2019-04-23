@@ -219,8 +219,8 @@ void motor_fast_loop(void) {
 		}else{
 			
 			uint32_temp = ui16_PWM_cycles_counter;
-			uint32_temp <<= 8;
-			ui8_interpolation_angle = uint32_temp / ui16_PWM_cycles_counter_total;
+			uint32_temp *= 256;
+			ui8_interpolation_angle = (uint8_t)(uint32_temp / (uint32_t)ui16_PWM_cycles_counter_total);
 			ui8_interpolation_start_position = ui8_s_hall_angle3_180; // that's where ui16_PWM_cycles_counter is being reset
 		}
 
