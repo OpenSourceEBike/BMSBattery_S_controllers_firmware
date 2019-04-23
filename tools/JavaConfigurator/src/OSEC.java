@@ -134,6 +134,7 @@ public class OSEC extends JFrame {
 	private JCheckBox cbPwmOff;
 	private JCheckBox cbDcNull;
 	private JCheckBox cbAntiJitter;
+	private JCheckBox cbSwitch360;
 	private JCheckBox cbDisable60DegInterpolation;
 	private JCheckBox cbDisableInterpolation;
 	private JCheckBox cbCorrectionEnabled;
@@ -279,6 +280,7 @@ public class OSEC extends JFrame {
 		cbPwmOff.setSelected((acaExperimentalFlags & 1024) > 0);
 		cbDcNull.setSelected((acaExperimentalFlags & 1) > 0);
 		cbAntiJitter.setSelected((acaExperimentalFlags & 2) > 0);
+		cbSwitch360.setSelected((acaExperimentalFlags & 16) > 0);
 		cbDisableInterpolation.setSelected((acaExperimentalFlags & 4) > 0);
 		cbDisable60DegInterpolation.setSelected((acaExperimentalFlags & 8) > 0);
 
@@ -530,6 +532,18 @@ public class OSEC extends JFrame {
 		txtBatteryCurcala.setBounds(150, 250, 86, 20);
 		contentPane.add(txtBatteryCurcala);
 		txtBatteryCurcala.setColumns(10);
+		
+		JLabel lblGearRatio = new JLabel("Gear Ratio");
+		lblGearRatio.setBounds(15, 270, 131, 14);
+		lblGearRatio.setForeground(Color.GRAY);
+		contentPane.add(lblGearRatio);
+		
+		
+		GearRatio = new JTextField();
+		GearRatio.setText("64");
+		GearRatio.setColumns(10);
+		GearRatio.setBounds(150, 270, 86, 20);
+		contentPane.add(GearRatio);
 
 		JLabel lblTemperatureCalA = new JLabel("Temperature cal a");
 		lblTemperatureCalA.setBounds(15, 310, 121, 14);
@@ -573,26 +587,16 @@ public class OSEC extends JFrame {
 		i_factor.setBounds(150, 370, 86, 20);
 		contentPane.add(i_factor);
 
-		JLabel lblGearRatio = new JLabel("Gear Ratio");
-		lblGearRatio.setBounds(15, 390, 131, 14);
-		lblGearRatio.setForeground(Color.GRAY);
-		contentPane.add(lblGearRatio);
-
-		GearRatio = new JTextField();
-		GearRatio.setText("64");
-		GearRatio.setColumns(10);
-		GearRatio.setBounds(150, 390, 86, 20);
-		contentPane.add(GearRatio);
 
 		JLabel lblPasThreshold = new JLabel("PAS threshold");
-		lblPasThreshold.setBounds(15, 430, 86, 20);
+		lblPasThreshold.setBounds(15, 390, 86, 20);
 		lblPasThreshold.setForeground(Color.GRAY);
 		contentPane.add(lblPasThreshold);
 
 		PAS_threshold = new JTextField();
 		PAS_threshold.setText("1.7");
 		PAS_threshold.setColumns(10);
-		PAS_threshold.setBounds(150, 430, 86, 20);
+		PAS_threshold.setBounds(150, 390, 86, 20);
 		contentPane.add(PAS_threshold);
 
 		JLabel lblAssistLevel = new JLabel("Assist Level 1");
@@ -913,9 +917,21 @@ public class OSEC extends JFrame {
 
 		JLabel lblRideMode = new JLabel("Ride Options");
 		lblRideMode.setFont(new Font("Tahoma", Font.BOLD, 12));
-		lblRideMode.setBounds(15, 470, 86, 20);
+		lblRideMode.setBounds(15, 430, 86, 20);
 		lblRideMode.setForeground(Color.GRAY);
 		contentPane.add(lblRideMode);
+		
+		cbDynAssist = new JCheckBox("Dynamic Assist Level");
+		cbDynAssist.setSelected(false);
+		cbDynAssist.setBounds(15, 455, 200, 20);
+		cbDynAssist.setForeground(Color.GRAY);
+		contentPane.add(cbDynAssist);
+
+		cbCorrectionEnabled = new JCheckBox("Enable rotor angle correction");
+		cbCorrectionEnabled.setSelected(false);
+		cbCorrectionEnabled.setBounds(15, 475, 200, 20);
+		cbCorrectionEnabled.setForeground(Color.GRAY);
+		contentPane.add(cbCorrectionEnabled);
 
 		cbBypassLowSpeedRegenPiControl = new JCheckBox("Bypass PI control regen @low speed");
 		cbBypassLowSpeedRegenPiControl.setSelected(false);
@@ -978,37 +994,31 @@ public class OSEC extends JFrame {
 		cbPasInverted.setForeground(Color.GRAY);
 		contentPane.add(cbPasInverted);
 
-		cbDynAssist = new JCheckBox("Dynamic Assist Level");
-		cbDynAssist.setSelected(false);
-		cbDynAssist.setBounds(250, 475, 250, 20);
-		cbDynAssist.setForeground(Color.GRAY);
-		contentPane.add(cbDynAssist);
-
-		cbCorrectionEnabled = new JCheckBox("Enable rotor angle correction");
-		cbCorrectionEnabled.setSelected(false);
-		cbCorrectionEnabled.setBounds(250, 495, 250, 20);
-		cbCorrectionEnabled.setForeground(Color.GRAY);
-		contentPane.add(cbCorrectionEnabled);
-
 		cbPowerBasedControlEnabled = new JCheckBox("Power based control");
 		cbPowerBasedControlEnabled.setSelected(false);
-		cbPowerBasedControlEnabled.setBounds(250, 515, 250, 20);
+		cbPowerBasedControlEnabled.setBounds(250, 455, 250, 20);
 		cbPowerBasedControlEnabled.setForeground(Color.GRAY);
 		contentPane.add(cbPowerBasedControlEnabled);
 
 		cbIdleDisablesOffroad = new JCheckBox("Idle disables offroad");
 		cbIdleDisablesOffroad.setSelected(false);
-		cbIdleDisablesOffroad.setBounds(250, 535, 250, 20);
+		cbIdleDisablesOffroad.setBounds(250, 475, 250, 20);
 		cbIdleDisablesOffroad.setForeground(Color.GRAY);
 		contentPane.add(cbIdleDisablesOffroad);
 
 		cbExternalSpeedSensor = new JCheckBox("External Speed-Sensor");
 		cbExternalSpeedSensor.setSelected(false);
-		cbExternalSpeedSensor.setBounds(250, 555, 250, 20);
+		cbExternalSpeedSensor.setBounds(250, 495, 250, 20);
 		cbExternalSpeedSensor.setForeground(Color.GRAY);
 		contentPane.add(cbExternalSpeedSensor);
+		
+		cbSwitch360 = new JCheckBox("Switch to 360\u00B0 interpol. @ 75 ERPS");
+		cbSwitch360.setSelected(false);
+		cbSwitch360.setBounds(250, 515, 250, 20);
+		cbSwitch360.setForeground(Color.GRAY);
+		contentPane.add(cbSwitch360);
 
-		cbAntiJitter = new JCheckBox("Motor anti jitter (@60° interpol.)");
+		cbAntiJitter = new JCheckBox("Motor anti jitter (@60\u00B0 interpol.)");
 		cbAntiJitter.setSelected(false);
 		cbAntiJitter.setBounds(250, 575, 250, 20);
 		cbAntiJitter.setForeground(Color.ORANGE);
@@ -1020,7 +1030,7 @@ public class OSEC extends JFrame {
 		cbDisableInterpolation.setForeground(Color.ORANGE);
 		contentPane.add(cbDisableInterpolation);
 		
-		cbDisable60DegInterpolation = new JCheckBox("Disable 60° interpolation");
+		cbDisable60DegInterpolation = new JCheckBox("Disable 60\u00B0 interpolation");
 		cbDisable60DegInterpolation.setSelected(false);
 		cbDisable60DegInterpolation.setBounds(250, 615, 250, 20);
 		cbDisable60DegInterpolation.setForeground(Color.ORANGE);
@@ -1048,12 +1058,12 @@ public class OSEC extends JFrame {
 		rdbtnNormal = new JRadioButton("Normal");
 		rdbtnNormal.setSelected(true);
 		MotorSpeed.add(rdbtnNormal);
-		rdbtnNormal.setBounds(440, 425, 101, 20);
+		rdbtnNormal.setBounds(440, 425, 80, 20);
 		contentPane.add(rdbtnNormal);
 
 		rdbtnHigh = new JRadioButton("High");
 		MotorSpeed.add(rdbtnHigh);
-		rdbtnHigh.setBounds(440, 445, 101, 20);
+		rdbtnHigh.setBounds(520, 425, 70, 20);
 		contentPane.add(rdbtnHigh);
 
 		lblDiplayType = new JLabel("Display Type");
@@ -1381,6 +1391,7 @@ public class OSEC extends JFrame {
 					int acaExperimentalFlags = 128;
 					acaExperimentalFlags |= (cbDcNull.isSelected() ? 1 : 0);
 					acaExperimentalFlags |= (cbAntiJitter.isSelected() ? 2 : 0);
+					acaExperimentalFlags |= (cbSwitch360.isSelected() ? 16 : 0);
 					acaExperimentalFlags |= (cbDisableInterpolation.isSelected() ? 4 : 0);
 					acaExperimentalFlags |= (cbDisable60DegInterpolation.isSelected() ? 8 : 0);
 					acaExperimentalFlags |= (cbPwmOff.isSelected() ? 1024 : 0);

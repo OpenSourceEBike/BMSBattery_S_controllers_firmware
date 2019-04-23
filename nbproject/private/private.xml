@@ -28,11 +28,14 @@
         </group>
         <group>
             <file>file:/G:/osebikefw/config.h</file>
+            <file>file:/G:/osebikefw/BOdisplay.c</file>
             <file>file:/G:/osebikefw/motor.c</file>
             <file>file:/G:/osebikefw/pwm.c</file>
+            <file>file:/G:/osebikefw/main.c</file>
             <file>file:/G:/osebikefw/ACAcontrollerState.c</file>
             <file>file:/G:/osebikefw/main.h</file>
             <file>file:/G:/osebikefw/test/motorTest.c</file>
+            <file>file:/G:/osebikefw/ACAsetPoint.c</file>
             <file>file:/G:/osebikefw/ACAcontrollerState.h</file>
             <file>file:/G:/osebikefw/motor.h</file>
         </group>
