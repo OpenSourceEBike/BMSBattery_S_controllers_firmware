@@ -17,15 +17,6 @@
 
 #include <stdio.h>
 #include <stdint.h>
-#include <time.h>
-#include <termios.h>
-#include <unistd.h>
-#include <fcntl.h>
-
-#define MORSE_TIME_1 50
-#define MORSE_TIME_2 50
-#define MORSE_TIME_3 50
-#define MORSE_TOLERANCE 50
 
 uint16_t ui16;
 uint16_t ui16b;
@@ -36,18 +27,22 @@ uint8_t ui8X;
 
 void main() {
 	
-		ui16=200;
-		ui16b=1000;
-		ui8 = (ui16 << 8) / ui16;
+		uint16_t ui16=5000;uint16_t ui16b=2500;
+		
+		ui8a = (0xffff&(ui16b << (uint8_t)8)) / ui16;
+		ui8b = ((uint32_t)ui16b << 8) / ui16;
+		ui8b = (ui16b << 8) / ui16;
+		ui8X = (0xffff&(ui16b << (uint8_t)8)) / ui16;
 		
 		printf("cycles test\r\n");
-		printf("%d \r\n", ui8);
+		printf("%d %d %d \r\n", ui8a, ui8b, ui8X);
 	
 		ui8a = 1 + 238 + 128 -127 + 48;
 		ui8b = 46 + 238 + 128 -127 + 1;
 		ui8 = ui8b - ui8a;
 		ui8X =224;
 		
+		printf("cast test\r\n");
 		printf("%d %d %d \r\n", (uint8_t)(ui8b-ui8a), (ui8b-ui8a), ui8);
 		
 		if (((uint8_t)(ui8b-ui8a))<224){
