@@ -22,21 +22,21 @@ A graphical tool is available, which allows the use of the firmware even for les
 
 
 ### What works:  
-Sine wave control with simplified FOC  
-Overvoltage (regeneration) and undervoltage protection
-Motor stopp while braking   
-Driving modes:  
-- PAS sensor with torque simulation and reverse step detection
-- Throttle (also as override)
-- Torque sensor  
-- Recuperation via analog "thumb brake" signal or digitally by brake switch  
-- Start-up support in torque sensor mode  
-- Pushing aid
-- Block commutation during start-up (only if you have o motor without "weird" angle definitions. 
-Displays:
-- Kunteng LCD3 / LCD5 (C/P parameters mapped differently)
-- BluOsec App as Display / as Tripmonitor / for on the fly configuration  
-- Kingmeter J-LCD and Forerider App (not tested for a long time now)
+* Sine wave control with simplified FOC  
+* Overvoltage (regeneration) and undervoltage protection
+* Motor stopp while braking   
+* Driving modes:  
+  - PAS sensor with torque simulation and reverse step detection
+  - Throttle (also as override)
+  - Torque sensor  
+  - Recuperation via analog "thumb brake" signal or digitally by brake switch  
+  - Start-up support in torque sensor mode  
+  - Pushing aid
+  - Block commutation during start-up (only if you have o motor without "weird" angle definitions. 
+* Displays:
+  - Kunteng LCD3 / LCD5 (C/P parameters mapped differently)
+  - BluOsec App as Display / as Tripmonitor / for on the fly configuration  
+  - Kingmeter J-LCD and Forerider App (not tested for a long time now)
 
 ### What doesn't:
 
