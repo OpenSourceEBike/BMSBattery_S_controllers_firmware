@@ -65,7 +65,7 @@ void hall_sensor_init(void) {
 void hall_sensors_read_and_action(void) {
 	// read hall sensors signal pins and mask other pins
 	hall_sensors = (GPIO_ReadInputData(HALL_SENSORS__PORT) & (HALL_SENSORS_MASK));
-	if ((hall_sensors != hall_sensors_last) || (ui8_motor_state == MOTOR_STATE_COAST)) // let's run the code when motor is stopped/coast so it can pick right motor position for correct startup
+	if ((hall_sensors != hall_sensors_last) || (ui8_possible_motor_state == MOTOR_STATE_COAST)) // let's run the code when motor is stopped/coast so it can pick right motor position for correct startup
 	{
 		if (hall_sensors_last >0 && hall_sensors_last < 7) {
 			uint8_t_60deg_pwm_cycles[hall_sensors_last-1] = ui16_PWM_cycles_counter_6;
@@ -75,8 +75,8 @@ void hall_sensors_read_and_action(void) {
 		//printf("hall change! %d, %d \n", hall_sensors, hall_sensors_last );
 		hall_sensors_last = hall_sensors;
 
-		if (ui8_motor_state == MOTOR_STATE_COAST) {
-			ui8_motor_state = MOTOR_STATE_RUNNING_NO_INTERPOLATION;
+		if (ui8_possible_motor_state == MOTOR_STATE_COAST) {
+			ui8_possible_motor_state = MOTOR_STATE_RUNNING_NO_INTERPOLATION;
 		}
 
 
@@ -100,11 +100,11 @@ void hall_sensors_read_and_action(void) {
 				}
 				// update motor state based on motor speed
 				if (ui16_motor_speed_erps > 64) {
-					ui8_motor_state = MOTOR_STATE_RUNNING_INTERPOLATION_360_POSSIBLE;
+					ui8_possible_motor_state = MOTOR_STATE_RUNNING_INTERPOLATION_360;
 				}else if (ui16_motor_speed_erps > 3) {
-					ui8_motor_state = MOTOR_STATE_RUNNING_INTERPOLATION_60_POSSIBLE;
+					ui8_possible_motor_state = MOTOR_STATE_RUNNING_INTERPOLATION_60;
 				} else {
-					ui8_motor_state = MOTOR_STATE_RUNNING_NO_INTERPOLATION;
+					ui8_possible_motor_state = MOTOR_STATE_RUNNING_NO_INTERPOLATION;
 				}
 
 				ui8_motor_rotor_hall_position = ui8_s_hall_angle3_180;
@@ -204,18 +204,18 @@ void motor_fast_loop(void) {
 
 
 		// next code is need for motor startup correctly
-		ui8_motor_state = MOTOR_STATE_COAST;
+		ui8_possible_motor_state = MOTOR_STATE_COAST;
 		hall_sensors_read_and_action();
 	}
 
 
 	//  // calculate the interpolation angle
 	//  // interpolation seems a problem when motor starts, so avoid to do it at very low speed
-	if (((ui8_motor_state == MOTOR_STATE_RUNNING_INTERPOLATION_60_POSSIBLE)||(ui8_motor_state == MOTOR_STATE_RUNNING_INTERPOLATION_360_POSSIBLE)) && ((ui16_aca_experimental_flags & DISABLE_INTERPOLATION) != DISABLE_INTERPOLATION)) {
+	if (((ui8_possible_motor_state == MOTOR_STATE_RUNNING_INTERPOLATION_60)||(ui8_possible_motor_state == MOTOR_STATE_RUNNING_INTERPOLATION_360)) && ((ui16_aca_experimental_flags & DISABLE_INTERPOLATION) != DISABLE_INTERPOLATION)) {
 		
 		if (
 				((ui16_aca_experimental_flags & DISABLE_60_DEG_INTERPOLATION) == DISABLE_60_DEG_INTERPOLATION)||
-				(((ui16_aca_experimental_flags & SWITCH_360_DEG_INTERPOLATION) == SWITCH_360_DEG_INTERPOLATION) && (ui8_motor_state == MOTOR_STATE_RUNNING_INTERPOLATION_360_POSSIBLE))
+				(((ui16_aca_experimental_flags & SWITCH_360_DEG_INTERPOLATION) == SWITCH_360_DEG_INTERPOLATION) && (ui8_possible_motor_state == MOTOR_STATE_RUNNING_INTERPOLATION_360))
 				){
 			
 			if (ui16_PWM_cycles_counter>255){
@@ -224,6 +224,7 @@ void motor_fast_loop(void) {
 				ui8_interpolation_angle = (ui16_PWM_cycles_counter <<8) / (ui16_PWM_cycles_counter_total);
 			}
 			ui8_interpolation_start_position = ui8_s_hall_angle3_180; // that's where ui16_PWM_cycles_counter is being reset
+			ui8_dynamic_motor_state = MOTOR_STATE_RUNNING_INTERPOLATION_360;
 		}else{
 			
 			if (ui16_PWM_cycles_counter_6>255){
@@ -232,7 +233,7 @@ void motor_fast_loop(void) {
 				ui8_interpolation_angle = (ui16_PWM_cycles_counter_6 << 8) / ui16_PWM_cycles_counter_total;
 			}
 			ui8_interpolation_start_position = ui8_motor_rotor_hall_position;
-			
+			ui8_dynamic_motor_state = MOTOR_STATE_RUNNING_INTERPOLATION_60;
 		}
 
 		ui16_PWM_cycles_counter_6++;
@@ -242,7 +243,7 @@ void motor_fast_loop(void) {
 		//ui8_interpolation_angle = 21; //30deg+ (avg between hall sensor change)
 		
 		ui8_interpolation_start_position = ui8_motor_rotor_hall_position;
-		
+		ui8_dynamic_motor_state = MOTOR_STATE_RUNNING_NO_INTERPOLATION;
 		
 	}
 	ui16_PWM_cycles_counter++;

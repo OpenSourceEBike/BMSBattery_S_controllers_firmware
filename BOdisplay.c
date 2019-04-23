@@ -224,7 +224,7 @@ void addBasicStateInfos(void) {
 	addPayload(CODE_ASSIST_PERCENT_WANTED, ui8_assist_percent_wanted);
 	addPayload(CODE_ASSIST_LEVEL_DYNAMIC_ADDON, ui8_assist_dynamic_percent_addon);
 	addPayload(CODE_BRAKE_STATUS, (int) brake_is_set());
-	addPayload(CODE_MOTOR_STATE, ui8_motor_state);
+	addPayload(CODE_MOTOR_STATE, ui8_possible_motor_state | ui8_dynamic_motor_state<<4);
 	addPayload(CODE_BATTERY_VOLTAGE, ui8_BatteryVoltage);
 	addPayload(CODE_ER_SPEED_HIGH_BYTE, ui16_motor_speed_erps >> 8);
 	addPayload(CODE_ER_SPEED, ui16_motor_speed_erps);
