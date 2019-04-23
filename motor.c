@@ -99,7 +99,7 @@ void hall_sensors_read_and_action(void) {
 					ui16_motor_speed_erps = 0;
 				}
 				// update motor state based on motor speed
-				if (ui16_motor_speed_erps > 64) {
+				if (ui16_motor_speed_erps > 75) {
 					ui8_possible_motor_state = MOTOR_STATE_RUNNING_INTERPOLATION_360;
 				}else if (ui16_motor_speed_erps > 3) {
 					ui8_possible_motor_state = MOTOR_STATE_RUNNING_INTERPOLATION_60;
