@@ -19,6 +19,8 @@
 #include "ACAcontrollerState.h"
 #include "ACAcommons.h"
 
+static uint32_t uint32_temp = 0;
+
 uint8_t ui8_counter = 0;
 uint8_t ui8_half_rotation_flag = 0;
 uint8_t ui8_foc_enable_flag = 0;
@@ -212,10 +214,13 @@ void motor_fast_loop(void) {
 	if ((ui8_motor_state == MOTOR_STATE_RUNNING_INTERPOLATION_POSSIBLE)&& ((ui16_aca_experimental_flags & DISABLE_INTERPOLATION) != DISABLE_INTERPOLATION)) {
 		
 		if ((ui16_aca_experimental_flags & DISABLE_60_DEG_INTERPOLATION) != DISABLE_60_DEG_INTERPOLATION){
-			ui8_interpolation_angle = (((uint32_t)ui16_PWM_cycles_counter_6) << 8) / ui16_PWM_cycles_counter_total;
+			ui8_interpolation_angle = (ui16_PWM_cycles_counter_6 << 8) / ui16_PWM_cycles_counter_total;
 			ui8_interpolation_start_position = ui8_motor_rotor_hall_position;
 		}else{
-			ui8_interpolation_angle = (((uint32_t)ui16_PWM_cycles_counter) << 8) / ui16_PWM_cycles_counter_total;
+			
+			uint32_temp = ui16_PWM_cycles_counter;
+			uint32_temp <<= 8;
+			ui8_interpolation_angle = uint32_temp / ui16_PWM_cycles_counter_total;
 			ui8_interpolation_start_position = ui8_s_hall_angle3_180; // that's where ui16_PWM_cycles_counter is being reset
 		}
 

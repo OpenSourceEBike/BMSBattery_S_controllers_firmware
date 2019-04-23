@@ -27,12 +27,15 @@ uint8_t ui8X;
 
 void main() {
 	
-		uint16_t ui16=5000;uint16_t ui16b=2500;
+		uint16_t ui16=5000;
+		uint16_t ui16b=2500;
 		
 		ui8a = (0xffff&(ui16b << (uint8_t)8)) / ui16;
 		ui8b = ((uint32_t)ui16b << 8) / ui16;
 		ui8b = (ui16b << 8) / ui16;
 		ui8X = (0xffff&(ui16b << (uint8_t)8)) / ui16;
+		
+		ui8X = (((uint32_t)ui16b) << 8) / ui16;
 		
 		printf("cycles test\r\n");
 		printf("%d %d %d \r\n", ui8a, ui8b, ui8X);
