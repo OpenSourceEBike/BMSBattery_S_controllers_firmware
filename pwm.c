@@ -156,6 +156,75 @@ uint8_t ui8_svm_table [SVM_VIRTUAL_TABLE_LEN] ={
 #endif
 
 #if (PWM_CYCLES_SECOND == 20833L)
+
+uint8_t ui8_sine_table[SVM_VIRTUAL_TABLE_LEN] ={
+	95,
+	97,
+   100,
+   102,
+   104,
+   107,
+   109,
+   111,
+   114,
+   116,
+   118,
+   120,
+   123,
+   125,
+   127,
+   129,
+   132,
+   134,
+   136,
+   138,
+   140,
+   142,
+   144,
+   146,
+   148,
+   150,
+   152,
+   154,
+   156,
+   157,
+   159,
+   161,
+   163,
+   164,
+   166,
+   167,
+   169,
+   170,
+   172,
+   173,
+   174,
+   176,
+   177,
+   178,
+   179,
+   180,
+   181,
+   182,
+   183,
+   184,
+   185,
+   186,
+   186,
+   187,
+   188,
+   188,
+   189,
+   189,
+   189,
+   190,
+   190,
+   190,
+   190,
+   190,
+   191
+};
+
 uint8_t ui8_svm_table [SVM_VIRTUAL_TABLE_LEN] ={
 	95,
 	100,
@@ -345,7 +414,7 @@ uint8_t fetch_table_value(uint8_t table_pos_in) {
 		translated_table_pos = 64 - translated_table_pos;
 	}
 
-	if ((ui16_aca_experimental_flags & USE_ALTERNATE_WAVETABLE) != USE_ALTERNATE_WAVETABLE){
+	if ((ui16_aca_experimental_flags & USE_ALTERNATE_WAVETABLE) == USE_ALTERNATE_WAVETABLE){
 		table_val = ui8_sine_table[translated_table_pos];
 	}else{
 		table_val = ui8_svm_table[translated_table_pos];

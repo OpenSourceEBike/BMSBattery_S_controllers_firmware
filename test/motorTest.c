@@ -376,28 +376,28 @@ uint8_t fetch_table_value(uint8_t table_pos_in, uint8_t* table) {
 
 }
 
-uint8_t gen_sspwm(uint8_t table_pos_in, uint8_t print){
+uint8_t gen_sspwm(uint8_t table_pos_in, uint16_t range, uint8_t print){
 	float x = 2*M_PI*table_pos_in/256.0;
 	float s= sin(x);
 		
-	int disc = 127+s * 127;
+	int disc = (range/2.0)-1.0 + s * ((range/2.0)-1.0);
 	
 	if (print)
-		printf("%d %.2f %.2f %d \n",table_pos_in, x,s,disc);
+		printf("%3d %.2f %.2f %d \n",table_pos_in, x,s,disc);
 	
 	return disc;
 }
 
-uint8_t gen_thipwm(uint8_t table_pos_in, uint8_t print){
+uint8_t gen_thipwm(uint8_t table_pos_in, uint16_t range, uint8_t print){
 	float x = 2*M_PI*table_pos_in/256.0;
 	float s;
 	
 	s= 2.0/3.0*(sqrt(3.0)*sin(x)+1.0/3.0*sin(3*x));
 		
-	int disc = 127+s * 127;
+	int disc = (range/2.0)-1.0 + s * ((range/2.0)-1.0);
 	
 	if (print)
-		printf("%d %.2f %.2f %d \n",table_pos_in, x,s,disc);
+		printf("%3d %.2f %.2f %d \n",table_pos_in, x,s,disc);
 	
 	return disc;
 }
@@ -413,11 +413,11 @@ void main() {
 		uint8_t compare_a = fetch_table_value(i,ui8_svm_table);
 		//uint8_t compare_b = fetch_table_value(i,ui8_sine_table);
 		
-		uint8_t compare_b = gen_sspwm(i,0);
-		//uint8_t compare_b = gen_thipwm(i,0);
+		uint8_t compare_b = gen_sspwm(i,193,0);
+		//uint8_t compare_b = gen_thipwm(i,256,0);
 
 		//printf("%3d %3d %3d %3d %2d %2d \r\n", i, compare_base, compare_a, compare_b, compare_a - compare_base, compare_b - compare_base);
-		printf("%3d,\r\n", compare_b);
+		printf(" %3d,\r\n", compare_b);
 		
 		
 		
@@ -427,7 +427,7 @@ void main() {
 //	printf("\r\ngenerator\r\n");
 //	for (int i = 0; i < 256; i++) {
 //		
-//		gen_thipwm(i,1);
+//		gen_sspwm(i,192,1);
 //	}
 
 }
