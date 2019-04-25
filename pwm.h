@@ -18,6 +18,7 @@
 
 #define SVM_TABLE SVM
 
+extern uint8_t ui8_sine_table [SVM_VIRTUAL_TABLE_LEN];
 extern uint8_t ui8_svm_table [SVM_VIRTUAL_TABLE_LEN];
 extern uint8_t ui8_duty_cycle_target;
 

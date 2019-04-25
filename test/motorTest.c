@@ -413,10 +413,11 @@ void main() {
 		uint8_t compare_a = fetch_table_value(i,ui8_svm_table);
 		//uint8_t compare_b = fetch_table_value(i,ui8_sine_table);
 		
-		//uint8_t compare_a = gen_sspwm(i,0);
-		uint8_t compare_b = gen_thipwm(i,0);
+		uint8_t compare_b = gen_sspwm(i,0);
+		//uint8_t compare_b = gen_thipwm(i,0);
 
-		printf("%3d %3d %3d %3d %2d %2d \r\n", i, compare_base, compare_a, compare_b, compare_a - compare_base, compare_b - compare_base);
+		//printf("%3d %3d %3d %3d %2d %2d \r\n", i, compare_base, compare_a, compare_b, compare_a - compare_base, compare_b - compare_base);
+		printf("%3d,\r\n", compare_b);
 		
 		
 		

@@ -15,8 +15,77 @@
 #include "motor.h"
 #include "pwm.h"
 #include "config.h"
+#include "ACAcontrollerState.h"
 
 #if (PWM_CYCLES_SECOND == 15625L)
+uint8_t ui8_sine_table[SVM_VIRTUAL_TABLE_LEN] ={
+	127,
+	130,
+	133,
+	136,
+	139,
+	142,
+	145,
+	148,
+	151,
+	154,
+	157,
+	160,
+	163,
+	166,
+	169,
+	172,
+	175,
+	178,
+	181,
+	184,
+	186,
+	189,
+	192,
+	194,
+	197,
+	200,
+	202,
+	205,
+	207,
+	209,
+	212,
+	214,
+	216,
+	218,
+	221,
+	223,
+	225,
+	227,
+	229,
+	230,
+	232,
+	234,
+	235,
+	237,
+	239,
+	240,
+	241,
+	243,
+	244,
+	245,
+	246,
+	247,
+	248,
+	249,
+	250,
+	250,
+	251,
+	252,
+	252,
+	253,
+	253,
+	253,
+	253,
+	253,
+	254
+};
+
 uint8_t ui8_svm_table [SVM_VIRTUAL_TABLE_LEN] ={
 	127,
 	133,
@@ -276,7 +345,11 @@ uint8_t fetch_table_value(uint8_t table_pos_in) {
 		translated_table_pos = 64 - translated_table_pos;
 	}
 
-	table_val = ui8_svm_table[translated_table_pos];
+	if ((ui16_aca_experimental_flags & USE_ALTERNATE_WAVETABLE) != USE_ALTERNATE_WAVETABLE){
+		table_val = ui8_sine_table[translated_table_pos];
+	}else{
+		table_val = ui8_svm_table[translated_table_pos];
+	}
 
 	if (table_pos_in & 128) {
 		table_val = 255 - table_val;
