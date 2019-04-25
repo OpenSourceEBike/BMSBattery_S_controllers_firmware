@@ -377,41 +377,44 @@ uint8_t fetch_table_value(uint8_t table_pos_in, uint8_t* table) {
 }
 
 uint8_t gen_sspwm(uint8_t table_pos_in, uint8_t print){
-	float f = 2*M_PI*table_pos_in/256.0;
-	float s= sin(f);
+	float x = 2*M_PI*table_pos_in/256.0;
+	float s= sin(x);
 		
 	int disc = 127+s * 127;
 	
 	if (print)
-		printf("%d %.2f %.2f %d \n",table_pos_in, f,s,disc);
+		printf("%d %.2f %.2f %d \n",table_pos_in, x,s,disc);
 	
 	return disc;
 }
 
-uint8_t gen_sapwm(uint8_t table_pos_in, uint8_t print){
-	float f = 2*M_PI*table_pos_in/256.0;
-	float s= sin(f);
+uint8_t gen_thipwm(uint8_t table_pos_in, uint8_t print){
+	float x = 2*M_PI*table_pos_in/256.0;
+	float s;
+	
+	s= 2.0/3.0*(sqrt(3.0)*sin(x)+1.0/3.0*sin(3*x));
 		
 	int disc = 127+s * 127;
 	
 	if (print)
-		printf("%d %.2f %.2f %d \n",table_pos_in, f,s,disc);
+		printf("%d %.2f %.2f %d \n",table_pos_in, x,s,disc);
 	
 	return disc;
 }
 
 void main() {
 
-	printf("curve test\r\n");
+	printf("\r\ncurve test\r\n");
 	for (int i = 0; i < 256; i++) {
 
 		uint8_t compare_base = ui8_svm_table[i];
 
 
-		uint8_t compare_a = fetch_table_value(i,ui8_svm_table);
+		//uint8_t compare_a = fetch_table_value(i,ui8_svm_table);
 		//uint8_t compare_b = fetch_table_value(i,ui8_sine_table);
 		
-		uint8_t compare_b = gen_sspwm(i,0);
+		uint8_t compare_a = gen_sspwm(i,0);
+		uint8_t compare_b = gen_thipwm(i,0);
 
 		printf("%3d %3d %3d %3d %2d %2d \r\n", i, compare_base, compare_a, compare_b, compare_a - compare_base, compare_b - compare_base);
 		
@@ -420,12 +423,13 @@ void main() {
 	}
 
 
+//	printf("\r\ngenerator\r\n");
 //	for (int i = 0; i < 256; i++) {
 //		
-//		gen_sspwm(i,1);
+//		gen_thipwm(i,1);
 //	}
 
 }
 
 
-
+//https://www.infineon.com/dgdl/AP1609710_different_PWM_for_three_phase_ACIM.pdf?fileId=db3a304412b407950112b40a1bf20453
