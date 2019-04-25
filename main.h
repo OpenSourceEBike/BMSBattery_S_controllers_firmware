@@ -9,7 +9,7 @@
 #ifndef _MAIN_H_
 #define _MAIN_H_
 
-#define SVM_TABLE_LEN 256
+#define SVM_VIRTUAL_TABLE_LEN 65 // 256/4 +1, we need only one quarter
 #define SVM_TABLE_LEN_x1024 262144 //(256 * 1024)
 
 

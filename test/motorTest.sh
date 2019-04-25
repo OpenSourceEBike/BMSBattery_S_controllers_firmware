@@ -1,2 +1,2 @@
 #/bin/sh
-gcc -o motorTest motorTest.c && ./motorTest
+gcc -lm -o motorTest motorTest.c && ./motorTest

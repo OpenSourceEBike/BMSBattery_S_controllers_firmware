@@ -17,74 +17,413 @@
 
 #include <stdio.h>
 #include <stdint.h>
+#include <math.h>
 
 uint16_t ui16;
 uint16_t ui16b;
-uint8_t ui8;
+uint8_t ui8Y;
 uint8_t ui8b;
 uint8_t ui8a;
 uint8_t ui8X;
 
+
+uint8_t ui8_sine_table [65] = {
+	127	,
+    133	,
+    138	,
+    144	,
+    149	,
+    154	,
+    160	,
+    165	,
+    170	,
+    176	,
+    181	,
+    186	,
+    191	,
+    197	,
+    202	,
+    207	,
+    212	,
+    217	,
+    222	,
+    227	,
+    231	,
+    236	,
+    239	,
+    240	,
+    242	,
+    243	,
+    244	,
+    245	,
+    247	,
+    248	,
+    249	,
+    250	,
+    250	,
+    251	,
+    252	,
+    253	,
+    253	,
+    254	,
+    254	,
+    254	,
+    255	,
+    255	,
+    255	,
+    255	,
+    255	,
+    255	,
+    254	,
+    254	,
+    254	,
+    253	,
+    253	,
+    252	,
+    251	,
+    251	,
+    250	,
+    249	,
+    248	,
+    247	,
+    246	,
+    245	,
+    243	,
+    242	,
+    241	,
+    239	,
+    238	
+};
+
+
+
+uint8_t ui8_svm_table [256] = {
+	127,
+	133,
+	138,
+	144,
+	149,
+	154,
+	160,
+	165,
+	170,
+	176,
+	181,
+	186,
+	191,
+	197,
+	202,
+	207,
+	212,
+	217,
+	222,
+	227,
+	231,
+	236,
+	239,
+	240,
+	242,
+	243,
+	244,
+	245,
+	247,
+	248,
+	249,
+	250,
+	250,
+	251,
+	252,
+	253,
+	253,
+	254,
+	254,
+	254,
+	255,
+	255,
+	255,
+	255,
+	255,
+	255,
+	254,
+	254,
+	254,
+	253,
+	253,
+	252,
+	251,
+	251,
+	250,
+	249,
+	248,
+	247,
+	246,
+	245,
+	243,
+	242,
+	241,
+	239,
+	238,
+	239,
+	241,
+	242,
+	243,
+	245,
+	246,
+	247,
+	248,
+	249,
+	250,
+	251,
+	251,
+	252,
+	253,
+	253,
+	254,
+	254,
+	254,
+	255,
+	255,
+	255,
+	255,
+	255,
+	255,
+	254,
+	254,
+	254,
+	253,
+	253,
+	252,
+	251,
+	250,
+	250,
+	249,
+	248,
+	247,
+	245,
+	244,
+	243,
+	242,
+	240,
+	239,
+	236,
+	231,
+	227,
+	222,
+	217,
+	212,
+	207,
+	202,
+	197,
+	191,
+	186,
+	181,
+	176,
+	170,
+	165,
+	160,
+	154,
+	149,
+	144,
+	138,
+	133,
+	127,
+	122,
+	116,
+	111,
+	106,
+	100,
+	95,
+	89,
+	84,
+	79,
+	74,
+	68,
+	63,
+	58,
+	53,
+	48,
+	43,
+	38,
+	33,
+	28,
+	23,
+	18,
+	16,
+	14,
+	13,
+	12,
+	10,
+	9,
+	8,
+	7,
+	6,
+	5,
+	4,
+	3,
+	3,
+	2,
+	1,
+	1,
+	1,
+	0,
+	0,
+	0,
+	0,
+	0,
+	0,
+	0,
+	0,
+	0,
+	1,
+	1,
+	2,
+	2,
+	3,
+	4,
+	5,
+	6,
+	6,
+	8,
+	9,
+	10,
+	11,
+	12,
+	14,
+	15,
+	17,
+	15,
+	14,
+	12,
+	11,
+	10,
+	9,
+	8,
+	6,
+	6,
+	5,
+	4,
+	3,
+	2,
+	2,
+	1,
+	1,
+	0,
+	0,
+	0,
+	0,
+	0,
+	0,
+	0,
+	0,
+	0,
+	1,
+	1,
+	1,
+	2,
+	3,
+	3,
+	4,
+	5,
+	6,
+	7,
+	8,
+	9,
+	10,
+	12,
+	13,
+	14,
+	16,
+	18,
+	23,
+	28,
+	33,
+	38,
+	43,
+	48,
+	53,
+	58,
+	63,
+	68,
+	74,
+	79,
+	84,
+	89,
+	95,
+	100,
+	106,
+	111,
+	116,
+	122
+};
+
+uint8_t fetch_table_value(uint8_t table_pos_in, uint8_t* table) {
+
+	// we only store a quarter of the values and generate the other 4 quarter with a simple lookop translation
+	uint8_t translated_table_pos = table_pos_in&~192;
+	uint8_t table_val;
+
+	if (table_pos_in & 64) {
+		translated_table_pos = 64 - translated_table_pos;
+	}
+
+	table_val = table[translated_table_pos];
+
+	if (table_pos_in & 128) {
+		table_val = 255 - table_val;
+	}
+
+	return table_val;
+
+}
+
+uint8_t gen_sspwm(uint8_t table_pos_in, uint8_t print){
+	float f = 2*M_PI*table_pos_in/256.0;
+	float s= sin(f);
+		
+	int disc = 127+s * 127;
+	
+	if (print)
+		printf("%d %.2f %.2f %d \n",table_pos_in, f,s,disc);
+	
+	return disc;
+}
+
+uint8_t gen_sapwm(uint8_t table_pos_in, uint8_t print){
+	float f = 2*M_PI*table_pos_in/256.0;
+	float s= sin(f);
+		
+	int disc = 127+s * 127;
+	
+	if (print)
+		printf("%d %.2f %.2f %d \n",table_pos_in, f,s,disc);
+	
+	return disc;
+}
+
 void main() {
-	
-		uint16_t ui16=5000;
-		uint16_t ui16b=2500;
-		
-		ui8a = (0xffff&(ui16b << (uint8_t)8)) / ui16;
-		ui8b = ((uint32_t)ui16b << 8) / ui16;
-		ui8b = (ui16b << 8) / ui16;
-		ui8X = (0xffff&(ui16b << (uint8_t)8)) / ui16;
-		
-		ui8X = (((uint32_t)ui16b) << 8) / ui16;
-		
-		printf("cycles test\r\n");
-		printf("%d %d %d \r\n", ui8a, ui8b, ui8X);
-	
-		ui8a = 1 + 238 + 128 -127 + 48;
-		ui8b = 46 + 238 + 128 -127 + 1;
-		ui8 = ui8b - ui8a;
-		ui8X =224;
-		
-		printf("cast test\r\n");
-		printf("%d %d %d \r\n", (uint8_t)(ui8b-ui8a), (ui8b-ui8a), ui8);
-		
-		if (((uint8_t)(ui8b-ui8a))<224){
-			printf("good\r\n");
-		}else{
-			printf("bad\r\n");
-		}
-		
-		if (((ui8b-ui8a))<224){
-			printf("good\r\n");
-		}else{
-			printf("bad\r\n");
-		}
-		
-		if (((ui8b-ui8a))<ui8X){
-			printf("good\r\n");
-		}else{
-			printf("bad\r\n");
-		}
-		
-		printf("deltatest\r\n");
-		printf("%d %d %d\r\n", ui8a, ui8b,ui8);
-	
-		ui8 = -1;
-		ui16 = (1 << 8) / 200;
-		printf("divtest\r\n");
-		printf("%d %d\r\n", ui16, ui8);
 
-		
-		ui8 = -1;
-		ui16 = -1;
-		printf("underflowtest\r\n");
-		printf("%d %d\r\n", ui16, ui8);
+	printf("curve test\r\n");
+	for (int i = 0; i < 256; i++) {
 
+		uint8_t compare_base = ui8_svm_table[i];
+
+
+		uint8_t compare_a = fetch_table_value(i,ui8_svm_table);
+		//uint8_t compare_b = fetch_table_value(i,ui8_sine_table);
 		
-		ui8++;
-		ui16++;
+		uint8_t compare_b = gen_sspwm(i,0);
+
+		printf("%3d %3d %3d %3d %2d %2d \r\n", i, compare_base, compare_a, compare_b, compare_a - compare_base, compare_b - compare_base);
 		
-		printf("\r\n%d %d\r\n", ui16, ui8);
+		
+		
+	}
+
+
+//	for (int i = 0; i < 256; i++) {
+//		
+//		gen_sspwm(i,1);
+//	}
 
 }
 
