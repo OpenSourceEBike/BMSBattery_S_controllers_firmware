@@ -21,14 +21,17 @@
 #include <stdio.h>
 #include <stdint.h>
 #include <math.h>
-#include "wavetables/midpoint_clamp_255_ZSM.c"
-#include "wavetables/third_harmonic_255_ZSM.c"
-#include "wavetables/nip_tuck_255_ZSM.c"
+
 #include "wavetables/midpoint_clamp_255_svm_orig.c"
+#include "wavetables/midpoint_clamp_192_svm_orig.c"
 #include "wavetables/third_harmonic_255_gen.c"
 #include "wavetables/third_harmonic_192_gen.c"
 #include "wavetables/pure_sine_255_gen.c"
 #include "wavetables/pure_sine_192_gen.c"
+#include "wavetables/midpoint_clamp_255_gen.c"
+#include "wavetables/midpoint_clamp_192_gen.c"
+#include "wavetables/nip_tuck_255_gen.c"
+#include "wavetables/nip_tuck_192_gen.c"
 
 uint16_t ui16;
 uint16_t ui16b;
@@ -55,6 +58,45 @@ uint8_t fetch_table_value(uint8_t table_pos_in, uint8_t* table, uint8_t max) {
 
 	return table_val;
 
+}
+
+// this is top and bottom clamp which equals nip and tuck with the given hardcoded amplitude 1.154734* (100%plus 15.5%gain compared to sine)
+// top and bottom clamp changes it's waveform with amplitude, so we can't use that with simplified foc
+// but we can use nip&tuck because that doesn't change it's waveform with amplitude
+uint8_t gen_natspwm(uint8_t table_pos_in, uint16_t range, uint8_t print){
+	float x = 2*M_PI*table_pos_in/256.0;
+	float a= 1.154734*sin(x);
+	float b= 1.154734*sin(x+(2.0/3.0)*M_PI);
+	float c= 1.154734*sin(x+(4.0/3.0)*M_PI);
+	
+	float z = 1-(fmaxf(fmaxf(a,b),c));
+	if ((a>0 && b>0)||(a>0 && c>0)||(b>0 && c>0)){
+		z = -1-(fminf(fminf(a,b),c));
+	}
+	
+	int disc = round(((range-0.01)/2.0) + (a) * (((range)/2.0)));
+	int discplus = round(((range-0.01)/2.0) + (a+z) * (((range)/2.0)));
+	
+	if (print)
+		printf("%3d %4.2f   % 4.2f % 4.2f % 4.2f   % 4.2f % 6.4f   %3d %3d\n",table_pos_in, x,a,b,c,z,a+z,disc,discplus);
+	
+	return discplus;
+}
+
+uint8_t gen_mcspwm(uint8_t table_pos_in, uint16_t range, uint8_t print){
+	float x = 2*M_PI*table_pos_in/256.0;
+	float a= sin(x);
+	float b= sin(x+(2.0/3.0)*M_PI);
+	float c= sin(x+(4.0/3.0)*M_PI);
+	float z = 1/2 - 0.5* (fminf(fminf(a,b),c)+fmaxf(fmaxf(a,b),c));
+	
+	int disc = round(((range-0.01)/2.0) + (a) * (((range)/2.0)));
+	int discplus = round(((range-0.01)/2.0) + (a+z) *1.154734* (((range)/2.0)));
+	
+	if (print)
+		printf("%3d %4.2f   % 4.2f % 4.2f % 4.2f   % 4.2f % 6.4f   %3d %3d\n",table_pos_in, x,a,b,c,z,a+z,disc,discplus);
+	
+	return discplus;
 }
 
 uint8_t gen_sspwm(uint8_t table_pos_in, uint16_t range, uint8_t print){
@@ -92,32 +134,37 @@ void main() {
 	printf("\r\ncurve test\r\n");
 	for (int i = 0; i < 256; i++) {
 
+		//uint8_t compare_base = midpoint_clamp_192_svm_orig[i];
 		//uint8_t compare_base = midpoint_clamp_255_svm_orig[i];
-		//uint8_t compare_base = midpoint_clamp_255_ZSM[i];
-		//uint8_t compare_base = third_harmonic_255_ZSM[i];
 		//uint8_t compare_base = third_harmonic_255_gen[i];
-		//uint8_t compare_base = nip_tuck_255_ZSM[i];
 		//uint8_t compare_base = pure_sine_255_gen[i];
 		//uint8_t compare_base = pure_sine_192_gen[i];
-		uint8_t compare_base = third_harmonic_192_gen[i];
+		//uint8_t compare_base = third_harmonic_192_gen[i];
 
-		//uint8_t compare_a = midpoint_clamp_255_ZSM[i];
-		//uint8_t compare_a = third_harmonic_255_ZSM[i];
+		//uint8_t compare_a = midpoint_clamp_255_gen[i];
+		//uint8_t compare_a = midpoint_clamp_192_gen[i];
 		
-		//uint8_t compare_a = fetch_table_value(i,midpoint_clamp_255_ZSM,255);
-		//uint8_t compare_a = fetch_table_value(i,third_harmonic_255_ZSM,255);
-		//uint8_t compare_a = fetch_table_value(i,nip_tuck_255_ZSM,255);
+		//uint8_t compare_base = pure_sine_255_gen[i];
+		//uint8_t compare_base = pure_sine_192_gen[i];
 		
+		//uint8_t compare_base = nip_tuck_255_gen[i];
+		uint8_t compare_base = nip_tuck_192_gen[i];
+
 		//uint8_t compare_a = fetch_table_value(i,third_harmonic_255_gen,255);
 
 		//uint8_t compare_a = fetch_table_value(i,midpoint_clamp_255_svm_orig,255);
 		//uint8_t compare_a = fetch_table_value(i,pure_sine_255_gen,255);
 		//uint8_t compare_a = fetch_table_value(i,pure_sine_192_gen,192);
-		//uint8_t compare_a = fetch_table_value(i,nip_tuck_255_ZSM,255);
-		uint8_t compare_a = fetch_table_value(i,third_harmonic_192_gen,192);
+		//uint8_t compare_a = fetch_table_value(i,third_harmonic_192_gen,192);
+		//uint8_t compare_a = fetch_table_value(i,midpoint_clamp_255_gen,255);
+		//uint8_t compare_a = fetch_table_value(i,midpoint_clamp_192_gen,192);
+		
+		uint8_t compare_a = fetch_table_value(i,nip_tuck_192_gen,192);
 
+		//uint8_t compare_a = gen_mcspwm(i,192,0);
 		//uint8_t compare_a = gen_sspwm(i,192,0);
 		//uint8_t compare_a = gen_thipwm(i,192,0);
+		//uint8_t compare_a = gen_natspwm(i,192,0);
 
 		printf("%3d %3d %3d  %2d \r\n", i, compare_base, compare_a, compare_a - compare_base);
 		//printf(" %3d,\r\n", compare_a);

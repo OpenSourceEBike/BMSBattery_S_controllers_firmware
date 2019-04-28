@@ -82,13 +82,15 @@
       </df>
       <df name="test">
         <df name="wavetables">
-          <in>midpoint_clamp_255_ZSM.c</in>
+          <in>midpoint_clamp_192_gen.c</in>
+          <in>midpoint_clamp_192_svm_orig.c</in>
+          <in>midpoint_clamp_255_gen.c</in>
           <in>midpoint_clamp_255_svm_orig.c</in>
-          <in>nip_tuck_255_ZSM.c</in>
+          <in>nip_tuck_192_gen.c</in>
+          <in>nip_tuck_255_gen.c</in>
           <in>pure_sine_192_gen.c</in>
           <in>pure_sine_255_gen.c</in>
           <in>third_harmonic_192_gen.c</in>
-          <in>third_harmonic_255_ZSM.c</in>
           <in>third_harmonic_255_gen.c</in>
         </df>
         <in>motorTest.c</in>
@@ -123,10 +125,13 @@
         </df>
       </df>
       <df name="wavetables">
-        <in>midpoint_clamp_192_svm_orig.c</in>
-        <in>midpoint_clamp_255_svm_orig.c</in>
+        <in>midpoint_clamp_192_gen.c</in>
+        <in>midpoint_clamp_255_gen.c</in>
+        <in>nip_tuck_192_gen.c</in>
+        <in>nip_tuck_255_gen.c</in>
         <in>pure_sine_192_gen.c</in>
         <in>pure_sine_255_gen.c</in>
+        <in>third_harmonic_192_gen.c</in>
         <in>third_harmonic_255_gen.c</in>
       </df>
       <in>ACAcommons.c</in>

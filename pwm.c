@@ -18,15 +18,17 @@
 #include "ACAcontrollerState.h"
 
 #if (PWM_CYCLES_SECOND == 15625L)
-#include "wavetables/midpoint_clamp_255_svm_orig.c"
+#include "wavetables/midpoint_clamp_255_gen.c"
 #include "wavetables/third_harmonic_255_gen.c"
 #include "wavetables/pure_sine_255_gen.c"
+#include "wavetables/nip_tuck_255_gen.c"
 #endif
 
 #if (PWM_CYCLES_SECOND == 20833L)
-#include "wavetables/midpoint_clamp_192_svm_orig.c"
+#include "wavetables/midpoint_clamp_192_gen.c"
 #include "wavetables/third_harmonic_192_gen.c"
 #include "wavetables/pure_sine_192_gen.c"
+#include "wavetables/nip_tuck_192_gen.c"
 #endif
 
 
@@ -151,17 +153,16 @@ uint8_t fetch_table_value(uint8_t table_pos_in) {
 
 	if ((ui16_aca_experimental_flags & (USE_ALTERNATE_WAVETABLE|USE_ALTERNATE_WAVETABLE_B)) == (0)){
 		// default
-		table_val = midpoint_clamp_svm_orig[translated_table_pos];
+		table_val = midpoint_clamp_gen[translated_table_pos];
 	}else if ((ui16_aca_experimental_flags & (USE_ALTERNATE_WAVETABLE|USE_ALTERNATE_WAVETABLE_B)) == (USE_ALTERNATE_WAVETABLE)){
 		table_val = pure_sine_gen[translated_table_pos];
 	}else if ((ui16_aca_experimental_flags & (USE_ALTERNATE_WAVETABLE|USE_ALTERNATE_WAVETABLE_B)) == (USE_ALTERNATE_WAVETABLE_B)){
 		table_val = third_harmonic_gen[translated_table_pos];
 	}else if ((ui16_aca_experimental_flags & (USE_ALTERNATE_WAVETABLE|USE_ALTERNATE_WAVETABLE_B)) == (USE_ALTERNATE_WAVETABLE|USE_ALTERNATE_WAVETABLE_B)){
-		// temp fallback cause we don't have table yet
-		table_val = midpoint_clamp_svm_orig[translated_table_pos];
+		table_val = nip_tuck_gen[translated_table_pos];
 	}else{
 		// fallback
-		table_val = midpoint_clamp_svm_orig[translated_table_pos];
+		table_val = midpoint_clamp_gen[translated_table_pos];
 	}
 
 	if (table_pos_in & 128) {
