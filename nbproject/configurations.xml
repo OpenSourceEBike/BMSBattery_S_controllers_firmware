@@ -62,6 +62,25 @@
           <in>stm8s_wwdg.c</in>
         </df>
       </df>
+      <df name="test">
+        <df name="wavetables">
+          <in>midpoint_clamp_255_ZSM.c</in>
+          <in>midpoint_clamp_255_svm_orig.c</in>
+          <in>nip_tuck_255_ZSM.c</in>
+          <in>pure_sine_192_gen.c</in>
+          <in>pure_sine_255_gen.c</in>
+          <in>third_harmonic_192_gen.c</in>
+          <in>third_harmonic_255_ZSM.c</in>
+          <in>third_harmonic_255_gen.c</in>
+        </df>
+      </df>
+      <df name="wavetables">
+        <in>midpoint_clamp_192_svm_orig.c</in>
+        <in>midpoint_clamp_255_svm_orig.c</in>
+        <in>pure_sine_192_gen.c</in>
+        <in>pure_sine_255_gen.c</in>
+        <in>third_harmonic_255_gen.c</in>
+      </df>
       <in>ACAcommons.c</in>
       <in>ACAcommons.h</in>
       <in>ACAcontrollerState.c</in>
@@ -308,6 +327,43 @@
       </item>
       <item path="pwm.h" ex="false" tool="3" flavor2="0">
       </item>
+      <item path="test/wavetables/midpoint_clamp_255_ZSM.c"
+            ex="false"
+            tool="0"
+            flavor2="0">
+      </item>
+      <item path="test/wavetables/midpoint_clamp_255_svm_orig.c"
+            ex="false"
+            tool="0"
+            flavor2="0">
+      </item>
+      <item path="test/wavetables/nip_tuck_255_ZSM.c" ex="false" tool="0" flavor2="0">
+      </item>
+      <item path="test/wavetables/pure_sine_192_gen.c"
+            ex="false"
+            tool="0"
+            flavor2="0">
+      </item>
+      <item path="test/wavetables/pure_sine_255_gen.c"
+            ex="false"
+            tool="0"
+            flavor2="0">
+      </item>
+      <item path="test/wavetables/third_harmonic_192_gen.c"
+            ex="false"
+            tool="0"
+            flavor2="0">
+      </item>
+      <item path="test/wavetables/third_harmonic_255_ZSM.c"
+            ex="false"
+            tool="0"
+            flavor2="0">
+      </item>
+      <item path="test/wavetables/third_harmonic_255_gen.c"
+            ex="false"
+            tool="0"
+            flavor2="0">
+      </item>
       <item path="timers.c" ex="false" tool="0" flavor2="0">
       </item>
       <item path="timers.h" ex="false" tool="3" flavor2="0">
@@ -315,6 +371,25 @@
       <item path="uart.c" ex="false" tool="0" flavor2="0">
       </item>
       <item path="uart.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="wavetables/midpoint_clamp_192_svm_orig.c"
+            ex="false"
+            tool="0"
+            flavor2="0">
+      </item>
+      <item path="wavetables/midpoint_clamp_255_svm_orig.c"
+            ex="false"
+            tool="0"
+            flavor2="0">
+      </item>
+      <item path="wavetables/pure_sine_192_gen.c" ex="false" tool="0" flavor2="0">
+      </item>
+      <item path="wavetables/pure_sine_255_gen.c" ex="false" tool="0" flavor2="0">
+      </item>
+      <item path="wavetables/third_harmonic_255_gen.c"
+            ex="false"
+            tool="0"
+            flavor2="0">
       </item>
     </conf>
   </confs>

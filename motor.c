@@ -1,7 +1,7 @@
 /*
  * EGG OpenSource EBike firmware
  *
- * Copyright (C) Casainho, 2015, 2106, 2017.
+ * Copyright (C) Casainho,Björn Schmidt 2015, 2106, 2017, 2019
  *
  * Released under the GPL License, Version 3
  */

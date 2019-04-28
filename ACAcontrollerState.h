@@ -170,6 +170,7 @@ typedef enum {
 	DISABLE_60_DEG_INTERPOLATION = ((uint16_t) 8),
 	SWITCH_360_DEG_INTERPOLATION = ((uint16_t) 16),
 	USE_ALTERNATE_WAVETABLE = ((uint16_t) 32),
+	USE_ALTERNATE_WAVETABLE_B = ((uint16_t) 64),
 	DUMMY_EXP_ALWAYS_ON = ((uint16_t) 128),
 	PWM_AUTO_OFF = ((uint16_t) 1024),
 			

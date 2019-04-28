@@ -1,7 +1,7 @@
 /*
  * EGG OpenSource EBike firmware
  *
- * Copyright (C) Casainho, 2015, 2106, 2017.
+ * Copyright (C) Casainho,Björn Schmidt 2015, 2106, 2017, 2019
  *
  * Released under the GPL License, Version 3
  */
@@ -18,280 +18,15 @@
 #include "ACAcontrollerState.h"
 
 #if (PWM_CYCLES_SECOND == 15625L)
-uint8_t ui8_sine_table[SVM_VIRTUAL_TABLE_LEN] ={
-	127,
-	130,
-	133,
-	136,
-	139,
-	142,
-	145,
-	148,
-	151,
-	154,
-	157,
-	160,
-	163,
-	166,
-	169,
-	172,
-	175,
-	178,
-	181,
-	184,
-	186,
-	189,
-	192,
-	194,
-	197,
-	200,
-	202,
-	205,
-	207,
-	209,
-	212,
-	214,
-	216,
-	218,
-	221,
-	223,
-	225,
-	227,
-	229,
-	230,
-	232,
-	234,
-	235,
-	237,
-	239,
-	240,
-	241,
-	243,
-	244,
-	245,
-	246,
-	247,
-	248,
-	249,
-	250,
-	250,
-	251,
-	252,
-	252,
-	253,
-	253,
-	253,
-	253,
-	253,
-	254
-};
-
-uint8_t ui8_svm_table [SVM_VIRTUAL_TABLE_LEN] ={
-	127,
-	133,
-	138,
-	144,
-	149,
-	154,
-	160,
-	165,
-	170,
-	176,
-	181,
-	186,
-	191,
-	197,
-	202,
-	207,
-	212,
-	217,
-	222,
-	227,
-	231,
-	236,
-	239,
-	240,
-	242,
-	243,
-	244,
-	245,
-	247,
-	248,
-	249,
-	250,
-	250,
-	251,
-	252,
-	253,
-	253,
-	254,
-	254,
-	254,
-	255,
-	255,
-	255,
-	255,
-	255,
-	255,
-	254,
-	254,
-	254,
-	253,
-	253,
-	252,
-	251,
-	251,
-	250,
-	249,
-	248,
-	247,
-	246,
-	245,
-	243,
-	242,
-	241,
-	239,
-	238
-};
+#include "wavetables/midpoint_clamp_255_svm_orig.c"
+#include "wavetables/third_harmonic_255_gen.c"
+#include "wavetables/pure_sine_255_gen.c"
 #endif
 
 #if (PWM_CYCLES_SECOND == 20833L)
-
-uint8_t ui8_sine_table[SVM_VIRTUAL_TABLE_LEN] ={
-	95,
-	97,
-   100,
-   102,
-   104,
-   107,
-   109,
-   111,
-   114,
-   116,
-   118,
-   120,
-   123,
-   125,
-   127,
-   129,
-   132,
-   134,
-   136,
-   138,
-   140,
-   142,
-   144,
-   146,
-   148,
-   150,
-   152,
-   154,
-   156,
-   157,
-   159,
-   161,
-   163,
-   164,
-   166,
-   167,
-   169,
-   170,
-   172,
-   173,
-   174,
-   176,
-   177,
-   178,
-   179,
-   180,
-   181,
-   182,
-   183,
-   184,
-   185,
-   186,
-   186,
-   187,
-   188,
-   188,
-   189,
-   189,
-   189,
-   190,
-   190,
-   190,
-   190,
-   190,
-   191
-};
-
-uint8_t ui8_svm_table [SVM_VIRTUAL_TABLE_LEN] ={
-	95,
-	100,
-	103,
-	108,
-	112,
-	115,
-	120,
-	124,
-	128,
-	132,
-	136,
-	140,
-	143,
-	148,
-	152,
-	155,
-	159,
-	163,
-	167,
-	170,
-	173,
-	177,
-	179,
-	180,
-	182,
-	182,
-	183,
-	184,
-	185,
-	186,
-	187,
-	188,
-	188,
-	188,
-	189,
-	190,
-	190,
-	191,
-	191,
-	191,
-	192,
-	192,
-	192,
-	192,
-	192,
-	192,
-	191,
-	191,
-	191,
-	190,
-	190,
-	189,
-	188,
-	188,
-	188,
-	187,
-	186,
-	185,
-	185,
-	184,
-	182,
-	182,
-	181,
-	179,
-	179
-};
+#include "wavetables/midpoint_clamp_192_svm_orig.c"
+#include "wavetables/third_harmonic_192_gen.c"
+#include "wavetables/pure_sine_192_gen.c"
 #endif
 
 
@@ -414,14 +149,27 @@ uint8_t fetch_table_value(uint8_t table_pos_in) {
 		translated_table_pos = 64 - translated_table_pos;
 	}
 
-	if ((ui16_aca_experimental_flags & USE_ALTERNATE_WAVETABLE) == USE_ALTERNATE_WAVETABLE){
-		table_val = ui8_sine_table[translated_table_pos];
+	if ((ui16_aca_experimental_flags & (USE_ALTERNATE_WAVETABLE|USE_ALTERNATE_WAVETABLE_B)) == (0)){
+		// default
+		table_val = midpoint_clamp_svm_orig[translated_table_pos];
+	}else if ((ui16_aca_experimental_flags & (USE_ALTERNATE_WAVETABLE|USE_ALTERNATE_WAVETABLE_B)) == (USE_ALTERNATE_WAVETABLE)){
+		table_val = pure_sine_gen[translated_table_pos];
+	}else if ((ui16_aca_experimental_flags & (USE_ALTERNATE_WAVETABLE|USE_ALTERNATE_WAVETABLE_B)) == (USE_ALTERNATE_WAVETABLE_B)){
+		table_val = third_harmonic_gen[translated_table_pos];
+	}else if ((ui16_aca_experimental_flags & (USE_ALTERNATE_WAVETABLE|USE_ALTERNATE_WAVETABLE_B)) == (USE_ALTERNATE_WAVETABLE|USE_ALTERNATE_WAVETABLE_B)){
+		// temp fallback cause we don't have table yet
+		table_val = midpoint_clamp_svm_orig[translated_table_pos];
 	}else{
-		table_val = ui8_svm_table[translated_table_pos];
+		// fallback
+		table_val = midpoint_clamp_svm_orig[translated_table_pos];
 	}
 
 	if (table_pos_in & 128) {
+#if (PWM_CYCLES_SECOND == 15625L)
 		table_val = 255 - table_val;
+#else
+		table_val = 192 - table_val;
+#endif
 	}
 	return table_val;
 
