@@ -635,6 +635,10 @@ void display_update() {
 			uint8_t requestedValue = ui8_rx_converted_buffer[5];
 
 			if (ui8_rx_converted_buffer[0] == DYNAMIC_DATA_ADDRESS) {
+				// dynamic data requests also sends the displays assist percentage
+				// temporary check for backwards compatibility
+				if (CODE_DUMMY != requestedValue)
+					ui8_assist_percent_wanted = requestedValue;
 				prepareBasePackage(DYNAMIC_DATA_ADDRESS, requestedFunction);
 				gatherDynamicPayload(requestedFunction);
 				addPayload(CODE_LRC_CHECK, calculatedLrc);

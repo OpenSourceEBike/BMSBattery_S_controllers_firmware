@@ -30,7 +30,6 @@
             <file>file:/G:/osebikefw/test/wavetables/midpoint_clamp_255_gen.c</file>
             <file>file:/G:/osebikefw/BOdisplay.c</file>
             <file>file:/G:/osebikefw/ACAcontrollerState.c</file>
-            <file>file:/G:/osebikefw/BOdisplay.h</file>
             <file>file:/G:/osebikefw/wavetables/third_harmonic_192_gen.c</file>
             <file>file:/G:/osebikefw/SPEED.c</file>
             <file>file:/G:/osebikefw/motor.c</file>
@@ -52,6 +51,7 @@
             <file>file:/G:/osebikefw/test/wavetables/third_harmonic_255_gen.c</file>
             <file>file:/G:/osebikefw/test/wavetables/pure_sine_192_gen.c</file>
             <file>file:/G:/osebikefw/test/motorTest.c</file>
+            <file>file:/G:/osebikefw/display.c</file>
             <file>file:/G:/osebikefw/wavetables/pure_sine_255_gen.c</file>
             <file>file:/G:/osebikefw/wavetables/midpoint_clamp_192_gen.c</file>
             <file>file:/G:/osebikefw/test/wavetables/third_harmonic_192_gen.c</file>
