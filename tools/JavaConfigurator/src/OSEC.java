@@ -87,7 +87,6 @@ public class OSEC extends JFrame {
 	private JTextField txtBatteryCurcala;
 	private JLabel lblDiplayType;
 	private final ButtonGroup displayButtonGroup = new ButtonGroup();
-	private final ButtonGroup MotorSpeed = new ButtonGroup();
 
 	private JTextField Assist_Level_1;
 	private JTextField Assist_Level_2;
@@ -106,8 +105,7 @@ public class OSEC extends JFrame {
 	private JTextField i_factor;
 	private JTextField GearRatio;
 	private JTextField txtMaxregencurrent;
-	private JRadioButton rdbtnNormal;
-	private JRadioButton rdbtnHigh;
+
 	private JTextField CellsNumber;
 	private JTextField PAS_threshold;
 	private JTextField txtMaxphasecurrent;
@@ -133,6 +131,7 @@ public class OSEC extends JFrame {
 	private JCheckBox cbPasInverted;
 	private JCheckBox cbPwmOff;
 	private JCheckBox cbDcNull;
+	private JCheckBox cbHighSpeedMotor;
 	private JCheckBox cbAntiJitter;
 	private JCheckBox cbSwitch360;
 	private JCheckBox cbDisable60DegInterpolation;
@@ -219,8 +218,9 @@ public class OSEC extends JFrame {
 			txtCorrectionAtAngle.setText(tmp);
 		}
 
-		rdbtnHigh.setSelected(Boolean.parseBoolean(in.readLine()));
-		rdbtnNormal.setSelected(Boolean.parseBoolean(in.readLine()));
+		in.readLine();
+		in.readLine();
+		
 		rdbtnKtlcd.setSelected(Boolean.parseBoolean(in.readLine()));
 		rdbtnKingmeterJlcd.setSelected(Boolean.parseBoolean(in.readLine()));
 		in.readLine();
@@ -280,6 +280,7 @@ public class OSEC extends JFrame {
 		cbPwmOff.setSelected((acaExperimentalFlags & 1024) > 0);
 		cbDcNull.setSelected((acaExperimentalFlags & 1) > 0);
 		cbAntiJitter.setSelected((acaExperimentalFlags & 2) > 0);
+		cbHighSpeedMotor.setSelected((acaExperimentalFlags & 256) > 0);
 		cbSwitch360.setSelected((acaExperimentalFlags & 16) > 0);
 		cbDisableInterpolation.setSelected((acaExperimentalFlags & 4) > 0);
 		cbDisable60DegInterpolation.setSelected((acaExperimentalFlags & 8) > 0);
@@ -1017,6 +1018,12 @@ public class OSEC extends JFrame {
 		cbSwitch360.setBounds(250, 515, 250, 20);
 		cbSwitch360.setForeground(Color.GRAY);
 		contentPane.add(cbSwitch360);
+		
+		cbHighSpeedMotor = new JCheckBox("High Speed Motor");
+		cbHighSpeedMotor.setSelected(false);
+		cbHighSpeedMotor.setBounds(250, 535, 250, 20);
+		cbHighSpeedMotor.setForeground(Color.GRAY);
+		contentPane.add(cbHighSpeedMotor);
 
 		cbAntiJitter = new JCheckBox("Motor anti jitter (@60\u00B0 interpol.)");
 		cbAntiJitter.setSelected(false);
@@ -1048,23 +1055,6 @@ public class OSEC extends JFrame {
 		cbDcNull.setForeground(Color.RED);
 		contentPane.add(cbDcNull);
 		
-		
-
-		JLabel lblMotorSpeed = new JLabel("Motor Speed");
-		lblMotorSpeed.setFont(new Font("Tahoma", Font.BOLD, 12));
-		lblMotorSpeed.setBounds(440, 400, 86, 20);
-		contentPane.add(lblMotorSpeed);
-
-		rdbtnNormal = new JRadioButton("Normal");
-		rdbtnNormal.setSelected(true);
-		MotorSpeed.add(rdbtnNormal);
-		rdbtnNormal.setBounds(440, 425, 80, 20);
-		contentPane.add(rdbtnNormal);
-
-		rdbtnHigh = new JRadioButton("High");
-		MotorSpeed.add(rdbtnHigh);
-		rdbtnHigh.setBounds(520, 425, 70, 20);
-		contentPane.add(rdbtnHigh);
 
 		lblDiplayType = new JLabel("Display Type");
 		lblDiplayType.setFont(new Font("Tahoma", Font.BOLD, 12));
@@ -1288,17 +1278,8 @@ public class OSEC extends JFrame {
 					iWriter.println(txtCorrectionAtAngle.getText());
 					pWriter.println(text_to_save);
 
-					if (rdbtnHigh.isSelected()) {
-						text_to_save = "#define PWM_CYCLES_SECOND 20833L";
-						pWriter.println(text_to_save);
-					}
-					iWriter.println(rdbtnHigh.isSelected());
-
-					if (rdbtnNormal.isSelected()) {
-						text_to_save = "#define PWM_CYCLES_SECOND 15625L";
-						pWriter.println(text_to_save);
-					}
-					iWriter.println(rdbtnNormal.isSelected());
+					iWriter.println("");
+					iWriter.println("");
 
 					if (rdbtnKtlcd.isSelected()) {
 						text_to_save = "#define DISPLAY_TYPE_KT_LCD3";
@@ -1391,6 +1372,7 @@ public class OSEC extends JFrame {
 					int acaExperimentalFlags = 128;
 					acaExperimentalFlags |= (cbDcNull.isSelected() ? 1 : 0);
 					acaExperimentalFlags |= (cbAntiJitter.isSelected() ? 2 : 0);
+					acaExperimentalFlags |= (cbHighSpeedMotor.isSelected() ? 256 : 0);
 					acaExperimentalFlags |= (cbSwitch360.isSelected() ? 16 : 0);
 					acaExperimentalFlags |= (cbDisableInterpolation.isSelected() ? 4 : 0);
 					acaExperimentalFlags |= (cbDisable60DegInterpolation.isSelected() ? 8 : 0);

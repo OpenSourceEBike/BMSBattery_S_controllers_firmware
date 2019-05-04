@@ -17,20 +17,10 @@
 #include "config.h"
 #include "ACAcontrollerState.h"
 
-#if (PWM_CYCLES_SECOND == 15625L)
 #include "wavetables/midpoint_clamp_255_gen.c"
 #include "wavetables/third_harmonic_255_gen.c"
 #include "wavetables/pure_sine_255_gen.c"
 #include "wavetables/nip_tuck_255_gen.c"
-#endif
-
-#if (PWM_CYCLES_SECOND == 20833L)
-#include "wavetables/midpoint_clamp_192_gen.c"
-#include "wavetables/third_harmonic_192_gen.c"
-#include "wavetables/pure_sine_192_gen.c"
-#include "wavetables/nip_tuck_192_gen.c"
-#endif
-
 
 uint8_t ui8_duty_cycle = 0;
 uint8_t ui8_duty_cycle_target = 0;
@@ -50,7 +40,7 @@ void pwm_init(void) {
 #if (SVM_TABLE == SVM)
 	TIM1_TimeBaseInit(0, // TIM1_Prescaler = 0
 			TIM1_COUNTERMODE_CENTERALIGNED1,
-			(16000000 / PWM_CYCLES_SECOND / 2 - 1), // clock = 16MHz; counter period = 1024; PWM freq = 16MHz / 1024 = 15.625kHz;
+			(16000000 / ui16_pwm_cycles_second / 2 - 1), // clock = 16MHz; counter period = 1024; PWM freq = 16MHz / 1024 = 15.625kHz;
 			//(BUT PWM center aligned mode needs twice the frequency)
 			1); // will fire the TIM1_IT_UPDATE at every PWM period cycle
 #elif (SVM_TABLE == SINE) || (SVM_TABLE == SINE_SVM_ORIGINAL)
@@ -164,13 +154,16 @@ uint8_t fetch_table_value(uint8_t table_pos_in) {
 		// fallback
 		table_val = midpoint_clamp_gen[translated_table_pos];
 	}
-
+	if (ui16_pwm_cycles_second == PWM_CPS_HIGH_SPEED){
+		// high speed motor runs at 25% higher pwm frequency so the pwm counters max value is 25% lower
+		table_val = table_val-(table_val>>2);
+	}
 	if (table_pos_in & 128) {
-#if (PWM_CYCLES_SECOND == 15625L)
-		table_val = 255 - table_val;
-#else
-		table_val = 192 - table_val;
-#endif
+		if (ui16_pwm_cycles_second == PWM_CPS_NORMAL_SPEED){
+			table_val = 255 - table_val;
+		}else{
+			table_val = 192 - table_val;
+		}
 	}
 	return table_val;
 

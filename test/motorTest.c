@@ -40,7 +40,7 @@ uint8_t ui8b;
 uint8_t ui8a;
 uint8_t ui8X;
 
-uint8_t fetch_table_value(uint8_t table_pos_in, uint8_t* table, uint8_t max) {
+uint8_t fetch_table_value(uint8_t table_pos_in, uint8_t* table, uint8_t max, uint8_t downscaleForHighSpeed) {
 
 	// we only store a quarter of the values and generate the other 4 quarter with a simple lookop translation
 	uint8_t translated_table_pos = table_pos_in&~192;
@@ -51,7 +51,10 @@ uint8_t fetch_table_value(uint8_t table_pos_in, uint8_t* table, uint8_t max) {
 	}
 
 	table_val = table[translated_table_pos];
-
+	
+	if (downscaleForHighSpeed){
+		table_val = table_val-(table_val>>2);
+	}
 	if (table_pos_in & 128) {
 		table_val = max - table_val;
 	}
@@ -134,7 +137,7 @@ void main() {
 	printf("\r\ncurve test\r\n");
 	for (int i = 0; i < 256; i++) {
 
-		//uint8_t compare_base = midpoint_clamp_192_svm_orig[i];
+		uint8_t compare_base = midpoint_clamp_192_svm_orig[i];
 		//uint8_t compare_base = midpoint_clamp_255_svm_orig[i];
 		//uint8_t compare_base = third_harmonic_255_gen[i];
 		//uint8_t compare_base = pure_sine_255_gen[i];
@@ -148,19 +151,20 @@ void main() {
 		//uint8_t compare_base = pure_sine_192_gen[i];
 		
 		//uint8_t compare_base = nip_tuck_255_gen[i];
-		uint8_t compare_base = nip_tuck_192_gen[i];
-
-		//uint8_t compare_a = fetch_table_value(i,third_harmonic_255_gen,255);
-
-		//uint8_t compare_a = fetch_table_value(i,midpoint_clamp_255_svm_orig,255);
-		//uint8_t compare_a = fetch_table_value(i,pure_sine_255_gen,255);
-		//uint8_t compare_a = fetch_table_value(i,pure_sine_192_gen,192);
-		//uint8_t compare_a = fetch_table_value(i,third_harmonic_192_gen,192);
-		//uint8_t compare_a = fetch_table_value(i,midpoint_clamp_255_gen,255);
-		//uint8_t compare_a = fetch_table_value(i,midpoint_clamp_192_gen,192);
+		//uint8_t compare_base = nip_tuck_192_gen[i];
 		
-		uint8_t compare_a = fetch_table_value(i,nip_tuck_192_gen,192);
 
+		//uint8_t compare_a = fetch_table_value(i,third_harmonic_255_gen,255,0);
+		//uint8_t compare_a = fetch_table_value(i,midpoint_clamp_255_svm_orig,255,0);
+		//uint8_t compare_a = fetch_table_value(i,pure_sine_255_gen,255,0);
+		//uint8_t compare_a = fetch_table_value(i,nip_tuck_255_gen,255,0);
+		
+		uint8_t compare_a = fetch_table_value(i,pure_sine_255_gen,192,1);
+		//uint8_t compare_a = fetch_table_value(i,third_harmonic_255_gen,192,1);
+		//uint8_t compare_a = fetch_table_value(i,midpoint_clamp_255_gen,192,1);	
+		//uint8_t compare_a = fetch_table_value(i,nip_tuck_255_gen,192,1);
+
+		
 		//uint8_t compare_a = gen_mcspwm(i,192,0);
 		//uint8_t compare_a = gen_sspwm(i,192,0);
 		//uint8_t compare_a = gen_thipwm(i,192,0);

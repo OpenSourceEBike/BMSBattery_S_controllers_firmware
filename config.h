@@ -40,7 +40,6 @@
 #define RAMP_START 64000
 #define limit_with_throttle_override 35
 #define CORRECTION_AT_ANGLE 127
-#define PWM_CYCLES_SECOND 15625L
 #define ANGLE_4_0 1
 #define ANGLE_6_60 46
 #define ANGLE_2_120 88

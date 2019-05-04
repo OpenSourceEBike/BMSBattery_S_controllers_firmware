@@ -23,6 +23,9 @@
 
 extern uint32_t uint32_icc_signals; // inter component communication, very simplistig way of signalling stuff via a shared var
 
+extern uint16_t ui16_erps_max;
+extern uint16_t ui16_pwm_cycles_second;
+
 extern uint8_t ui8_throttle_min_range;
 extern uint8_t ui8_throttle_max_range;
 extern uint16_t ui16_control_state;
@@ -172,6 +175,7 @@ typedef enum {
 	USE_ALTERNATE_WAVETABLE = ((uint16_t) 32),
 	USE_ALTERNATE_WAVETABLE_B = ((uint16_t) 64),
 	DUMMY_EXP_ALWAYS_ON = ((uint16_t) 128),
+	HIGH_SPEED_MOTOR = ((uint16_t) 256),
 	PWM_AUTO_OFF = ((uint16_t) 1024),
 			
 } ACA_EXPERIMENTAL_FLAGS;

@@ -75,7 +75,7 @@ void send_message() {
 		if (ui16_time_ticks_between_speed_interrupt > 65000) {
 			ui16_wheel_period_ms = 4500;
 		} else {
-			ui16_wheel_period_ms = (uint16_t) ((float) ui16_time_ticks_between_speed_interrupt / ((float) PWM_CYCLES_SECOND / 1000.0)); //must be /1000 devided in /125/8 for better resolution
+			ui16_wheel_period_ms = (uint16_t) ((float) ui16_time_ticks_between_speed_interrupt / ((float) ui16_pwm_cycles_second / 1000.0)); //must be /1000 devided in /125/8 for better resolution
 		}
 	}else{
 		if (ui32_erps_filtered == 0) {

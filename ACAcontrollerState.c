@@ -54,6 +54,9 @@ uint8_t ui8_s_battery_voltage_max;
 // internal
 uint32_t uint32_icc_signals = 0;
 
+uint16_t ui16_erps_max = 0;
+uint16_t ui16_pwm_cycles_second = 0;
+
 uint8_t ui8_gear_ratio = 1;
 
 uint8_t ui8_a_s_assistlevels[6];
@@ -137,6 +140,8 @@ void controllerstate_init(void) {
 	uint8_t eepromHighVal;
 
 	// convert static defines to volatile vars
+	ui16_pwm_cycles_second = PWM_CPS_NORMAL_SPEED;
+	ui16_erps_max = ui16_pwm_cycles_second / 30; //limit erps to have minimum 30 points on the sine curve for proper commutation
 	ui8_a_s_assistlevels[0] =0;
 	ui8_a_s_assistlevels[1] =LEVEL_1;
 	ui8_a_s_assistlevels[2] =LEVEL_2;
@@ -188,6 +193,13 @@ void controllerstate_init(void) {
 	eepromHighVal = eeprom_read(OFFSET_ACA_EXPERIMENTAL_FLAGS_HIGH_BYTE);
 	eepromVal = eeprom_read(OFFSET_ACA_EXPERIMENTAL_FLAGS);
 	if (eepromVal > 0 || eepromHighVal > 0) ui16_aca_experimental_flags = ((uint16_t) eepromHighVal << 8) + (uint16_t) eepromVal;
+	
+	if ((ui16_aca_experimental_flags & HIGH_SPEED_MOTOR) == HIGH_SPEED_MOTOR) {
+		// pwm_init is run right after this functions call in main.c, so it's ok to change it here
+		// we do this only here at startup, so controller has to be restarted for motor speed changes to take effect
+		ui16_pwm_cycles_second = PWM_CPS_HIGH_SPEED;
+		ui16_erps_max = ui16_pwm_cycles_second / 30;
+	}
 
 	eepromVal = eeprom_read(OFFSET_GEAR_RATIO);
 	if (eepromVal > 0) ui8_gear_ratio = eepromVal;

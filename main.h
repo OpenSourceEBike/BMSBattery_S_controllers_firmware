@@ -50,7 +50,8 @@
 
 
 #define PWM_CYCLES_COUNTER_MAX 3000 // higher values assume motor is at standstill.
-
+#define PWM_CPS_NORMAL_SPEED 15625L
+#define PWM_CPS_HIGH_SPEED 20833L
 
 // 2 seconds to get up to max PWM duty cycle value of 255 (127 * 255 * 64us ~= 2 seconds)
 #define PWM_DUTY_CYCLE_CONTROLLER_COUNTER 127

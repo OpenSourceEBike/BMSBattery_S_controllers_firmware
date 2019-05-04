@@ -95,7 +95,7 @@ void updateSpeeds(void) {
 			ui16_time_ticks_for_speed_calculation = 0; //reset speed counter
 
 			ui32_speed_sensor_rpks_accumulated -= ui32_speed_sensor_rpks_accumulated >> 2;
-			ui32_speed_sensor_rpks_accumulated += (((uint32_t)PWM_CYCLES_SECOND)*1000) / ((uint32_t) ui16_time_ticks_between_speed_interrupt); // speed in rounds per 1000 seconds
+			ui32_speed_sensor_rpks_accumulated += (((uint32_t)ui16_pwm_cycles_second)*1000) / ((uint32_t) ui16_time_ticks_between_speed_interrupt); // speed in rounds per 1000 seconds
 			ui32_speed_sensor_rpks = ui32_speed_sensor_rpks_accumulated >> 2; //tic frequency 15625 Hz
 		}
 

@@ -41,7 +41,6 @@ static uint32_t ui32_erps_accumulated; //for filtering of erps
 //static uint32_t ui32_speedlimit_actual_accumulated;
 static uint32_t ui32_sumthrottle_accumulated; //it is already smoothed b4 we get it, we want to smooth it even more though for dynamic assist levels
 
-static uint16_t ui16_erps_max = PWM_CYCLES_SECOND / 30; //limit erps to have minimum 30 points on the sine curve for proper commutation
 static float float_temp = 0; //for float calculations
 
 static uint32_t uint32_temp = 0;

@@ -91,7 +91,7 @@ void hall_sensors_read_and_action(void) {
 					if (ui16_PWM_cycles_counter > 20) ui16_PWM_cycles_counter_total = ui16_PWM_cycles_counter;
 
 					ui16_PWM_cycles_counter = 0;
-					ui16_motor_speed_erps = ((uint16_t) PWM_CYCLES_SECOND) / ui16_PWM_cycles_counter_total; // this division takes ~4.2us
+					ui16_motor_speed_erps = ((uint16_t) ui16_pwm_cycles_second) / ui16_PWM_cycles_counter_total; // this division takes ~4.2us
 
 				}
 
