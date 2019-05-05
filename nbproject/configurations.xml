@@ -83,8 +83,10 @@
         <in>nip_tuck_255_gen.c</in>
         <in>pure_sine_192_gen.c</in>
         <in>pure_sine_255_gen.c</in>
+        <in>six_step_255.c</in>
         <in>third_harmonic_192_gen.c</in>
         <in>third_harmonic_255_gen.c</in>
+        <in>trapezodial_255.c</in>
       </df>
       <in>ACAcommons.c</in>
       <in>ACAcommons.h</in>
@@ -402,6 +404,8 @@
       </item>
       <item path="wavetables/pure_sine_255_gen.c" ex="false" tool="0" flavor2="0">
       </item>
+      <item path="wavetables/six_step_255.c" ex="false" tool="0" flavor2="0">
+      </item>
       <item path="wavetables/third_harmonic_192_gen.c"
             ex="false"
             tool="0"
@@ -411,6 +415,8 @@
             ex="false"
             tool="0"
             flavor2="0">
+      </item>
+      <item path="wavetables/trapezodial_255.c" ex="false" tool="0" flavor2="0">
       </item>
     </conf>
   </confs>

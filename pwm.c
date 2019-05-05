@@ -21,6 +21,7 @@
 #include "wavetables/third_harmonic_255_gen.c"
 #include "wavetables/pure_sine_255_gen.c"
 #include "wavetables/nip_tuck_255_gen.c"
+#include "wavetables/six_step_255.c"
 
 uint8_t ui8_duty_cycle = 0;
 uint8_t ui8_duty_cycle_target = 0;
@@ -141,7 +142,9 @@ uint8_t fetch_table_value(uint8_t table_pos_in) {
 		translated_table_pos = 64 - translated_table_pos;
 	}
 
-	if ((ui16_aca_experimental_flags & (USE_ALTERNATE_WAVETABLE|USE_ALTERNATE_WAVETABLE_B)) == (0)){
+	if (ui8_dynamic_motor_state == MOTOR_STATE_RUNNING_NO_INTERPOLATION){
+		table_val = six_step[translated_table_pos];
+	}else if ((ui16_aca_experimental_flags & (USE_ALTERNATE_WAVETABLE|USE_ALTERNATE_WAVETABLE_B)) == (0)){
 		// default
 		table_val = midpoint_clamp_gen[translated_table_pos];
 	}else if ((ui16_aca_experimental_flags & (USE_ALTERNATE_WAVETABLE|USE_ALTERNATE_WAVETABLE_B)) == (USE_ALTERNATE_WAVETABLE)){

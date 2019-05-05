@@ -131,8 +131,10 @@
         <in>nip_tuck_255_gen.c</in>
         <in>pure_sine_192_gen.c</in>
         <in>pure_sine_255_gen.c</in>
+        <in>six_step_255.c</in>
         <in>third_harmonic_192_gen.c</in>
         <in>third_harmonic_255_gen.c</in>
+        <in>trapezodial_255.c</in>
       </df>
       <in>ACAcommons.c</in>
       <in>ACAcommons.h</in>

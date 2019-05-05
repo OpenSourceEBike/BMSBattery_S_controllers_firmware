@@ -240,7 +240,6 @@ void motor_fast_loop(void) {
 	}else {// MOTOR_STATE_COAST || MOTOR_STATE_RUNNING_NO_INTERPOLATION
 		
 		ui8_interpolation_angle = 0;
-		//ui8_interpolation_angle = 21; //30deg+ (avg between hall sensor change)
 		
 		ui8_interpolation_start_position = ui8_motor_rotor_hall_position;
 		ui8_dynamic_motor_state = MOTOR_STATE_RUNNING_NO_INTERPOLATION;
