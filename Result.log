@@ -859,3 +859,80 @@ BoardName=ST-LINK ST-LINK_ID=0 Device=STM8S105x6 Port=USB ProgMode=SWIM
 Cannot communicate with the tool.
 Wrong tool selection or check tool power supply or check that a previous session is closed.
 <<< Programming PROGRAM MEMORY fails
+----------------------------------------------------------
+new log session
+date:				05/10/19
+time:				18:17:32
+----------------------------------------------------------
+STVP_CmdLine version 1.6
+
+Verbose ON
+Log activity ON
+Display Progress OFF
+Message box warning if protect option byte ON
+Loop mode OFF
+Erase device OFF
+Blank check device OFF
+Verify device ON
+
+Configuration:
+BoardName=ST-LINK ST-LINK_ID=0 Device=STM8S105x6 Port=USB ProgMode=SWIM
+
+>>> Filling PROGRAM MEMORY image in computer with Blank Value
+<<< Filling PROGRAM MEMORY image in computer succeeds
+
+>>> Loading file main.hex in PROGRAM MEMORY image in computer
+No such file or directory
+----------------------------------------------------------
+new log session
+date:				05/10/19
+time:				18:18:52
+----------------------------------------------------------
+STVP_CmdLine version 1.6
+
+Verbose ON
+Log activity ON
+Display Progress OFF
+Message box warning if protect option byte ON
+Loop mode OFF
+Erase device OFF
+Blank check device OFF
+Verify device ON
+
+Configuration:
+BoardName=ST-LINK ST-LINK_ID=0 Device=STM8S105x6 Port=USB ProgMode=SWIM
+
+>>> Filling PROGRAM MEMORY image in computer with Blank Value
+<<< Filling PROGRAM MEMORY image in computer succeeds
+
+>>> Loading file main.hex in PROGRAM MEMORY image in computer
+<<< Loading file succeeds
+
+>>> Programming PROGRAM MEMORY
+Cannot communicate with the tool.
+Wrong tool selection or check tool power supply or check that a previous session is closed.
+<<< Programming PROGRAM MEMORY fails
+----------------------------------------------------------
+new log session
+date:				05/10/19
+time:				18:19:42
+----------------------------------------------------------
+STVP_CmdLine version 1.6
+
+Verbose ON
+Log activity ON
+Display Progress OFF
+Message box warning if protect option byte ON
+Loop mode OFF
+Erase device OFF
+Blank check device OFF
+Verify device ON
+
+Configuration:
+BoardName=ST-LINK ST-LINK_ID=0 Device=STM8S105x6 Port=USB ProgMode=SWIM
+
+>>> Filling PROGRAM MEMORY image in computer with Blank Value
+<<< Filling PROGRAM MEMORY image in computer succeeds
+
+>>> Loading file main.hex in PROGRAM MEMORY image in computer
+No such file or directory

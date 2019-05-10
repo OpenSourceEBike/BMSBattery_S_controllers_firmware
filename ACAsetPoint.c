@@ -36,7 +36,7 @@ static int8_t uint_PWM_Enable = 0; //flag for PWM state
 static uint16_t ui16_BatteryCurrent_accumulated = 2496L; //8x current offset, for filtering or Battery Current
 static uint16_t ui16_BatteryVoltage_accumulated;
 static uint16_t ui16_assist_percent_smoothed;
-static uint32_t ui32_time_ticks_between_pas_interrupt_accumulated = timeout; // for filtering of PAS value 
+static uint32_t ui32_time_ticks_between_pas_interrupt_accumulated = 0; // for filtering of PAS value 
 static uint32_t ui32_erps_accumulated; //for filtering of erps
 //static uint32_t ui32_speedlimit_actual_accumulated;
 static uint32_t ui32_sumthrottle_accumulated; //it is already smoothed b4 we get it, we want to smooth it even more though for dynamic assist levels
@@ -93,7 +93,7 @@ BitStatus checkOverVoltageOverride(){
 	return 0;
 }
 
-uint16_t aca_setpoint(uint16_t ui16_time_ticks_between_speed_interrupt, uint16_t ui16_time_ticks_between_pas_interrupt, uint16_t setpoint_old) {
+uint16_t aca_setpoint(uint16_t ui16_time_ticks_between_pas_interrupt, uint16_t setpoint_old) {
 	// select virtual erps speed based on speedsensor type
 	if (((ui16_aca_flags & EXTERNAL_SPEED_SENSOR) == EXTERNAL_SPEED_SENSOR)) {
 		ui16_virtual_erps_speed = (uint16_t) ((((uint32_t)ui8_gear_ratio) * ui32_speed_sensor_rpks) /1000); 
@@ -143,6 +143,11 @@ uint16_t aca_setpoint(uint16_t ui16_time_ticks_between_speed_interrupt, uint16_t
 	ui32_erps_accumulated -= ui32_erps_accumulated >> 3;
 	ui32_erps_accumulated += ui16_motor_speed_erps;
 	ui32_erps_filtered = ui32_erps_accumulated >> 3;
+	
+	if (ui32_time_ticks_between_pas_interrupt_accumulated == 0){
+		// init first time here
+		ui32_time_ticks_between_pas_interrupt_accumulated = ((uint32_t)ui16_s_ramp_start)<<3;
+	}
 
 	ui32_time_ticks_between_pas_interrupt_accumulated -= ui32_time_ticks_between_pas_interrupt_accumulated >> 3;
 	// do not allow values > ramp_start into smoothing cause it makes startup sluggish
