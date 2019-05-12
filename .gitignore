@@ -19,3 +19,5 @@ Debug
 /tools/JavaConfigurator/nbproject/private/
 /tools/JavaConfigurator/build/
 /tools/JavaConfigurator/dist/
+/nbproject/private/
+/Result.log
