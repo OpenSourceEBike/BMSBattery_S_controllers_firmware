@@ -109,6 +109,7 @@ int main(void) {
 	adc_init();
 	PAS_init();
 	SPEED_init();
+	aca_setpoint_init();
 #if (defined (DISPLAY_TYPE) && defined (DISPLAY_TYPE_KINGMETER)) || defined DISPLAY_TYPE_KT_LCD3 || defined BLUOSEC
 	display_init();
 #endif

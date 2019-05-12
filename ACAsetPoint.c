@@ -93,6 +93,10 @@ BitStatus checkOverVoltageOverride(){
 	return 0;
 }
 
+void aca_setpoint_init(void) {
+	ui32_time_ticks_between_pas_interrupt_accumulated = ((uint32_t)ui16_s_ramp_start)<<3;
+}
+
 uint16_t aca_setpoint(uint16_t ui16_time_ticks_between_pas_interrupt, uint16_t setpoint_old) {
 	// select virtual erps speed based on speedsensor type
 	if (((ui16_aca_flags & EXTERNAL_SPEED_SENSOR) == EXTERNAL_SPEED_SENSOR)) {
@@ -143,11 +147,6 @@ uint16_t aca_setpoint(uint16_t ui16_time_ticks_between_pas_interrupt, uint16_t s
 	ui32_erps_accumulated -= ui32_erps_accumulated >> 3;
 	ui32_erps_accumulated += ui16_motor_speed_erps;
 	ui32_erps_filtered = ui32_erps_accumulated >> 3;
-	
-	if (ui32_time_ticks_between_pas_interrupt_accumulated == 0){
-		// init first time here
-		ui32_time_ticks_between_pas_interrupt_accumulated = ((uint32_t)ui16_s_ramp_start)<<3;
-	}
 
 	ui32_time_ticks_between_pas_interrupt_accumulated -= ui32_time_ticks_between_pas_interrupt_accumulated >> 3;
 	// do not allow values > ramp_start into smoothing cause it makes startup sluggish

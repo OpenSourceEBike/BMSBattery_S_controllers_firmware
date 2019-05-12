@@ -22,6 +22,7 @@
 #include "config.h"
 
 uint16_t aca_setpoint (uint16_t ui16_time_ticks_between_pas_interrupt, uint16_t setpoint_old );
+void aca_setpoint_init(void);
 
 #endif /* ACASETPOINT_H */
 
