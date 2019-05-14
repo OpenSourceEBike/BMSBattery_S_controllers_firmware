@@ -83,6 +83,7 @@ uint16_t ui16_regen_current_max_value = 0;
 uint8_t ui8_possible_motor_state = 0;
 uint8_t ui8_dynamic_motor_state = 0;
 uint8_t ui8_BatteryVoltage = 0; //Battery Voltage read from ADC
+uint8_t ui8_battery_voltage_nominal =0;
 uint16_t ui16_motor_speed_erps = 0;
 uint32_t ui32_erps_filtered = 0; //filtered value of erps
 uint16_t ui16_virtual_erps_speed = 0;
@@ -269,6 +270,8 @@ void controllerstate_init(void) {
 	if (eepromVal > 0) ui8_s_battery_voltage_min = eepromVal;
 	eepromVal = eeprom_read(OFFSET_BATTERY_VOLTAGE_MAX);
 	if (eepromVal > 0) ui8_s_battery_voltage_max = eepromVal;
+	
+	ui8_battery_voltage_nominal = (((uint16_t)(ui8_s_battery_voltage_max-(ui8_s_battery_voltage_max-ui8_s_battery_voltage_min)/2))*ui8_s_battery_voltage_calibration)/256L;
 	
 	eepromVal = eeprom_read(OFFSET_MOTOR_CONSTANT);
 	if (eepromVal > 0) flt_s_motor_constant = int2float(eepromVal, 4.0);

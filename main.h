@@ -20,34 +20,6 @@
 #define ADC_MOTOR_TOTAL_CURRENT_MAX_NEGATIVE 70 // +2A
 #define MORSE_TOLERANCE 40 // Tolerance for "morse" code detection
 
-//for Kunteng Displays
-#define COMMUNICATIONS_BATTERY_VOLTAGE	(BATTERY_LI_ION_CELLS_NUMBER * 3.45) // example: 7S battery, should be = 24
-
-// Considering the follow voltage values for each li-ion battery cell
-// State of charge 		| voltage
-#define LI_ION_CELL_VOLTS_MAX 	4.20
-#define LI_ION_CELL_VOLTS_100 	4.20
-#define LI_ION_CELL_VOLTS_80 	4.02
-#define LI_ION_CELL_VOLTS_60 	3.87
-#define LI_ION_CELL_VOLTS_40 	3.80
-#define LI_ION_CELL_VOLTS_20 	3.73
-#define LI_ION_CELL_VOLTS_0 	3.27
-#define LI_ION_CELL_VOLTS_MIN 	3.10
-
-#define BATTERY_PACK_VOLTS_100	(LI_ION_CELL_VOLTS_100 * BATTERY_LI_ION_CELLS_NUMBER) * 255
-#define BATTERY_PACK_VOLTS_80 	(LI_ION_CELL_VOLTS_80 * BATTERY_LI_ION_CELLS_NUMBER) * 255
-#define BATTERY_PACK_VOLTS_60	(LI_ION_CELL_VOLTS_60 * BATTERY_LI_ION_CELLS_NUMBER) * 255
-#define BATTERY_PACK_VOLTS_40	(LI_ION_CELL_VOLTS_40 * BATTERY_LI_ION_CELLS_NUMBER) * 255
-#define BATTERY_PACK_VOLTS_20	(LI_ION_CELL_VOLTS_20 * BATTERY_LI_ION_CELLS_NUMBER) * 255
-#define BATTERY_PACK_VOLTS_0	(LI_ION_CELL_VOLTS_0 * BATTERY_LI_ION_CELLS_NUMBER) * 255
-
-// Phase current: max of +-15.5 amps
-// 512 --> 15.5 amps
-// 1 ADC increment --> 0.030A
-// 1 ADC RMS --> 0.03 * 0.707 -- > 0.021A
-#define ADC_PHASE_B_CURRENT_STEP 21 // 0.021 * 1000 = 21
-#define ADC_PHASE_B_CURRENT_FACTOR_MA 21 // 0,030273437 * 1000 * 0.707
-
 
 #define PWM_CYCLES_COUNTER_MAX 3000 // higher values assume motor is at standstill.
 #define PWM_CPS_NORMAL_SPEED 15625L

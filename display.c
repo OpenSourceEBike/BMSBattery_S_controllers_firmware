@@ -44,7 +44,7 @@ uint8_t ui8_tx_buffer[12];
 uint8_t ui8_j;
 uint8_t ui8_crc;
 uint16_t ui16_wheel_period_ms = 4500;
-uint16_t ui16_battery_volts = 36;
+uint16_t ui16_battery_bars_calc = 0;
 uint8_t ui8_battery_soc = 12;
 uint8_t ui16_error;
 uint8_t ui8_rx_buffer[13];
@@ -86,17 +86,20 @@ void send_message() {
 	}
 
 	// calc battery pack state of charge (SOC)
-	ui16_battery_volts = ((uint16_t) ui8_adc_read_battery_voltage()) * ((uint16_t) ui8_s_battery_voltage_calibration);
-	if (ui16_battery_volts > ((uint16_t) BATTERY_PACK_VOLTS_80)) {
+	ui16_battery_bars_calc = ui8_adc_read_battery_voltage() - ui8_s_battery_voltage_min;
+	ui16_battery_bars_calc<<8;
+	ui16_battery_bars_calc /=(ui8_s_battery_voltage_max-ui8_s_battery_voltage_min);
+	
+	if (ui16_battery_bars_calc > 200) {
 		ui8_battery_soc = 16;
 	}// 4 bars | full
-	else if (ui16_battery_volts > ((uint16_t) BATTERY_PACK_VOLTS_60)) {
+	else if (ui16_battery_bars_calc > 150) {
 		ui8_battery_soc = 12;
 	}// 3 bars
-	else if (ui16_battery_volts > ((uint16_t) BATTERY_PACK_VOLTS_40)) {
+	else if (ui16_battery_bars_calc > 100) {
 		ui8_battery_soc = 8;
 	}// 2 bars
-	else if (ui16_battery_volts > ((uint16_t) BATTERY_PACK_VOLTS_20)) {
+	else if (ui16_battery_bars_calc > 50) {
 		ui8_battery_soc = 4;
 	}// 1 bar
 	else {
@@ -107,7 +110,7 @@ void send_message() {
 	// B1: battery level
 	ui8_tx_buffer [1] = ui8_battery_soc;
 	// B2: 24V controller
-	ui8_tx_buffer [2] = (uint8_t) COMMUNICATIONS_BATTERY_VOLTAGE;
+	ui8_tx_buffer [2] = ui8_battery_voltage_nominal;
 	// B3: speed, wheel rotation period, ms; period(ms)=B3*256+B4;
 	ui8_tx_buffer [3] = (ui16_wheel_period_ms >> 8) & 0xff;
 	ui8_tx_buffer [4] = ui16_wheel_period_ms & 0xff;

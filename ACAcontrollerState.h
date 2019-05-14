@@ -53,6 +53,7 @@ extern uint16_t ui16_regen_current_max_value;
 extern uint8_t ui8_possible_motor_state;
 extern uint8_t ui8_dynamic_motor_state;
 extern uint8_t ui8_BatteryVoltage;
+extern uint8_t ui8_battery_voltage_nominal;
 extern uint16_t ui16_motor_speed_erps;
 extern uint16_t ui16_virtual_erps_speed;
 extern uint32_t ui32_erps_filtered; //filtered value of erps

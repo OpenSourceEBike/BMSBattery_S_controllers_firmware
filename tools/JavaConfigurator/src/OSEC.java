@@ -106,11 +106,8 @@ public class OSEC extends JFrame {
 	private JTextField GearRatio;
 	private JTextField txtMaxregencurrent;
 
-	private JTextField CellsNumber;
 	private JTextField PAS_threshold;
 	private JTextField txtMaxphasecurrent;
-	private JTextField TempCalA;
-	private JTextField TempCalB;
 	private JRadioButton rdbtnBluOsecDisplay;
 
 	private JRadioButton rdbtnKingmeterJlcd;
@@ -190,8 +187,8 @@ public class OSEC extends JFrame {
 		txtMaxregencurrent.setText(in.readLine());
 		txtMotor_specific_angle.setText(in.readLine());
 		txtBatteryCurcala.setText(in.readLine());
-		TempCalA.setText(in.readLine());
-		TempCalB.setText(in.readLine());
+		in.readLine();
+		in.readLine();
 		Assist_Level_1.setText(in.readLine());
 		Assist_Level_2.setText(in.readLine());
 		Assist_Level_3.setText(in.readLine());
@@ -204,7 +201,7 @@ public class OSEC extends JFrame {
 		p_factor.setText(in.readLine());
 		i_factor.setText(in.readLine());
 		GearRatio.setText(in.readLine());
-		CellsNumber.setText(in.readLine());
+		in.readLine();
 		PAS_threshold.setText(in.readLine());
 
 		cbTorqueSensor.setSelected(Boolean.parseBoolean(in.readLine()));
@@ -545,26 +542,39 @@ public class OSEC extends JFrame {
 		GearRatio.setColumns(10);
 		GearRatio.setBounds(150, 270, 86, 20);
 		contentPane.add(GearRatio);
+		
+		JLabel lblUndervoltageLimit = new JLabel("Undervoltage");
+		lblUndervoltageLimit.setBounds(15, 290, 121, 14);
+		lblUndervoltageLimit.setForeground(Color.GRAY);
+		contentPane.add(lblUndervoltageLimit);
 
-		JLabel lblTemperatureCalA = new JLabel("Temperature cal a");
-		lblTemperatureCalA.setBounds(15, 310, 121, 14);
-		contentPane.add(lblTemperatureCalA);
+		txtUndervoltage = new JTextField();
+		txtUndervoltage.setText("127");
+		txtUndervoltage.setBounds(150, 290, 86, 20);
+		contentPane.add(txtUndervoltage);
+		txtUndervoltage.setColumns(3);
 
-		TempCalA = new JTextField();
-		TempCalA.setText("1.6");
-		TempCalA.setColumns(10);
-		TempCalA.setBounds(150, 310, 86, 20);
-		contentPane.add(TempCalA);
+		JLabel lblOvervoltageLimit = new JLabel("Overvoltage");
+		lblOvervoltageLimit.setBounds(15, 310, 121, 14);
+		lblOvervoltageLimit.setForeground(Color.GRAY);
+		contentPane.add(lblOvervoltageLimit);
 
-		JLabel lblTemperatureCalB = new JLabel("Temperature cal b");
-		lblTemperatureCalB.setBounds(15, 330, 121, 14);
-		contentPane.add(lblTemperatureCalB);
+		txtOvervoltage = new JTextField();
+		txtOvervoltage.setText("150");
+		txtOvervoltage.setBounds(150, 310, 86, 20);
+		contentPane.add(txtOvervoltage);
+		txtOvervoltage.setColumns(3);
+		
+		JLabel lblBatVolCal = new JLabel("Voltage Calibration");
+		lblBatVolCal.setBounds(15, 330, 121, 14);
+		lblBatVolCal.setForeground(Color.GRAY);
+		contentPane.add(lblBatVolCal);
 
-		TempCalB = new JTextField();
-		TempCalB.setText("110.4");
-		TempCalB.setColumns(10);
-		TempCalB.setBounds(150, 330, 86, 20);
-		contentPane.add(TempCalB);
+		batteryVoltageCalib = new JTextField();
+		batteryVoltageCalib.setText("70");
+		batteryVoltageCalib.setColumns(2);
+		batteryVoltageCalib.setBounds(150, 330, 86, 20);
+		contentPane.add(batteryVoltageCalib);
 
 		JLabel lblPfactor = new JLabel("Gain P");
 		lblPfactor.setBounds(15, 350, 67, 14);
@@ -743,49 +753,6 @@ public class OSEC extends JFrame {
 		contentPane.add(txtMotor_specific_angle);
 		txtMotor_specific_angle.setColumns(10);
 
-		JLabel lblUndervoltageLimit = new JLabel("Undervoltage");
-		lblUndervoltageLimit.setBounds(415, 270, 121, 14);
-		lblUndervoltageLimit.setForeground(Color.GRAY);
-		contentPane.add(lblUndervoltageLimit);
-
-		txtUndervoltage = new JTextField();
-		txtUndervoltage.setText("127");
-		txtUndervoltage.setBounds(530, 270, 50, 20);
-		contentPane.add(txtUndervoltage);
-		txtUndervoltage.setColumns(3);
-
-		JLabel lblNumberSerialCells = new JLabel("# Cells");
-		lblNumberSerialCells.setBounds(415, 290, 121, 14);
-		contentPane.add(lblNumberSerialCells);
-
-		CellsNumber = new JTextField();
-		CellsNumber.setText("10");
-		CellsNumber.setColumns(10);
-		CellsNumber.setBounds(530, 290, 50, 20);
-		contentPane.add(CellsNumber);
-
-		JLabel lblOvervoltageLimit = new JLabel("Overvoltage");
-		lblOvervoltageLimit.setBounds(415, 310, 121, 14);
-		lblOvervoltageLimit.setForeground(Color.GRAY);
-		contentPane.add(lblOvervoltageLimit);
-
-		txtOvervoltage = new JTextField();
-		txtOvervoltage.setText("150");
-		txtOvervoltage.setBounds(530, 310, 50, 20);
-		contentPane.add(txtOvervoltage);
-		txtOvervoltage.setColumns(3);
-
-		JLabel lblBatVolCal = new JLabel("Volt Calib");
-		lblBatVolCal.setBounds(415, 330, 121, 14);
-		lblBatVolCal.setForeground(Color.GRAY);
-		contentPane.add(lblBatVolCal);
-
-		batteryVoltageCalib = new JTextField();
-		batteryVoltageCalib.setText("70");
-		batteryVoltageCalib.setColumns(2);
-		batteryVoltageCalib.setBounds(530, 330, 50, 20);
-		contentPane.add(batteryVoltageCalib);
-
 		JList list = new JList();
 		list.setBounds(441, 177, 1, 1);
 		contentPane.add(list);
@@ -884,35 +851,35 @@ public class OSEC extends JFrame {
 		contentPane.add(ramp_start);
 
 		lblSpeedLimit = new JLabel("Limit (km/h)");
-		lblSpeedLimit.setBounds(250, 340, 80, 14);
+		lblSpeedLimit.setBounds(250, 350, 80, 14);
 		lblSpeedLimit.setForeground(Color.GRAY);
 		contentPane.add(lblSpeedLimit);
 
 		txtSpeedlimit = new JTextField();
 		txtSpeedlimit.setText("25");
-		txtSpeedlimit.setBounds(350, 340, 50, 20);
+		txtSpeedlimit.setBounds(350, 350, 50, 20);
 		contentPane.add(txtSpeedlimit);
 		txtSpeedlimit.setColumns(10);
 
 		JLabel lblSpeedLimitwopas = new JLabel("Without PAS");
-		lblSpeedLimitwopas.setBounds(250, 360, 80, 14);
+		lblSpeedLimitwopas.setBounds(250, 370, 80, 14);
 		lblSpeedLimitwopas.setForeground(Color.GRAY);
 		contentPane.add(lblSpeedLimitwopas);
 
 		txtSpeedlimitWithoutPas = new JTextField();
 		txtSpeedlimitWithoutPas.setText("6");
-		txtSpeedlimitWithoutPas.setBounds(350, 360, 50, 20);
+		txtSpeedlimitWithoutPas.setBounds(350, 370, 50, 20);
 		contentPane.add(txtSpeedlimitWithoutPas);
 		txtSpeedlimitWithoutPas.setColumns(10);
 
 		JLabel lblSpeedLimitwto = new JLabel("Offroad");
-		lblSpeedLimitwto.setBounds(250, 380, 80, 14);
+		lblSpeedLimitwto.setBounds(250, 390, 80, 14);
 		lblSpeedLimitwto.setForeground(Color.GRAY);
 		contentPane.add(lblSpeedLimitwto);
 
 		txtSpeedlimitWithThrottleOverride = new JTextField();
 		txtSpeedlimitWithThrottleOverride.setText("25");
-		txtSpeedlimitWithThrottleOverride.setBounds(350, 380, 50, 20);
+		txtSpeedlimitWithThrottleOverride.setBounds(350, 390, 50, 20);
 		contentPane.add(txtSpeedlimitWithThrottleOverride);
 		txtSpeedlimitWithThrottleOverride.setColumns(10);
 
@@ -1200,13 +1167,8 @@ public class OSEC extends JFrame {
 					iWriter.println(txtBatteryCurcala.getText());
 					pWriter.println(text_to_save);
 
-					text_to_save = "#define TEMP_CAL_A " + TempCalA.getText();
-					iWriter.println(TempCalA.getText());
-					pWriter.println(text_to_save);
-
-					text_to_save = "#define TEMP_CAL_B " + TempCalB.getText();
-					iWriter.println(TempCalB.getText());
-					pWriter.println(text_to_save);
+					iWriter.println("");
+					iWriter.println("");
 
 					text_to_save = "#define LEVEL_1 " + Assist_Level_1.getText();
 					iWriter.println(Assist_Level_1.getText());
@@ -1256,9 +1218,7 @@ public class OSEC extends JFrame {
 					iWriter.println(GearRatio.getText());
 					pWriter.println(text_to_save);
 
-					text_to_save = "#define BATTERY_LI_ION_CELLS_NUMBER " + CellsNumber.getText();
-					iWriter.println(CellsNumber.getText());
-					pWriter.println(text_to_save);
+					iWriter.println("");
 
 					text_to_save = "#define PAS_THRESHOLD " + PAS_threshold.getText();
 					iWriter.println(PAS_threshold.getText());
