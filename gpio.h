@@ -125,5 +125,8 @@ void debug_pin_set (void);
 void debug_pin_reset (void);
 void PAS_init (void);
 void SPEED_init (void);
+void light_pin_init (void);
+void light_pin_set (void);
+void light_pin_reset (void);
 
 #endif /* GPIO_H_ */
