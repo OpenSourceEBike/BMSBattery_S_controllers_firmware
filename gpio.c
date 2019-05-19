@@ -32,4 +32,22 @@ void debug_pin_reset (void)
   GPIO_WriteLow(DEBUG__PORT, DEBUG__PIN);
 }
 
+// added by DerBastler - Light
+void light_pin_init (void)
+{
+  GPIO_Init(LIGHT__PORT,
+	    LIGHT__PIN,
+	    GPIO_MODE_OUT_PP_HIGH_FAST);
+}
+// added by DerBastler - Light
+void light_pin_set (void)
+{
+  GPIO_WriteHigh(LIGHT__PORT, LIGHT__PIN);
+}
+// added by DerBastler - Light
+void light_pin_reset (void)
+{
+  GPIO_WriteLow(LIGHT__PORT, LIGHT__PIN);
+}
+
 
