@@ -203,7 +203,10 @@ void display_update() {
 		    		((ui8_crc ^ 8) == ui8_rx_buffer [5]) ||
 				((ui8_crc ^ 9) == ui8_rx_buffer [5])) // CRC LCD3
 		{
-
+			// added by DerBastler Light On/Off 
+			lcd_configuration_variables.ui8_light_On = ui8_rx_buffer [1] & 128;
+			// added by DerBastler Walk On/Off 
+			lcd_configuration_variables.ui8_WalkModus_On = ui8_rx_buffer [1] & 64;	
 			lcd_configuration_variables.ui8_assist_level = ui8_rx_buffer [1] & 7;
 			lcd_configuration_variables.ui8_max_speed = 10 + ((ui8_rx_buffer [2] & 248) >> 3) | (ui8_rx_buffer [4] & 32);
 			lcd_configuration_variables.ui8_wheel_size = ((ui8_rx_buffer [4] & 192) >> 6) | ((ui8_rx_buffer [2] & 7) << 2);
