@@ -99,6 +99,7 @@ int main(void) {
 	brake_init();
 	while (brake_is_set()); // hold here while brake is pressed -- this is a protection for development
 	debug_pin_init();
+	light_pin_init();
 	timer2_init();
 	uart_init();
 	eeprom_init();
