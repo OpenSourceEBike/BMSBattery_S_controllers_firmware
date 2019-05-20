@@ -58,6 +58,7 @@ extern uint8_t battery_percent_fromvoltage;
 extern uint8_t battery_percent_fromcapacity;
 extern uint32_t wheel_time;
 extern float current_display;
+extern uint8_t light_stat;
 
 #ifdef DISPLAY_TYPE_KT_LCD3
 typedef struct _lcd_configuration_variables
