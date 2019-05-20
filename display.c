@@ -165,7 +165,9 @@ void send_message() {
 void digestLcdValues(void) {
 
 	ui8_assistlevel_global = lcd_configuration_variables.ui8_assist_level + 80; // always add max regen 
-
+	// added by DerBastler Light On/Off
+	light_stat = lcd_configuration_variables.ui8_light_On;
+	
 	if (lcd_configuration_variables.ui8_max_speed != ui8_speedlimit_kph) {
 		ui8_speedlimit_kph = lcd_configuration_variables.ui8_max_speed;
 		eeprom_write(OFFSET_MAX_SPEED_DEFAULT, lcd_configuration_variables.ui8_max_speed);
