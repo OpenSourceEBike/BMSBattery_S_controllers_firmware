@@ -175,8 +175,7 @@ int main(void) {
 			//pwm_set_duty_cycle ((uint8_t)ui16_sum_throttle);
 
 			//added by DerBastler - Light
-			if (lcd_configuration_variables.ui8_light_On==0) 
-				{light_pin_reset();}else{light_pin_set();}
+			if (light_stat == 0) {light_pin_reset();}else{light_pin_set();}
 			
 			
 			/****************************************************************************/
