@@ -134,6 +134,7 @@ extern uint8_t ui8_s_battery_voltage_min;
 extern uint8_t ui8_s_battery_voltage_max;
 
 extern uint8_t light_stat;
+extern uint8_t walk_stat;
 
 void controllerstate_init(void);
 
