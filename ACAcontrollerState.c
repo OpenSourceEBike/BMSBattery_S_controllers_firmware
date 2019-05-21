@@ -135,6 +135,9 @@ uint16_t ui16_PAS_High = 1; //number of High readings on PAS
 uint8_t ui8_PAS_update_call_when_inactive_counter = 50; //increased when no pas change is detected (50Hz)
 uint8_t ui8_PAS_Flag = 0;
 
+uint8_t light_stat = 0;
+uint8_t walk_stat = 0;
+
 void controllerstate_init(void) {
 	uint8_t di;
 	uint8_t eepromVal;

@@ -59,9 +59,12 @@ extern uint8_t battery_percent_fromcapacity;
 extern uint32_t wheel_time;
 extern float current_display;
 
+
 #ifdef DISPLAY_TYPE_KT_LCD3
 typedef struct _lcd_configuration_variables
 {
+  uint8_t ui8_light_On;        //added by DerBasteler	
+  uint8_t ui8_WalkModus_On;    //added by DerBasteler	
   uint8_t ui8_assist_level;
   uint8_t ui8_max_speed;
   uint8_t ui8_wheel_size;

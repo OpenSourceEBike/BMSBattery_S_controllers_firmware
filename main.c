@@ -99,6 +99,7 @@ int main(void) {
 	brake_init();
 	while (brake_is_set()); // hold here while brake is pressed -- this is a protection for development
 	debug_pin_init();
+	light_pin_init();
 	timer2_init();
 	uart_init();
 	eeprom_init();
@@ -161,7 +162,8 @@ int main(void) {
 			updateRequestedTorque(); //now calculates tq for sensor as well
 			updateSlowLoopStates();
 			updateX4();
-
+			updateLight();
+			updateWalk();
 			ui16_setpoint = (uint16_t) aca_setpoint(ui16_time_ticks_between_pas_interrupt, ui16_setpoint); //update setpoint
 
 			//#define DO_CRUISE_CONTROL 1
@@ -173,6 +175,9 @@ int main(void) {
 
 			//pwm_set_duty_cycle ((uint8_t)ui16_sum_throttle);
 
+
+			
+			
 			/****************************************************************************/
 			//very slow loop for communication
 			if (ui8_veryslowloop_counter > 5) {

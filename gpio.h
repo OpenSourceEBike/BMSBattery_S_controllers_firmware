@@ -115,11 +115,18 @@
 #define DEBUG__PIN                  GPIO_PIN_2
 #define DEBUG__PORT                 GPIOD
 
+#define LIGHT__PIN                  GPIO_PIN_4
+#define LIGHT__PORT                 GPIOC
+
+
 void gpio_init (void);
 void debug_pin_init (void);
 void debug_pin_set (void);
 void debug_pin_reset (void);
 void PAS_init (void);
 void SPEED_init (void);
+void light_pin_init (void);
+void light_pin_set (void);
+void light_pin_reset (void);
 
 #endif /* GPIO_H_ */
