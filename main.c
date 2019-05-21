@@ -162,7 +162,7 @@ int main(void) {
 			updateRequestedTorque(); //now calculates tq for sensor as well
 			updateSlowLoopStates();
 			updateX4();
-
+			updateLight();
 			ui16_setpoint = (uint16_t) aca_setpoint(ui16_time_ticks_between_pas_interrupt, ui16_setpoint); //update setpoint
 
 			//#define DO_CRUISE_CONTROL 1
@@ -174,8 +174,7 @@ int main(void) {
 
 			//pwm_set_duty_cycle ((uint8_t)ui16_sum_throttle);
 
-			//added by DerBastler - Light
-			if (light_stat == 0) {light_pin_reset();}else{light_pin_set();}
+
 			
 			
 			/****************************************************************************/
