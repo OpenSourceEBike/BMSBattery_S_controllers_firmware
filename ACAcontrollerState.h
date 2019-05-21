@@ -133,6 +133,8 @@ extern uint8_t ui8_s_battery_voltage_calibration;
 extern uint8_t ui8_s_battery_voltage_min;
 extern uint8_t ui8_s_battery_voltage_max;
 
+extern uint8_t light_stat;
+
 void controllerstate_init(void);
 
 typedef enum {
