@@ -136,6 +136,7 @@ uint8_t ui8_PAS_update_call_when_inactive_counter = 50; //increased when no pas 
 uint8_t ui8_PAS_Flag = 0;
 
 uint8_t light_stat = 0;
+uint8_t walk_stat = 0;
 
 void controllerstate_init(void) {
 	uint8_t di;
