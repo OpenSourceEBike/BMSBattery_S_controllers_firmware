@@ -182,6 +182,9 @@ void updateX4(void) {
 void updateLight(void) {
 	if (light_stat == 0) {light_pin_reset();}else{light_pin_set();}
 }
+void updateWalk(void) {
+	//if (walk_stat == 0) {light_pin_reset();}else{light_pin_set();}
+}
 
 void updateRequestedTorque(void) {
 
