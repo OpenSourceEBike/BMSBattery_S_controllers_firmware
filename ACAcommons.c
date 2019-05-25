@@ -180,11 +180,15 @@ void updateX4(void) {
 
 //added by DerBastler - Light		
 void updateLight(void) {
-	if (light_stat == 0) {light_pin_reset();}else{light_pin_set();}
+	if (((light_stat &1) != 1)&& ((light_stat &128) == 128)) {
+		light_pin_set();
+		light_stat = (light_stat&~1) | 1;
+	}else if (((light_stat &1) == 1)&& ((light_stat &128)!= 128)) {
+		light_pin_reset();
+		light_stat = (light_stat&~1) | 0;
+	}
 }
-void updateWalk(void) {
-	//if (walk_stat == 0) {light_pin_reset();}else{light_pin_set();}
-}
+
 
 void updateRequestedTorque(void) {
 

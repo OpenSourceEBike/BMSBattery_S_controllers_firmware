@@ -166,7 +166,7 @@ void digestLcdValues(void) {
 
 	ui8_assistlevel_global = lcd_configuration_variables.ui8_assist_level + 80; // always add max regen 
 	// added by DerBastler Light On/Off
-	light_stat = lcd_configuration_variables.ui8_light_On;
+	light_stat = (light_stat&~128) | lcd_configuration_variables.ui8_light_On; // only update 7th bit, 1st bit is current status
 	
 	if (lcd_configuration_variables.ui8_max_speed != ui8_speedlimit_kph) {
 		ui8_speedlimit_kph = lcd_configuration_variables.ui8_max_speed;

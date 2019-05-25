@@ -35,7 +35,6 @@ void initErpsRatio(void);
 void updateSpeeds(void);
 void updateX4(void);
 void updateLight(void);
-void updateWalk(void);
 void updatePasStatus(void);
 void checkPasInActivity(void);
 void updateRequestedTorque(void);

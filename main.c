@@ -163,7 +163,6 @@ int main(void) {
 			updateSlowLoopStates();
 			updateX4();
 			updateLight();
-			updateWalk();
 			ui16_setpoint = (uint16_t) aca_setpoint(ui16_time_ticks_between_pas_interrupt, ui16_setpoint); //update setpoint
 
 			//#define DO_CRUISE_CONTROL 1
