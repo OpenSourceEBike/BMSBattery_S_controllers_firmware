@@ -87,7 +87,7 @@ void send_message() {
 
 	// calc battery pack state of charge (SOC)
 	ui16_battery_bars_calc = ui8_adc_read_battery_voltage() - ui8_s_battery_voltage_min;
-	ui16_battery_bars_calc<<8;
+	ui16_battery_bars_calc<<=8;
 	ui16_battery_bars_calc /=(ui8_s_battery_voltage_max-ui8_s_battery_voltage_min);
 	
 	if (ui16_battery_bars_calc > 200) {
