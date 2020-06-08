@@ -2,6 +2,8 @@
 
 Caution! this is not a professional project. Anything you do with this firmware is at your own risk. In any case, use a quick fuse in the power supply to minimize the risk of destroying the controller, battery or motor!
 
+Please read and reread the [wiki](https://github.com/stancecoke/BMSBattery_S_controllers_firmware/wiki).
+
 ## Preface
 
 Many thanks to the team of the Forumscontroller, Main functions are from [there](https://github.com/jenkie/Arduino-Pedelec-Controller)!
