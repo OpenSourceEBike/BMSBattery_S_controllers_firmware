@@ -15,7 +15,9 @@ This is the maintained fork of [casainho's project(not maintained)](https://gith
 This firmware replaces the closed source one on Kunteng sine wave controllers. It enables you to change basically anything about the way the controller reacts to inputs (throttle, PAS, torque sensor, brake, displays) and handles different modes/states concerning  power output.
 [A graphical tool](https://github.com/stancecoke/BMSBattery_S_controllers_firmware/wiki/04-The-Java-Tool) is available, which allows the use of the firmware even for less experienced Windows users without programming knowledge. With the [BluOsec android app](https://github.com/stancecoke/BMSBattery_S_controllers_firmware/wiki/05-The-BluOSEC-Android-App) you can control the assist level and set many parameters at runtime.  [Download it by clicking this link](https://github.com/Xnyle/bluosec-apk/raw/master/BluOsec-release.apk).
 
-**But** if you want something added / changed that isn't already implemented / beta / buggy, you have to get involved yourself. This is a hobbyists project and there is no one else to blame than yourself if something isn't working as desired ;-)
+### Help out yo
+
+ If you want something added / changed that isn't already implemented / beta / buggy, you have to get involved yourself. This is a hobbyists project and there is no one else to blame than yourself if something isn't working as desired ;-)
 
 ### What works  
 
