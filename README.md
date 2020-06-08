@@ -44,7 +44,7 @@ This firmware replaces the closed source one on Kunteng sine wave controllers. I
 
 ## For further reading
 
-The documentation on the project can be found [here](https://github.com/stancecoke/BMSBattery_S_controllers_firmware/wiki)  
+The documentation on the project, aka wiki, can be found [here](https://github.com/stancecoke/BMSBattery_S_controllers_firmware/wiki)  
 
 The corresponding thread in the german Pedelecforum [can be found here](https://www.pedelecforum.de/forum/index.php?threads/custom-rom-f%C3%BCr-kunteng-s06s-kt36-controller.50061/)  
 
