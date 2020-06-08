@@ -2,14 +2,11 @@
 
 Caution! this is not a professional project. Anything you do with this firmware is at your own risk. In any case, use a quick fuse in the power supply to minimize the risk of destroying the controller, battery or motor!
 
-Please make sure you read and understood the project documentation here: <https://opensourceebikefirmware.bitbucket.io/>
-
 ## Preface
 
 Many thanks to the team of the Forumscontroller, Main functions are from [there](https://github.com/jenkie/Arduino-Pedelec-Controller)!
 
-After the main developer casainho decided to stop his activities in this project, the [fork of stancecoke](https://github.com/stancecoke/BMSBattery_S_controllers_firmware) will be maintained as the main path.
-Of course the origin project of casainho can still be found: [origin fork, not longer maintained](https://github.com/OpenSource-EBike-firmware/BMSBattery_S_controllers_firmware).
+This is the maintained fork of [casainho's project(not maintained)](https://github.com/OpenSource-EBike-firmware/BMSBattery_S_controllers_firmware)
 
 ## About the project
 
