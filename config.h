@@ -41,7 +41,7 @@
 #define ANGLE_6_60 41
 #define ANGLE_2_120 84
 #define ANGLE_3_180 129
-#define BLUOSEC
+#define DISPLAY_TYPE_KT_LCD3
 #define ANGLE_1_240 167
 #define ANGLE_5_300 212
 #define TQS_CALIB 0.0

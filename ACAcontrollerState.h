@@ -33,6 +33,7 @@ extern uint8_t ui8_a_s_assistlevels[6];
 extern uint8_t ui8_assist_percent_actual;
 extern uint8_t ui8_assist_percent_wanted;
 extern uint8_t ui8_assistlevel_global; //assist level for regen (high 4 bits) and torque (low 4 bits)
+extern uint8_t ui8_walk_assist;
 extern uint8_t ui8_assist_dynamic_percent_addon;
 extern uint8_t PAS_act;
 extern uint8_t PAS_is_active;

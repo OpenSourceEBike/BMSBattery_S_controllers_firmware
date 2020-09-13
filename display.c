@@ -165,6 +165,7 @@ void send_message() {
 void digestLcdValues(void) {
 
 	ui8_assistlevel_global = lcd_configuration_variables.ui8_assist_level + 80; // always add max regen 
+	ui8_walk_assist = lcd_configuration_variables.ui8_WalkModus_On;
 	// added by DerBastler Light On/Off
 	light_stat = (light_stat&~128) | lcd_configuration_variables.ui8_light_On; // only update 7th bit, 1st bit is current status
 	
