@@ -209,9 +209,13 @@ void display_update() {
 		{
 			// added by DerBastler Light On/Off 
 			lcd_configuration_variables.ui8_light_On = ui8_rx_buffer [1] & 128;
-			// added by DerBastler Walk On/Off 
-			lcd_configuration_variables.ui8_WalkModus_On = ui8_rx_buffer [1] & 64;	
+			
 			lcd_configuration_variables.ui8_assist_level = ui8_rx_buffer [1] & 7;
+			
+			// walk assist, see https://endless-sphere.com/forums/viewtopic.php?f=2&t=73471&p=1324745&hilit=kunteng+protocol+hacked#p1109048 
+			if(lcd_configuration_variables.ui8_assist_level == 6)lcd_configuration_variables.ui8_WalkModus_On = 1;
+			else lcd_configuration_variables.ui8_WalkModus_On = 0;
+			
 			lcd_configuration_variables.ui8_max_speed = 10 + ((ui8_rx_buffer [2] & 248) >> 3) | (ui8_rx_buffer [4] & 32);
 			lcd_configuration_variables.ui8_wheel_size = ((ui8_rx_buffer [4] & 192) >> 6) | ((ui8_rx_buffer [2] & 7) << 2);
 
