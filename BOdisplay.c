@@ -533,6 +533,7 @@ void digestConfigRequest(uint8_t configAddress, uint8_t requestedCodeLowByte, ui
 			break;
 		case CODE_TQ_CALIB:
 			flt_torquesensorCalibration = int2float(requestedValue, 8000.0);
+						uint32_torquesensorCalibration = (uint32_t)flt_torquesensorCalibration;
 			if (configAddress == EEPROM_ADDRESS) {
 				eeprom_write(OFFSET_TQ_CALIB, requestedValue);
 			}
