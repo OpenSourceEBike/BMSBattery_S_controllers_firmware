@@ -180,14 +180,19 @@ int main(void) {
 			
 			/****************************************************************************/
 			//very slow loop for communication
-			if (ui8_veryslowloop_counter > 5) {
+			if (ui8_veryslowloop_counter >= 5) {
 
 				ui8_ultraslowloop_counter++;
 				ui8_veryslowloop_counter = 0;
 
-				if (ui8_ultraslowloop_counter > 10) {
+				if (ui8_ultraslowloop_counter >= 10) {
 					ui8_ultraslowloop_counter = 0;
 					ui8_uptime++;
+
+					/*updateX4(); //Can be activated to display temperature on display
+					i8_motor_temperature = (ui16_x4_value - 105) >> 1;
+					i8_motor_temperature += (int8_t)(ui16_BatteryCurrent - ui16_current_cal_b - 2) / 9; //if temperature sensor is not in the exact same common ground point you can add some compensation according to battery current
+					//*/
 				}
 
 #ifdef DIAGNOSTICS
