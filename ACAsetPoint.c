@@ -263,8 +263,8 @@ uint16_t aca_setpoint(uint16_t ui16_time_ticks_between_pas_interrupt, uint16_t s
 			}
 		} else {
 			float_temp = (float) ui16_momentary_throttle; // or ui16_sum_throttle
-			float_temp *= (1 - (float) ui16_virtual_erps_speed / 2 / (float) (ui16_speed_kph_to_erps_ratio * ((float) ui8_speedlimit_kph))); //ramp down linear with speed. Risk: Value is getting negative if speed>2*speedlimit
-
+			//float_temp *= (1 - (float) ui16_virtual_erps_speed / 2 / (float) (ui16_speed_kph_to_erps_ratio/100 * ((float) ui8_speedlimit_kph))); //ramp down linear with speed. Risk: Value is getting negative if speed>2*speedlimit
+			// above line wasnt working anyway before, so I commented it out, but it should be fixed with the division by 100
 		}
 
 		// map curret target to assist level, not to maximum value
