@@ -100,6 +100,7 @@ int main(void) {
 	while (brake_is_set()); // hold here while brake is pressed -- this is a protection for development
 	debug_pin_init();
 	light_pin_init();
+	light_pin_reset(); //seemed to fix floating issues
 	timer2_init();
 	uart_init();
 	eeprom_init();
