@@ -310,7 +310,12 @@ uint16_t aca_setpoint(uint16_t ui16_time_ticks_between_pas_interrupt, uint16_t s
 		if ((ui16_aca_flags & POWER_BASED_CONTROL) == POWER_BASED_CONTROL) {
 			// nominal voltage based on limits
 			ui8_temp = ((ui8_s_battery_voltage_max - ui8_s_battery_voltage_min)>>1)+ui8_s_battery_voltage_min;
-			uint32_current_target*=ui8_temp/ui8_BatteryVoltage;
+			//uint32_current_target*=ui8_temp/ui8_BatteryVoltage;
+
+			uint32_current_target -= ui16_current_cal_b;
+			uint32_current_target *= ui8_temp; // or nominal voltage at which you want to calculate the power target
+			uint32_current_target /= ui8_BatteryVoltage;
+			uint32_current_target += ui16_current_cal_b;
 		}
 		
 		if ((ui16_aca_experimental_flags & DC_STATIC_ZERO) == DC_STATIC_ZERO) {
