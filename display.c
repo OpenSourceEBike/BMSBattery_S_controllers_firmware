@@ -50,7 +50,7 @@ uint8_t ui16_error;
 uint8_t ui8_rx_buffer[13];
 uint8_t ui8_rx_buffer_counter = 0;
 uint8_t ui8_byte_received;
-uint8_t ui8_moving_indication = 0;
+
 uint8_t ui8_UARTCounter = 0;
 
 volatile struc_lcd_configuration_variables lcd_configuration_variables;
@@ -62,10 +62,8 @@ void display_init(){
 void send_message() {
 
 	// prepare moving indication info
-	ui8_moving_indication = 0;
-	if (brake_is_set()) {
-		ui8_moving_indication |= (1 << 5);
-	}
+	
+	
 	//if (ebike_app_cruise_control_is_set ()) { ui8_moving_indication |= (1 << 3); }
 	//if (throttle_is_set ()) { ui8_moving_indication |= (1 << 1); }
 	//if (pas_is_set ()) { ui8_moving_indication |= (1 << 4); }
