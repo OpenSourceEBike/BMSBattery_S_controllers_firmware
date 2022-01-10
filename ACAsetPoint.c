@@ -157,10 +157,11 @@ uint16_t aca_setpoint(uint16_t ui16_time_ticks_between_pas_interrupt, uint16_t s
 		ui32_time_ticks_between_pas_interrupt_accumulated += ui16_time_ticks_between_pas_interrupt;
 	}
 	ui16_time_ticks_between_pas_interrupt_smoothed = ui32_time_ticks_between_pas_interrupt_accumulated >> 3;
-	
+
+	ui8_moving_indication = 0;
 	// check for brake --> set regen current
 	if (brake_is_set()) {
-		
+		ui8_moving_indication |= (32);
 		controll_state_temp = 255;
 		//Current target based on regen assist level
 		if ((ui16_aca_flags & DIGITAL_REGEN) == DIGITAL_REGEN) {
@@ -202,7 +203,6 @@ uint16_t aca_setpoint(uint16_t ui16_time_ticks_between_pas_interrupt, uint16_t s
 		}
 		
 	} else {
-
 		uint32_current_target = ui16_current_cal_b; // reset target to zero
 		controll_state_temp = 0;
 		//if none of the overruling boundaries are concerned, calculate new setpoint
@@ -217,19 +217,21 @@ uint16_t aca_setpoint(uint16_t ui16_time_ticks_between_pas_interrupt, uint16_t s
 				ui8_temp += ui8_assist_dynamic_percent_addon;
 			}
 
-			if (ui16_time_ticks_between_pas_interrupt_smoothed > ui16_s_ramp_end) {
+			if (ui16_time_ticks_between_pas_interrupt_smoothed > ui16_s_ramp_end && ui16_time_ticks_between_pas_interrupt_smoothed < ui16_s_ramp_start) { //ramp end usually 1500
 				//if you are pedaling slower than defined ramp end
-				//or not pedalling at all
+				//but faster than ramp start
 				//current is proportional to cadence
-				uint32_current_target = (ui8_temp * (ui16_battery_current_max_value) / 100);
-				float_temp = 1.0 - (((float) (ui16_time_ticks_between_pas_interrupt_smoothed - ui16_s_ramp_end)) / ((float) (ui16_s_ramp_start - ui16_s_ramp_end)));
-				uint32_current_target = ((uint16_t) (uint32_current_target)*(uint16_t) (float_temp * 100.0)) / 100 + ui16_current_cal_b;
-				controll_state_temp += 1;
+					uint32_current_target = (ui8_temp * (ui16_battery_current_max_value) / 100);
+					float_temp = 1.0 - (((float)(ui16_time_ticks_between_pas_interrupt_smoothed - ui16_s_ramp_end)) / ((float)(ui16_s_ramp_start - ui16_s_ramp_end)));
+					uint32_current_target = ((uint16_t)(uint32_current_target) * (uint16_t)(float_temp * 100.0)) / 100 + ui16_current_cal_b;
+					controll_state_temp += 1;
+					ui8_moving_indication |= (16);
 
 				//in you are pedaling faster than in ramp end defined, desired battery current level is set,
 			} else {
 				uint32_current_target = (ui8_temp * (ui16_battery_current_max_value) / 100 + ui16_current_cal_b);
 				controll_state_temp += 2;
+				ui8_moving_indication |= (16);
 			}
 		} else { // torque sensor mode
 
@@ -263,8 +265,8 @@ uint16_t aca_setpoint(uint16_t ui16_time_ticks_between_pas_interrupt, uint16_t s
 			}
 		} else {
 			float_temp = (float) ui16_momentary_throttle; // or ui16_sum_throttle
-			float_temp *= (1 - (float) ui16_virtual_erps_speed / 2 / (float) (ui16_speed_kph_to_erps_ratio * ((float) ui8_speedlimit_kph))); //ramp down linear with speed. Risk: Value is getting negative if speed>2*speedlimit
-
+			//float_temp *= (1 - (float) ui16_virtual_erps_speed / 2 / (float) (ui16_speed_kph_to_erps_ratio/100 * ((float) ui8_speedlimit_kph))); //ramp down linear with speed. Risk: Value is getting negative if speed>2*speedlimit
+			// above line wasnt working anyway before, so I commented it out, but it should be fixed with the division by 100
 		}
 
 		// map curret target to assist level, not to maximum value
@@ -281,10 +283,14 @@ uint16_t aca_setpoint(uint16_t ui16_time_ticks_between_pas_interrupt, uint16_t s
 				if (uint32_current_target > ui16_current_cal_b){
 					//override cadence based torque with torquesensor-throttle only if there is cadence based contribution
 					uint32_current_target = (uint32_t) float_temp;
+					ui8_moving_indication &= ~(16);
+					ui8_moving_indication |= 2;
 				}
 			}else{
 				//override torque simulation with throttle
 				uint32_current_target = (uint32_t) float_temp; 
+				ui8_moving_indication &= ~(16);
+				ui8_moving_indication |= 2;
 			}
 			controll_state_temp += 16;
 		}
@@ -306,12 +312,7 @@ uint16_t aca_setpoint(uint16_t ui16_time_ticks_between_pas_interrupt, uint16_t s
 			controll_state_temp += 128;
 		}
 		
-		// control power instead of current
-		if ((ui16_aca_flags & POWER_BASED_CONTROL) == POWER_BASED_CONTROL) {
-			// nominal voltage based on limits
-			ui8_temp = ((ui8_s_battery_voltage_max - ui8_s_battery_voltage_min)>>1)+ui8_s_battery_voltage_min;
-			uint32_current_target*=ui8_temp/ui8_BatteryVoltage;
-		}
+		
 		
 		if ((ui16_aca_experimental_flags & DC_STATIC_ZERO) == DC_STATIC_ZERO) {
 			ui32_dutycycle = 0;
@@ -319,6 +320,20 @@ uint16_t aca_setpoint(uint16_t ui16_time_ticks_between_pas_interrupt, uint16_t s
 		}else if (!checkUnderVoltageOverride() && !checkMaxErpsOverride()){
 
 			if (ui8_walk_assist) uint32_current_target = 10 + ui16_current_cal_b;
+
+			// control power instead of current
+			if ((ui16_aca_flags & POWER_BASED_CONTROL) == POWER_BASED_CONTROL) {
+				// nominal voltage based on limits
+				ui8_temp = ((ui8_s_battery_voltage_max - ui8_s_battery_voltage_min) >> 1) + ui8_s_battery_voltage_min;
+				//uint32_current_target*=ui8_temp/ui8_BatteryVoltage;
+				if (ui8_moving_indication & 16 == 16) {
+					uint32_current_target -= ui16_current_cal_b;
+					uint32_current_target *= ui8_temp; // or nominal voltage at which you want to calculate the power target
+					uint32_current_target /= ui8_BatteryVoltage;
+					uint32_current_target += ui16_current_cal_b;
+				}
+			}
+
 			//send current target to PI-controller
 			ui32_dutycycle = PI_control(ui16_BatteryCurrent, uint32_current_target,uint_PWM_Enable);
 		}
