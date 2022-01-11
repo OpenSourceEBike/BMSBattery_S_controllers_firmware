@@ -28,12 +28,15 @@ extern uint16_t ui16_pwm_cycles_second;
 
 extern uint8_t ui8_throttle_min_range;
 extern uint8_t ui8_throttle_max_range;
+
+
+
+
 extern uint16_t ui16_control_state;
 extern uint8_t ui8_a_s_assistlevels[6];
 extern uint8_t ui8_assist_percent_actual;
 extern uint8_t ui8_assist_percent_wanted;
 extern uint8_t ui8_assistlevel_global; //assist level for regen (high 4 bits) and torque (low 4 bits)
-extern uint8_t ui8_walk_assist;
 extern uint8_t ui8_assist_dynamic_percent_addon;
 extern uint8_t PAS_act;
 extern uint8_t PAS_is_active;
@@ -68,6 +71,7 @@ extern uint8_t ui8_speedlimit_without_pas_kph;
 extern uint8_t ui8_speedlimit_actual_kph;
 extern uint8_t ui8_speedlimit_with_throttle_override_kph;
 extern uint8_t ui8_uptime;
+extern uint8_t ui8_walk_assist;
 
 extern uint8_t ui8_variableDebugA;
 extern uint8_t ui8_variableDebugB;
@@ -116,6 +120,7 @@ extern uint8_t ui8_PAS_update_call_when_inactive_counter;
 
 
 extern float flt_torquesensorCalibration;
+extern uint32_t uint32_torquesensorCalibration;
 extern float flt_s_pas_threshold;
 extern float flt_s_pid_gain_p;
 extern float flt_s_pid_gain_i;

@@ -84,7 +84,7 @@ void hall_sensors_read_and_action(void) {
 			case 3://rotor position 180 degree
 				// full electric revolution recognized, update counters
 				uint8_t_hall_case[3] = ui8_adc_read_phase_B_current();
-				debug_pin_set();
+
 
 				if (ui8_half_rotation_flag) {
 					ui8_half_rotation_flag = 0;
@@ -126,7 +126,7 @@ void hall_sensors_read_and_action(void) {
 				ui8_foc_enable_flag = 1;
 
 				uint8_t_hall_case[0] = ui8_adc_read_phase_B_current();
-				debug_pin_reset();
+ 				//debug_pin_reset();
 				ui8_motor_rotor_hall_position = ui8_s_hall_angle4_0;
 				break;
 

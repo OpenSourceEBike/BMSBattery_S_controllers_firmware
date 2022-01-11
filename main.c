@@ -154,7 +154,7 @@ int main(void) {
 		// scheduled update of setpoint and duty cycle (slow loop, 50 Hz)
 		if (ui8_slowloop_flag) {
 			//printf("MainSlowLoop\n");
-
+		    debug_pin_set();
 			ui8_slowloop_flag = 0; //reset flag for slow loop
 			ui8_veryslowloop_counter++; // increase counter for very slow loop
 
@@ -190,7 +190,8 @@ int main(void) {
 				}
 
 #ifdef DIAGNOSTICS
-				printf("%u,%u, %u, %u, %u, %u\r\n", ui16_control_state, ui16_setpoint, ui16_motor_speed_erps, ui16_BatteryCurrent, ui16_sum_torque, ui16_momentary_throttle);
+				//uint32_torquesensorCalibration=80;
+				printf("%u,%u, %u, %u, %u, %u\r\n", ui16_control_state, (uint16_t) uint32_current_target, PAS_is_active, ui16_BatteryCurrent, ui16_sum_torque, (uint16_t)uint32_torquesensorCalibration);
 
 				//printf("erps %d, motorstate %d, cyclecountertotal %d\r\n", ui16_motor_speed_erps, ui8_possible_motor_state|ui8_dynamic_motor_state, ui16_PWM_cycles_counter_total);
 
@@ -212,7 +213,7 @@ int main(void) {
 #endif
 			}//end of very slow loop
 
-
+			debug_pin_reset();
 		}// end of slow loop
 	}// end of while(1) loop
 }
